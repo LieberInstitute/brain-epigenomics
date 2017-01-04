@@ -28,12 +28,13 @@ cat > .${SHORT}.sh <<EOF
 echo "**** Job starts ****"
 date
 
-ID=\$(awk "NR==$SGE_TASK_ID" $FILELIST )
+ID=\$(awk "NR==\${SGE_TASK_ID}" $FILELIST )
 
 ## Create ouput directory
 mkdir -p Reports
 mkdir -p Reports/\${ID}
 
+module load samtools/1.1
 /users/ajaffe/software/bismark_v0.16.3/bismark_methylation_extractor --single-end \
 	--cytosine_report --genome_folder /dcl01/lieber/ajaffe/Annotation/Homo_sapiens/UCSC/hg19/Sequence/WholeGenomeFasta/ \
 	--gzip --multicore 4 --bedGraph  \
