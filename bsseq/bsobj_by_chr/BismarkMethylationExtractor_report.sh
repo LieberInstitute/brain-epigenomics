@@ -7,6 +7,8 @@
 
 SHORT="bismark-non-CpG"
 
+mkdir -p logs
+
 # Construct shell files
 FILELIST=/dcl01/lieber/WGBS/LIBD_Data/WGC_IDs.txt
 NUM=$(cat $FILELIST | awk '{print $NF}' | uniq | wc -l)
@@ -32,7 +34,7 @@ ID=\$(awk "NR==$SGE_TASK_ID" $FILELIST )
 mkdir -p Reports
 mkdir -p Reports/\${ID}
 
-bismark_methylation_extractor --single-end \
+/users/ajaffe/software/bismark_v0.16.3/bismark_methylation_extractor --single-end \
 	--cytosine_report --genome_folder /dcl01/lieber/ajaffe/Annotation/Homo_sapiens/UCSC/hg19/Sequence/WholeGenomeFasta/ \
 	--gzip --multicore 4 --bedGraph  \
 	-o Reports/\${ID} --CX_context --split_by_chromosome \
