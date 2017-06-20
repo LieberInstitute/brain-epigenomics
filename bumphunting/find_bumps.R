@@ -24,12 +24,14 @@ if (!is.null(opt$help)) {
 
 ## For testing
 if(FALSE) {
-    opt <- list('model' = 'cell', 'subset' = 'Homogenate', cores = 1, permutations = 5)
+    opt <- list('model' = 'interaction', 'subset' = 'Neuron', cores = 1,
+        permutations = 5)
 }
 
 ## Check inputs
 stopifnot(opt$model %in% c('cell', 'age', 'interaction'))
 stopifnot(opt$subset %in% c('all', 'Homogenate', 'Neuron'))
+if(opt$subset == 'all') stop("Subset = 'all' is not supported.")
 
 ## Load data
 load("/dcl01/lieber/WGBS/LIBD_Data/bsseqObj/bsseqObj_postNatal_cleaned_CpGonly.rda")
@@ -60,9 +62,9 @@ if(opt$model == 'cell') {
 
 ## Get chr coordinates and methylation values
 gr <- granges(BSobj)
-#gr <- gr[1:1000]
+#gr <- gr[1:1e6]
 meth <- getMeth(BSobj, type = 'raw')
-#meth <- getMeth(BSobj[1:1000,], type = 'raw')
+#meth <- getMeth(BSobj[1:1e6,], type = 'raw')
 
 ## Free some memory
 rm(BSobj)
@@ -76,7 +78,7 @@ bumps <- bumphunter(object = meth,
     maxGap = 300, B = opt$permutations, coef = coef, cutoff = cut)
 
 ## Save results
-save(bumps, file = paste0('bumps_', opt$subset, '_', opt$model, '_',
+save(bumps, pd, file = paste0('bumps_', opt$subset, '_', opt$model, '_',
     opt$permutations, '.Rdata'))
 
 ## Reproducibility info
