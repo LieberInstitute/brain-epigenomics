@@ -2,7 +2,7 @@ library('bsseq')
 library('bumphunter')
 library('devtools')
 library('getopt')
-library('doparallel')
+library('doParallel')
 
 ## Specify parameters
 spec <- matrix(c(

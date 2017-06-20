@@ -24,8 +24,8 @@ cat > .${SHORT}.sh <<EOF
 #$ -l mem_free=10G,h_vmem=12G,h_fsize=100G
 #$ -N ${SHORT}
 #$ -pe local ${CORES}
-#$ -o ./logs/${SHORT}.o.txt
-#$ -e ./logs/${SHORT}.e.txt
+#$ -o ./logs/${SHORT}.txt
+#$ -e ./logs/${SHORT}.txt
 #$ -m e
 
 echo "**** Job starts ****"
