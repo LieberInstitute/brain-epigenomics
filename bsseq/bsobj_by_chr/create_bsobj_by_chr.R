@@ -52,7 +52,7 @@ rownames(pd) <- pd$Data.ID
 
 ## append phenotype data
 pData(BSobj) <- DataFrame(pd)
-save(BSobj, file = paste0(opt$chr, '_postNatal_cleaned_CpGonly.rda'))
+save(BSobj, file = paste0(opt$chr, '_postNatal_cleaned_CpGonly_noHomogenate.Rdata'))
 
 ## Reproducibility information
 print('Reproducibility information:')
