@@ -27,7 +27,7 @@ cat > .${SHORT}.sh <<EOF
 echo "**** Job starts ****"
 date
 
-Rscript create_bsobj_by_chr.R -c ${chr} -t 8
+Rscript create_bsobj_by_chr.R -c ${chr} -t 4
 
 echo "**** Job ends ****"
 date
