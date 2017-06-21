@@ -10,7 +10,7 @@ for cell in Neuron
 do
     for model in cell age interaction
     do
-        for permutations in 5
+        for permutations in 0 5
         do
 
 SHORT="finding_bumps_${cell}_${model}_${permutations}"

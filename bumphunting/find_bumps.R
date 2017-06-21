@@ -75,7 +75,9 @@ registerDoParallel(cores = opt$cores)
 ## Run bumphunter
 bumps <- bumphunter(object = meth,
     design = design, chr = as.character(seqnames(gr)), pos = start(gr),
-    maxGap = 300, B = opt$permutations, coef = coef, cutoff = cut)
+    maxGap = 1000, B = opt$permutations, coef = coef, cutoff = cut,
+    nullMethod = 'bootstrap', smooth = TRUE, smoothFunction = locfitByCluster,
+    useWeights = TRUE, bpSpan = 500)
 
 ## Save results
 save(bumps, pd, file = paste0('bumps_', opt$subset, '_', opt$model, '_',
