@@ -19,8 +19,8 @@ cat > .${SHORT}.sh <<EOF
 #$ -l mem_free=20G,h_vmem=25G
 #$ -N ${SHORT}
 #$ -pe local 8
-#$ -o ./logs/bsseq_by_chr.o.txt
-#$ -e ./logs/bsseq_by_chr.e.txt
+#$ -o ./logs/${SHORT}.txt
+#$ -e ./logs/${SHORT}.txt
 #$ -m e
 
 echo "**** Job starts ****"
