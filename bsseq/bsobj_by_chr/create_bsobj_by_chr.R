@@ -29,6 +29,9 @@ pd <- pd[!is.na(pd$Data.ID), ]
 ## keep only postnatal
 pd <- pd[pd$Age > 0,]
 
+## Drop Homogenate
+pd <- pd[pd$Cell.Type != 'Homogenate', ]
+
 ## all report files
 pd$reportFiles <- file.path(
     '/dcl01/lieber/WGBS/LIBD_Data/DNAm_Ratios_duplicates_dropped/Reports',
