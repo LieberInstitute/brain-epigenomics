@@ -3,7 +3,7 @@
 ## Usage:
 # sh find_bumps.sh
 
-CORES=6
+CORES=4
 mkdir -p logs
 
 for cell in Neuron
@@ -21,7 +21,7 @@ echo "Creating script for chromosome Glia + ${cell} using model ${model} with ${
 cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l mem_free=18G,h_vmem=20G,h_fsize=100G
+#$ -l mem_free=35G,h_vmem=40G,h_fsize=100G
 #$ -N ${SHORT}
 #$ -pe local ${CORES}
 #$ -o ./logs/${SHORT}.txt
