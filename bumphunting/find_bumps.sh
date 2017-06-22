@@ -3,14 +3,14 @@
 ## Usage:
 # sh find_bumps.sh
 
-CORES=8
+CORES=6
 mkdir -p logs
 
 for cell in Neuron
 do
     for model in cell age interaction
     do
-        for permutations in 0 5
+        for permutations in 0
         do
 
 SHORT="finding_bumps_${cell}_${model}_${permutations}"
@@ -21,7 +21,7 @@ echo "Creating script for chromosome Glia + ${cell} using model ${model} with ${
 cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l mem_free=10G,h_vmem=12G,h_fsize=100G
+#$ -l mem_free=18G,h_vmem=20G,h_fsize=100G
 #$ -N ${SHORT}
 #$ -pe local ${CORES}
 #$ -o ./logs/${SHORT}.txt
