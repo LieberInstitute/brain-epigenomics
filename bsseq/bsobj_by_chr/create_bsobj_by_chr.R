@@ -40,7 +40,7 @@ pd$reportFiles <- file.path(
 
 ## Load the data
 BSobj <- combineList(bplapply(pd$reportFiles, function(input_file) {
-    res <- read.bismark(pd$reportFiles[ii], pd$WGC.ID[ii],
+    res <- read.bismark(pd$reportFiles[input_file], pd$WGC.ID[input_file],
         strandCollapse=TRUE, fileType = 'cytosineReport')
     res <- res[seqnames(res) == opt$chr, ]
     return(res)
