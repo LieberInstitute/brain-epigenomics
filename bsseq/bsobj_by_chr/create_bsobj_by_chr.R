@@ -20,6 +20,11 @@ if (!is.null(opt$help)) {
 	q(status=1)
 }
 
+## For testing
+if(FALSE) {
+    opt <- list(chr = 'chr21', cores = 1)
+}
+
 # read in cleaned phenotype
 pd <- read_excel(
     '/users/ajaffe/Lieber/Projects/WGBS/Analysis/WGBS-pd-fixed.xlsx')
@@ -34,13 +39,14 @@ pd <- pd[pd$Cell.Type != 'Homogenate', ]
 
 ## all report files
 pd$reportFiles <- file.path(
-    '/dcl01/lieber/WGBS/LIBD_Data/DNAm_Ratios_duplicates_dropped/Reports',
+    '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports',
 	pd$Data.ID, paste0(pd$Data.ID,
-    '.concatenated.sorted.duplicatesRemoved.CpG_report.txt'))
+    '.concatenated.sorted.duplicatesRemoved.CX_reportchr', opt$chr, '.txt'))
+stopifnot(all(file.exists(pd$reportFiles)))
 
 ## Load the data
-BSobj <- combineList(bplapply(pd$reportFiles, function(input_file) {
-    res <- read.bismark(pd$reportFiles[input_file], pd$WGC.ID[input_file],
+BSobj <- combineList(bplapply(seq_len(nrow(pd)), function(ii) {
+    res <- read.bismark(pd$reportFiles[ii], pd$WGC.ID[ii],
         strandCollapse=TRUE, fileType = 'cytosineReport')
     res <- res[seqnames(res) == opt$chr, ]
     return(res)
