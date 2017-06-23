@@ -5,6 +5,7 @@ library('readxl')
 library('devtools')
 library('data.table')
 library('GenomicRanges')
+library('BiocParallel')
 
 ## Specify parameters
 spec <- matrix(c(
@@ -46,8 +47,12 @@ pd$reportFiles <- file.path(
 stopifnot(all(file.exists(pd$reportFiles)))
 
 ## Load the data without collapsing by strand
-BSobj <- read.bismark(pd$reportFiles, pd$Data.ID, strandCollapse = FALSE,
-    fileType = 'cytosineReport', mc.cores = opt$cores)
+BSobj <- combineList(bpmapply(function(input_file, sample) {
+    library('bsseq')
+    read.bismark(input_file, sample, strandCollapse = FALSE,
+        fileType = 'cytosineReport')
+}, pd$reportFiles, pd$Data.ID, SIMPLIFY = FALSE,
+    BPPARAM = SnowParam(opt$cores, outfile =  Sys.getenv('SGE_STDERR_PATH'))))
 
 ## Get CX context
 context <- fread(pd$reportFiles[1], colClasses = c('factor', 'numeric',
