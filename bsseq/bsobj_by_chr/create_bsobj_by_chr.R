@@ -2,8 +2,9 @@
 library('getopt')
 library('bsseq')
 library('readxl')
-library('BiocParallel')
 library('devtools')
+library('data.table')
+library('GenomicRanges')
 
 ## Specify parameters
 spec <- matrix(c(
@@ -44,21 +45,29 @@ pd$reportFiles <- file.path(
     '.concatenated.sorted.duplicatesRemoved.CX_reportchr', opt$chr, '.txt'))
 stopifnot(all(file.exists(pd$reportFiles)))
 
-## Load the data
-BSobj <- combineList(bplapply(seq_len(nrow(pd)), function(ii) {
-    res <- read.bismark(pd$reportFiles[ii], pd$WGC.ID[ii],
-        strandCollapse=TRUE, fileType = 'cytosineReport')
-    res <- res[seqnames(res) == opt$chr, ]
-    return(res)
-}, BPPARAM = MulticoreParam(opt$cores)))
+## Load the data without collapsing by strand
+BSobj <- read.bismark(pd$reportFiles, pd$Data.ID, strandCollapse = FALSE,
+    fileType = 'cytosineReport', mc.cores = opt$cores)
 
-## add sample names
-sampleNames(BSobj) <- pd$Data.ID
-rownames(pd) <- pd$Data.ID
+## Get CX context
+context <- fread(pd$reportFiles[1], colClasses = c('factor', 'numeric',
+    'factor', 'integer', 'integer', 'factor', 'factor'))
+context_gr <- GRanges(seqnames = opt$chr,
+    IRanges(start = context[[2]], width = 1), strand = context[[3]],
+    c_context = Rle(context[[6]]), trinucleotide_context = Rle(context[[7]]))
+    
+## Re-order based on strand
+context_gr <- c(context_gr[strand(context_gr) == '+'],
+    context_gr[strand(context_gr) == '-'])
+stopifnot(identical(ranges(granges(BSobj)), ranges(context_gr)))
+
+## Same the context information on the BSobj
+rowRanges(BSobj) <- context_gr
 
 ## append phenotype data
+rownames(pd) <- pd$Data.ID
 pData(BSobj) <- DataFrame(pd)
-save(BSobj, file = paste0(opt$chr, '_postNatal_cleaned_CpGonly_noHomogenate.Rdata'))
+save(BSobj, file = paste0(opt$chr, '_postNatal_cleaned_CX_noHomogenate.Rdata'))
 
 ## Reproducibility information
 print('Reproducibility information:')
