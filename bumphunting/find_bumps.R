@@ -61,11 +61,11 @@ if(!file.exists(paste0('BSobj_', opt$subset '.Rdata'))) {
     save(BSobj, file = paste0('BSobj_', opt$subset, '.Rdata'))
     
     ## Get the top million most variable CpGs
-    rvar <- genefilter::rowVars(cov)
+    rvar <- genefilter::rowVars(getMeth(BSobj, type = 'raw'))
     rvar.filt <- which(order(rvar, decreasing = TRUE) %in% seq_len(1e6))
     BSobj_top <- BSobj[rvar.filt, ]
     save(BSobj_top, file = paste0('BSobj_', opt$subset, '_topMillionVar.Rdata'))
-    rm(cov, rvar, rvar.filt)
+    rm(rvar, rvar.filt)
     
 } else {
     load(paste0('BSobj_', opt$subset, '.Rdata'))
