@@ -1,0 +1,4 @@
+*.Rdata
+Reports
+.*.sh
+
