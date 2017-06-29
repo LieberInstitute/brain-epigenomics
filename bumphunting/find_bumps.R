@@ -25,7 +25,7 @@ if (!is.null(opt$help)) {
 ## For testing
 if(FALSE) {
     opt <- list('model' = 'cell', 'subset' = 'Neuron', cores = 1,
-        permutations = 5)
+        permutations = 0)
 }
 
 ## Check inputs
@@ -33,17 +33,45 @@ stopifnot(opt$model %in% c('cell', 'age', 'interaction'))
 stopifnot(opt$subset %in% c('all', 'Homogenate', 'Neuron'))
 if(opt$subset == 'all') stop("Subset = 'all' is not supported.")
 
-## Load data
-load("/dcl01/lieber/WGBS/LIBD_Data/bsseqObj/bsseqObj_postNatal_cleaned_CpGonly.rda")
 
-## extract pheno
-pd <- pData(BSobj)
+if(!file.exists(paste0('BSobj_', opt$subset '.Rdata'))) {
+    ## Load data
+    load("/dcl01/lieber/WGBS/LIBD_Data/bsseqObj/bsseqObj_postNatal_cleaned_CpGonly.rda")
 
-## Keep only a given cell type if specified
-if(opt$subset != 'all') {
-    BSobj <- BSobj[, which(pd$Cell.Type %in% c(opt$subset, 'Glia'))]
+    ## extract pheno
+    pd <- pData(BSobj)
+
+    ## Keep only a given cell type if specified
+    if(opt$subset != 'all') {
+        BSobj <- BSobj[, which(pd$Cell.Type %in% c(opt$subset, 'Glia'))]
+        pd <- pData(BSobj)
+    }
+
+    ## Filter low coverage bases
+    cov <- getCoverage(BSobj, type = 'Cov')
+    cov.ge1 <- cov >= 1
+    cov.filt <- rowSums(cov.ge1) == ncol(cov)
+    print("Number of bases filtered")
+    table(cov.filt)
+#    FALSE     TRUE
+#  3655383 24562065
+    BSobj <- BSobj[cov.filt, ]
+    rm(cov, cov.ge1, cov.filt)
+    
+    save(BSobj, file = paste0('BSobj_', opt$subset, '.Rdata'))
+    
+    ## Get the top million most variable CpGs
+    rvar <- genefilter::rowVars(cov)
+    rvar.filt <- which(order(rvar, decreasing = TRUE) %in% seq_len(1e6))
+    BSobj_top <- BSobj[rvar.filt, ]
+    save(BSobj_top, file = paste0('BSobj_', opt$subset, '_topMillionVar.Rdata'))
+    rm(cov, rvar, rvar.filt)
+    
+} else {
+    load(paste0('BSobj_', opt$subset, '.Rdata'))
     pd <- pData(BSobj)
 }
+
 
 print(paste('Number of samples used:', nrow(pd)))
 
@@ -60,14 +88,6 @@ if(opt$model == 'cell') {
     cut <- 0.1 * 0.01
 }
 
-## Filter low coverage bases
-cov <- getCoverage(BSobj, type = 'Cov')
-cov.ge1 <- cov >= 1
-cov.filt <- rowSums(cov.ge1) == ncol(cov)
-table(cov.filt)
-BSobj <- BSobj[cov.filt, ]
-rm(cov, cov.ge1, cov.filt)
-
 ## Get chr coordinates and methylation values
 gr <- granges(BSobj)
 #gr <- gr[1:1e6]
@@ -78,12 +98,6 @@ meth <- getMeth(BSobj, type = 'raw')
 #meth <- getCoverage(BSobj, type = 'M')  / (getCoverage(BSobj, type = 'Cov') + 1e-05)
 stopifnot(all(is.finite(range(meth))))
 
-if(!file.exists(paste0('BSobj_', opt$subset '.Rdata'))) {
-    save(BSobj, file = paste0('BSobj_', opt$subset '.Rdata'))
-}
-#if(!file.exists(paste0('meth_', opt$subset, '.Rdata'))) {
-#    save(meth, file = paste0('meth_', opt$subset, '.Rdata'))
-#}
 
 ## Free some memory
 rm(BSobj)
