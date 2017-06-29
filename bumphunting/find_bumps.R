@@ -24,7 +24,7 @@ if (!is.null(opt$help)) {
 
 ## For testing
 if(FALSE) {
-    opt <- list('model' = 'interaction', 'subset' = 'Neuron', cores = 1,
+    opt <- list('model' = 'cell', 'subset' = 'Neuron', cores = 1,
         permutations = 5)
 }
 
@@ -60,11 +60,30 @@ if(opt$model == 'cell') {
     cut <- 0.1 * 0.01
 }
 
+## Filter low coverage bases
+cov <- getCoverage(BSobj, type = 'Cov')
+cov.ge1 <- cov >= 1
+cov.filt <- rowSums(cov.ge1) == ncol(cov)
+table(cov.filt)
+BSobj <- BSobj[cov.filt, ]
+rm(cov, cov.ge1, cov.filt)
+
 ## Get chr coordinates and methylation values
 gr <- granges(BSobj)
 #gr <- gr[1:1e6]
+## This codes leads to NaN values when not filtering
 meth <- getMeth(BSobj, type = 'raw')
 #meth <- getMeth(BSobj[1:1e6,], type = 'raw')
+## Use this code when not filtering
+#meth <- getCoverage(BSobj, type = 'M')  / (getCoverage(BSobj, type = 'Cov') + 1e-05)
+stopifnot(all(is.finite(range(meth))))
+
+if(!file.exists(paste0('BSobj_', opt$subset '.Rdata'))) {
+    save(BSobj, file = paste0('BSobj_', opt$subset '.Rdata'))
+}
+#if(!file.exists(paste0('meth_', opt$subset, '.Rdata'))) {
+#    save(meth, file = paste0('meth_', opt$subset, '.Rdata'))
+#}
 
 ## Free some memory
 rm(BSobj)
