@@ -81,11 +81,11 @@ if(opt$model == 'cell') {
     cut <- 0.1
 } else if (opt$model == 'age') {
     design <- with(pd, model.matrix(~ Age + Cell.Type))
-    cut <- 0.01
+    cut <- 0.005
 } else if (opt$model == 'interaction') {
     design <- with(pd, model.matrix(~ Age * Cell.Type))
     coef <- grep(':', colnames(design))
-    cut <- 0.1 * 0.01
+    cut <- 0.009
 }
 
 ## Get chr coordinates and methylation values
