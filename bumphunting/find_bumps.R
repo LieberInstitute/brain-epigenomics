@@ -34,7 +34,7 @@ stopifnot(opt$subset %in% c('all', 'Homogenate', 'Neuron'))
 if(opt$subset == 'all') stop("Subset = 'all' is not supported.")
 
 
-if(!file.exists(paste0('BSobj_', opt$subset '.Rdata'))) {
+if(!file.exists(paste0('BSobj_', opt$subset, '.Rdata'))) {
     ## Load data
     load("/dcl01/lieber/WGBS/LIBD_Data/bsseqObj/bsseqObj_postNatal_cleaned_CpGonly.rda")
 
