@@ -6,8 +6,8 @@
 mkdir -p logs
 
 #for chrnum in {1..22} X Y M
-for chrnum in M Y 21 22
-#for chrnum in {3..20} X
+#for chrnum in M Y 21 22
+for chrnum in {2..20} X
 #for chrnum in {2..22} X Y M
 do 
 
