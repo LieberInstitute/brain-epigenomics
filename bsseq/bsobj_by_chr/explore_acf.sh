@@ -7,8 +7,9 @@ mkdir -p logs
 
 #for chrnum in {1..22} X Y M
 #for chrnum in M Y 21 22
-for chrnum in {2..20} X
+#for chrnum in {2..20} X
 #for chrnum in {2..22} X Y M
+for chrnum in 8 10 11 X
 do 
 
     chr="chr${chrnum}"
@@ -24,7 +25,7 @@ do
     cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l mem_free=35G,h_vmem=40G,h_fsize=100G
+#$ -l mem_free=75G,h_vmem=80G,h_fsize=100G
 #$ -N ${SHORT}
 #$ -o ./logs/${SHORT}.txt
 #$ -e ./logs/${SHORT}.txt
