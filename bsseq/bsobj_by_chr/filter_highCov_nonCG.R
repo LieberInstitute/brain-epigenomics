@@ -32,18 +32,20 @@ load_filt <- function(f) {
         message(paste(Sys.time(), chr, ':', original - filtered, 'bases did not have all samples with coverage >=5 out of', original, 'That is,', round(filtered / original * 100, 2), 'percent is remaining.'))
     
         ## Save results
+        message(paste(Sys.time(), 'saving the results in', res_file))
         save(BSobj, file = res_file)
     } else {
         message(paste(Sys.time(), 'loading pre-existing', res_file))
         load(res_file)
     }
     
+    ## Tweak reportFiles so they can be combined
+    colData(BSobj)$reportFiles <- gsub('chr.*', '', colData(BSobj)$reportFiles)
     
     return(BSobj)
 }
 
-
-BSobj <- combineList(lapply(files[c(13, 25)], load_filt))
+BSobj <- do.call(rbind, lapply(files[c(13, 25)], load_filt))
 
 ## Save final combined result
 save(BSobj, file = 'allChrs_postNatal_cleaned_nonCG_noHomogenate_highCov.Rdata')
