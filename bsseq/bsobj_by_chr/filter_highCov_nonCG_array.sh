@@ -1,11 +1,11 @@
 #!/bin/bash
 #$ -cwd
 #$ -l mem_free=130G,h_vmem=130G,h_fsize=100G
-#$ -N nonCG_highCov
-#$ -o ./logs/nonCG_highCov.txt
-#$ -e ./logs/nonCG_highCov.txt
+#$ -N nonCG_highCov_array
+#$ -o ./logs/nonCG_highCov.${TASK_ID}.txt
+#$ -e ./logs/nonCG_highCov.${TASK_ID}.txt
 #$ -m e
-#$ -hold_jid nonCG_highCov_array
+#$ -t 1-25
 
 echo "**** Job starts ****"
 date

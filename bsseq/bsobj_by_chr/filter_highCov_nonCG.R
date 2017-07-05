@@ -45,10 +45,18 @@ load_filt <- function(f) {
     return(BSobj)
 }
 
-BSobj <- do.call(rbind, lapply(files, load_filt))
+## Is this an array job?
+array <- Sys.getenv('SGE_TASK_ID')
+print(array)
 
-## Save final combined result
-save(BSobj, file = 'allChrs_postNatal_cleaned_nonCG_noHomogenate_highCov.Rdata')
+if(array == '') {
+    BSobj <- do.call(rbind, lapply(files, load_filt))
+
+    ## Save final combined result
+    save(BSobj, file = 'allChrs_postNatal_cleaned_nonCG_noHomogenate_highCov.Rdata')
+} else {
+    BSobj <- load_filt(files[as.integer(array)])
+}
 
 ## Reproducibility information
 print('Reproducibility information:')
