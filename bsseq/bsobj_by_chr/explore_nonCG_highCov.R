@@ -25,7 +25,8 @@ pd$Percent.GreaterThan.Q30 <- as.numeric(pd$Percent.GreaterThan.Q30)
 
 ## Get methylation info
 meth <- getMeth(BSobj, type = 'raw')
-meth.filt <- rowSums(meth) > 0
+meth.ge0 <- meth > 0
+meth.filt <- rowSums(meth.ge0) >= 5
 table(meth.filt)
 meth <- meth[meth.filt, ]
 
