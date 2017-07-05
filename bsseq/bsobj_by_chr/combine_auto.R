@@ -19,12 +19,13 @@ if(!file.exists('auto_long_combined.Rdata')) {
 }
 dim(auto_long)
 
-context_summary <- lapply(unique(auto_long)$context, function(context) {
-    sub <- auto_long[auto_long$context == context, ]
-    tapply(sub$acf, sub$lag, summary)
-})
-context_summary
-save(context_summary, file = 'autocorrelation_summary_by_context.Rdata')
+## This never finished running:
+# context_summary <- lapply(unique(auto_long)$context, function(context) {
+#     sub <- auto_long[auto_long$context == context, ]
+#     tapply(sub$acf, sub$lag, summary)
+# })
+# context_summary
+# save(context_summary, file = 'autocorrelation_summary_by_context.Rdata')
 
 auto_long$lag <- as.factor(auto_long$lag)
 
