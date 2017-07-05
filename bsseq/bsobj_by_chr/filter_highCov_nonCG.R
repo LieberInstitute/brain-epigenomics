@@ -45,7 +45,7 @@ load_filt <- function(f) {
     return(BSobj)
 }
 
-BSobj <- do.call(rbind, lapply(files[c(13, 25)], load_filt))
+BSobj <- do.call(rbind, lapply(files, load_filt))
 
 ## Save final combined result
 save(BSobj, file = 'allChrs_postNatal_cleaned_nonCG_noHomogenate_highCov.Rdata')
