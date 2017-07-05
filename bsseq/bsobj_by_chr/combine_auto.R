@@ -26,8 +26,13 @@ context_summary <- lapply(unique(auto_long)$context, function(context) {
 context_summary
 save(context_summary, file = 'autocorrelation_summary_by_context.Rdata')
 
-pdf('autocorrelation_by_context.pdf', width = 14)
+auto_long$lag <- as.factor(auto_long$lag)
+
+png('autocorrelation_by_context.png', width = 480 * 2)
 ggplot(auto_long, aes(x = lag, y = acf)) + geom_boxplot() + facet_grid(. ~ context) + theme_bw(base_size = 14)
+dev.off()
+
+png('autocorrelation_by_context_abs.png', width = 480 * 2)
 ggplot(auto_long, aes(x = lag, y = abs(acf))) + geom_boxplot() + facet_grid(. ~ context) + theme_bw(base_size = 14)
 dev.off()
 
