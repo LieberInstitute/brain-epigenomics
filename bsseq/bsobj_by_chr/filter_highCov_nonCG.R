@@ -1,7 +1,7 @@
 library('bsseq')
 library('devtools')
 
-files <- dir(pattern = '^chr')
+files <- dir(pattern = '_postNatal_cleaned_CX_noHomogenate.Rdata')
 chrs <- gsub('_.*', '', files)
 
 ## Load and filter:
