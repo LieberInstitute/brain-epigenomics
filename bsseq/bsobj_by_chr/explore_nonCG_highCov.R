@@ -82,7 +82,10 @@ coef_interest <- mapply(function(f, coef) {
 summary(coef_interest)
 summary(abs(coef_interest))
 
-save(fits, models, coef_interest, file = 'limma_exploration_nonCG_highCov.Rdata')
+ebList <- lapply(fits, ebayes)
+
+save(fits, models, coef_interest, ebList, file = 'limma_exploration_nonCG_highCov.Rdata')
+
 
 
 ### examples to plot ###
