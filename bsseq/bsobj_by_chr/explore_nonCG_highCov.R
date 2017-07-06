@@ -19,7 +19,6 @@ pd$Race[pd$Race == "CAUC "] <- 'CAUC'
 pd$Sex[pd$Sex == " M"] <- 'M'
 pd$RIN <- as.numeric(gsub(' ', '', pd$RIN))
 pd$pg.DNA.nuclei.input <- as.numeric(pd$pg.DNA.nuclei.input)
-pd$Data.Yield. <- as.numeric(pd$Data.Yield.)
 pd$Reads <- as.numeric(pd$Reads)
 pd$Percent.GreaterThan.Q30 <- as.numeric(pd$Percent.GreaterThan.Q30)
 
@@ -41,7 +40,7 @@ plot(pcs$x[, 1] ~ pcs$x[, 2],
     ylab = paste0('PC1: ', pcaVars[1], '% of Var Explained'),
     xlab = paste0('PC2: ', pcaVars[2], '% of Var Explained'), pch = 19)
 
-to_plot <- c('Cell.Type', 'Age', 'Age.Bin', 'PMI', 'Sex', 'Race', 'RIN', 'pH', 'Proportion.of.Neurons', 'yield.nuclei.mg.tissue', 'pg.DNA.nuclei.input', 'X260.280.DNA', 'Library.Technician', 'Flowcell', 'Data.Yield.', 'Reads', 'Percent.GreaterThan.Q30', 'avg.Cov', 'cov.sDev', 'Percent.Duplication', 'total_num_trimmed_reads', 'total_num_untrimmed_reads', 'alignment.efficiency')
+to_plot <- c('Cell.Type', 'Age', 'Age.Bin', 'PMI', 'Sex', 'Race', 'RIN', 'pH', 'Proportion.of.Neurons', 'yield.nuclei.mg.tissue', 'pg.DNA.nuclei.input', 'X260.280.DNA', 'Library.Technician', 'Flowcell', 'Reads', 'Percent.GreaterThan.Q30', 'avg.Cov', 'cov.sDev', 'Percent.Duplication', 'total_num_trimmed_reads', 'total_num_untrimmed_reads', 'alignment.efficiency')
 to_plot <- which(colnames(pd) %in% to_plot)
 names(to_plot) <- colnames(pd)[to_plot]
 
