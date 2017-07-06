@@ -6,10 +6,7 @@ library('shinycsv')
 library('RColorBrewer')
 
 ## Load data
-load('allChrs_postNatal_cleaned_nonCG_noHomogenate_highCov.Rdata')
-
-## Size of the data
-dim(BSobj)
+load('BSobj_Neuron.Rdata')
 
 ## extract pheno
 pd <- pData(BSobj)
@@ -19,32 +16,27 @@ pd$Race[pd$Race == "CAUC "] <- 'CAUC'
 pd$Sex[pd$Sex == " M"] <- 'M'
 pd$RIN <- as.numeric(gsub(' ', '', pd$RIN))
 pd$pg.DNA.nuclei.input <- as.numeric(pd$pg.DNA.nuclei.input)
+pd$Data.Yield. <- as.numeric(pd$Data.Yield.)
 pd$Reads <- as.numeric(pd$Reads)
 pd$Percent.GreaterThan.Q30 <- as.numeric(pd$Percent.GreaterThan.Q30)
 
 ## Get methylation info
 meth <- getMeth(BSobj, type = 'raw')
 rm(BSobj)
-meth.g0 <- meth > 0
-meth.filt <- rowSums(meth.g0) >= 5
-meth.tab <- table(meth.filt)
-meth.tab
-round(meth.tab / sum(meth.tab) * 100, 2)
-meth <- meth[meth.filt, ]
-rm(meth.g0, meth.filt)
+dim(meth)
 
 pcs <- prcomp(t(meth))
 pcaVars <- getPcaVars(pcs)
 names(pcaVars) <- paste0('PC', seq_len(length(pcaVars)))
 
-pdf('pca_nonCG_highCov.pdf')
+pdf('pca_Neuron.pdf')
 barplot(pcaVars[1:10], col = '#377EB8', ylab = 'Percent of Variance Explained')
 
 plot(pcs$x[, 1] ~ pcs$x[, 2],
     ylab = paste0('PC1: ', pcaVars[1], '% of Var Explained'),
     xlab = paste0('PC2: ', pcaVars[2], '% of Var Explained'), pch = 19)
 
-to_plot <- c('Cell.Type', 'Age', 'Age.Bin', 'PMI', 'Sex', 'Race', 'RIN', 'pH', 'Proportion.of.Neurons', 'yield.nuclei.mg.tissue', 'pg.DNA.nuclei.input', 'X260.280.DNA', 'Library.Technician', 'Flowcell', 'Reads', 'Percent.GreaterThan.Q30', 'avg.Cov', 'cov.sDev', 'Percent.Duplication', 'total_num_trimmed_reads', 'total_num_untrimmed_reads', 'alignment.efficiency')
+to_plot <- c('Cell.Type', 'Age', 'Age.Bin', 'PMI', 'Sex', 'Race', 'RIN', 'pH', 'Proportion.of.Neurons', 'yield.nuclei.mg.tissue', 'pg.DNA.nuclei.input', 'X260.280.DNA', 'Library.Technician', 'Flowcell', 'Data.Yield.', 'Reads', 'Percent.GreaterThan.Q30', 'avg.Cov', 'cov.sDev', 'Percent.Duplication', 'total_num_trimmed_reads', 'total_num_untrimmed_reads', 'alignment.efficiency')
 to_plot <- which(colnames(pd) %in% to_plot)
 names(to_plot) <- colnames(pd)[to_plot]
 
@@ -58,13 +50,14 @@ for(pc in 1:4) {
 }
 dev.off()
 
-pdf('pca_nonCG_highCov_PC1vsAge.pdf')
+pdf('pca_Neuron_PC1vsAge.pdf')
 palette(brewer.pal(8,"Dark2"))
 par(mar=c(5,6,2,2), cex.axis=2, cex.lab=2)
 plot(pcs$x[, 1] ~ pd$Age, cex=2, pch = 21, bg=factor(pd$Cell.Type),
     ylab = paste0('PC1: ', pcaVars[1], '% of Var Explained'),  xlab = "Age")
 legend("right", levels(factor(pd$Cell.Type)), pch = 15, col=1:2, cex=1.4)
 dev.off()
+
 
 ## Explore with limma
 models <- list(
@@ -78,6 +71,7 @@ fits <- lapply(models, function(mod) {
 coefs <- c(2, 2, 4)
 names(coefs) <- names(fits)
 
+
 coef_interest <- mapply(function(f, coef) {
     f$coefficients[, coef]
 }, fits, coefs)
@@ -86,13 +80,12 @@ summary(abs(coef_interest))
 
 ebList <- lapply(fits, ebayes)
 
-save(fits, models, coef_interest, ebList, file = 'limma_exploration_nonCG_highCov.Rdata')
+save(fits, models, coef_interest, ebList, file = 'limma_exploration_Neuron.Rdata')
 rm(fits, models, coef_interest)
 
 
-
 ### examples to plot ###
-pdf("cellType_DMPs_nonCG_highCov.pdf")
+pdf("cellType_DMPs_Neuron.pdf")
 par(mar=c(5,6,2,2),cex.axis=2,cex.lab=2)
 sigIndex_cell = order(ebList[[1]]$p[,2])[1:50]
 for(i in seq(along=sigIndex_cell)) {
@@ -105,7 +98,7 @@ for(i in seq(along=sigIndex_cell)) {
 }
 dev.off()
 		
-pdf("overallAge_DMPs_nonCG_highCov.pdf")
+pdf("overallAge_DMPs_Neuron.pdf")
 par(mar=c(5,6,2,2),cex.axis=2,cex.lab=2)
 sigIndex_age = order(ebList[[2]]$p[,2])[1:50]
 for(i in seq(along=sigIndex_age)) {
@@ -120,7 +113,7 @@ for(i in seq(along=sigIndex_age)) {
 }
 dev.off()		
 
-pdf("interactionCelltypeAge_DMPs_nonCG_highCov.pdf")
+pdf("interactionCelltypeAge_DMPs_Neuron.pdf")
 par(mar=c(5,6,2,2),cex.axis=2,cex.lab=2)
 sigIndex_int = order(ebList[[3]]$p[,4])[1:50]
 for(i in seq(along=sigIndex_int)) {
@@ -145,9 +138,8 @@ xx <- mapply(function(coef, fit, model) {
     return(invisible(NULL))
 }, coefs, ebList, names(ebList))
 
-## Reproducibility information
-print('Reproducibility information:')
-Sys.time()
+## Reproducibility info
 proc.time()
+message(Sys.time())
 options(width = 120)
 session_info()
