@@ -27,8 +27,11 @@ meth <- getMeth(BSobj, type = 'raw')
 rm(BSobj)
 meth.g0 <- meth > 0
 meth.filt <- rowSums(meth.g0) >= 5
-table(meth.filt)
+meth.tab <- table(meth.filt)
+meth.tab
+round(meth.tab / sum(meth.tab) * 100, 2)
 meth <- meth[meth.filt, ]
+rm(meth.g0, meth.filt, meth.filt)
 
 pcs <- prcomp(t(meth))
 pcaVars <- getPcaVars(pcs)
@@ -75,7 +78,6 @@ fits <- lapply(models, function(mod) {
 coefs <- c(2, 2, 4)
 names(coefs) <- names(fits)
 
-
 coef_interest <- mapply(function(f, coef) {
     f$coefficients[, coef]
 }, fits, coefs)
@@ -85,6 +87,7 @@ summary(abs(coef_interest))
 ebList <- lapply(fits, ebayes)
 
 save(fits, models, coef_interest, ebList, file = 'limma_exploration_nonCG_highCov.Rdata')
+rm(fits, models, coef_interest)
 
 
 
