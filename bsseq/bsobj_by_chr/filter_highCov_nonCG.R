@@ -49,7 +49,7 @@ load_filt <- function(f) {
 array <- Sys.getenv('SGE_TASK_ID')
 print(array)
 
-if(array == '') {
+if(array == 'undefined') {
     BSobj <- do.call(rbind, lapply(files, load_filt))
 
     ## Save final combined result
