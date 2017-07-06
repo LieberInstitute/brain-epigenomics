@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -cwd
-#$ -l mem_free=40G,h_vmem=40G,h_fsize=100G
+#$ -l bluejay,mem_free=80G,h_vmem=80G,h_fsize=100G
 #$ -N nonCG_highCov
 #$ -o ./logs/nonCG_highCov.txt
 #$ -e ./logs/nonCG_highCov.txt
