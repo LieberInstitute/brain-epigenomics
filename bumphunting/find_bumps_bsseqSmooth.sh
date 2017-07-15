@@ -13,7 +13,7 @@ do
         for permutations in 0
         do
 
-SHORT="finding_bumps_${cell}_${model}_${permutations}"
+SHORT="finding_bumps_bsseqSmooth_${cell}_${model}_${permutations}"
 
 # Construct shell file
 echo "Creating script for chromosome Glia + ${cell} using model ${model} with ${permutations} permutations"
