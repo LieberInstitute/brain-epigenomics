@@ -2,6 +2,7 @@ library('bsseq')
 library('bumphunter')
 library('devtools')
 library('getopt')
+library('RColorBrewer')
 
 ## Specify parameters
 spec <- matrix(c(
@@ -41,17 +42,18 @@ tab = bumps$table[1:100,]
 ## top CpGs
 topInds = mapply(function(s,e) s:e, tab$indexStart, tab$indexEnd)
 
-meanMeth = sapply(topInds, function(ii) colMeans(t(t(meth[ii,]))))
+meanMeth = lapply(topInds, function(ii) colMeans(t(t(meth[ii,]))))
 meanMeth = do.call("rbind", meanMeth)
 
 pdfFile <- paste0('bumps_bsseqSmooth_', opt$subset, '_', opt$model,
     '_', opt$permutations, '.pdf')
 
 pdf(pdfFile)
+palette(brewer.pal(8,"Dark2"))
 for(i in 1:nrow(meanMeth)) {
 	plot(meanMeth[i,] ~ pd$Age, pch = 21,
 		bg = factor(pd$Cell.Type),ylim = c(0,1),
-		ylab = "DNAm Level")
+		ylab = "DNAm Level", xlab = 'Age')
 	abline(lm(meanMeth[i,] ~ pd$Age, subset = pd$Cell.Type =="Glia"),
 		col = 1)
 	abline(lm(meanMeth[i,] ~ pd$Age, subset = pd$Cell.Type =="Neuron"),
