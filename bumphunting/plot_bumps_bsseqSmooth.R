@@ -82,7 +82,8 @@ for(i in seq_len(100)) {
         cell = rep(pd$Cell.Type, each = length(topInds[[i]])),
         dmr = rep(seq_len(length(topInds[[i]])), each = nrow(pd))
     )
-    ggplot(data = df, aes(x = factor(Age), y = Meth, fill = cell)) + geom_boxplot() + theme_bw() + scale_fill_brewer(palette = 'Dark2') + xlab('Age') + ylab('DNAm Level')
+    g <- ggplot(data = df, aes(x = factor(Age), y = Meth, fill = cell)) + geom_boxplot() + theme_bw() + scale_fill_brewer(palette = 'Dark2') + xlab('Age') + ylab('DNAm Level')
+    print(g)
 }
 dev.off()
 
