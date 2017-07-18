@@ -72,7 +72,7 @@ if(!file.exists(paste0('BSobj_', opt$subset, '.Rdata'))) {
     if(!file.exists(paste0('BSobj_bsseqSmooth_', opt$subset, '.Rdata'))) {
         load(paste0('BSobj_', opt$subset, '.Rdata'))
         BSobj <- BSmooth(BSobj, mc.cores = opt$cores, parallelBy = 'sample')
-        save(BSobj, file = paste0('BSobj_bsseqSmooth', opt$subset, '.Rdata'))
+        save(BSobj, file = paste0('BSobj_bsseqSmooth_', opt$subset, '.Rdata'))
     } else {
         load(paste0('BSobj_bsseqSmooth_', opt$subset, '.Rdata'))
     }
