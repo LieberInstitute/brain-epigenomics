@@ -60,11 +60,6 @@ for(i in 1:nrow(meanMeth)) {
 	abline(lm(meanMeth[i,] ~ pd$Age, subset = pd$Cell.Type =="Neuron"),
 		col = 2)
     legend("right", levels(factor(pd$Cell.Type)), pch = 15, col=1:2, cex=1.4)
-    
-    matplot(meth[topInds[[i]], ], pch = 20, bg = factor(pd$Cell.Type), ylim = c(0, 1), ylab = 'DNAm Level', xlab = 'Age', col = factor(pd$Cell.Type))
-    
-    
-    
 }
 dev.off()
 
