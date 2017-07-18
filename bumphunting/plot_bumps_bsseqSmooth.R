@@ -3,6 +3,7 @@ library('bumphunter')
 library('devtools')
 library('getopt')
 library('RColorBrewer')
+library('ggplot2')
 
 ## Specify parameters
 spec <- matrix(c(
@@ -59,6 +60,34 @@ for(i in 1:nrow(meanMeth)) {
 	abline(lm(meanMeth[i,] ~ pd$Age, subset = pd$Cell.Type =="Neuron"),
 		col = 2)
     legend("right", levels(factor(pd$Cell.Type)), pch = 15, col=1:2, cex=1.4)
+    
+    matplot(meth[topInds[[i]], ], pch = 20, bg = factor(pd$Cell.Type), ylim = c(0, 1), ylab = 'DNAm Level', xlab = 'Age', col = factor(pd$Cell.Type))
+    
+    
+    
+}
+dev.off()
+
+
+pdf(paste0('bumps_bsseqSmooth_', opt$subset, '_', opt$model,
+    '_', opt$permutations, '_CpG_in_DMR.pdf'))
+for(i in seq_len(100)) {
+    matplot(meth[topInds[[i]], ], pch = 20, bg = factor(pd$Cell.Type), ylim = c(0, 1), ylab = 'DNAm Level', xlab = 'CpG in DMR', col = factor(pd$Cell.Type))
+}
+dev.off()
+
+
+
+pdf(paste0('bumps_bsseqSmooth_', opt$subset, '_', opt$model,
+    '_', opt$permutations, '_boxplot_by_age.pdf'))
+for(i in seq_len(100)) {
+    df <-  data.frame(
+        Meth = as.vector(t(meth[topInds[[i]], ])),
+        Age = rep(pd$Age, each = length(topInds[[i]])),
+        cell = rep(pd$Cell.Type, each = length(topInds[[i]])),
+        dmr = rep(seq_len(length(topInds[[i]])), each = nrow(pd))
+    )
+    ggplot(data = df, aes(x = factor(Age), y = Meth, fill = cell)) + geom_boxplot() + theme_bw() + scale_fill_brewer(palette = 'Dark2') + xlab('Age') + ylab('DNAm Level')
 }
 dev.off()
 
