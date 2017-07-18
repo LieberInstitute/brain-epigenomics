@@ -1,4 +1,3 @@
 *.Rdata
 with_NaNs
-
-
+.*.sh
