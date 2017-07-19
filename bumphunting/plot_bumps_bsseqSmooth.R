@@ -4,6 +4,7 @@ library('devtools')
 library('getopt')
 library('RColorBrewer')
 library('ggplot2')
+library('EnsDb.Hsapiens.v75')
 
 ## Specify parameters
 spec <- matrix(c(
@@ -65,7 +66,7 @@ dev.off()
 
 
 pdf(paste0('bumps_bsseqSmooth_', opt$subset, '_', opt$model,
-    '_', opt$permutations, '_CpG_in_DMR.pdf'))
+    '_', opt$permutations, '_CpG_in_DMR.pdf'), width = 14)
 for(i in seq_len(100)) {
     matplot(meth[topInds[[i]], ], pch = 20, bg = factor(pd$Cell.Type), ylim = c(0, 1), ylab = 'DNAm Level', xlab = 'CpG in DMR', col = factor(pd$Cell.Type))
 }
@@ -74,7 +75,7 @@ dev.off()
 
 
 pdf(paste0('bumps_bsseqSmooth_', opt$subset, '_', opt$model,
-    '_', opt$permutations, '_boxplot_by_age.pdf'))
+    '_', opt$permutations, '_boxplot_by_age.pdf'), width = 14)
 for(i in seq_len(100)) {
     df <-  data.frame(
         Meth = as.vector(t(meth[topInds[[i]], ])),
@@ -85,6 +86,51 @@ for(i in seq_len(100)) {
     g <- ggplot(data = df, aes(x = factor(Age), y = Meth, fill = cell)) + geom_boxplot() + theme_bw() + scale_fill_brewer(palette = 'Dark2') + xlab('Age') + ylab('DNAm Level')
     print(g)
 }
+dev.off()
+
+## Use the plotting code from bsseq
+load(paste0('BSobj_bsseqSmooth_', opt$subset, '.Rdata'))
+## Add colors
+colData(BSobj)$col <- brewer.pal(8,"Dark2")[factor(pd$Cell.Type)]
+
+## To get an idea of how much to extend
+round(mean(bumps$table$end[1:100] - bumps$table$start[1:100] + 1))
+
+genes <- genes(EnsDb.Hsapiens.v75)
+seqlevels(genes) <- paste0('chr', seqlevels(genes))
+regions_gr <- GRanges(seqnames = bumps$table$chr[1:100], IRanges(bumps$table$start[1:100], bumps$table$end[1:100]))
+regions_gr <- resize(regions_gr, width(regions_gr) + 40000, fix = 'center')
+genes <- genes[countOverlaps(genes, regions_gr) > 0]
+
+exons <- exons(EnsDb.Hsapiens.v75)
+seqlevels(exons) <- paste0('chr', seqlevels(exons))
+exons <- exons[countOverlaps(exons, regions_gr) > 0]
+
+
+
+pdf(paste0('bumps_bsseqSmooth_', opt$subset, '_', opt$model,
+    '_', opt$permutations, '_with_bsseq_cell.pdf'), width = 14)
+plotManyRegions(BSobj, regions = bumps$table[1:100, ], extend = 20000, addRegions = bumps$table, annoTrack = list(genes = genes, exons = exons))
+dev.off()
+
+colData(BSobj)$age_group <- factor(ifelse(colData(BSobj)$Age < 1, 'Infant',
+    ifelse(colData(BSobj)$Age <= 12, 'Child',
+    ifelse(colData(BSobj)$Age <= 17, 'Teen', 'Adult'))),
+    levels = c('Infant', 'Child', 'Teen', 'Adult'))
+    
+colData(BSobj)$age_group_cell <- factor(paste0(colData(BSobj)$age_group, '_',
+    colData(BSobj)$Cell.Type),
+    levels = paste0(rep(levels(colData(BSobj)$age_group), each = 2),
+    '_', c('Glia', 'Neuron')))
+colData(BSobj)$col <- brewer.pal(8, "Paired")[colData(BSobj)$age_group_cell]
+
+pdf(paste0('bumps_bsseqSmooth_', opt$subset, '_', opt$model,
+    '_', opt$permutations, '_with_bsseq_age_cell.pdf'), width = 14)
+palette(brewer.pal(8, "Paired"))
+plot(colData(BSobj)$Age, type = 'p', pch = 21, ylab = 'Age',
+    bg = colData(BSobj)$age_group_cell, cex = 3)
+legend("bottomright", levels(colData(BSobj)$age_group_cell), pch = 15, col=1:8, cex=1.4)
+plotManyRegions(BSobj, regions = bumps$table[1:100, ], extend = 20000, addRegions = bumps$table, annoTrack = list(genes = genes, exons = exons), regionCol = brewer.pal(8, 'Greys')[2])
 dev.off()
 
 ## Reproducibility info
