@@ -122,11 +122,11 @@ colData(BSobj)$age_group_cell <- factor(paste0(colData(BSobj)$age_group, '_',
     colData(BSobj)$Cell.Type),
     levels = paste0(rep(levels(colData(BSobj)$age_group), each = 2),
     '_', c('Glia', 'Neuron')))
-colData(BSobj)$col <- brewer.pal(8, "Paired")[colData(BSobj)$age_group_cell]
+colData(BSobj)$col <- brewer.pal(8, "Paired")[c(5:6, 7:8, 3:4, 1:2)][colData(BSobj)$age_group_cell]
 
 pdf(paste0('bumps_bsseqSmooth_', opt$subset, '_', opt$model,
     '_', opt$permutations, '_with_bsseq_age_cell.pdf'), width = 14)
-palette(brewer.pal(8, "Paired"))
+palette(brewer.pal(8, "Paired")[c(5:6, 7:8, 3:4, 1:2)])
 plot(colData(BSobj)$Age, type = 'p', pch = 21, ylab = 'Age',
     bg = colData(BSobj)$age_group_cell, cex = 3)
 legend("bottomright", levels(colData(BSobj)$age_group_cell), pch = 15, col=1:8, cex=1.4)
