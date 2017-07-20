@@ -137,20 +137,34 @@ dev.off()
 ## ATAC-seq info
 load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ATAC_peaks_methDiffOrdered.rda')
 
+## Subset annotation to match these regions
+genes <- genes(EnsDb.Hsapiens.v75)
+seqlevels(genes) <- paste0('chr', seqlevels(genes))
+regions_gr <- peaks_methDiffOrdered[1:100]
+regions_gr <- resize(regions_gr, width(regions_gr) + 40000, fix = 'center')
+genes <- genes[countOverlaps(genes, regions_gr) > 0]
+
+exons <- exons(EnsDb.Hsapiens.v75)
+seqlevels(exons) <- paste0('chr', seqlevels(exons))
+exons <- exons[countOverlaps(exons, regions_gr) > 0]
+
+bumps_gr <- GRanges(seqnames = bumps$table$chr, IRanges(bumps$table$start, bumps$table$end))
+
 pdf(paste0('bumps_bsseqSmooth_', opt$subset, '_', opt$model,
     '_', opt$permutations, '_ATAC_cell.pdf'), width = 14)
-palette(brewer.pal(8,"Dark2"))
-plotManyRegions(BSobj, regions = peaks_methDiffOrdered[1:100], extend = 20000, addRegions = peaks_methDiffOrdered, annoTrack = list(genes = genes, exons = exons))
+colData(BSobj)$col <- brewer.pal(8,"Dark2")[factor(pd$Cell.Type)]
+plotManyRegions(BSobj, regions = peaks_methDiffOrdered[1:100], extend = 20000, addRegions = peaks_methDiffOrdered, annoTrack = list(genes = genes, exons = exons, DMRs = bumps_gr))
 dev.off()
 
 
 pdf(paste0('bumps_bsseqSmooth_', opt$subset, '_', opt$model,
     '_', opt$permutations, '_ATAC_age_cell.pdf'), width = 14)
 palette(brewer.pal(8, "Paired")[c(5:6, 7:8, 3:4, 1:2)])
+colData(BSobj)$col <- brewer.pal(8, "Paired")[c(5:6, 7:8, 3:4, 1:2)][colData(BSobj)$age_group_cell]
 plot(colData(BSobj)$Age, type = 'p', pch = 21, ylab = 'Age',
     bg = colData(BSobj)$age_group_cell, cex = 3)
 legend("bottomright", levels(colData(BSobj)$age_group_cell), pch = 15, col=1:8, cex=1.4)
-plotManyRegions(BSobj, regions = peaks_methDiffOrdered[1:100], extend = 20000, addRegions = peaks_methDiffOrdered, annoTrack = list(genes = genes, exons = exons), regionCol = brewer.pal(8, 'Greys')[2])
+plotManyRegions(BSobj, regions = peaks_methDiffOrdered[1:100], extend = 20000, addRegions = peaks_methDiffOrdered, annoTrack = list(genes = genes, exons = exons, DMRs = bumps_gr), regionCol = brewer.pal(8, 'Greys')[2])
 dev.off()
 
 
