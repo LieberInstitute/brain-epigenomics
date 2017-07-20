@@ -111,7 +111,7 @@ stopifnot(all(is.finite(range(meth))))
 rm(BSobj)
 
 ## Define parallel environment
-registerDoParallel(cores = opt$cores)
+if(opt$cores > 1) registerDoParallel(cores = opt$cores)
 
 ## Run bumphunter
 bumps <- bumphunter(object = meth,
