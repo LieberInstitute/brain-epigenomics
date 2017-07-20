@@ -22,7 +22,7 @@ echo "Creating script for chromosome Glia + ${cell} using model ${model} with ${
 cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l bluejay,mem_free=220G,h_vmem=220G,h_fsize=100G
+#$ -l bluejay,mem_free=245G,h_vmem=260G,h_fsize=100G
 #$ -N ${SHORT}
 #$ -o ./logs/${SHORT}.txt
 #$ -e ./logs/${SHORT}.txt
