@@ -30,6 +30,8 @@ if(FALSE) {
         permutations = 0)
 }
 
+dir.create('pdf', showWarnings = FALSE)
+
 ## Check inputs
 inputFile <- paste0('bumps_bsseqSmooth_', opt$subset, '_', opt$model,
     '_', opt$permutations, '.Rdata')
@@ -65,7 +67,7 @@ for(i in 1:nrow(meanMeth)) {
 dev.off()
 
 
-pdf(paste0('bumps_bsseqSmooth_', opt$subset, '_', opt$model,
+pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
     '_', opt$permutations, '_CpG_in_DMR.pdf'), width = 14)
 for(i in seq_len(100)) {
     matplot(meth[topInds[[i]], ], pch = 20, bg = factor(pd$Cell.Type), ylim = c(0, 1), ylab = 'DNAm Level', xlab = 'CpG in DMR', col = factor(pd$Cell.Type))
@@ -74,7 +76,7 @@ dev.off()
 
 
 
-pdf(paste0('bumps_bsseqSmooth_', opt$subset, '_', opt$model,
+pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
     '_', opt$permutations, '_boxplot_by_age.pdf'), width = 14)
 for(i in seq_len(100)) {
     df <-  data.frame(
@@ -108,7 +110,7 @@ exons <- exons[countOverlaps(exons, regions_gr) > 0]
 
 
 
-pdf(paste0('bumps_bsseqSmooth_', opt$subset, '_', opt$model,
+pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
     '_', opt$permutations, '_with_bsseq_cell.pdf'), width = 14)
 palette(brewer.pal(8,"Dark2"))
 plotManyRegions(BSobj, regions = bumps$table[1:100, ], extend = 20000, addRegions = bumps$table, annoTrack = list(genes = genes, exons = exons))
@@ -125,7 +127,7 @@ colData(BSobj)$age_group_cell <- factor(paste0(colData(BSobj)$age_group, '_',
     '_', c('Glia', 'Neuron')))
 colData(BSobj)$col <- brewer.pal(8, "Paired")[c(5:6, 7:8, 3:4, 1:2)][colData(BSobj)$age_group_cell]
 
-pdf(paste0('bumps_bsseqSmooth_', opt$subset, '_', opt$model,
+pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
     '_', opt$permutations, '_with_bsseq_age_cell.pdf'), width = 14)
 palette(brewer.pal(8, "Paired")[c(5:6, 7:8, 3:4, 1:2)])
 plot(colData(BSobj)$Age, type = 'p', pch = 21, ylab = 'Age',
@@ -148,14 +150,14 @@ exons <- exons(EnsDb.Hsapiens.v75)
 seqlevels(exons) <- paste0('chr', seqlevels(exons))
 exons <- exons[countOverlaps(exons, regions_gr) > 0]
 
-pdf(paste0('bumps_bsseqSmooth_', opt$subset, '_', opt$model,
+pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
     '_', opt$permutations, '_ATAC_cell.pdf'), width = 14)
 colData(BSobj)$col <- brewer.pal(8,"Dark2")[factor(pd$Cell.Type)]
 plotManyRegions(BSobj, regions = peaks_methDiffOrdered[1:100], extend = 2000, addRegions = peaks_methDiffOrdered, annoTrack = list(genes = genes, exons = exons))
 dev.off()
 
 
-pdf(paste0('bumps_bsseqSmooth_', opt$subset, '_', opt$model,
+pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
     '_', opt$permutations, '_ATAC_age_cell.pdf'), width = 14)
 palette(brewer.pal(8, "Paired")[c(5:6, 7:8, 3:4, 1:2)])
 colData(BSobj)$col <- brewer.pal(8, "Paired")[c(5:6, 7:8, 3:4, 1:2)][colData(BSobj)$age_group_cell]

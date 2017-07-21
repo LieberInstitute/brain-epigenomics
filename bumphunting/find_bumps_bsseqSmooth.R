@@ -95,6 +95,17 @@ if(opt$model == 'cell') {
     cut <- 0.009
 }
 
+## Further filter to reduce the memory load
+cov <- getCoverage(BSobj, type = 'Cov')
+cov.ge1 <- cov >= 3
+cov.filt <- rowSums(cov.ge1) == ncol(cov)
+print("Number of bases filtered")
+cov.tab <- table(cov.filt)
+cov.tab
+round(cov.tab/ sum(cov.tab) * 100, 2)
+BSobj <- BSobj[cov.filt, ]
+rm(cov, cov.ge1, cov.filt, cov.tab)
+
 ## Get chr coordinates and methylation values
 gr <- granges(BSobj)
 #gr <- gr[1:1e6]
@@ -105,7 +116,6 @@ meth <- getMeth(BSobj, type = 'smooth')
 ## Use this code when not filtering
 #meth <- getCoverage(BSobj, type = 'M')  / (getCoverage(BSobj, type = 'Cov') + 1e-05)
 stopifnot(all(is.finite(range(meth))))
-
 
 ## Free some memory
 rm(BSobj)
