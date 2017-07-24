@@ -49,7 +49,7 @@ topInds = mapply(function(s,e) s:e, tab$indexStart, tab$indexEnd)
 meanMeth = lapply(topInds, function(ii) colMeans(t(t(meth[ii,]))))
 meanMeth = do.call("rbind", meanMeth)
 
-pdfFile <- paste0('bumps_bsseqSmooth_', opt$subset, '_', opt$model,
+pdfFile <- paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
     '_', opt$permutations, '.pdf')
 
 pdf(pdfFile)
