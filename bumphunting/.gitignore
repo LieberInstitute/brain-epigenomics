@@ -1,3 +1,5 @@
 *.Rdata
 with_NaNs
 .*.sh
+*.bed
+
