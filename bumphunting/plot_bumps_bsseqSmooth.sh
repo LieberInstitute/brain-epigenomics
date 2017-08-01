@@ -9,7 +9,7 @@ for cell in Neuron
 do
     for model in cell age interaction
     do
-        for permutations in 0
+        for permutations in 250
         do
 
 SHORT="plotting_bumps_bsseqSmooth_${cell}_${model}_${permutations}"
@@ -29,7 +29,7 @@ cat > .${SHORT}.sh <<EOF
 echo "**** Job starts ****"
 date
 
-Rscript plot_bumps_bsseqSmooth.R -m ${model} -s ${cell} -p ${permutations}
+Rscript plot_bumps_bsseqSmooth.R -m ${model} -s ${cell} -p ${permutations} -b FALSE
 
 echo "**** Job ends ****"
 date

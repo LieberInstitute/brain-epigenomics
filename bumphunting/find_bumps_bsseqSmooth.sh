@@ -31,7 +31,7 @@ cat > .${SHORT}.sh <<EOF
 echo "**** Job starts ****"
 date
 
-Rscript find_bumps_bsseqSmooth.R -m ${model} -s ${cell} -p ${permutations} -t ${CORES}
+Rscript find_bumps_bsseqSmooth.R -m ${model} -s ${cell} -p ${permutations} -t ${CORES} -b FALSE
 
 echo "**** Job ends ****"
 date

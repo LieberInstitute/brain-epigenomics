@@ -13,6 +13,7 @@ spec <- matrix(c(
     'cores', 't', 1, 'integer', 'Number of cores to use',
 #    'chromosome', 'c', 1, 'character', 'One of chr1 to chr22, chrX, chrY or chrM'
     'permutations', 'p', 1, 'integer', 'Number of permutations to run',
+    'bootstrap', 'b', 1, 'logical', 'Whether to use Bootstrap or permutation method',
 	'help' , 'h', 0, 'logical', 'Display help'
 ), byrow=TRUE, ncol=5)
 opt <- getopt(spec)
@@ -27,14 +28,14 @@ if (!is.null(opt$help)) {
 ## For testing
 if(FALSE) {
     opt <- list('model' = 'cell', 'subset' = 'Neuron',
-        permutations = 0)
+        permutations = 0, 'bootstrap' = FALSE)
 }
 
 dir.create('pdf', showWarnings = FALSE)
 
 ## Check inputs
 inputFile <- paste0('bumps_bsseqSmooth_', opt$subset, '_', opt$model,
-    '_', opt$permutations, '.Rdata')
+    '_', opt$permutations, ifelse(opt$bootstrap, '', '_perm'), '.Rdata')
 stopifnot(file.exists(inputFile))
 
 load(inputFile)
@@ -50,7 +51,7 @@ meanMeth = lapply(topInds, function(ii) colMeans(t(t(meth[ii,]))))
 meanMeth = do.call("rbind", meanMeth)
 
 pdfFile <- paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
-    '_', opt$permutations, '.pdf')
+    '_', opt$permutations, ifelse(opt$bootstrap, '', '_perm'), '.pdf')
 
 pdf(pdfFile)
 palette(brewer.pal(8,"Dark2"))
@@ -68,7 +69,8 @@ dev.off()
 
 
 pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
-    '_', opt$permutations, '_CpG_in_DMR.pdf'), width = 14)
+    '_', opt$permutations, '_CpG_in_DMR', ifelse(opt$bootstrap, '', '_perm'),
+    '.pdf'), width = 14)
 for(i in seq_len(100)) {
     matplot(meth[topInds[[i]], ], pch = 20, bg = factor(pd$Cell.Type), ylim = c(0, 1), ylab = 'DNAm Level', xlab = 'CpG in DMR', col = factor(pd$Cell.Type))
 }
@@ -77,7 +79,8 @@ dev.off()
 
 
 pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
-    '_', opt$permutations, '_boxplot_by_age.pdf'), width = 14)
+    '_', opt$permutations, '_boxplot_by_age', ifelse(opt$bootstrap, '',
+    '_perm'), '.pdf'), width = 14)
 for(i in seq_len(100)) {
     df <-  data.frame(
         Meth = as.vector(t(meth[topInds[[i]], ])),
@@ -91,7 +94,8 @@ for(i in seq_len(100)) {
 dev.off()
 
 ## Use the plotting code from bsseq
-load(paste0('BSobj_bsseqSmooth_', opt$subset, '.Rdata'))
+load(paste0('BSobj_bsseqSmooth_', opt$subset, '_minCov_3.Rdata'))
+#load(paste0('BSobj_bsseqSmooth_', opt$subset, '.Rdata'))
 ## Add colors
 colData(BSobj)$col <- brewer.pal(8,"Dark2")[factor(pd$Cell.Type)]
 
@@ -111,7 +115,8 @@ exons <- exons[countOverlaps(exons, regions_gr) > 0]
 
 
 pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
-    '_', opt$permutations, '_with_bsseq_cell.pdf'), width = 14)
+    '_', opt$permutations, '_with_bsseq_cell', ifelse(opt$bootstrap, '',
+    '_perm'), '.pdf'), width = 14)
 palette(brewer.pal(8,"Dark2"))
 plotManyRegions(BSobj, regions = bumps$table[1:100, ], extend = 20000, addRegions = bumps$table, annoTrack = list(genes = genes, exons = exons))
 dev.off()
@@ -128,7 +133,8 @@ colData(BSobj)$age_group_cell <- factor(paste0(colData(BSobj)$age_group, '_',
 colData(BSobj)$col <- brewer.pal(8, "Paired")[c(5:6, 7:8, 3:4, 1:2)][colData(BSobj)$age_group_cell]
 
 pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
-    '_', opt$permutations, '_with_bsseq_age_cell.pdf'), width = 14)
+    '_', opt$permutations, '_with_bsseq_age_cell', ifelse(opt$bootstrap, '',
+    '_perm'), '.pdf'), width = 14)
 palette(brewer.pal(8, "Paired")[c(5:6, 7:8, 3:4, 1:2)])
 plot(colData(BSobj)$Age, type = 'p', pch = 21, ylab = 'Age',
     bg = colData(BSobj)$age_group_cell, cex = 3)
@@ -151,14 +157,16 @@ seqlevels(exons) <- paste0('chr', seqlevels(exons))
 exons <- exons[countOverlaps(exons, regions_gr) > 0]
 
 pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
-    '_', opt$permutations, '_ATAC_cell.pdf'), width = 14)
+    '_', opt$permutations, '_ATAC_cell', ifelse(opt$bootstrap, '', '_perm'),
+    '.pdf'), width = 14)
 colData(BSobj)$col <- brewer.pal(8,"Dark2")[factor(pd$Cell.Type)]
 plotManyRegions(BSobj, regions = peaks_methDiffOrdered[1:100], extend = 2000, addRegions = peaks_methDiffOrdered, annoTrack = list(genes = genes, exons = exons))
 dev.off()
 
 
 pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
-    '_', opt$permutations, '_ATAC_age_cell.pdf'), width = 14)
+    '_', opt$permutations, '_ATAC_age_cell', ifelse(opt$bootstrap, '',
+    '_perm'), '.pdf'), width = 14)
 palette(brewer.pal(8, "Paired")[c(5:6, 7:8, 3:4, 1:2)])
 colData(BSobj)$col <- brewer.pal(8, "Paired")[c(5:6, 7:8, 3:4, 1:2)][colData(BSobj)$age_group_cell]
 plot(colData(BSobj)$Age, type = 'p', pch = 21, ylab = 'Age',

@@ -11,6 +11,7 @@ spec <- matrix(c(
     'cores', 't', 1, 'integer', 'Number of cores to use',
 #    'chromosome', 'c', 1, 'character', 'One of chr1 to chr22, chrX, chrY or chrM'
     'permutations', 'p', 1, 'integer', 'Number of permutations to run',
+    'bootstrap', 'b', 1, 'logical', 'Whether to use Bootstrap or permutation method',
 	'help' , 'h', 0, 'logical', 'Display help'
 ), byrow=TRUE, ncol=5)
 opt <- getopt(spec)
@@ -25,7 +26,7 @@ if (!is.null(opt$help)) {
 ## For testing
 if(FALSE) {
     opt <- list('model' = 'cell', 'subset' = 'Neuron', cores = 1,
-        permutations = 0)
+        permutations = 0, 'bootstrap' = FALSE)
 }
 
 ## Check inputs
@@ -68,16 +69,36 @@ if(!file.exists(paste0('BSobj_', opt$subset, '.Rdata'))) {
     rm(rvar, rvar.filt)
     
 } else {
-    ## Smooth with bsseq
-    if(!file.exists(paste0('BSobj_bsseqSmooth_', opt$subset, '.Rdata'))) {
-        load(paste0('BSobj_', opt$subset, '.Rdata'))
-        BSobj <- BSmooth(BSobj, mc.cores = opt$cores, parallelBy = 'sample')
-        save(BSobj, file = paste0('BSobj_bsseqSmooth_', opt$subset, '.Rdata'))
+    if (!file.exists(paste0('BSobj_bsseqSmooth_', opt$subset, '_minCov_3.Rdata'))) {
+        ## Smooth with bsseq
+        if(!file.exists(paste0('BSobj_bsseqSmooth_', opt$subset, '.Rdata'))) {
+            load(paste0('BSobj_', opt$subset, '.Rdata'))
+            BSobj <- BSmooth(BSobj, mc.cores = opt$cores, parallelBy = 'sample')
+            save(BSobj, file = paste0('BSobj_bsseqSmooth_', opt$subset,
+                '.Rdata'))
+        } else {
+            load(paste0('BSobj_bsseqSmooth_', opt$subset, '.Rdata'))
+        }
+    
+        ## Further filter to reduce the memory load
+        cov <- getCoverage(BSobj, type = 'Cov')
+        cov.ge1 <- cov >= 3
+        cov.filt <- rowSums(cov.ge1) == ncol(cov)
+        print("Number of bases filtered")
+        cov.tab <- table(cov.filt)
+        cov.tab
+        round(cov.tab/ sum(cov.tab) * 100, 2)
+        BSobj <- BSobj[cov.filt, ]
+        rm(cov, cov.ge1, cov.filt, cov.tab)
+    
+        save(BSobj, file = paste0('BSobj_bsseqSmooth_', opt$subset,
+            '_minCov_3.Rdata'))
+    
     } else {
-        load(paste0('BSobj_bsseqSmooth_', opt$subset, '.Rdata'))
+        load(paste0('BSobj_bsseqSmooth_', opt$subset, '_minCov_3.Rdata'))
     }
-    pd <- pData(BSobj)
 }
+pd <- pData(BSobj)
 
 
 print(paste('Number of samples used:', nrow(pd)))
@@ -94,17 +115,6 @@ if(opt$model == 'cell') {
     coef <- grep(':', colnames(design))
     cut <- 0.009
 }
-
-## Further filter to reduce the memory load
-cov <- getCoverage(BSobj, type = 'Cov')
-cov.ge1 <- cov >= 3
-cov.filt <- rowSums(cov.ge1) == ncol(cov)
-print("Number of bases filtered")
-cov.tab <- table(cov.filt)
-cov.tab
-round(cov.tab/ sum(cov.tab) * 100, 2)
-BSobj <- BSobj[cov.filt, ]
-rm(cov, cov.ge1, cov.filt, cov.tab)
 
 ## Get chr coordinates and methylation values
 gr <- granges(BSobj)
@@ -127,11 +137,12 @@ registerDoParallel(cores = opt$cores)
 bumps <- bumphunter(object = meth,
     design = design, chr = as.character(seqnames(gr)), pos = start(gr),
     maxGap = 1000, B = opt$permutations, coef = coef, cutoff = cut,
-    nullMethod = 'bootstrap', smooth = FALSE)
+    nullMethod = ifelse(opt$bootstrap, 'bootstrap', 'permutation'),
+    smooth = FALSE)
 
 ## Save results
 save(bumps, pd, file = paste0('bumps_bsseqSmooth_', opt$subset, '_', opt$model,
-    '_', opt$permutations, '.Rdata'))
+    '_', opt$permutations, ifelse(opt$bootstrap, '', '_perm'), '.Rdata'))
 
 ## Reproducibility info
 proc.time()
