@@ -3,7 +3,7 @@
 FILELIST=/dcl01/lieber/ajaffe/Amanda/ATAC/FinalPeaks/scripts/finalizedList-pooled.txt
 ID=$(awk "NR==$SGE_TASK_ID" $FILELIST)
 
-CPGs=/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/BSobj_bsseqSmooth_Neuron_minCov_3.bed
+CPGs=/dcl01/lieber/ajaffe/Amanda/ATAC/Coverage/coverage_at_CpGs/BSobj_bsseqSmooth_Neuron_minCov_3_sorted.bed
 sortedbed=/dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set/${ID}.final.sorted.bed
 
 cd /dcl01/lieber/ajaffe/Amanda/ATAC/Coverage/coverage_at_CpGs
