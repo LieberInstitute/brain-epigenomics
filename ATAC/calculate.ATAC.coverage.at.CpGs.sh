@@ -5,8 +5,11 @@ ID=$(awk "NR==$SGE_TASK_ID" $FILELIST)
 
 CPGs=/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/BSobj_bsseqSmooth_Neuron_minCov_3.bed
 BED=/dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set/${ID}.final.10bp-added2.bed
+sortedbed=/dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set/${ID}.final.sorted.bed
 
 cd /dcl01/lieber/ajaffe/Amanda/ATAC/Coverage/coverage_at_CpGs
 module load bedtools/2.24.0
 
-coverageBed -sorted -g ../../genome_files/hg19.genome.reordered -counts -a $CPGs -b $BED > ${ID}_CpGs_coverageBed.txt
+sort -k1,1 -k2,2n $BED > $sortedbed
+
+coverageBed -sorted -g ../../genome_files/hg19.genome.reordered -counts -a $CPGs -b $sortedbed > ${ID}_CpGs_coverageBed.txt
