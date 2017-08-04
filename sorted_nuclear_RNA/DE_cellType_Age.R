@@ -1,0 +1,89 @@
+#results <- do.call(rbind, lapply(regs, function(reg) {
+#  message(paste(Sys.time(), 'processing region', reg))
+#  design <- with(subset(pd, Region == reg), model.matrix(~ Dx + RIN + age + Sex + Race + mitoRate + gene_Assigned_Percent))
+#  
+#  counts <- geneCounts[, pd$Region == reg]
+#  dge <- DGEList(counts = counts)
+#  dge <- calcNormFactors(dge)
+#  v <- voom(dge, design, plot = TRUE)
+#  fit <- lmFit(v, design)
+#  fit <- eBayes(fit)
+#  log2FC <- fit$coefficients[, 2]
+#  pvalue <- fit$p.value[, 2]
+#  qvalue <- qvalue(pvalue)$qvalues
+#  gene_res <- cbind(data.frame(log2FC, pvalue, qvalue, Region = rep(reg, nrow(counts))), geneMap)
+#  rownames(gene_res) <- NULL
+#  return(gene_res)
+#}))
+
+
+library("limma")
+library("edgeR")
+
+
+load("./Dropbox/Support_RNA-seq/data/rawCounts_CellSorting_July5_n12.rda")
+
+# format phenotype table
+metrics[grep("12", metrics$SampleID),"Age"] = "Neonate"
+metrics[grep("13", metrics$SampleID),"Age"] = "Teenager"
+metrics[grep("14", metrics$SampleID),"Age"] = "Toddler"
+metrics$CellType = ifelse(metrics$NeuN=="NeuN_Minus", "Glia", "Neuron")
+
+polya = metrics[which(metrics$Prep=="PolyA"),]
+ribo = metrics[which(metrics$Prep=="Ribo"),]
+
+# format counts
+geneCounts = geneCounts[rowSums(geneCounts)>0,]
+polyaCounts = geneCounts[,grep("PolyA", colnames(geneCounts))]
+riboCounts = geneCounts[,grep("Ribo", colnames(geneCounts))]
+exonCounts = exonCounts[rowSums(exonCounts)>0,]
+polyaExons = exonCounts[,grep("PolyA", colnames(exonCounts))]
+riboExons = exonCounts[,grep("Ribo", colnames(exonCounts))]
+
+match(rownames(polya), colnames(polyaCounts))
+match(rownames(ribo), colnames(riboCounts))
+match(rownames(polya), colnames(polyaExons))
+match(rownames(ribo), colnames(riboExons))
+
+### Differential expression: gene level
+# PolyA
+design <- model.matrix(~ polya$Age + polya$CellType)
+pdge <- DGEList(counts = polyaCounts)
+pdge <- calcNormFactors(pdge)
+pdat <- voom(pdge, design, plot = TRUE)
+fit_gene_polya <- lmFit(pdat, design)
+fit_gene_polya <- eBayes(fit_gene_polya)
+
+# Ribo
+design <- model.matrix(~ ribo$Age + ribo$CellType)
+rdge <- DGEList(counts = riboCounts)
+rdge <- calcNormFactors(rdge)
+rdat <- voom(rdge, design, plot = TRUE)
+fit_gene_ribo <- lmFit(rdat, design)
+fit_gene_ribo <- eBayes(fit_gene_ribo)
+
+### Differential expression: exon level
+# PolyA
+design <- model.matrix(~ polya$Age + polya$CellType)
+pdee <- DGEList(counts = polyaExons)
+pdee <- calcNormFactors(pdee)
+pdat.exons <- voom(pdee, design, plot = TRUE)
+fit_exon_polya <- lmFit(pdat.exons, design)
+fit_exon_polya <- eBayes(fit_exon_polya)
+
+# Ribo
+design <- model.matrix(~ ribo$Age + ribo$CellType)
+rdee <- DGEList(counts = riboExons)
+rdee <- calcNormFactors(rdee)
+rdat.exons <- voom(rdee, design, plot = TRUE)
+fit_exon_ribo <- lmFit(rdat.exons, design)
+fit_exon_ribo <- eBayes(fit_exon_ribo)
+
+save(fit_gene_polya,fit_gene_ribo,fit_exon_polya,fit_exon_ribo, file="./Dropbox/Support_RNA-seq/data/DE_limma_results_objects.rda")
+
+
+
+
+
+
+
