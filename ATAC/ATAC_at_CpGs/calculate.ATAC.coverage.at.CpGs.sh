@@ -9,4 +9,4 @@ sortedbed=/dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set/${ID}.final.sorted.
 cd /dcl01/lieber/ajaffe/Amanda/ATAC/Coverage/coverage_at_CpGs
 module load bedtools/2.24.0
 
-coverageBed -sorted -g ../../genome_files/hg19.genome.reordered -counts -a $CPGs -b $sortedbed > ${ID}_CpGs_coverageBed.txt
+coverageBed -sorted -g ../../genome_files/hg19.genome.reordered2 -counts -a $CPGs -b $sortedbed > ${ID}_CpGs_coverageBed.txt
