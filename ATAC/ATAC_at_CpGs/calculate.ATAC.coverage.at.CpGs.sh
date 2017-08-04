@@ -1,4 +1,4 @@
-# qsub -tc 245 -l mf=10G,h_vmem=10G,h_fsize=15G,h_stack=256M -m e -M amanda.joy.price@gmail.com -t 1-34 calculate.ATAC.coverage.at.CpGs.sh
+# qsub -tc 245 -l mf=15G,h_vmem=15G,h_fsize=25G,h_stack=256M -m e -M amanda.joy.price@gmail.com -t 1-34 calculate.ATAC.coverage.at.CpGs.sh
 
 FILELIST=/dcl01/lieber/ajaffe/Amanda/ATAC/FinalPeaks/scripts/finalizedList-pooled.txt
 ID=$(awk "NR==$SGE_TASK_ID" $FILELIST)
