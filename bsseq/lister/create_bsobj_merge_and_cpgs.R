@@ -47,6 +47,8 @@ files <- dir(pattern = '_BSobj_lister_nonCG_highCov.Rdata')
 load_filt <- function(f) {
     message(paste(Sys.time(), 'loading', f))
     load(f)
+    ## Tweak reportFiles so they can be combined
+    colData(BSobj)$reportFiles <- gsub('chr.*', '', colData(BSobj)$reportFiles)
     return(BSobj)
 }
 
