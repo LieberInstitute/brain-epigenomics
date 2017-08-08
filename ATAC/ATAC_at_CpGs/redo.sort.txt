@@ -1,0 +1,7 @@
+Minus10
+Minus30
+Plus9
+Plus30
+Plus27
+Minus27
+Plus8
