@@ -41,10 +41,14 @@ stopifnot(file.exists(inputFile))
 
 load(inputFile)
 
-load(paste0('BSobj_bsseqSmooth_', opt$subset, '_minCov_3.Rdata'))
-meth <- getMeth(BSobj, type = 'raw')
-pd <- pData(BSobj)
-rm(BSobj)
+if(opt$permutations != 0) {
+    load(paste0('BSobj_bsseqSmooth_', opt$subset, '_minCov_3.Rdata'))
+    meth <- getMeth(BSobj, type = 'raw')
+    pd <- pData(BSobj)
+    rm(BSobj)
+} else {
+    load('../processed_beta_values_plusMap.rda')
+}
 
 ## tale of top loci
 if(opt$top100) {
