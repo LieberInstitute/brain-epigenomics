@@ -30,7 +30,7 @@ gr <- rowRanges(BSobj)
 Cov <- M <- matrix(0, nrow = length(gr_all_highCov), ncol = ncol(BSobj))
 colnames(Cov) <- colnames(M) <- colnames(BSobj)
 
-ov <- findOverlaps(gr_cpgs, rowRanges(BSobj))
+ov <- findOverlaps(gr_all_highCov, rowRanges(BSobj))
 M[queryHits(ov), ] <- assays(BSobj)$M[subjectHits(ov), ]
 Cov[queryHits(ov), ] <- assays(BSobj)$Cov[subjectHits(ov), ]
 
