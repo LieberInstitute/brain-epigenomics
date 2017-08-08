@@ -26,8 +26,7 @@ BSobj_raw <- combineList(bpmapply(function(input_file, sample) {
     read.bismark(input_file, sample, strandCollapse = FALSE,
         fileType = 'cov')
 }, pd$reportFiles, pd$sample_name, SIMPLIFY = FALSE,
-    BPPARAM = SnowParam(opt$cores,
-        outfile =  Sys.getenv('SGE_STDERR_PATH'))))
+    BPPARAM = SerialParam()))
 
 
 ## Filter based on CpGs with minCov >=3 
