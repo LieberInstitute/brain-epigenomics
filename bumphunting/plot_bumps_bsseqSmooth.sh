@@ -29,7 +29,7 @@ cat > .${SHORT}.sh <<EOF
 echo "**** Job starts ****"
 date
 
-Rscript plot_bumps_bsseqSmooth.R -m ${model} -s ${cell} -p ${permutations} -b FALSE
+Rscript plot_bumps_bsseqSmooth.R -m ${model} -s ${cell} -p ${permutations} -b FALSE -i FALSE
 
 echo "**** Job ends ****"
 date
