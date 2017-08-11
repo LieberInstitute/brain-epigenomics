@@ -20,7 +20,7 @@ FILELIST=/dcl01/lieber/ajaffe/Amanda/ATAC/FinalPeaks/scripts/finalizedList-poole
 ID=$(awk "NR==$SGE_TASK_ID" $FILELIST)
 
 CPGs=/dcl01/lieber/ajaffe/Amanda/ATAC/Coverage/coverage_at_CpGs/BSobj_bsseqSmooth_Neuron_minCov_3_resized_sorted.bed
-sortedbed=/dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set/${ID}.final.sorted.bed
+sortedbed=/dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set/${ID}.final.sorted.6col.bed
 
 module load bedtools/2.24.0
 
