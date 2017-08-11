@@ -1,8 +1,8 @@
 #!/bin/bash
 #$ -cwd
 #$ -N complete_CpGs
-#$ -o ./complete_CpGs.$TASK_ID.txt
-#$ -e ./complete_CpGs.$TASK_ID.txt
+#$ -o ./logs/complete_CpGs.$TASK_ID.txt
+#$ -e ./logs/complete_CpGs.$TASK_ID.txt
 #$ -m e
 #$ -l bluejay,mem_free=20G,h_vmem=20G,h_fsize=100G
 #$ -t 2,15
@@ -26,7 +26,7 @@ module load bedtools/2.24.0
 
 echo ${ID}
 
-coverageBed -sorted -g ../../genome_files/hg19.genome.reordered2 -counts -a $CPGs -b $sortedbed > ${ID}_CpGs_coverageBed_versionByLeo.txt
+coverageBed -sorted -g /dcl01/lieber/ajaffe/Amanda/ATAC/genome_files/hg19.genome.reordered2 -counts -a $CPGs -b $sortedbed > ${ID}_CpGs_coverageBed_versionByLeo.txt
 
 echo "**** Job ends ****"
 date
