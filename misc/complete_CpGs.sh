@@ -26,7 +26,7 @@ module load bedtools/2.24.0
 
 echo ${ID}
 
-coverageBed -sorted -g ../../genome_files/hg19.genome.reordered2 -counts -a $CPGs -b $sortedbed > /dcl01/lieber/ajaffe/Amanda/ATAC/Coverage/coverage_at_CpGs/${ID}_CpGs_coverageBed_versionByLeo.txt
+coverageBed -sorted -g ../../genome_files/hg19.genome.reordered2 -counts -a $CPGs -b $sortedbed > ${ID}_CpGs_coverageBed_versionByLeo.txt
 
 echo "**** Job ends ****"
 date
