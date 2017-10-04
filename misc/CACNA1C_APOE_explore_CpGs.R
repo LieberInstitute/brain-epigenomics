@@ -1,3 +1,4 @@
+# qrsh -l bluejay,mem_free=40G,h_vmem=40G
 library('bsseq')
 library('bumphunter')
 library('devtools')
@@ -8,20 +9,21 @@ library('EnsDb.Hsapiens.v75')
     
 dir.create('pdf', showWarnings = FALSE)
 
+window_extend <- 1000
 
 ## Load CpG data
 load(file.path('/dcl01/lieber/ajaffe/lab/brain-epigenomics', 'bumphunting',
    'BSobj_bsseqSmooth_Neuron_minCov_3.Rdata'))
 
 ## Regions of interest to plot
-regions <- GRanges(c('chr12', 'chr19'),
+regions <- GRanges(c('chr12', 'chr19', 'chr6'),
     IRanges(
-        c(2162416, 45392785),
-        c(2807115, 45428904)
+        c(2162416, 45392785, 35541362),
+        c(2807115, 45428904, 35696397)
     )
 )
-names(regions) <- c('CACNA1C', 'APOE')
-regions_long <- resize(regions, width(regions) + 40000, fix = 'center')
+names(regions) <- c('CACNA1C', 'APOE', 'FKBP5')
+regions_long <- resize(regions, width(regions) + window_extend * 2, fix = 'center')
 
 ## Subset BSobj
 ov <- findOverlaps(regions_long, rowRanges(BSobj))
@@ -49,19 +51,19 @@ seqlevels(exons) <- paste0('chr', seqlevels(exons))
 exons <- exons[countOverlaps(exons, regions_long) > 0]
 
 ## Get the main exons to highlight
-exonid <- select(EnsDb.Hsapiens.v75, keys = c('APOE', 'CACNA1C'), keytype = 'GENENAME', columns = c('EXONID', 'GENENAME'))
+exonid <- select(EnsDb.Hsapiens.v75, keys = names(regions), keytype = 'GENENAME', columns = c('EXONID', 'GENENAME'))
 main_ex <- exons[names(exons) %in% exonid$EXONID]
 
 
 ## Split by gene
-for(gene in c('APOE', 'CACNA1C')) {
+for(gene in names(regions)) {
     regs_plot <- regs_w_clus[subjectHits(findOverlaps(regions[gene], regs_w_clus))]
 
     ## Make the plots
     colData(BSobj)$col <- brewer.pal(8,"Dark2")[factor(colData(BSobj)$Cell.Type)]
     pdf(paste0('pdf/', gene, '_with_bsseq_cell.pdf'), width = 14)
     palette(brewer.pal(8,"Dark2"))
-    plotManyRegions(BSobj, regions = regs_plot, extend = 20000, addRegions = main_ex, annoTrack = list(genes = genes, exons = exons), regionCol = brewer.pal(8, 'Greys')[2])
+    plotManyRegions(BSobj, regions = regs_plot, extend = window_extend, addRegions = main_ex, annoTrack = list(genes = genes, exons = exons), regionCol = brewer.pal(8, 'Greys')[2])
     dev.off()
 
     ## Add age groups
@@ -81,7 +83,7 @@ for(gene in c('APOE', 'CACNA1C')) {
     plot(colData(BSobj)$Age, type = 'p', pch = 21, ylab = 'Age',
         bg = colData(BSobj)$age_group_cell, cex = 3)
     legend("bottomright", levels(colData(BSobj)$age_group_cell), pch = 15, col=1:8, cex=1.4)
-    plotManyRegions(BSobj, regions = regs_plot, extend = 20000, addRegions = main_ex, annoTrack = list(genes = genes, exons = exons), regionCol = brewer.pal(8, 'Greys')[2])
+    plotManyRegions(BSobj, regions = regs_plot, extend = window_extend, addRegions = main_ex, annoTrack = list(genes = genes, exons = exons), regionCol = brewer.pal(8, 'Greys')[2])
     dev.off()
 }
 
@@ -99,7 +101,7 @@ session_info()
 #  language (EN)
 #  collate  en_US.UTF-8
 #  tz       <NA>
-#  date     2017-09-19
+#  date     2017-10-02
 #
 # Packages --------------------------------------------------------------------------------------------------------------
 #  package                * version  date       source
@@ -174,7 +176,6 @@ session_info()
 #  rngtools                 1.2.4    2014-03-06 CRAN (R 3.3.0)
 #  Rsamtools                1.26.2   2017-05-10 Bioconductor
 #  RSQLite                  2.0      2017-06-19 CRAN (R 3.3.3)
-#  rstudioapi               0.6      2016-06-27 CRAN (R 3.3.1)
 #  rtracklayer              1.34.2   2017-06-05 Bioconductor
 #  S4Vectors              * 0.12.2   2017-06-05 Bioconductor
 #  scales                   0.5.0    2017-08-24 CRAN (R 3.3.3)
