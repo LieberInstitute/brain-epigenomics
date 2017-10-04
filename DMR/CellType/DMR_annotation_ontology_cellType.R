@@ -13,7 +13,7 @@ load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/bumps_bsseqSmooth_N
 
 cell = bumps[[1]]
 dim(cell) # 241924     14
-dim(cell[which(cell$fwerArea<=0.05),]) # 11179    14
+dim(cell[which(cell$fwer<=0.05),]) # 11179    14
 
 
 # Annotate editing sites to features in the genome
@@ -298,7 +298,7 @@ save(compareKegg, compareKegg.dir, compareBP, compareBP.dir, compareMF, compareM
      file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CellType/KEGG_GO_DO_objects.rda")
 
 # plot compared results
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CellType/KEGG_GO_DO_plots.pdf", height = 20, width = 20)
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CellType/DMR_KEGG_GO_DO_plots_byCellType.pdf", height = 20, width = 20)
 plot(compareKegg, colorBy="p.adjust", showCategory = 45, title= "KEGG Pathway Enrichment")
 plot(compareBP, colorBy="p.adjust", showCategory = 45, title= "Biological Process GO Enrichment")
 plot(compareMF, colorBy="p.adjust", showCategory = 45, title= "Molecular Function GO Enrichment")

@@ -6,14 +6,17 @@ library(clusterProfiler)
 require(org.Hs.eg.db)
 
 load("/dcl01/lieber/ajaffe/CellSorting/RNAseq_pipeline/rawCounts_CellSorting_July5_n12.rda")
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/bumps_bsseqSmooth_Neuron_interaction_250_perm.Rdata")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/RData_objects/nonCG_highCov_neuronsOnly_pca_pd_methTable.Rdata")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/RData_objects/limma_exploration_nonCG_highCov_neuronsOnly.Rdata")
 
+### Just Neurons ###
 
-## How many regions are DMRs? (model: ~ age + cell + age:cell)
+## How many sites are DM? (model: ~ age)
 
-interaction = bumps[[1]]
-dim(interaction) # 26282     14
-dim(interaction[which(interaction$fwer<=0.05),]) # 2178    14
+CHneurons = cbind(as.data.frame(gr), lods = ebResults$lods[,2], Tstat = ebResults$t[,2], pval = ebResults$p.value[,2])
+CHneurons$padj = p.adjust(CHneurons$pval, method = "fdr")
+dim(CHneurons) # 36099584       11
+dim(CHneurons[which(CHneurons$padj<=0.05),]) # 4020371      11 
 
 
 # Annotate editing sites to features in the genome
@@ -31,76 +34,78 @@ features = c(features, islands = makeGRangesFromDataFrame(islands, keep.extra.co
              promoters = promoters(txdb, upstream=2000, downstream=200))
 lapply(features, head)
 
-grinteraction = makeGRangesFromDataFrame(interaction, keep.extra.columns = T)
-annotation = lapply(features, function(y) findOverlaps(grinteraction, y))
+grCHneurons = makeGRangesFromDataFrame(CHneurons, keep.extra.columns = T)
+annotation = lapply(features, function(y) findOverlaps(grCHneurons, y))
 
-grinteraction$rnum = 1:length(grinteraction)
-grinteraction$cds = ifelse(grinteraction$rnum %in% queryHits(annotation[["CDS"]]), "CDS", NA)
-grinteraction$intron = ifelse(grinteraction$rnum %in% queryHits(annotation[["Introns"]]), "Intron", NA)
-grinteraction$UTR5 = ifelse(grinteraction$rnum %in% queryHits(annotation[["UTR5"]]), "UTR5", NA)
-grinteraction$UTR3 = ifelse(grinteraction$rnum %in% queryHits(annotation[["UTR3"]]), "UTR3", NA)
-grinteraction$islands = ifelse(grinteraction$rnum %in% queryHits(annotation[["islands"]]), "CpG_Island", "non-Island")
-grinteraction$promoter = ifelse(grinteraction$rnum %in% queryHits(annotation[["promoters"]]), "Promoter", NA)
-grinteraction$anno = paste0(grinteraction$cds,":",grinteraction$intron, ":", grinteraction$UTR5, ":", grinteraction$UTR3, ":", grinteraction$promoter)
+grCHneurons$rnum = 1:length(grCHneurons)
+grCHneurons$cds = ifelse(grCHneurons$rnum %in% queryHits(annotation[["CDS"]]), "CDS", NA)
+grCHneurons$intron = ifelse(grCHneurons$rnum %in% queryHits(annotation[["Introns"]]), "Intron", NA)
+grCHneurons$UTR5 = ifelse(grCHneurons$rnum %in% queryHits(annotation[["UTR5"]]), "UTR5", NA)
+grCHneurons$UTR3 = ifelse(grCHneurons$rnum %in% queryHits(annotation[["UTR3"]]), "UTR3", NA)
+grCHneurons$islands = ifelse(grCHneurons$rnum %in% queryHits(annotation[["islands"]]), "CpG_Island", "non-Island")
+grCHneurons$promoter = ifelse(grCHneurons$rnum %in% queryHits(annotation[["promoters"]]), "Promoter", NA)
+grCHneurons$anno = paste0(grCHneurons$cds,":",grCHneurons$intron, ":", grCHneurons$UTR5, ":", grCHneurons$UTR3, ":", grCHneurons$promoter)
 
-interaction = as.data.frame(grinteraction)
-interaction[which(interaction$anno == "NA:NA:NA:NA:NA"),"annotation"] = "Other" 
-interaction[grep("CDS", interaction$cds),"annotation"] = "CDS"
-interaction[which(is.na(interaction$annotation) & interaction$UTR5 == "UTR5"),"annotation"] = "UTR5"
-interaction[which(is.na(interaction$annotation) & interaction$UTR3 == "UTR3"),"annotation"] = "UTR3"
-interaction[which(is.na(interaction$annotation) & interaction$intron == "Intron"),"annotation"] = "Intron"
-interaction[which(is.na(interaction$annotation) & interaction$promoter == "Promoter"),"annotation"] = "Promoter"
+CHneurons = as.data.frame(grCHneurons)
+CHneurons[which(CHneurons$anno == "NA:NA:NA:NA:NA"),"annotation"] = "Other" 
+CHneurons[grep("CDS", CHneurons$cds),"annotation"] = "CDS"
+CHneurons[which(is.na(CHneurons$annotation) & CHneurons$UTR5 == "UTR5"),"annotation"] = "UTR5"
+CHneurons[which(is.na(CHneurons$annotation) & CHneurons$UTR3 == "UTR3"),"annotation"] = "UTR3"
+CHneurons[which(is.na(CHneurons$annotation) & CHneurons$intron == "Intron"),"annotation"] = "Intron"
+CHneurons[which(is.na(CHneurons$annotation) & CHneurons$promoter == "Promoter"),"annotation"] = "Promoter"
 
 # Mapping cell sites to nearest gene
 geneMapGR = makeGRangesFromDataFrame(geneMap, start.field="Start",end.field="End",strand.field="Strand",keep=TRUE)
-dA = distanceToNearest(grinteraction, geneMapGR)
-interaction$nearestSymbol = geneMapGR$Symbol[subjectHits(dA)]
-interaction$nearestID = names(geneMapGR)[subjectHits(dA)]
-interaction$distToGene = mcols(dA)$distance
-interaction$EntrezID = geneMapGR$EntrezID[subjectHits(dA)]
-interaction$regionID = paste0(interaction$seqnames,":",interaction$start,"-", interaction$end)
-interaction$sig = ifelse(interaction$fwer<=0.05, "FWER < 0.05", "FWER > 0.05")
-interaction$Dir = ifelse(interaction$value<0, "neg", "pos")
-dtinteraction = data.table(interaction)
-
+dA = distanceToNearest(grCHneurons, geneMapGR)
+CHneurons$nearestSymbol = geneMapGR$Symbol[subjectHits(dA)]
+CHneurons$nearestID = names(geneMapGR)[subjectHits(dA)]
+CHneurons$distToGene = mcols(dA)$distance
+CHneurons$EntrezID = geneMapGR$EntrezID[subjectHits(dA)]
+CHneurons$regionID = paste0(CHneurons$seqnames,":",CHneurons$start,"-", CHneurons$end)
+CHneurons$sig = ifelse(CHneurons$padj<=0.05, "FDR < 0.05", "FDR > 0.05")
+CHneurons$Dir = ifelse(CHneurons$Tstat<0, "neg", "pos")
+dtCHneurons = data.table(CHneurons)
+save(CHneurons, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/RData_objects/CHneurons_object.rda")
 
 ### Explore annotation of regions
 
 ## how many fall within CpG islands?
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/DMR_overap_with_CpG_Islands_CT_Age_Interaction.pdf")
-x = dtinteraction[,length(unique(regionID)), by = "islands"]
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/non-CpG_overap_with_CpG_Islands_neuronsOnly_byAge.pdf")
+x = dtCHneurons[,length(unique(regionID)), by = "islands"]
 x$perc = round(x$V1/sum(x$V1)*100,2)
 ggplot(x, aes(x = islands, y = V1)) + geom_bar(stat = "identity") +
   geom_text(aes( label = paste0(perc,"%")), vjust = -.5) +
   labs(fill="") +
   ylab("Count") + 
   xlab("") +
-  ggtitle("DMRs Overlapping CpG Islands: All DMRs") +
+  ggtitle("non-CpGs Overlapping CpG Islands:\nAll non-CpGs") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 
-x = dtinteraction[sig=="FWER < 0.05",length(unique(regionID)), by = "islands"]
+x = dtCHneurons[sig=="FDR < 0.05",length(unique(regionID)), by = "islands"]
 x$perc = round(x$V1/sum(x$V1)*100,2)
 ggplot(x, aes(x = islands, y = V1)) + geom_bar(stat = "identity") +
   geom_text(aes( label = paste0(perc,"%")), vjust = -.5) +
   labs(fill="") +
   ylab("Count") + 
   xlab("") +
-  ggtitle("DMRs Overlapping CpG Islands: FWER < 0.05") +
+  ggtitle("non-CpGs Overlapping CpG Islands:\nFDR < 0.05") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 
-x = dtinteraction[,length(unique(regionID)), by = c("islands", "sig")]
-x$perc = unlist(c(round(x[1:2,"V1"]/sum(x[1:2,"V1"])*100,2),
-           round(x[3:4,"V1"]/sum(x[3:4,"V1"])*100,2)))
+x = dtCHneurons[,length(unique(regionID)), by = c("islands", "sig")]
+x$perc = unlist(c(round(x[1,"V1"]/sum(x[c(1,3),"V1"])*100,2),
+                  round(x[2,"V1"]/sum(x[c(2,4),"V1"])*100,2),
+                  round(x[3,"V1"]/sum(x[c(1,3),"V1"])*100,2),
+                  round(x[4,"V1"]/sum(x[c(2,4),"V1"])*100,2)))
 ggplot(x, aes(x = islands, y = V1)) + geom_bar(stat = "identity") +
   geom_text(aes( label = paste0(perc,"%")), vjust = -.5) +
   facet_grid(. ~ sig) +
   labs(fill="") +
   ylab("Count") + 
   xlab("") +
-  ggtitle("DMRs Overlapping CpG Islands") +
+  ggtitle("non-CpGs Overlapping CpG Islands") +
   theme(axis.text.x=element_text(angle=45,hjust=1)) +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
@@ -108,48 +113,48 @@ dev.off()
 
 # Is there a relationship between being significantly DM and overlapping a CpG island?
 
-fisher.test(data.frame(c(nrow(interaction[which(interaction$sig=="FWER < 0.05" & interaction$islands=="CpG_Island"),]),
-                         nrow(interaction[which(interaction$sig=="FWER > 0.05" & interaction$islands=="CpG_Island"),])),
-                       c(nrow(interaction[which(interaction$sig=="FWER < 0.05" & interaction$islands=="non-Island"),]),
-                         nrow(interaction[which(interaction$sig=="FWER > 0.05" & interaction$islands=="non-Island"),]))))
-# CpG islands are overrepresented in DMRs
+fisher.test(data.frame(c(nrow(CHneurons[which(CHneurons$sig=="FDR < 0.05" & CHneurons$islands=="CpG_Island"),]),
+                         nrow(CHneurons[which(CHneurons$sig=="FDR > 0.05" & CHneurons$islands=="CpG_Island"),])),
+                       c(nrow(CHneurons[which(CHneurons$sig=="FDR < 0.05" & CHneurons$islands=="non-Island"),]),
+                         nrow(CHneurons[which(CHneurons$sig=="FDR > 0.05" & CHneurons$islands=="non-Island"),]))))
+# CpG islands are depleted in dmCH
 #p-value < 2.2e-16
 #alternative hypothesis: true odds ratio is not equal to 1
 #95 percent confidence interval:
-#  2.864436 3.825320
+#  0.1925635 0.2024278
 #sample estimates:
 #  odds ratio 
-#3.314157
-
+#0.1974567
 
 # assign genomic features
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/DMR_annotation_CT_Age_Interaction.pdf")
-x = dtinteraction[,length(unique(regionID)), by = "annotation"]
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/non-CpG_annotation_neuronsOnly_byAge.pdf")
+x = dtCHneurons[,length(unique(regionID)), by = "annotation"]
 x$perc = round(x$V1/sum(x$V1)*100,2)
 ggplot(x, aes(x = annotation, y = V1)) + geom_bar(stat = "identity") +
   geom_text(aes( label = paste0(perc,"%")), vjust = -.5) +
   labs(fill="") +
   ylab("Count") + 
   xlab("") +
-  ggtitle("DMR annotation: All DMRs") +
+  ggtitle("non-CpG annotation: All non-CpGs") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 
-x = dtinteraction[sig=="FWER < 0.05",length(unique(regionID)), by = "annotation"]
+x = dtCHneurons[sig=="FDR < 0.05",length(unique(regionID)), by = "annotation"]
 x$perc = round(x$V1/sum(x$V1)*100,2)
 ggplot(x, aes(x = annotation, y = V1)) + geom_bar(stat = "identity") +
   geom_text(aes( label = paste0(perc,"%")), vjust = -.5) +
   labs(fill="") +
   ylab("Count") + 
   xlab("") +
-  ggtitle("DMR annotation: FWER < 0.05") +
+  ggtitle("non-CpG annotation: FDR < 0.05") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 
-x = dtinteraction[,length(unique(regionID)), by = c("annotation", "sig")]
-x$perc = unlist(c(round(x[1:6,"V1"]/sum(x[1:6,"V1"])*100,2),
-                  round(x[7:12,"V1"]/sum(x[7:12,"V1"])*100,2)))
+x = dtCHneurons[,length(unique(regionID)), by = c("annotation", "sig")]
+x$perc = NA
+x$perc[grep("<", x$sig)] = unlist(c(round(x[grep("<", x$sig),"V1"]/sum(x[grep("<", x$sig),"V1"])*100,2)))
+x$perc[grep(">", x$sig)] = unlist(c(round(x[grep(">", x$sig),"V1"]/sum(x[grep(">", x$sig),"V1"])*100,2)))
 ggplot(x, aes(x = annotation, y = V1)) + geom_bar(stat = "identity") +
   geom_text(aes( label = paste0(perc,"%")), vjust = -.5) +
   facet_grid(. ~ sig) +
@@ -157,74 +162,74 @@ ggplot(x, aes(x = annotation, y = V1)) + geom_bar(stat = "identity") +
   ylab("Count") + 
   theme(axis.text.x=element_text(angle=45,hjust=1)) +
   xlab("") +
-  ggtitle("DMR annotation") +
+  ggtitle("non-CpG annotation") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 dev.off()
 
 # Is there a relationship between being significantly DM and overlapping a gene?
 
-fisher.test(data.frame(c(nrow(interaction[which(interaction$sig=="FWER < 0.05" & interaction$distToGene==0),]),
-                         nrow(interaction[which(interaction$sig=="FWER > 0.05" & interaction$distToGene==0),])),
-                       c(nrow(interaction[which(interaction$sig=="FWER < 0.05" & interaction$distToGene>0),]),
-                         nrow(interaction[which(interaction$sig=="FWER > 0.05" & interaction$distToGene>0),]))))
-# Genes are overrepresented in DMRs
-#p-value = 2.511e-11
+fisher.test(data.frame(c(nrow(CHneurons[which(CHneurons$sig=="FDR < 0.05" & CHneurons$distToGene==0),]),
+                         nrow(CHneurons[which(CHneurons$sig=="FDR > 0.05" & CHneurons$distToGene==0),])),
+                       c(nrow(CHneurons[which(CHneurons$sig=="FDR < 0.05" & CHneurons$distToGene>0),]),
+                         nrow(CHneurons[which(CHneurons$sig=="FDR > 0.05" & CHneurons$distToGene>0),]))))
+# Genes are underrepresented in dmCH
+#p-value < 2.2e-16
 #alternative hypothesis: true odds ratio is not equal to 1
 #95 percent confidence interval:
-#  1.274575 1.574807
+#  0.8328637 0.8367461
 #sample estimates:
 #  odds ratio 
-#1.415813 
+#0.8347676  
 
 # Is there a relationship between being significantly DM and overlapping a promoter?
 
-fisher.test(data.frame(c(nrow(interaction[which(interaction$sig=="FWER < 0.05" & interaction$annotation=="Promoter"),]),
-                         nrow(interaction[which(interaction$sig=="FWER > 0.05" & interaction$annotation=="Promoter"),])),
-                       c(nrow(interaction[which(interaction$sig=="FWER < 0.05" & interaction$annotation!="Promoter"),]),
-                         nrow(interaction[which(interaction$sig=="FWER > 0.05" & interaction$annotation!="Promoter"),]))))
-# promoters by themselves aren't overrepresented in DMRs
-#p-value = 0.26
+fisher.test(data.frame(c(nrow(CHneurons[which(CHneurons$sig=="FDR < 0.05" & CHneurons$annotation=="Promoter"),]),
+                         nrow(CHneurons[which(CHneurons$sig=="FDR > 0.05" & CHneurons$annotation=="Promoter"),])),
+                       c(nrow(CHneurons[which(CHneurons$sig=="FDR < 0.05" & CHneurons$annotation!="Promoter"),]),
+                         nrow(CHneurons[which(CHneurons$sig=="FDR > 0.05" & CHneurons$annotation!="Promoter"),]))))
+# promoters are underrepresented in dmCH
+#p-value < 2.2e-16
 #alternative hypothesis: true odds ratio is not equal to 1
 #95 percent confidence interval:
-#  0.9219585 1.3248631
+#  0.9166502 0.9308900
 #sample estimates:
 #  odds ratio 
-#1.108489 
+#0.9237535
 
 # Is there a relationship between being significantly DM and overlapping a gene and/or promoter?
 
-fisher.test(data.frame(c(nrow(interaction[which(interaction$sig=="FWER < 0.05" & interaction$annotation!="Other"),]),
-                         nrow(interaction[which(interaction$sig=="FWER > 0.05" & interaction$annotation!="Other"),])),
-                       c(nrow(interaction[which(interaction$sig=="FWER < 0.05" & interaction$annotation=="Other"),]),
-                         nrow(interaction[which(interaction$sig=="FWER > 0.05" & interaction$annotation=="Other"),]))))
-# genes and promoters together are overrepresented in DMRs
-#p-value = 1.759e-14
+fisher.test(data.frame(c(nrow(CHneurons[which(CHneurons$sig=="FDR < 0.05" & CHneurons$annotation!="Other"),]),
+                         nrow(CHneurons[which(CHneurons$sig=="FDR > 0.05" & CHneurons$annotation!="Other"),])),
+                       c(nrow(CHneurons[which(CHneurons$sig=="FDR < 0.05" & CHneurons$annotation=="Other"),]),
+                         nrow(CHneurons[which(CHneurons$sig=="FDR > 0.05" & CHneurons$annotation=="Other"),]))))
+# genes and promoters together are underrepresented in dmCH
+#p-value < 2.2e-16
 #alternative hypothesis: true odds ratio is not equal to 1
 #95 percent confidence interval:
-#  1.373659 1.734670
+#  0.8311978 0.8350066
 #sample estimates:
 #  odds ratio 
-#1.542175 
+#0.8331474
 
 
 ### Gene Ontology
-entrez = list(All = dtinteraction[sig=="FWER < 0.05",list(na.omit(EntrezID)),], 
-              GenesPlusPromoters = dtinteraction[annotation != "Other" & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
-              Genes = dtinteraction[distToGene==0 & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
-              Promoters = dtinteraction[annotation == "Promoter" & sig=="FWER < 0.05",list(na.omit(EntrezID)),])
-entrez.dir = list(All.pos = dtinteraction[value>0 & sig=="FWER < 0.05",list(na.omit(EntrezID)),], 
-                  GenesPlusPromoters.pos = dtinteraction[value>0 & annotation != "Other" & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
-                  Genes.pos = dtinteraction[value>0 & distToGene==0 & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
-                  Promoters.pos = dtinteraction[value>0 & annotation == "Promoter" & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
-                  All.neg = dtinteraction[value<0 & sig=="FWER < 0.05",list(na.omit(EntrezID)),], 
-                  GenesPlusPromoters.neg = dtinteraction[value<0 & annotation != "Other" & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
-                  Genes.neg = dtinteraction[value<0 & distToGene==0 & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
-                  Promoters.neg = dtinteraction[value<0 & annotation == "Promoter" & sig=="FWER < 0.05",list(na.omit(EntrezID)),])
+entrez = list(All = dtCHneurons[sig=="FDR < 0.05",list(na.omit(EntrezID)),], 
+              GenesPlusPromoters = dtCHneurons[annotation != "Other" & sig=="FDR < 0.05",list(na.omit(EntrezID)),],
+              Genes = dtCHneurons[distToGene==0 & sig=="FDR < 0.05",list(na.omit(EntrezID)),],
+              Promoters = dtCHneurons[annotation == "Promoter" & sig=="FDR < 0.05",list(na.omit(EntrezID)),])
+entrez.dir = list(All.pos = dtCHneurons[Tstat>0 & sig=="FDR < 0.05",list(na.omit(EntrezID)),], 
+                  GenesPlusPromoters.pos = dtCHneurons[Tstat>0 & annotation != "Other" & sig=="FDR < 0.05",list(na.omit(EntrezID)),],
+                  Genes.pos = dtCHneurons[Tstat>0 & distToGene==0 & sig=="FDR < 0.05",list(na.omit(EntrezID)),],
+                  Promoters.pos = dtCHneurons[Tstat>0 & annotation == "Promoter" & sig=="FDR < 0.05",list(na.omit(EntrezID)),],
+                  All.neg = dtCHneurons[Tstat<0 & sig=="FDR < 0.05",list(na.omit(EntrezID)),], 
+                  GenesPlusPromoters.neg = dtCHneurons[Tstat<0 & annotation != "Other" & sig=="FDR < 0.05",list(na.omit(EntrezID)),],
+                  Genes.neg = dtCHneurons[Tstat<0 & distToGene==0 & sig=="FDR < 0.05",list(na.omit(EntrezID)),],
+                  Promoters.neg = dtCHneurons[Tstat<0 & annotation == "Promoter" & sig=="FDR < 0.05",list(na.omit(EntrezID)),])
 entrez = lapply(entrez, function(x) as.character(unique(x$V1)))              
 entrez.dir = lapply(entrez.dir, function(x) as.character(unique(x$V1)))       
 
-GeneUniverse = dtinteraction[,list(na.omit(EntrezID)),]
+GeneUniverse = dtCHneurons[,list(na.omit(EntrezID)),]
 GeneUniverse = as.character(unique(GeneUniverse$V1))
 
 # Find enriched Pathways via KEGG
@@ -292,19 +297,21 @@ compareDO = compareCluster(entrez, fun="enrichDO",  ont = "DO", qvalueCutoff = 0
 compareDO.dir = compareCluster(entrez.dir, fun="enrichDO",  ont = "DO", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
 
 # save, write to csv
-save(compareKegg, compareKegg.dir, compareBP, compareBP.dir, compareMF, compareMF.dir, compareCC, compareCC.dir,
+save(compareKegg, compareKegg.dir, compareBP, compareBP.dir, compareMF, compareMF.dir, compareCC, compareCC.dir, compareDO, compareDO.dir,
      keggList, keggList.dir, goList_BP, goList_BP.dir, goList_MF, goList_MF.dir, goList_CC, goList_CC.dir, goList_DO, goList_DO.dir,
      keggListdf, keggList.dir.df, goListdf_BP, goListdf_BP.dir, goListdf_MF, goListdf_MF.dir, goListdf_CC, goListdf_CC.dir, goListdf_DO, goListdf_DO.dir,
-     file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/KEGG_GO_DO_objects.rda")
+     file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/KEGG_GO_DO_objects.rda")
 
 # plot compared results
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/DMR_KEGG_GO_DO_plots_CT_Age_Interaction.pdf", height = 20, width = 20)
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/non-CpG_KEGG_GO_DO_plots_neuronsOnly_byAge.pdf", height = 20, width = 20)
 plot(compareKegg, colorBy="p.adjust", showCategory = 45, title= "KEGG Pathway Enrichment")
 plot(compareBP, colorBy="p.adjust", showCategory = 45, title= "Biological Process GO Enrichment")
 plot(compareMF, colorBy="p.adjust", showCategory = 45, title= "Molecular Function GO Enrichment")
 plot(compareCC, colorBy="p.adjust", showCategory = 45, title= "Cellular Compartment GO Enrichment")
+plot(compareDO, colorBy="p.adjust", showCategory = 30, title= "Disease Ontology Enrichment")
 plot(compareKegg.dir, colorBy="p.adjust", showCategory = 45, title= "KEGG Pathway Enrichment")
 plot(compareBP.dir, colorBy="p.adjust", showCategory = 45, title= "Biological Process GO Enrichment")
 plot(compareMF.dir, colorBy="p.adjust", showCategory = 45, title= "Molecular Function GO Enrichment")
 plot(compareCC.dir, colorBy="p.adjust", showCategory = 45, title= "Cellular Compartment GO Enrichment")
+plot(compareDO.dir, colorBy="p.adjust", showCategory = 30, title= "Disease Ontology Enrichment")
 dev.off()
