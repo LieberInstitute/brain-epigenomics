@@ -17,8 +17,8 @@ dim(interaction[which(interaction$fwer<=0.05),]) # 2178    14
 
 
 # Annotate editing sites to features in the genome
-txdb = loadDb("/dcl01/lieber/ajaffe/lab/brain-epigenomics/annotation_objects/gencode.v25lift37.annotation.sqlite")
-islands = read.table("/dcl01/lieber/ajaffe/lab/brain-epigenomics/annotation_objects/cpgIslandExt.hg19.txt", sep="\t", header = T)
+txdb = loadDb("/dcl01/lieber/ajaffe/Amanda/annotation_objects/gencode.v25lift37.annotation.sqlite")
+islands = read.table("/dcl01/lieber/ajaffe/Amanda/annotation_objects/cpgIslandExt.hg19.txt", sep="\t", header = T)
 features = list(CDS = cdsBy(txdb, by="tx", use.names=T), Introns = intronsByTranscript(txdb, use.names=T), 
                 UTR5 = fiveUTRsByTranscript(txdb, use.names=T), UTR3 = threeUTRsByTranscript(txdb, use.names=T))
 features = lapply(features, function(x) unlist(x, recursive = TRUE, use.names = TRUE))
@@ -68,7 +68,7 @@ dtinteraction = data.table(interaction)
 
 ## how many fall within CpG islands?
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/DMR_overap_with_CpG_Islands_CT_Age_Interaction.pdf")
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/figures/DMR_overap_with_CpG_Islands_CT_Age_Interaction.pdf")
 x = dtinteraction[,length(unique(regionID)), by = "islands"]
 x$perc = round(x$V1/sum(x$V1)*100,2)
 ggplot(x, aes(x = islands, y = V1)) + geom_bar(stat = "identity") +
@@ -124,7 +124,7 @@ fisher.test(data.frame(c(nrow(interaction[which(interaction$sig=="FWER < 0.05" &
 
 # assign genomic features
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/DMR_annotation_CT_Age_Interaction.pdf")
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/figures/DMR_annotation_CT_Age_Interaction.pdf")
 x = dtinteraction[,length(unique(regionID)), by = "annotation"]
 x$perc = round(x$V1/sum(x$V1)*100,2)
 ggplot(x, aes(x = annotation, y = V1)) + geom_bar(stat = "identity") +
@@ -295,10 +295,10 @@ compareDO.dir = compareCluster(entrez.dir, fun="enrichDO",  ont = "DO", qvalueCu
 save(compareKegg, compareKegg.dir, compareBP, compareBP.dir, compareMF, compareMF.dir, compareCC, compareCC.dir,
      keggList, keggList.dir, goList_BP, goList_BP.dir, goList_MF, goList_MF.dir, goList_CC, goList_CC.dir, goList_DO, goList_DO.dir,
      keggListdf, keggList.dir.df, goListdf_BP, goListdf_BP.dir, goListdf_MF, goListdf_MF.dir, goListdf_CC, goListdf_CC.dir, goListdf_DO, goListdf_DO.dir,
-     file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/KEGG_GO_DO_objects.rda")
+     file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/CT_Age_Interaction/DMR_KEGG_GO_DO_objects_CT_Age_Interaction.rda")
 
 # plot compared results
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/DMR_KEGG_GO_DO_plots_CT_Age_Interaction.pdf", height = 20, width = 20)
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/figures/DMR_KEGG_GO_DO_plots_CT_Age_Interaction.pdf", height = 20, width = 20)
 plot(compareKegg, colorBy="p.adjust", showCategory = 45, title= "KEGG Pathway Enrichment")
 plot(compareBP, colorBy="p.adjust", showCategory = 45, title= "Biological Process GO Enrichment")
 plot(compareMF, colorBy="p.adjust", showCategory = 45, title= "Molecular Function GO Enrichment")

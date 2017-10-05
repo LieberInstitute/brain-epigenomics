@@ -18,8 +18,8 @@ dim(cell) # 241924     14
 dim(cell[which(cell$fwer<=0.05),]) # 11179    14
 
 # Annotate editing sites to features in the genome
-txdb = loadDb("/dcl01/lieber/ajaffe/lab/brain-epigenomics/annotation_objects/gencode.v25lift37.annotation.sqlite")
-islands = read.table("/dcl01/lieber/ajaffe/lab/brain-epigenomics/annotation_objects/cpgIslandExt.hg19.txt", sep="\t", header = T)
+txdb = loadDb("/dcl01/lieber/ajaffe/Amanda/annotation_objects/gencode.v25lift37.annotation.sqlite")
+islands = read.table("/dcl01/lieber/ajaffe/Amanda/annotation_objects/cpgIslandExt.hg19.txt", sep="\t", header = T)
 features = list(CDS = cdsBy(txdb, by="tx", use.names=T), Introns = intronsByTranscript(txdb, use.names=T), 
                 UTR5 = fiveUTRsByTranscript(txdb, use.names=T), UTR3 = threeUTRsByTranscript(txdb, use.names=T))
 features = lapply(features, function(x) unlist(x, recursive = TRUE, use.names = TRUE))
@@ -163,4 +163,4 @@ pd$Reads <- as.numeric(pd$Reads)
 pd$Percent.GreaterThan.Q30 <- as.numeric(pd$Percent.GreaterThan.Q30)
 
 
-save(DMR, geneMap, pd, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/DMR_objects.rda")
+save(DMR, geneMap, pd, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda")

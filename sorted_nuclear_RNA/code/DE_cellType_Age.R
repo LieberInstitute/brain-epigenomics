@@ -21,7 +21,7 @@ library("limma")
 library("edgeR")
 
 
-load("./Dropbox/Support_RNA-seq/data/rawCounts_CellSorting_July5_n12.rda")
+load("/dcl01/lieber/ajaffe/CellSorting/RNAseq_pipeline/rawCounts_CellSorting_July5_n12.rda")
 
 # format phenotype table
 metrics[grep("12", metrics$SampleID),"Age"] = "Neonate"

@@ -42,7 +42,7 @@ pcs <- prcomp(t(meth))
 pcaVars <- getPcaVars(pcs)
 names(pcaVars) <- paste0('PC', seq_len(length(pcaVars)))
 save(pcs, pcaVars, pd, meth, gr, 
-     file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/RData_objects/nonCG_highCov_neuronsOnly_pca_pd_methTable.Rdata")
+     file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/nonCG_highCov_neuronsOnly_pca_pd_methTable.Rdata")
 
 ## Explore with limma
 model <- with(pd, model.matrix(~ Age))
@@ -58,5 +58,5 @@ summary(abs(coef_interest))
 ebResults <- ebayes(fit)
 pvalue <- ebResults$p.value[, 2]
 padj = p.adjust(pvalue, method = "fdr")
-save(fit, model, coef_interest, ebResults, file = '/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/RData_objects/limma_exploration_nonCG_highCov_neuronsOnly.Rdata')
+save(fit, model, coef_interest, ebResults, file = '/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/limma_exploration_nonCG_highCov_neuronsOnly.Rdata')
 
