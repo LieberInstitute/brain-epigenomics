@@ -12,9 +12,9 @@ dim(nucRNAres[which(nucRNAres$padj.CellTypeNeuron<=0.05),]) # 9994
 dim(nucRNAres[which(nucRNAres$padj.CellTypeNeuron<=0.05 & nucRNAres$Coeff.CellTypeNeuron > 0),]) # 6521
 
 
-### Correlate gene expression by cell type and DNA methylation by cell type
+### Correlate gene expression and DMR
 
-## DMR
+## by cell type
 cell = cbind(DMR$CellType, nucRNAres[match(DMR$CellType$nearestID, nucRNAres$gencodeID),])
 dtcell = data.table(cell)
 
@@ -43,12 +43,12 @@ length(na.omit(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UT
 cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR5")), "Coeff.CellTypeNeuron"]
 length(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR5") & cell$value!="NA" & cell$Coeff.CellTypeNeuron!="NA"), "Coeff.CellTypeNeuron"])
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/sorted_nuclear_RNA/figures/LFC_gene_expression_vs_meanBetadiff_byCellType.pdf")
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/sorted_nuclear_RNA/figures/LFC_gene_expression_vs_meanBetadiff_byCellType.pdf", width = 10)
 ggplot(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR5") & cell$value!="NA" & cell$Coeff.CellTypeNeuron!="NA"),], 
        aes(x = value, y = Coeff.CellTypeNeuron)) + geom_point(alpha=1/10) +
   geom_smooth(method=lm) +
   labs(fill="") +
-  ylab("Log2(Fold Change)") + 
+  ylab("Log2(Fold Change)\nGene Expression") + 
   xlab("Mean Difference in Beta") +
   ggtitle("Cell Type DMRs (FWER<0.05) in Promoters or 5'UTR\nvs. Cell Type Gene Expression\nr=-0.47") +
   theme(title = element_text(size = 20)) +
@@ -57,7 +57,7 @@ ggplot(cell[which(cell$fwer<=0.05 & cell$annotation=="Other" & cell$value!="NA" 
        aes(x = value, y = Coeff.CellTypeNeuron)) + geom_point(alpha=1/10) +
   geom_smooth(method=lm) +
   labs(fill="") +
-  ylab("Log2(Fold Change)") + 
+  ylab("Log2(Fold Change)\nGene Expression") + 
   xlab("Mean Difference in Beta") +
   ggtitle("Intergenic Cell Type DMRs (FWER<0.05)\nvs. Nearest Gene Expression\nr=-0.18") +
   theme(title = element_text(size = 20)) +
