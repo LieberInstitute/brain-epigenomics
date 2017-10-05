@@ -4,7 +4,7 @@ library(pheatmap)
 library(RColorBrewer)
 
 
-load("./Dropbox/Support_RNA-seq/data/rawCounts_CellSorting_July5_n12.rda")
+load("/dcl01/lieber/ajaffe/CellSorting/RNAseq_pipeline/rawCounts_CellSorting_July5_n12.rda")
 
 # process counts for PCA
 metrics[grep("12", metrics$SampleID),"Age"] = "Neonate"
@@ -15,8 +15,8 @@ metrics$CellType = ifelse(metrics$NeuN=="NeuN_Minus", "Glia", "Neuron")
 dds = DESeqDataSetFromMatrix(countData = geneCounts, colData = metrics, design = ~ Prep + Age + CellType)
 rlog.dds  = rlog(dds)
 rlog = rlog(geneCounts)
-save(rlog,rlog.dds,file="./Dropbox/Support_RNA-seq/data/rlog_transformed_dds_sorted_nuclear_RNA.rda")
-load("./Dropbox/Support_RNA-seq/data/rlog_transformed_dds_sorted_nuclear_RNA.rda")
+save(rlog,rlog.dds,file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/sorted_nuclear_RNA/rlog_transformed_dds_sorted_nuclear_RNA.rda")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/sorted_nuclear_RNA/rlog_transformed_dds_sorted_nuclear_RNA.rda")
 
 ### PCA Functions ###
 
