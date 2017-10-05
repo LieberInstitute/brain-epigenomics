@@ -62,6 +62,17 @@ rdat <- voom(rdge, design, plot = TRUE)
 fit_gene_ribo <- lmFit(rdat, design)
 fit_gene_ribo <- eBayes(fit_gene_ribo)
 
+# Together
+combinedCounts = polyaCounts + riboCounts
+match(rownames(polya), colnames(combinedCounts))
+design <- model.matrix(~ polya$Age + polya$CellType)
+rdge <- DGEList(counts = combinedCounts)
+rdge <- calcNormFactors(rdge)
+rdat <- voom(rdge, design, plot = F)
+fit_gene_combined <- lmFit(rdat, design)
+fit_gene_combined <- eBayes(fit_gene_combined)
+
+
 ### Differential expression: exon level
 # PolyA
 design <- model.matrix(~ polya$Age + polya$CellType)
@@ -79,7 +90,21 @@ rdat.exons <- voom(rdee, design, plot = TRUE)
 fit_exon_ribo <- lmFit(rdat.exons, design)
 fit_exon_ribo <- eBayes(fit_exon_ribo)
 
-save(fit_gene_polya,fit_gene_ribo,fit_exon_polya,fit_exon_ribo, file="./Dropbox/Support_RNA-seq/data/DE_limma_results_objects.rda")
+# Together
+combinedExons = polyaExons + riboExons
+match(rownames(polya), colnames(combinedExons))
+design <- model.matrix(~ polya$Age + polya$CellType)
+rdge <- DGEList(counts = combinedExons)
+rdge <- calcNormFactors(rdge)
+rdat <- voom(rdge, design, plot = F)
+fit_exon_combined <- lmFit(rdat, design)
+fit_exon_combined <- eBayes(fit_exon_combined)
+
+
+
+
+save(fit_gene_polya,fit_gene_ribo,fit_exon_polya,fit_exon_ribo, fit_gene_combined, fit_exon_combined, 
+     file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/sorted_nuclear_RNA/DE_limma_results_objects.rda")
 
 
 
