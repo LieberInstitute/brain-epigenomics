@@ -164,3 +164,16 @@ pd$Percent.GreaterThan.Q30 <- as.numeric(pd$Percent.GreaterThan.Q30)
 
 
 save(DMR, geneMap, pd, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda")
+
+names = c("CellType", "Age", "CT_Age_Interaction")
+for (i in (1:length(DMR))){
+  tmp = DMR[[i]]
+  write.csv(tmp[which(tmp$fwer<=0.05),], 
+            file=paste0("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/", names[i], "/", names(DMR)[i],"_DMRs_fwer_0.05.csv"),
+            quote=F)
+}
+
+
+
+
+
