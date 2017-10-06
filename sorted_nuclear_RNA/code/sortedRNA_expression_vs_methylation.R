@@ -91,7 +91,23 @@ ggplot(cell[which(cell$fwer<=0.05 & cell$annotation=="Other" & cell$value!="NA" 
   theme(text = element_text(size = 20))
 dev.off()
 
-
+# make contingency tables of quadrants of the above plots
+tables = list(Prom.5UTR = data.frame(c(nrow(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR5") & cell$Coeff.CellTypeNeuron>0 & cell$value<0),]),
+                                       nrow(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR5") & cell$Coeff.CellTypeNeuron<0 & cell$value<0),])),
+                                     c(nrow(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR5") & cell$Coeff.CellTypeNeuron>0 & cell$value>0),]),
+                                       nrow(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR5") & cell$Coeff.CellTypeNeuron<0 & cell$value>0),]))),
+              CDSonly = data.frame(c(nrow(cell[which(cell$fwer<=0.05 & cell$cds=="CDS" & cell$Coeff.CellTypeNeuron>0 & cell$value<0),]),
+                                     nrow(cell[which(cell$fwer<=0.05 & cell$cds=="CDS" & cell$Coeff.CellTypeNeuron<0 & cell$value<0),])),
+                                   c(nrow(cell[which(cell$fwer<=0.05 & cell$cds=="CDS" & cell$Coeff.CellTypeNeuron>0 & cell$value>0),]),
+                                     nrow(cell[which(cell$fwer<=0.05 & cell$cds=="CDS" & cell$Coeff.CellTypeNeuron<0 & cell$value>0),]))),
+              CDS.Introns = data.frame(c(nrow(cell[which(cell$fwer<=0.05 & (cell$cds=="CDS" | cell$intron=="Intron") & cell$Coeff.CellTypeNeuron>0 & cell$value<0),]),
+                                         nrow(cell[which(cell$fwer<=0.05 & (cell$cds=="CDS" | cell$intron=="Intron") & cell$Coeff.CellTypeNeuron<0 & cell$value<0),])),
+                                       c(nrow(cell[which(cell$fwer<=0.05 & (cell$cds=="CDS" | cell$intron=="Intron") & cell$Coeff.CellTypeNeuron>0 & cell$value>0),]),
+                                         nrow(cell[which(cell$fwer<=0.05 & (cell$cds=="CDS" | cell$intron=="Intron") & cell$Coeff.CellTypeNeuron<0 & cell$value>0),]))),
+              Intergenic = data.frame(c(nrow(cell[which(cell$fwer<=0.05 & cell$annotation=="Other" & cell$Coeff.CellTypeNeuron>0 & cell$value<0),]),
+                                        nrow(cell[which(cell$fwer<=0.05 & cell$annotation=="Other" & cell$Coeff.CellTypeNeuron<0 & cell$value<0),])),
+                                      c(nrow(cell[which(cell$fwer<=0.05 & cell$annotation=="Other" & cell$Coeff.CellTypeNeuron>0 & cell$value>0),]),
+                                        nrow(cell[which(cell$fwer<=0.05 & cell$annotation=="Other" & cell$Coeff.CellTypeNeuron<0 & cell$value>0),]))))
 
 
 
