@@ -37,13 +37,22 @@ cor(x = cell[which(cell$fwer<=0.05 & cell$distToGene==0), "value"],
 # correlate intergenic DMRs with expression
 cor(x = cell[which(cell$fwer<=0.05 & cell$annotation=="Other"), "value"], 
     y = cell[which(cell$fwer<=0.05 & cell$annotation=="Other"), "Coeff.CellTypeNeuron"], use = "pairwise.complete.obs") # -0.1755019
+# correlate Gene Body (ie, CDS | Introns) with expression
+cor(x = cell[which(cell$fwer<=0.05 & (cell$cds=="CDS" | cell$intron=="Intron")), "value"], 
+    y = cell[which(cell$fwer<=0.05 & (cell$cds=="CDS" | cell$intron=="Intron")), "Coeff.CellTypeNeuron"], use = "pairwise.complete.obs") #  -0.4494576
+cor(x = cell[which(cell$fwer<=0.05 & (cell$annotation=="CDS" | cell$annotation=="Intron")), "value"], 
+    y = cell[which(cell$fwer<=0.05 & (cell$annotation=="CDS" | cell$annotation=="Intron")), "Coeff.CellTypeNeuron"], use = "pairwise.complete.obs") #  -0.443522
+# correlate CDS with expression
+cor(x = cell[which(cell$fwer<=0.05 & cell$annotation=="CDS"), "value"], 
+    y = cell[which(cell$fwer<=0.05 & cell$annotation=="CDS"), "Coeff.CellTypeNeuron"], use = "pairwise.complete.obs") #  -0.462388
+
 
 length(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR5")), "value"])
 length(na.omit(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR5")), "value"]))
 cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR5")), "Coeff.CellTypeNeuron"]
 length(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR5") & cell$value!="NA" & cell$Coeff.CellTypeNeuron!="NA"), "Coeff.CellTypeNeuron"])
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/sorted_nuclear_RNA/figures/LFC_gene_expression_vs_meanBetadiff_byCellType.pdf", width = 10)
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/sorted_nuclear_RNA/figures/LFC_gene_expression_vs_meanBetadiff_byCellType.pdf", width = 9, height = 9)
 ggplot(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR5") & cell$value!="NA" & cell$Coeff.CellTypeNeuron!="NA"),], 
        aes(x = value, y = Coeff.CellTypeNeuron)) + geom_point(alpha=1/10) +
   geom_smooth(method=lm) +
@@ -51,6 +60,24 @@ ggplot(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR
   ylab("Log2(Fold Change)\nGene Expression") + 
   xlab("Mean Difference in Beta") +
   ggtitle("Cell Type DMRs (FWER<0.05) in Promoters or 5'UTR\nvs. Cell Type Gene Expression\nr=-0.47") +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20))
+ggplot(cell[which(cell$fwer<=0.05 & cell$cds=="CDS" & cell$value!="NA" & cell$Coeff.CellTypeNeuron!="NA"),], 
+       aes(x = value, y = Coeff.CellTypeNeuron)) + geom_point(alpha=1/10) +
+  geom_smooth(method=lm) +
+  labs(fill="") +
+  ylab("Log2(Fold Change)\nGene Expression") + 
+  xlab("Mean Difference in Beta") +
+  ggtitle("Cell Type DMRs (FWER<0.05) in CDS\nvs. Cell Type Gene Expression\nr=-0.46") +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20))
+ggplot(cell[which(cell$fwer<=0.05 & (cell$cds=="CDS" | cell$intron=="Intron") & cell$value!="NA" & cell$Coeff.CellTypeNeuron!="NA"),], 
+       aes(x = value, y = Coeff.CellTypeNeuron)) + geom_point(alpha=1/10) +
+  geom_smooth(method=lm) +
+  labs(fill="") +
+  ylab("Log2(Fold Change)\nGene Expression") + 
+  xlab("Mean Difference in Beta") +
+  ggtitle("Cell Type DMRs (FWER<0.05) in CDS or Introns\nvs. Cell Type Gene Expression\nr=-0.45") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 ggplot(cell[which(cell$fwer<=0.05 & cell$annotation=="Other" & cell$value!="NA" & cell$Coeff.CellTypeNeuron!="NA"),], 
