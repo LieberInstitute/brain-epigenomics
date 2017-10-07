@@ -109,6 +109,38 @@ tables = list(Prom.5UTR = data.frame(c(nrow(cell[which(cell$fwer<=0.05 & (cell$p
                                       c(nrow(cell[which(cell$fwer<=0.05 & cell$annotation=="Other" & cell$Coeff.CellTypeNeuron>0 & cell$value>0),]),
                                         nrow(cell[which(cell$fwer<=0.05 & cell$annotation=="Other" & cell$Coeff.CellTypeNeuron<0 & cell$value>0),]))))
 
+fisher = lapply(tables, fisher.test)
+p = data.frame(pval.quad = unlist(lapply(fisher, function(x) x$p.value)), 
+               odds.quad = unlist(lapply(fisher, function(x) x$estimate)), 
+               conf.int1.quad = unlist(lapply(fisher, function(x) x$conf.int[1])),
+               conf.int2.quad = unlist(lapply(fisher, function(x) x$conf.int[2])))
+#pval.quad odds.quad conf.int1.quad conf.int2.quad
+#Prom.5UTR   2.185770e-149  6.500542       5.585876       7.575867
+#CDSonly      1.381958e-97  6.083485       5.079201       7.301256
+#CDS.Introns  0.000000e+00  6.403200       5.787354       7.088556
+#Intergenic   1.297670e-08  2.026202       1.569693       2.631323
+
+
+# are genes with DMR more likely to be sigDEG?
+tables = list(Prom.5UTR = data.frame(c(nrow(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR5") & cell$fwer<=0.05 & cell$padj.CellTypeNeuron<=0.05),]),
+                                       nrow(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR5") & cell$fwer>0.05 & cell$padj.CellTypeNeuron<=0.05),])),
+                                     c(nrow(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR5") & cell$fwer<=0.05 & cell$padj.CellTypeNeuron>0.05),]),
+                                       nrow(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR5") & cell$fwer>0.05 & cell$padj.CellTypeNeuron>0.05),]))),
+              CDSonly = data.frame(c(nrow(cell[which(cell$fwer<=0.05 & cell$cds=="CDS" & cell$fwer<=0.05 & cell$padj.CellTypeNeuron<=0.05),]),
+                                     nrow(cell[which(cell$fwer<=0.05 & cell$cds=="CDS" & cell$fwer>0.05 & cell$padj.CellTypeNeuron<=0.05),])),
+                                   c(nrow(cell[which(cell$fwer<=0.05 & cell$cds=="CDS" & cell$fwer<=0.05 & cell$padj.CellTypeNeuron>0.05),]),
+                                     nrow(cell[which(cell$fwer<=0.05 & cell$cds=="CDS" & cell$fwer>0.05 & cell$padj.CellTypeNeuron>0.05),]))),
+              CDS.Introns = data.frame(c(nrow(cell[which(cell$fwer<=0.05 & (cell$cds=="CDS" | cell$intron=="Intron") & cell$fwer<=0.05 & cell$padj.CellTypeNeuron<=0.05),]),
+                                         nrow(cell[which(cell$fwer<=0.05 & (cell$cds=="CDS" | cell$intron=="Intron") & cell$fwer>0.05 & cell$padj.CellTypeNeuron<=0.05),])),
+                                       c(nrow(cell[which(cell$fwer<=0.05 & (cell$cds=="CDS" | cell$intron=="Intron") & cell$fwer<=0.05 & cell$padj.CellTypeNeuron>0.05),]),
+                                         nrow(cell[which(cell$fwer<=0.05 & (cell$cds=="CDS" | cell$intron=="Intron") & cell$fwer>0.05 & cell$padj.CellTypeNeuron>0.05),]))),
+              Intergenic = data.frame(c(nrow(cell[which(cell$fwer<=0.05 & cell$annotation=="Other" & cell$fwer<=0.05 & cell$padj.CellTypeNeuron<=0.05),]),
+                                        nrow(cell[which(cell$fwer<=0.05 & cell$annotation=="Other" & cell$fwer>0.05 & cell$padj.CellTypeNeuron<=0.05),])),
+                                      c(nrow(cell[which(cell$fwer<=0.05 & cell$annotation=="Other" & cell$fwer<=0.05 & cell$padj.CellTypeNeuron>0.05),]),
+                                        nrow(cell[which(cell$fwer<=0.05 & cell$annotation=="Other" & cell$fwer>0.05 & cell$padj.CellTypeNeuron>0.05),]))))
+
+
+
 
 
 
