@@ -66,6 +66,8 @@ CHneurons$sig = ifelse(CHneurons$padj<=0.05, "FDR < 0.05", "FDR > 0.05")
 CHneurons$Dir = ifelse(CHneurons$Tstat<0, "neg", "pos")
 dtCHneurons = data.table(CHneurons)
 save(CHneurons, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/CHneurons_object.rda")
+write.csv(CHneurons[which(CHneurons$padj<=0.001),], quote = F, 
+          file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/CH_neuronsOnly_FDR_0.001.csv")
 
 ### Explore annotation of regions
 
