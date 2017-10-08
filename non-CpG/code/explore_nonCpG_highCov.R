@@ -116,3 +116,28 @@ t.test(x=meanNeuron, y=meanGlia)
 #sample estimates:
 #  mean of x  mean of y 
 #0.09234615 0.02665427
+
+
+# fit linear models
+
+models <- list(
+  'cell' = with(pd, model.matrix(~ Cell.Type + Age)),
+  'age' = with(pd, model.matrix(~ Age + Cell.Type)),
+  'interaction' = with(pd, model.matrix(~ Age * Cell.Type)))
+
+fits <- lapply(models, function(mod) {
+  lmFit(meth, design = mod)
+})
+coefs <- c(2, 2, 4)
+names(coefs) <- names(fits)
+
+coef_interest <- mapply(function(f, coef) {
+  f$coefficients[, coef]
+}, fits, coefs)
+summary(coef_interest)
+summary(abs(coef_interest))
+
+ebList <- lapply(fits, ebayes)
+
+save(fits, models, coef_interest, ebList, gr, meth, pd,
+     file = '/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/limma_exploration_nonCG_highCov.Rdata')
