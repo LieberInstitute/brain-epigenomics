@@ -48,7 +48,13 @@ peakMeth_outPeak[as.numeric(rownames(meanMeth_outPeak)),] = meanMeth_outPeak
 
 ## differences
 peakDiff = rowMeans(peakMeth_inPeak - peakMeth_outPeak)
-hist(peakDiff, xlab = "In Peak - Out Peak",	main = "DNAm Differences")
+
+pdf("plots/atac_DNAm_inVsOut.pdf",w=12)
+par(mar=c(5,6,2,2), cex.axis=2,cex.lab=2,cex.main=2)
+hist(-1*peakDiff, xlab = "(Outside Peak) - (Inside Peak)",	
+	main = "DNAm Differences",col="grey")
+dev.off()
+
 peaks_methDiffOrdered = peaks[order(peakDiff)]
 save(peaks_methDiffOrdered, file="rdas/ATAC_peaks_methDiffOrdered.rda")
 
