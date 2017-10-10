@@ -134,7 +134,7 @@ pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
     '_', opt$permutations, '_with_bsseq_cell', ifelse(opt$bootstrap, '',
     '_perm'), '.pdf'), width = 14)
 palette(brewer.pal(8,"Dark2"))
-plotManyRegions(BSobj, regions = tab, extend = 20000, addRegions = bumps$table, annoTrack = list(genes = genes, exons = exons))
+plotManyRegions(BSobj, regions = tab, extend = 20000, addRegions = subset(bumps$table, fwer < 0.05), annoTrack = list(genes = genes, exons = exons))
 dev.off()
 
 colData(BSobj)$age_group <- factor(ifelse(colData(BSobj)$Age < 1, 'Infant',
@@ -155,7 +155,7 @@ palette(brewer.pal(8, "Paired")[c(5:6, 7:8, 3:4, 1:2)])
 plot(colData(BSobj)$Age, type = 'p', pch = 21, ylab = 'Age',
     bg = colData(BSobj)$age_group_cell, cex = 3)
 legend("bottomright", levels(colData(BSobj)$age_group_cell), pch = 15, col=1:8, cex=1.4)
-plotManyRegions(BSobj, regions = tab, extend = 20000, addRegions = bumps$table, annoTrack = list(genes = genes, exons = exons), regionCol = brewer.pal(8, 'Greys')[2])
+plotManyRegions(BSobj, regions = tab, extend = 20000, addRegions = subset(bumps$table, fwer < 0.05), annoTrack = list(genes = genes, exons = exons), regionCol = brewer.pal(8, 'Greys')[2])
 dev.off()
 
 ## ATAC-seq info: it's the same for all models, so only do this for the age
