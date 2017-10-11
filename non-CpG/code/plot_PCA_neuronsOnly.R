@@ -1,4 +1,10 @@
 library(ggplot2)
+library('bsseq')
+library('devtools')
+library('limma')
+library('jaffelab')
+library('shinycsv')
+library('RColorBrewer')
 
 
 ### non-CpG: both neurons and glia ###
