@@ -1,31 +1,43 @@
 library('bsseq')
 library('bumphunter')
 library('doParallel')
-library(limma)
-library(rtracklayer)
-library(jaffelab)
+library('limma')
+library('rtracklayer')
+library('jaffelab')
 
-## load BSobj
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/processed_beta_values_plusMap.rda")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/CH_object.rda")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ATAC/CpG.single.site.ATAC.coverageMatrix.rda")
 
-## atac-seq 
-peaks = import("/dcl01/lieber/ajaffe/Amanda/ATAC/FinalPeaks/pooled_sample_peaks/mergedPeaks-shifted.bed")
-peaks$name=NULL
+#For all DMRs, compare ATAC-seq coverage within DMR to 1kbp up- and down-stream
 
-## mean meth within each peak
-oo = findOverlaps(peaks, gr)
+DMRgr = lapply(DMR, function(x) makeGRangesFromDataFrame(x, keep.extra.columns = T))
+ATAC = as.matrix(ATACcovCpGs/colSums(ATACcovCpGs)/(10^6))
+ATACgr = GRanges(rownames(ATAC))
 
-rIndexes = split(subjectHits(oo), queryHits(oo))
-meanMeth_inPeak= sapply(rIndexes, function(ii) 
-	colMeans(t(t(meth[ii,]))))
-meanMeth_inPeak = do.call("rbind", meanMeth_inPeak)
+# Calculate mean coverage within each DMR
+oo = lapply(DMRgr, function(x) findOverlaps(x, ATACgr))
+rIndexes = lapply(oo, function(x) split(subjectHits(x), queryHits(x)))
+meanCov_inDMR= list(CellType = matrix(nrow = length(rIndexes$CellType), ncol = length(colnames(ATAC)), dimnames = list(DMR$CellType$regionID, colnames(ATAC))),
+                    Age = matrix(nrow = length(rIndexes$Age), ncol = length(colnames(ATAC)), dimnames = list(DMR$Age$regionID, colnames(ATAC))),
+                    Interaction = matrix(nrow = length(rIndexes$Interaction), ncol = length(colnames(ATAC)), dimnames = list(DMR$Interaction$regionID, colnames(ATAC))))
+for (i in 1:length(meanCov_inDMR)){
+  tmp = meanCov_inDMR[[i]]
+  for (j in 1:nrow(tmp)){
+    row = rIndexes[[i]][[j]]
+    for (k in 1:ncol(tmp)){
+      tmp[j,k] = mean(ATAC[row,k])
+      meanCov_inDMR[[i]] = tmp
+    }
+  }
+}  
 
 ## get flanking regions 
-bpShift = 500 
-leftShift = shift(peaks,-1*bpShift)
-end(leftShift) = start(peaks)-1
-rightShift = shift(peaks, bpShift)
-start(rightShift) = end(peaks)+1
+bpShift = 1000 
+leftShift = lapply(DMRgr, function(x) shift(x,-1*bpShift))
+end(leftShift) = lapply(DMRgr, function(x) start(x)-1)
+rightShift = lapply(DMRgr, function(x) shift(x, bpShift))
+start(rightShift) = lapply(DMRgr, function(x) end(x)+1)
 
 ## match up
 ooLeft = findOverlaps(leftShift, gr)
@@ -61,3 +73,10 @@ save(peaks_methDiffOrdered, file="rdas/ATAC_peaks_methDiffOrdered.rda")
 cIndexes = splitit(pd$Cell.Type)
 peakDiff_cellType = sapply(cIndexes, function(ii) 
 	rowMeans(peakMeth_inPeak[,ii] - peakMeth_outPeak[,ii]))
+
+#Subset DNAm to set in ATAC-seq, then plot mean coverage in ATAC-seq vs mean methylation for a given DMR at a time. Take into account library size. 
+#`peakMeth_inPeak` vs `peakMeth_outPeak` from the previous code (something like that)
+
+## load BSobj
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/processed_beta_values_plusMap.rda")
+
