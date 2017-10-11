@@ -644,21 +644,15 @@ IntcompareDO = compareCluster(Intentrez, fun="enrichDO",  ont = "DO", qvalueCuto
 IntcompareDO.dir = compareCluster(Intentrez.dir, fun="enrichDO",  ont = "DO", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
 
 # save, write to csv
-save(IntcompareKegg, IntcompareKegg.dir, IntcompareBP, IntcompareBP.dir, IntcompareMF, IntcompareMF.dir, IntcompareCC, IntcompareCC.dir, IntcompareDO, IntcompareDO.dir,
+save(IntcompareKegg.dir, IntcompareBP.dir, IntcompareDO.dir,
      IntkeggList, IntkeggList.dir, IntgoList_BP, IntgoList_BP.dir, IntgoList_MF, IntgoList_MF.dir, IntgoList_CC, IntgoList_CC.dir, IntgoList_DO, IntgoList_DO.dir,
      file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/nonCG_KEGG_GO_DO_objects_byInteraction.rda")
 
+
 # plot compared results
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/nonCpG_KEGG_GO_DO_plots_byInteraction.pdf", height = 20, width = 20)
-plot(IntcompareKegg, colorBy="p.adjust", showCategory = 45, title= "non-CpG KEGG Pathway Enrichment\nby Interaction")
-plot(IntcompareBP, colorBy="p.adjust", showCategory = 45, title= "non-CpG Biological Process GO Enrichment\nby Interaction")
-plot(IntcompareMF, colorBy="p.adjust", showCategory = 45, title= "non-CpG Molecular Function GO Enrichment\nby Interaction")
-plot(IntcompareCC, colorBy="p.adjust", showCategory = 45, title= "non-CpG Cellular Compartment GO Enrichment\nby Interaction")
-plot(IntcompareDO, colorBy="p.adjust", showCategory = 30, title= "non-CpG Disease Ontology Enrichment\nby Interaction")
 plot(IntcompareKegg.dir, colorBy="p.adjust", showCategory = 45, title= "non-CpG KEGG Pathway Enrichment\nby Interaction")
 plot(IntcompareBP.dir, colorBy="p.adjust", showCategory = 45, title= "non-CpG Biological Process GO Enrichment\nby Interaction")
-plot(IntcompareMF.dir, colorBy="p.adjust", showCategory = 45, title= "non-CpG Molecular Function GO Enrichment\nby Interaction")
-plot(IntcompareCC.dir, colorBy="p.adjust", showCategory = 45, title= "non-CpG Cellular Compartment GO Enrichment\nby Interaction")
 plot(IntcompareDO.dir, colorBy="p.adjust", showCategory = 30, title= "non-CpG Disease Ontology Enrichment\nby Interaction")
 dev.off()
 
