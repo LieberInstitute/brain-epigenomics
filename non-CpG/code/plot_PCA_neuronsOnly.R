@@ -9,9 +9,9 @@ library(ggplot2)
 
 ### non-CpG: only neurons ###
 
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/RData_objects/nonCG_highCov_neuronsOnly_pca_pd_methTable.Rdata")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/nonCG_highCov_neuronsOnly_pca_pd_methTable.Rdata")
 
-pdf('pca_nonCG_highCov_neuronsOnly.pdf')
+pdf('/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/pca_nonCG_highCov_neuronsOnly.pdf')
 barplot(pcaVars[1:10], col = '#377EB8', ylab = 'Percent of Variance Explained')
 
 plot(pcs$x[, 1] ~ pcs$x[, 2],
@@ -32,7 +32,7 @@ for(pc in 1:4) {
 }
 dev.off()
 
-pdf('pca_nonCG_highCov_PC1vsAge_neuronsOnly.pdf')
+pdf('/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/pca_nonCG_highCov_PC1vsAge_neuronsOnly.pdf')
 palette(brewer.pal(8,"Dark2"))
 par(mar=c(5,6,2,2), cex.axis=2, cex.lab=2)
 plot(pcs$x[, 1] ~ pd$Age, cex=2, pch = 21, bg=factor(pd$Cell.Type),
