@@ -40,10 +40,10 @@ rightShift = lapply(DMRgr, function(x) shift(x, bpShift))
 start(rightShift) = lapply(DMRgr, function(x) end(x)+1)
 
 ## match up
-ooLeft = findOverlaps(leftShift, gr)
-ooRight = findOverlaps(rightShift, gr)
-ooOut = rbind(as.matrix(ooLeft), as.matrix(ooRight))
-rIndexesOut = split(ooOut[,"subjectHits"], ooOut[,"queryHits"])
+ooLeft = lapply(leftShift, function(x) findOverlaps(x, ATACgr))
+ooRight = lapply(rightShift, function(x) findOverlaps(x, ATACgr))
+ooOut = mapply(function(x,y) rbind(as.matrix(x), as.matrix(y)), ooLeft, ooRight)
+rIndexesOut = lapply(ooOut, function(x) split(x[,"subjectHits"], x[,"queryHits"]))
 
 ## get mean meth
 meanMeth_outPeak= sapply(rIndexesOut, function(ii) 
