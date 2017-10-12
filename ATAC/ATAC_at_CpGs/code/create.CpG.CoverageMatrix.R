@@ -33,7 +33,7 @@ ATACpd = data.frame(SampleID = SampleID, RNum = 1:length(SampleID), PE_HS3000 = 
                Post.Picard.Markdups.BAM.Path = NA, Filtered.Sorted.BAM.Path = NA, BigWig.Path = NA, TotalReads.Sequenced = NA,          
                TotalAligned.dupsIncl = NA, Alignment.Percent = NA, TotalReads.dupsRemoved = NA, Percent.Duplicates = NA,            
                chrM.final = NA, TotalReads.final = NA, TotalReads.ff = NA, Frag.Size = NA)
-ATACpd$CellType = ifelse(grep("Minus", ATACpd$SampleID) %in% ATACpd$RNum, "Glia", "Neuron")
+ATACpd$CellType = ifelse(ATACpd$RNum %in% grep("Minus", ATACpd$SampleID), "Glia", "Neuron")
 
 for (i in 1:length(SampleID)){
   ATACpd$PE_HS3000[i] = ifelse("PE_HS3000" %in% pd[which(pd$SampleID==ATACpd$SampleID[i]), "Seq.Category"], "PE_HS3000", "no")
