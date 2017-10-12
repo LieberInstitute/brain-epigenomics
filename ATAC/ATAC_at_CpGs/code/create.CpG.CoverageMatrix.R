@@ -12,7 +12,7 @@ names(covMat) = samps
 coord = lapply(covMat, function(x) paste0(x$chr, ":", x$start, "-", x$end))
 ReadCount = lapply(covMat, function(x) x$ReadCount)
 ATACcovCpGs = as.data.frame(ReadCount, row.names = coord[[1]])
-ATACcovCpGs = CpGcov[,order(colnames(CpGcov))]
+ATACcovCpGs = ATACcovCpGs[,order(colnames(ATACcovCpGs))]
 pd = read.table("/dcl01/lieber/ajaffe/Amanda/ATAC/pd.txt", header=TRUE)
 rownames(pd) = pd$ID
 
@@ -34,8 +34,11 @@ ATACpd = data.frame(SampleID = SampleID, RNum = 1:length(SampleID), PE_HS3000 = 
                TotalAligned.dupsIncl = NA, Alignment.Percent = NA, TotalReads.dupsRemoved = NA, Percent.Duplicates = NA,            
                chrM.final = NA, TotalReads.final = NA, TotalReads.ff = NA, Frag.Size = NA)
 ATACpd$CellType = ifelse(ATACpd$RNum %in% grep("Minus", ATACpd$SampleID), "Glia", "Neuron")
+ATACpd = ATACpd[which(ATACpd$SampleID %in% colnames(ATACcovCpGs)),]
+ATACpd = ATACpd[order(ATACpd$SampleID),]
+rownames(ATACpd) = ATACpd$SampleID
 
-for (i in 1:length(SampleID)){
+for (i in 1:length(ATACpd$SampleID)){
   ATACpd$PE_HS3000[i] = ifelse("PE_HS3000" %in% pd[which(pd$SampleID==ATACpd$SampleID[i]), "Seq.Category"], "PE_HS3000", "no")
   ATACpd$SE_HS3000[i] = ifelse("SE_HS3000" %in% pd[which(pd$SampleID==ATACpd$SampleID[i]), "Seq.Category"], "SE_HS3000", "no")
   ATACpd$SE_HS2000[i] = ifelse("SE_HS2000" %in% pd[which(pd$SampleID==ATACpd$SampleID[i]), "Seq.Category"], "SE_HS2000", "no")
