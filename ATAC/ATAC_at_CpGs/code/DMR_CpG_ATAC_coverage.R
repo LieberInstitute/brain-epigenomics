@@ -66,7 +66,7 @@ for (i in 1:3){
 dev.off()
 
 
-## break this down by cell type, age bins, significance and direction of methylation change
+### Break this down by cell type, age bins, significance and direction of methylation change
 cIndexes = splitit(ATACpd$CellType)
 covDiff_cellType = list(Neuron = mapply(function(x,y) rowMeans(x[,cIndexes$Neuron] - y[,cIndexes$Neuron]), meanCov_inDMR, meanCov_outDMR),
                         Glia = mapply(function(x,y) rowMeans(x[,cIndexes$Glia] - y[,cIndexes$Glia]), meanCov_inDMR, meanCov_outDMR))
@@ -140,6 +140,7 @@ covDiff_int = list("CellType" = rbind(covDiff_int$Neuron_Neonate$CellType, covDi
 covDiff_int = Map(cbind, covDiff_int, Sig = mapply(function(x,y) ifelse(rownames(x) %in% y[which(y$sig=="FWER < 0.05"),"regionID"], "FWER < 0.05", "FWER > 0.05"), covDiff_int, DMR),
                   Direction = mapply(function(x,y) ifelse(rownames(x) %in% y[which(y$Dir=="pos"),"regionID"], "Positive", "Negative"), covDiff_int, DMR))
 
+# Save objects
 save(covDiff, covDiff_cellType, covDiff_age, covDiff_int, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ATAC/DMR_ATACcovDiff_objects.rda")
 
 
@@ -150,9 +151,9 @@ par(mar=c(5,6,2,2), cex.axis=2,cex.lab=2,cex.main=2)
 for (i in 1:3){
   p = ggplot(covDiff_cellType[[i]], aes(x=Difference)) + geom_density(aes(group=CellType, colour=CellType)) + 
     facet_grid(Direction ~ Sig) +
-    ylab("Density") + 
+    ylab("Density") + ylim(0,30) +
     xlab("(Inside Region) - (Outside Region)") +
-    ggtitle(paste0("Mean ATAC-seq Coverage Difference at CpGs\nBetween DMR and Flanking Regions: " , names(covDiff_cellType)[i])) + 
+    ggtitle(paste0("Mean ATAC-seq Coverage Difference at CpGs\nBetween DMR and Flanking Regions: " , names(covDiff_cellType)[i], " Regions")) + 
     theme(title = element_text(size = 20)) +
     theme(text = element_text(size = 20))
   print(p)
@@ -164,9 +165,9 @@ par(mar=c(5,6,2,2), cex.axis=2,cex.lab=2,cex.main=2)
 for (i in 1:3){
     p = ggplot(covDiff_age[[i]], aes(x=Difference)) + geom_density(aes(group=AgeBin, colour=AgeBin)) + 
       facet_grid(Sig ~ Direction) +
-      ylab("Density") + 
+      ylab("Density") + ylim(0,30) +
       xlab("(Inside Region) - (Outside Region)") +
-      ggtitle(paste0("Mean ATAC-seq Coverage Difference at CpGs Between DMR and Flanking Regions: " , names(covDiff_cellType)[i])) + 
+      ggtitle(paste0("Mean ATAC-seq Coverage Difference at CpGs\nBetween DMR and Flanking Regions: " , names(covDiff_age)[i], " Regions")) + 
       theme(title = element_text(size = 20)) +
       theme(text = element_text(size = 20))
     print(p)
@@ -178,20 +179,22 @@ par(mar=c(5,6,2,2), cex.axis=2,cex.lab=2,cex.main=2)
 for (i in 1:3){
   p = ggplot(covDiff_int[[i]], aes(x=Difference)) + geom_density(aes(group=Group, colour=Group)) + 
       facet_grid(Sig ~ Direction) +
-      ylab("Density") + 
+      ylab("Density") + ylim(0,30) +
       xlab("(Inside Region) - (Outside Region)") +
-      ggtitle(paste0("Mean ATAC-seq Coverage Difference at CpGs Between DMR and Flanking Regions: " , names(covDiff)[i])) + 
+      ggtitle(paste0("Mean ATAC-seq Coverage Difference at CpGs\nBetween DMR and Flanking Regions: " , names(covDiff)[i], " Regions")) + 
       theme(title = element_text(size = 20)) +
       theme(text = element_text(size = 20))
+  print(p)
 }
 for (i in 1:3){
   p = ggplot(covDiff_int[[i]], aes(x=Difference)) + geom_density(aes(group=Group, colour=Group)) + 
     facet_grid(. ~ Sig) +
-    ylab("Density") + 
+    ylab("Density") + ylim(0,30) +
     xlab("(Inside Region) - (Outside Region)") +
-    ggtitle(paste0("Mean ATAC-seq Coverage Difference at CpGs Between DMR and Flanking Regions: " , names(covDiff)[i])) + 
+    ggtitle(paste0("Mean ATAC-seq Coverage Difference at CpGs\nBetween DMR and Flanking Regions: " , names(covDiff)[i], " Regions")) + 
     theme(title = element_text(size = 20)) +
     theme(text = element_text(size = 20))
+  print(p)
 }
 dev.off()
   
