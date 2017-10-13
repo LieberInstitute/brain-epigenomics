@@ -164,7 +164,7 @@ pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/ATAC/ATAC_at_CpGs/figures/DMR_Cp
 par(mar=c(5,6,2,2), cex.axis=2,cex.lab=2,cex.main=2)
 for (i in 1:3){
     p = ggplot(covDiff_age[[i]], aes(x=Difference)) + geom_density(aes(group=AgeBin, colour=AgeBin)) + 
-      facet_grid(Sig ~ Direction) +
+      facet_grid(Direction ~ Sig) +
       ylab("Density") + ylim(0,30) +
       xlab("(Inside Region) - (Outside Region)") +
       ggtitle(paste0("Mean ATAC-seq Coverage Difference at CpGs\nBetween DMR and Flanking Regions: " , names(covDiff_age)[i], " Regions")) + 
@@ -178,7 +178,7 @@ pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/ATAC/ATAC_at_CpGs/figures/DMR_Cp
 par(mar=c(5,6,2,2), cex.axis=2,cex.lab=2,cex.main=2)
 for (i in 1:3){
   p = ggplot(covDiff_int[[i]], aes(x=Difference)) + geom_density(aes(group=Group, colour=Group)) + 
-      facet_grid(Sig ~ Direction) +
+      facet_grid(Direction ~ Sig) +
       ylab("Density") + ylim(0,30) +
       xlab("(Inside Region) - (Outside Region)") +
       ggtitle(paste0("Mean ATAC-seq Coverage Difference at CpGs\nBetween DMR and Flanking Regions: " , names(covDiff)[i], " Regions")) + 
@@ -197,14 +197,16 @@ for (i in 1:3){
   print(p)
 }
 dev.off()
-  
 
+# get correlation of IN vs OUT coverage broken down by group
 
-
+correlation = data.frame(mapply(function(x,y,z) cor(x[which(x)], y covDiff_cellType
+    
 
 #Subset DNAm to set in ATAC-seq, then plot mean coverage in ATAC-seq vs mean methylation for a given DMR at a time. Take into account library size. 
 #`DMRcov_inDMR` vs `DMRcov_outDMR` from the previous code (something like that)
 
 ## load BSobj
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/processed_beta_values_plusMap.rda")
+
 
