@@ -1,0 +1,1531 @@
+**** Job starts ****
+Fri Oct 27 13:49:57 EDT 2017
+**** JHPCE info ****
+User: lcollado
+Job id: 3244486
+Job name: atacFullCov
+Hostname: compute-050
+Task id: 
+Using the following user library: ~/R/x86_64-pc-linux-gnu-library/3.3.x
+Using the following user library: ~/R/x86_64-pc-linux-gnu-library/3.3.x
+Using the following user library: ~/R/x86_64-pc-linux-gnu-library/3.3.x
+Using the following user library: ~/R/x86_64-pc-linux-gnu-library/3.3.x
+Using the following user library: ~/R/x86_64-pc-linux-gnu-library/3.3.x
+Using the following user library: ~/R/x86_64-pc-linux-gnu-library/3.3.x
+2017-10-27 13:50:35 fullCoverage: processing chromosome chr21
+2017-10-27 13:50:36 loadCoverage: finding chromosome lengths
+2017-10-27 13:50:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 13:50:41 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 13:50:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 13:51:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 13:51:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 13:51:09 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 13:51:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 13:51:27 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 13:51:40 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 13:51:48 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 13:51:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 13:51:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 13:52:06 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 13:52:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 13:52:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 13:52:27 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 13:52:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 13:52:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 13:52:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 13:52:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 13:53:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 13:53:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 13:53:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 13:53:08 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 13:53:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 13:53:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 13:53:19 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 13:53:26 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 13:53:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 13:53:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 13:53:43 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 13:53:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 13:54:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 13:54:08 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 13:54:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 13:54:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 13:54:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 13:54:25 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 13:54:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 13:54:38 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 13:54:44 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 13:54:50 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 13:54:59 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 13:55:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 13:55:16 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 13:55:23 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 13:55:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 13:55:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 13:55:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 13:55:42 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 13:55:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 13:56:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 13:56:09 loadCoverage: applying the cutoff to the merged data
+2017-10-27 13:56:11 filterData: originally there were 48129895 rows, now there are 48129895 rows. Meaning that 0 percent was filtered.
+2017-10-27 13:56:11 fullCoverage: processing chromosome chr22
+2017-10-27 13:56:11 loadCoverage: finding chromosome lengths
+2017-10-27 13:56:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 13:56:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 13:56:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 13:56:21 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 13:56:23 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 13:56:25 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 13:56:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 13:56:38 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 13:56:46 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 13:56:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 13:56:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 13:57:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 13:57:06 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 13:57:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 13:57:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 13:57:25 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 13:57:31 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 13:57:41 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 13:57:46 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 13:57:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 13:57:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 13:57:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 13:57:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 13:58:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 13:58:05 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 13:58:08 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 13:58:10 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 13:58:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 13:58:23 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 13:58:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 13:58:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 13:58:48 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 13:58:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 13:59:06 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 13:59:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 13:59:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 13:59:21 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 13:59:26 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 13:59:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 13:59:38 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 13:59:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 13:59:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 14:00:06 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 14:00:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 14:00:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 14:00:38 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 14:00:44 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 14:00:46 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 14:00:48 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 14:00:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 14:01:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 14:01:21 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 14:01:35 loadCoverage: applying the cutoff to the merged data
+2017-10-27 14:01:35 filterData: originally there were 51304566 rows, now there are 51304566 rows. Meaning that 0 percent was filtered.
+2017-10-27 14:01:35 fullCoverage: processing chromosome chrX
+2017-10-27 14:01:35 loadCoverage: finding chromosome lengths
+2017-10-27 14:01:35 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 14:01:40 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 14:01:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 14:02:10 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 14:02:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 14:02:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 14:02:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 14:03:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 14:03:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 14:04:09 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 14:04:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 14:04:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 14:04:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 14:04:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 14:05:09 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 14:05:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 14:05:44 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 14:06:06 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 14:06:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 14:06:43 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 14:06:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 14:06:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 14:06:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 14:07:06 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 14:07:16 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 14:07:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 14:07:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 14:07:42 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 14:07:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 14:08:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 14:08:16 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 14:08:42 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 14:08:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 14:09:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 14:09:41 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 14:09:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 14:09:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 14:10:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 14:10:15 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 14:10:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 14:10:41 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 14:10:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 14:11:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 14:11:27 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 14:11:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 14:12:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 14:12:27 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 14:12:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 14:12:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 14:12:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 14:13:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 14:13:23 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 14:13:43 loadCoverage: applying the cutoff to the merged data
+2017-10-27 14:13:44 filterData: originally there were 155270560 rows, now there are 155270560 rows. Meaning that 0 percent was filtered.
+2017-10-27 14:13:44 fullCoverage: processing chromosome chrY
+2017-10-27 14:13:44 loadCoverage: finding chromosome lengths
+2017-10-27 14:13:44 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 14:13:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 14:13:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 14:13:50 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 14:13:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 14:13:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 14:13:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 14:13:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 14:13:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 14:13:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 14:13:59 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 14:14:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 14:14:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 14:14:05 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 14:14:05 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 14:14:09 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 14:14:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 14:14:15 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 14:14:16 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 14:14:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 14:14:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 14:14:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 14:14:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 14:14:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 14:14:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 14:14:23 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 14:14:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 14:14:26 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 14:14:27 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 14:14:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 14:14:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 14:14:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 14:14:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 14:14:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 14:14:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 14:14:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 14:14:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 14:14:35 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 14:14:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 14:14:38 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 14:14:39 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 14:14:40 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 14:14:42 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 14:14:44 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 14:14:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 14:14:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 14:14:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 14:14:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 14:14:48 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 14:14:50 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 14:14:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 14:14:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 14:14:57 loadCoverage: applying the cutoff to the merged data
+2017-10-27 14:14:57 filterData: originally there were 59373566 rows, now there are 59373566 rows. Meaning that 0 percent was filtered.
+2017-10-27 14:14:57 fullCoverage: processing chromosome chrM
+2017-10-27 14:14:57 loadCoverage: finding chromosome lengths
+2017-10-27 14:14:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 14:14:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 14:14:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 14:14:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 14:14:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 14:14:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 14:14:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 14:14:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 14:14:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 14:14:59 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 14:14:59 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 14:14:59 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 14:14:59 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 14:14:59 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 14:14:59 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 14:14:59 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 14:14:59 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 14:15:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 14:15:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 14:15:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 14:15:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 14:15:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 14:15:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 14:15:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 14:15:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 14:15:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 14:15:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 14:15:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 14:15:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 14:15:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 14:15:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 14:15:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 14:15:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 14:15:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 14:15:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 14:15:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 14:15:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 14:15:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 14:15:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 14:15:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 14:15:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 14:15:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 14:15:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 14:15:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 14:15:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 14:15:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 14:15:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 14:15:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 14:15:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 14:15:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 14:15:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 14:15:04 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 14:15:04 loadCoverage: applying the cutoff to the merged data
+2017-10-27 14:15:04 filterData: originally there were 16571 rows, now there are 16571 rows. Meaning that 0 percent was filtered.
+2017-10-27 13:50:36 fullCoverage: processing chromosome chr16
+2017-10-27 13:50:36 loadCoverage: finding chromosome lengths
+2017-10-27 13:50:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 13:50:46 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 13:51:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 13:51:10 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 13:51:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 13:51:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 13:51:27 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 13:51:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 13:52:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 13:52:27 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 13:52:39 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 13:52:48 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 13:53:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 13:53:15 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 13:53:25 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 13:53:42 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 13:53:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 13:54:19 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 13:54:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 13:54:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 13:54:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 13:54:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 13:54:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 13:55:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 13:55:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 13:55:21 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 13:55:25 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 13:55:44 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 13:55:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 13:56:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 13:56:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 13:56:39 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 13:56:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 13:57:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 13:57:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 13:57:35 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 13:57:42 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 13:57:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 13:58:04 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 13:58:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 13:58:31 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 13:58:48 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 13:59:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 13:59:26 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 13:59:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 14:00:06 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 14:00:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 14:00:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 14:00:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 14:00:44 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 14:01:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 14:01:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 14:01:56 loadCoverage: applying the cutoff to the merged data
+2017-10-27 14:01:57 filterData: originally there were 90354753 rows, now there are 90354753 rows. Meaning that 0 percent was filtered.
+2017-10-27 14:01:57 fullCoverage: processing chromosome chr17
+2017-10-27 14:01:57 loadCoverage: finding chromosome lengths
+2017-10-27 14:01:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 14:02:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 14:02:10 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 14:02:19 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 14:02:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 14:02:27 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 14:02:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 14:02:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 14:03:10 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 14:03:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 14:03:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 14:03:42 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 14:03:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 14:04:05 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 14:04:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 14:04:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 14:04:42 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 14:05:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 14:05:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 14:05:26 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 14:05:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 14:05:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 14:05:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 14:05:41 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 14:05:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 14:05:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 14:06:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 14:06:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 14:06:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 14:06:40 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 14:06:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 14:07:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 14:07:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 14:07:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 14:08:10 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 14:08:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 14:08:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 14:08:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 14:08:46 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 14:08:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 14:09:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 14:09:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 14:09:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 14:10:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 14:10:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 14:10:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 14:11:08 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 14:11:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 14:11:16 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 14:11:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 14:11:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 14:12:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 14:12:50 loadCoverage: applying the cutoff to the merged data
+2017-10-27 14:12:51 filterData: originally there were 81195210 rows, now there are 81195210 rows. Meaning that 0 percent was filtered.
+2017-10-27 14:12:52 fullCoverage: processing chromosome chr18
+2017-10-27 14:12:52 loadCoverage: finding chromosome lengths
+2017-10-27 14:12:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 14:12:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 14:13:08 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 14:13:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 14:13:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 14:13:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 14:13:38 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 14:14:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 14:14:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 14:14:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 14:14:44 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 14:14:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 14:15:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 14:15:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 14:15:25 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 14:15:41 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 14:15:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 14:16:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 14:16:26 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 14:16:39 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 14:16:44 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 14:16:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 14:16:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 14:16:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 14:17:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 14:17:10 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 14:17:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 14:17:26 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 14:17:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 14:17:44 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 14:17:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 14:18:15 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 14:18:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 14:18:43 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 14:18:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 14:19:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 14:19:08 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 14:19:15 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 14:19:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 14:19:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 14:19:48 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 14:20:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 14:20:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 14:20:31 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 14:20:50 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 14:21:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 14:21:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 14:21:15 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 14:21:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 14:21:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 14:21:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 14:22:04 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 14:22:22 loadCoverage: applying the cutoff to the merged data
+2017-10-27 14:22:23 filterData: originally there were 78077248 rows, now there are 78077248 rows. Meaning that 0 percent was filtered.
+2017-10-27 14:22:23 fullCoverage: processing chromosome chr19
+2017-10-27 14:22:23 loadCoverage: finding chromosome lengths
+2017-10-27 14:22:23 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 14:22:26 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 14:22:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 14:22:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 14:22:41 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 14:22:44 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 14:22:48 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 14:23:04 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 14:23:15 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 14:23:25 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 14:23:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 14:23:38 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 14:23:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 14:23:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 14:24:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 14:24:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 14:24:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 14:24:39 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 14:24:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 14:24:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 14:25:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 14:25:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 14:25:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 14:25:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 14:25:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 14:25:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 14:25:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 14:25:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 14:25:43 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 14:25:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 14:26:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 14:26:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 14:26:31 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 14:26:43 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 14:26:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 14:26:59 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 14:27:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 14:27:09 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 14:27:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 14:27:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 14:27:40 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 14:27:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 14:28:08 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 14:28:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 14:28:41 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 14:28:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 14:29:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 14:29:06 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 14:29:09 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 14:29:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 14:29:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 14:29:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 14:30:18 loadCoverage: applying the cutoff to the merged data
+2017-10-27 14:30:18 filterData: originally there were 59128983 rows, now there are 59128983 rows. Meaning that 0 percent was filtered.
+2017-10-27 14:30:18 fullCoverage: processing chromosome chr20
+2017-10-27 14:30:19 loadCoverage: finding chromosome lengths
+2017-10-27 14:30:19 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 14:30:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 14:30:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 14:30:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 14:30:41 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 14:30:44 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 14:30:48 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 14:31:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 14:31:19 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 14:31:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 14:31:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 14:31:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 14:31:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 14:32:04 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 14:32:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 14:32:23 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 14:32:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 14:32:50 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 14:32:59 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 14:33:08 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 14:33:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 14:33:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 14:33:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 14:33:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 14:33:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 14:33:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 14:33:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 14:33:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 14:33:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 14:34:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 14:34:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 14:34:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 14:34:42 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 14:34:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 14:35:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 14:35:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 14:35:16 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 14:35:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 14:35:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 14:35:41 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 14:35:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 14:36:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 14:36:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 14:36:31 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 14:36:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 14:37:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 14:37:10 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 14:37:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 14:37:16 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 14:37:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 14:37:41 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 14:38:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 14:38:18 loadCoverage: applying the cutoff to the merged data
+2017-10-27 14:38:18 filterData: originally there were 63025520 rows, now there are 63025520 rows. Meaning that 0 percent was filtered.
+2017-10-27 13:50:36 fullCoverage: processing chromosome chr11
+2017-10-27 13:50:36 loadCoverage: finding chromosome lengths
+2017-10-27 13:50:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 13:50:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 13:51:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 13:51:43 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 13:51:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 13:52:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 13:52:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 13:52:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 13:53:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 13:53:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 13:54:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 13:54:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 13:54:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 13:55:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 13:55:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 13:55:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 13:56:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 13:56:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 13:57:19 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 13:57:41 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 13:57:50 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 13:57:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 13:57:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 13:58:09 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 13:58:26 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 13:58:38 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 13:58:44 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 13:59:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 13:59:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 13:59:48 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 14:00:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 14:00:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 14:01:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 14:01:46 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 14:02:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 14:02:25 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 14:02:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 14:02:50 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 14:03:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 14:03:31 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 14:03:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 14:04:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 14:04:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 14:05:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 14:05:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 14:06:21 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 14:06:40 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 14:06:46 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 14:06:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 14:07:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 14:07:46 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 14:08:26 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 14:09:03 loadCoverage: applying the cutoff to the merged data
+2017-10-27 14:09:05 filterData: originally there were 135006516 rows, now there are 135006516 rows. Meaning that 0 percent was filtered.
+2017-10-27 14:09:05 fullCoverage: processing chromosome chr12
+2017-10-27 14:09:05 loadCoverage: finding chromosome lengths
+2017-10-27 14:09:05 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 14:09:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 14:09:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 14:09:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 14:10:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 14:10:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 14:10:23 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 14:11:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 14:11:35 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 14:11:59 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 14:12:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 14:12:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 14:12:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 14:13:16 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 14:13:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 14:13:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 14:14:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 14:14:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 14:15:15 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 14:15:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 14:15:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 14:15:46 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 14:15:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 14:16:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 14:16:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 14:16:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 14:16:35 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 14:17:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 14:17:16 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 14:17:35 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 14:17:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 14:18:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 14:19:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 14:19:31 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 14:19:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 14:20:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 14:20:19 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 14:20:31 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 14:20:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 14:21:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 14:21:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 14:21:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 14:22:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 14:22:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 14:23:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 14:23:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 14:24:16 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 14:24:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 14:24:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 14:24:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 14:25:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 14:26:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 14:26:41 loadCoverage: applying the cutoff to the merged data
+2017-10-27 14:26:42 filterData: originally there were 133851895 rows, now there are 133851895 rows. Meaning that 0 percent was filtered.
+2017-10-27 14:26:42 fullCoverage: processing chromosome chr13
+2017-10-27 14:26:43 loadCoverage: finding chromosome lengths
+2017-10-27 14:26:43 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 14:26:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 14:27:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 14:27:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 14:27:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 14:27:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 14:27:44 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 14:28:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 14:28:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 14:28:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 14:29:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 14:29:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 14:29:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 14:29:50 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 14:29:59 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 14:30:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 14:30:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 14:31:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 14:31:15 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 14:31:31 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 14:31:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 14:31:38 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 14:31:38 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 14:31:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 14:32:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 14:32:09 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 14:32:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 14:32:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 14:32:40 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 14:32:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 14:33:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 14:33:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 14:33:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 14:34:04 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 14:34:19 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 14:34:27 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 14:34:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 14:34:42 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 14:34:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 14:35:09 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 14:35:23 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 14:35:39 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 14:35:59 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 14:36:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 14:36:40 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 14:36:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 14:37:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 14:37:10 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 14:37:15 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 14:37:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 14:37:48 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 14:38:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 14:38:35 loadCoverage: applying the cutoff to the merged data
+2017-10-27 14:38:36 filterData: originally there were 115169878 rows, now there are 115169878 rows. Meaning that 0 percent was filtered.
+2017-10-27 14:38:37 fullCoverage: processing chromosome chr14
+2017-10-27 14:38:37 loadCoverage: finding chromosome lengths
+2017-10-27 14:38:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 14:38:41 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 14:38:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 14:39:10 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 14:39:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 14:39:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 14:39:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 14:39:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 14:40:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 14:40:35 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 14:40:46 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 14:40:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 14:41:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 14:41:26 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 14:41:35 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 14:41:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 14:42:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 14:42:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 14:42:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 14:43:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 14:43:08 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 14:43:09 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 14:43:09 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 14:43:19 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 14:43:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 14:43:38 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 14:43:42 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 14:43:59 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 14:44:09 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 14:44:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 14:44:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 14:44:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 14:45:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 14:45:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 14:45:48 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 14:45:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 14:46:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 14:46:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 14:46:27 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 14:46:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 14:46:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 14:47:08 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 14:47:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 14:47:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 14:48:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 14:48:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 14:48:41 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 14:48:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 14:48:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 14:49:06 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 14:49:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 14:49:50 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 14:50:13 loadCoverage: applying the cutoff to the merged data
+2017-10-27 14:50:14 filterData: originally there were 107349540 rows, now there are 107349540 rows. Meaning that 0 percent was filtered.
+2017-10-27 14:50:14 fullCoverage: processing chromosome chr15
+2017-10-27 14:50:14 loadCoverage: finding chromosome lengths
+2017-10-27 14:50:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 14:50:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 14:50:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 14:50:40 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 14:50:46 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 14:50:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 14:50:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 14:51:19 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 14:51:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 14:51:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 14:52:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 14:52:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 14:52:26 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 14:52:38 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 14:52:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 14:53:05 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 14:53:19 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 14:53:39 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 14:53:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 14:54:05 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 14:54:10 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 14:54:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 14:54:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 14:54:19 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 14:54:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 14:54:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 14:54:40 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 14:54:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 14:55:06 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 14:55:16 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 14:55:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 14:55:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 14:56:08 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 14:56:25 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 14:56:40 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 14:56:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 14:56:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 14:57:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 14:57:15 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 14:57:26 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 14:57:40 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 14:57:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 14:58:15 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 14:58:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 14:58:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 14:59:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 14:59:23 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 14:59:26 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 14:59:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 14:59:46 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 15:00:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 15:00:27 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 15:00:50 loadCoverage: applying the cutoff to the merged data
+2017-10-27 15:00:51 filterData: originally there were 102531392 rows, now there are 102531392 rows. Meaning that 0 percent was filtered.
+2017-10-27 13:50:35 fullCoverage: processing chromosome chr6
+2017-10-27 13:50:35 loadCoverage: finding chromosome lengths
+2017-10-27 13:50:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 13:50:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 13:51:25 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 13:52:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 13:52:16 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 13:52:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 13:52:35 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 13:53:27 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 13:54:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 13:54:41 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 13:55:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 13:55:23 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 13:55:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 13:56:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 13:56:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 13:57:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 13:57:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 13:58:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 13:58:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 13:59:25 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 13:59:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 13:59:39 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 13:59:40 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 14:00:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 14:00:21 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 14:00:38 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 14:00:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 14:01:16 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 14:01:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 14:02:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 14:02:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 14:03:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 14:03:43 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 14:04:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 14:04:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 14:05:04 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 14:05:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 14:05:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 14:06:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 14:06:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 14:06:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 14:07:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 14:07:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 14:08:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 14:09:09 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 14:09:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 14:09:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 14:10:05 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 14:10:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 14:10:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 14:11:15 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 14:12:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 14:12:45 loadCoverage: applying the cutoff to the merged data
+2017-10-27 14:12:47 filterData: originally there were 171115067 rows, now there are 171115067 rows. Meaning that 0 percent was filtered.
+2017-10-27 14:12:47 fullCoverage: processing chromosome chr7
+2017-10-27 14:12:47 loadCoverage: finding chromosome lengths
+2017-10-27 14:12:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 14:12:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 14:13:21 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 14:13:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 14:14:04 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 14:14:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 14:14:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 14:15:08 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 14:15:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 14:16:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 14:16:41 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 14:17:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 14:17:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 14:17:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 14:18:08 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 14:18:42 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 14:19:10 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 14:19:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 14:20:16 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 14:20:42 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 14:20:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 14:20:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 14:20:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 14:21:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 14:21:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 14:21:48 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 14:21:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 14:22:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 14:22:43 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 14:23:06 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 14:23:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 14:24:15 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 14:24:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 14:25:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 14:25:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 14:26:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 14:26:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 14:26:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 14:26:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 14:27:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 14:27:39 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 14:28:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 14:28:42 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 14:29:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 14:29:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 14:30:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 14:30:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 14:30:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 14:30:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 14:31:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 14:31:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 14:32:40 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 14:33:19 loadCoverage: applying the cutoff to the merged data
+2017-10-27 14:33:21 filterData: originally there were 159138663 rows, now there are 159138663 rows. Meaning that 0 percent was filtered.
+2017-10-27 14:33:21 fullCoverage: processing chromosome chr8
+2017-10-27 14:33:21 loadCoverage: finding chromosome lengths
+2017-10-27 14:33:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 14:33:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 14:33:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 14:34:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 14:34:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 14:34:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 14:34:46 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 14:35:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 14:36:05 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 14:36:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 14:36:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 14:37:05 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 14:37:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 14:37:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 14:38:08 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 14:38:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 14:39:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 14:39:40 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 14:40:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 14:40:26 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 14:40:35 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 14:40:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 14:40:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 14:40:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 14:41:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 14:41:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 14:41:31 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 14:41:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 14:42:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 14:42:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 14:42:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 14:43:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 14:43:59 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 14:44:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 14:44:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 14:45:05 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 14:45:16 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 14:45:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 14:45:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 14:46:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 14:46:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 14:46:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 14:47:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 14:47:59 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 14:48:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 14:49:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 14:49:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 14:49:27 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 14:49:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 14:50:04 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 14:50:31 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 14:51:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 14:51:48 loadCoverage: applying the cutoff to the merged data
+2017-10-27 14:51:50 filterData: originally there were 146364022 rows, now there are 146364022 rows. Meaning that 0 percent was filtered.
+2017-10-27 14:51:50 fullCoverage: processing chromosome chr9
+2017-10-27 14:51:50 loadCoverage: finding chromosome lengths
+2017-10-27 14:51:50 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 14:51:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 14:52:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 14:52:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 14:52:43 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 14:52:48 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 14:52:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 14:53:31 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 14:54:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 14:54:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 14:54:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 14:54:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 14:55:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 14:55:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 14:55:42 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 14:56:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 14:56:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 14:57:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 14:57:19 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 14:57:40 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 14:57:48 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 14:57:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 14:57:50 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 14:58:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 14:58:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 14:58:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 14:58:35 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 14:58:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 14:59:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 14:59:27 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 14:59:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 15:00:19 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 15:00:43 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 15:01:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 15:01:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 15:01:39 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 15:01:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 15:02:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 15:02:21 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 15:02:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 15:02:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 15:03:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 15:03:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 15:04:09 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 15:04:42 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 15:05:04 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 15:05:21 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 15:05:25 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 15:05:31 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 15:05:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 15:06:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 15:06:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 15:07:24 loadCoverage: applying the cutoff to the merged data
+2017-10-27 15:07:26 filterData: originally there were 141213431 rows, now there are 141213431 rows. Meaning that 0 percent was filtered.
+2017-10-27 15:07:26 fullCoverage: processing chromosome chr10
+2017-10-27 15:07:26 loadCoverage: finding chromosome lengths
+2017-10-27 15:07:26 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 15:07:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 15:07:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 15:08:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 15:08:23 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 15:08:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 15:08:39 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 15:09:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 15:09:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 15:10:09 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 15:10:25 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 15:10:41 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 15:11:04 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 15:11:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 15:11:38 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 15:12:05 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 15:12:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 15:13:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 15:13:23 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 15:13:44 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 15:13:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 15:13:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 15:13:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 15:14:09 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 15:14:27 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 15:14:38 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 15:14:44 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 15:15:10 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 15:15:26 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 15:15:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 15:16:06 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 15:16:40 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 15:17:05 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 15:17:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 15:17:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 15:18:08 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 15:18:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 15:18:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 15:18:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 15:19:10 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 15:19:31 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 15:19:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 15:20:25 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 15:20:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 15:21:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 15:21:50 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 15:22:10 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 15:22:15 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 15:22:21 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 15:22:48 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 15:23:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 15:24:04 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 15:24:38 loadCoverage: applying the cutoff to the merged data
+2017-10-27 15:24:40 filterData: originally there were 135534747 rows, now there are 135534747 rows. Meaning that 0 percent was filtered.
+2017-10-27 13:50:36 fullCoverage: processing chromosome chr1
+2017-10-27 13:50:36 loadCoverage: finding chromosome lengths
+2017-10-27 13:50:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 13:51:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 13:51:41 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 13:52:19 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 13:52:39 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 13:52:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 13:53:06 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 13:54:16 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 13:55:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 13:55:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 13:56:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 13:56:50 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 13:57:31 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 13:58:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 13:58:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 13:59:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 14:00:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 14:01:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 14:01:50 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 14:02:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 14:02:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 14:02:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 14:02:48 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 14:03:15 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 14:03:46 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 14:04:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 14:04:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 14:05:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 14:05:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 14:06:10 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 14:06:50 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 14:07:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 14:08:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 14:09:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 14:10:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 14:10:42 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 14:11:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 14:11:23 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 14:12:05 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 14:12:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 14:13:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 14:14:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 14:14:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 14:15:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 14:16:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 14:17:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 14:18:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 14:18:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 14:18:31 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 14:19:19 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 14:20:06 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 14:21:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 14:22:24 loadCoverage: applying the cutoff to the merged data
+2017-10-27 14:22:27 filterData: originally there were 249250621 rows, now there are 249250621 rows. Meaning that 0 percent was filtered.
+2017-10-27 14:22:27 fullCoverage: processing chromosome chr2
+2017-10-27 14:22:27 loadCoverage: finding chromosome lengths
+2017-10-27 14:22:27 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 14:22:39 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 14:23:15 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 14:23:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 14:24:16 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 14:24:26 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 14:24:43 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 14:25:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 14:26:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 14:27:38 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 14:28:09 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 14:28:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 14:29:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 14:29:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 14:30:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 14:31:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 14:31:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 14:32:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 14:33:35 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 14:34:15 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 14:34:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 14:34:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 14:34:35 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 14:35:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 14:35:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 14:35:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 14:36:06 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 14:36:50 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 14:37:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 14:37:52 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 14:38:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 14:39:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 14:40:19 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 14:41:10 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 14:41:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 14:42:15 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 14:42:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 14:42:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 14:43:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 14:44:06 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 14:44:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 14:45:26 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 14:46:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 14:47:10 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 14:48:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 14:49:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 14:49:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 14:49:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 14:49:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 14:50:46 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 14:51:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 14:52:43 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 14:53:47 loadCoverage: applying the cutoff to the merged data
+2017-10-27 14:53:50 filterData: originally there were 243199373 rows, now there are 243199373 rows. Meaning that 0 percent was filtered.
+2017-10-27 14:53:50 fullCoverage: processing chromosome chr3
+2017-10-27 14:53:50 loadCoverage: finding chromosome lengths
+2017-10-27 14:53:50 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 14:54:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 14:54:31 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 14:55:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 14:55:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 14:55:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 14:55:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 14:56:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 14:57:42 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 14:58:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 14:58:44 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 14:59:08 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 14:59:44 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 15:00:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 15:00:35 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 15:01:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 15:01:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 15:02:43 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 15:03:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 15:03:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 15:04:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 15:04:05 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 15:04:05 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 15:04:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 15:04:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 15:05:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 15:05:21 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 15:05:59 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 15:06:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 15:06:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 15:07:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 15:08:16 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 15:08:59 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 15:09:41 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 15:10:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 15:10:38 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 15:10:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 15:11:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 15:11:50 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 15:12:15 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 15:12:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 15:13:25 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 15:14:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 15:14:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 15:15:46 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 15:16:21 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 15:16:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 15:16:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 15:17:07 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 15:17:46 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 15:18:23 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 15:19:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 15:20:12 loadCoverage: applying the cutoff to the merged data
+2017-10-27 15:20:14 filterData: originally there were 198022430 rows, now there are 198022430 rows. Meaning that 0 percent was filtered.
+2017-10-27 15:20:14 fullCoverage: processing chromosome chr4
+2017-10-27 15:20:14 loadCoverage: finding chromosome lengths
+2017-10-27 15:20:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 15:20:24 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 15:20:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 15:21:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 15:21:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 15:22:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 15:22:16 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 15:23:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 15:24:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 15:24:48 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 15:26:06 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 15:26:27 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 15:27:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 15:30:45 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 15:31:39 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 15:32:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 15:34:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 15:36:54 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 15:39:09 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 15:40:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 15:40:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 15:40:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 15:40:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 15:43:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 15:46:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 15:46:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 15:46:42 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 15:47:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 15:47:35 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 15:48:02 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 15:48:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 15:49:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 15:49:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 15:50:30 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 15:51:06 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 15:51:28 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 15:51:42 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 15:51:58 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 15:52:31 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 15:52:53 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 15:53:21 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 15:53:49 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 15:54:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 15:55:04 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 15:56:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 15:56:51 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 15:57:14 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 15:57:20 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 15:57:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 15:58:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 15:58:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 15:59:19 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 15:59:59 loadCoverage: applying the cutoff to the merged data
+2017-10-27 16:00:01 filterData: originally there were 191154276 rows, now there are 191154276 rows. Meaning that 0 percent was filtered.
+2017-10-27 16:00:01 fullCoverage: processing chromosome chr5
+2017-10-27 16:00:01 loadCoverage: finding chromosome lengths
+2017-10-27 16:00:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus10.final.bam
+2017-10-27 16:00:10 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus11.final.bam
+2017-10-27 16:00:37 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus12.final.bam
+2017-10-27 16:01:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus13.final.bam
+2017-10-27 16:01:27 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus14.final.bam
+2017-10-27 16:01:35 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus15.final.bam
+2017-10-27 16:01:48 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus16.final.bam
+2017-10-27 16:02:39 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus18.final.bam
+2017-10-27 16:03:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus19.final.bam
+2017-10-27 16:04:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus1.final.bam
+2017-10-27 16:04:27 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus20.final.bam
+2017-10-27 16:04:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus21.final.bam
+2017-10-27 16:05:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus23.final.bam
+2017-10-27 16:05:43 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus24.final.bam
+2017-10-27 16:06:01 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus25.final.bam
+2017-10-27 16:11:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus26.final.bam
+2017-10-27 16:13:40 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus27.final.bam
+2017-10-27 16:14:26 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus2.final.bam
+2017-10-27 16:15:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus30.final.bam
+2017-10-27 16:16:00 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus3.final.bam
+2017-10-27 16:16:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus4.final.bam
+2017-10-27 16:16:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus5.final.bam
+2017-10-27 16:16:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus6.final.bam
+2017-10-27 16:16:33 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus7.final.bam
+2017-10-27 16:16:55 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus8.final.bam
+2017-10-27 16:17:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Minus9.final.bam
+2017-10-27 16:17:18 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus10.final.bam
+2017-10-27 16:17:50 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus11.final.bam
+2017-10-27 16:18:11 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus12.final.bam
+2017-10-27 16:18:36 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus13.final.bam
+2017-10-27 16:19:05 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus14.final.bam
+2017-10-27 16:19:48 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus15.final.bam
+2017-10-27 16:20:22 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus16.final.bam
+2017-10-27 16:20:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus18.final.bam
+2017-10-27 16:21:29 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus19.final.bam
+2017-10-27 16:21:43 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus1.final.bam
+2017-10-27 16:21:56 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus20.final.bam
+2017-10-27 16:22:13 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus21.final.bam
+2017-10-27 16:22:44 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus23.final.bam
+2017-10-27 16:23:05 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus24.final.bam
+2017-10-27 16:23:32 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus25.final.bam
+2017-10-27 16:24:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus26.final.bam
+2017-10-27 16:24:44 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus27.final.bam
+2017-10-27 16:25:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus2.final.bam
+2017-10-27 16:26:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus30.final.bam
+2017-10-27 16:26:34 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus3.final.bam
+2017-10-27 16:26:57 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus4.final.bam
+2017-10-27 16:27:03 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus5.final.bam
+2017-10-27 16:27:12 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus6.final.bam
+2017-10-27 16:27:47 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus7.final.bam
+2017-10-27 16:28:17 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus8.final.bam
+2017-10-27 16:30:04 loadCoverage: loading BAM file /dcl01/lieber/ajaffe/Amanda/ATAC/BAMs/combined_set//Plus9.final.bam
+2017-10-27 16:32:27 loadCoverage: applying the cutoff to the merged data
+2017-10-27 16:32:29 filterData: originally there were 180915260 rows, now there are 180915260 rows. Meaning that 0 percent was filtered.
+[1] "Reproducibility information:"
+[1] "2017-10-27 21:14:30 EDT"
+     user    system   elapsed 
+10985.935  7122.358 26673.137 
+Error: could not find function "session_info"
+Execution halted
+**** Job ends ****
+Fri Oct 27 21:14:38 EDT 2017
+
+
+## Added session info manually after loading devtools
+Session info ----------------------------------------------------------------------------------------------------------
+ setting  value
+ version  R version 3.3.3 Patched (2017-03-15 r72696)
+ system   x86_64, linux-gnu
+ ui       X11
+ language (EN)
+ collate  en_US.UTF-8
+ tz       <NA>
+ date     2017-10-27
+
+Packages --------------------------------------------------------------------------------------------------------------
+ package              * version  date       source
+ acepack                1.4.1    2016-10-29 CRAN (R 3.3.1)
+ AnnotationDbi          1.36.2   2017-02-07 Bioconductor
+ backports              1.1.1    2017-09-25 CRAN (R 3.3.3)
+ base                 * 3.3.3    2017-05-18 local
+ base64enc              0.1-3    2015-07-28 CRAN (R 3.3.0)
+ Biobase                2.34.0   2016-10-20 Bioconductor
+ BiocGenerics           0.20.0   2017-06-05 Bioconductor
+ BiocParallel           1.8.2    2017-04-28 cran (@1.8.2)
+ biomaRt                2.30.0   2016-12-06 Bioconductor
+ Biostrings             2.42.1   2016-12-06 Bioconductor
+ bit                    1.1-12   2014-04-09 CRAN (R 3.3.0)
+ bit64                  0.9-7    2017-05-08 CRAN (R 3.3.3)
+ bitops                 1.0-6    2013-08-17 CRAN (R 3.3.0)
+ blob                   1.1.0    2017-06-17 CRAN (R 3.3.3)
+ BSgenome               1.42.0   2016-11-18 Bioconductor
+ bumphunter             1.14.0   2017-06-05 Bioconductor
+ checkmate              1.8.4    2017-09-25 CRAN (R 3.3.3)
+ cluster                2.0.5    2016-10-08 CRAN (R 3.3.3)
+ codetools              0.2-15   2016-10-05 CRAN (R 3.3.3)
+ colorout             * 1.1-2    2016-07-22 Github (jalvesaq/colorout@6d84420)
+ colorspace             1.3-2    2016-12-14 CRAN (R 3.3.1)
+ data.table             1.10.4   2017-02-01 CRAN (R 3.3.1)
+ datasets             * 3.3.3    2017-05-18 local
+ DBI                    0.7      2017-06-18 CRAN (R 3.3.3)
+ derfinder            * 1.8.5    2017-06-05 Bioconductor
+ derfinderHelper        1.8.1    2017-03-09 Bioconductor
+ devtools             * 1.13.3   2017-08-02 CRAN (R 3.3.3)
+ digest                 0.6.12   2017-01-27 CRAN (R 3.3.1)
+ doRNG                  1.6.6    2017-04-10 CRAN (R 3.3.1)
+ foreach                1.4.3    2015-10-13 CRAN (R 3.3.0)
+ foreign                0.8-67   2016-09-13 CRAN (R 3.3.3)
+ Formula                1.2-2    2017-07-10 CRAN (R 3.3.3)
+ GenomeInfoDb           1.10.3   2017-02-14 Bioconductor
+ GenomicAlignments      1.10.1   2017-03-21 Bioconductor
+ GenomicFeatures        1.26.4   2017-06-05 Bioconductor
+ GenomicFiles           1.10.3   2016-11-18 Bioconductor
+ GenomicRanges          1.26.4   2017-06-05 Bioconductor
+ ggplot2                2.2.1    2016-12-30 CRAN (R 3.3.1)
+ graphics             * 3.3.3    2017-05-18 local
+ grDevices            * 3.3.3    2017-05-18 local
+ grid                   3.3.3    2017-05-18 local
+ gridExtra              2.3      2017-09-09 CRAN (R 3.3.3)
+ gtable                 0.2.0    2016-02-26 CRAN (R 3.3.0)
+ Hmisc                  4.0-3    2017-05-02 CRAN (R 3.3.1)
+ htmlTable              1.9      2017-01-26 CRAN (R 3.3.1)
+ htmltools              0.3.6    2017-04-28 CRAN (R 3.3.1)
+ htmlwidgets            0.9      2017-07-10 CRAN (R 3.3.3)
+ IRanges                2.8.2    2017-06-05 Bioconductor
+ iterators              1.0.8    2015-10-13 CRAN (R 3.3.0)
+ knitr                  1.17     2017-08-10 CRAN (R 3.3.3)
+ lattice                0.20-34  2016-09-06 CRAN (R 3.3.3)
+ latticeExtra           0.6-28   2016-02-09 CRAN (R 3.3.0)
+ lazyeval               0.2.0    2016-06-12 CRAN (R 3.3.1)
+ locfit                 1.5-9.1  2013-04-20 CRAN (R 3.3.0)
+ magrittr               1.5      2014-11-22 CRAN (R 3.3.1)
+ Matrix                 1.2-8    2017-01-20 CRAN (R 3.3.3)
+ matrixStats            0.52.2   2017-04-14 CRAN (R 3.3.1)
+ memoise                1.1.0    2017-04-21 CRAN (R 3.3.1)
+ methods              * 3.3.3    2017-05-18 local
+ munsell                0.4.3    2016-02-13 CRAN (R 3.3.0)
+ nnet                   7.3-12   2016-02-02 CRAN (R 3.3.3)
+ parallel               3.3.3    2017-05-18 local
+ pkgmaker               0.22     2014-05-14 CRAN (R 3.3.0)
+ plyr                   1.8.4    2016-06-08 CRAN (R 3.3.1)
+ qvalue                 2.6.0    2016-11-17 Bioconductor
+ RColorBrewer           1.1-2    2014-12-07 CRAN (R 3.3.0)
+ Rcpp                   0.12.12  2017-07-15 CRAN (R 3.3.3)
+ RCurl                  1.95-4.8 2016-03-01 CRAN (R 3.3.0)
+ registry               0.3      2015-07-08 CRAN (R 3.3.0)
+ reshape2               1.4.2    2016-10-22 CRAN (R 3.3.1)
+ rlang                  0.1.2    2017-08-09 CRAN (R 3.3.3)
+ rngtools               1.2.4    2014-03-06 CRAN (R 3.3.0)
+ rpart                  4.1-10   2015-06-29 CRAN (R 3.3.3)
+ Rsamtools              1.26.2   2017-05-10 Bioconductor
+ RSQLite                2.0      2017-06-19 CRAN (R 3.3.3)
+ rtracklayer            1.34.2   2017-06-05 Bioconductor
+ S4Vectors              0.12.2   2017-06-05 Bioconductor
+ scales                 0.5.0    2017-08-24 CRAN (R 3.3.3)
+ splines                3.3.3    2017-05-18 local
+ stats                * 3.3.3    2017-05-18 local
+ stats4                 3.3.3    2017-05-18 local
+ stringi                1.1.5    2017-04-07 CRAN (R 3.3.1)
+ stringr                1.2.0    2017-02-18 CRAN (R 3.3.1)
+ SummarizedExperiment   1.4.0    2017-06-05 Bioconductor
+ survival               2.41-3   2017-04-04 CRAN (R 3.3.1)
+ tibble                 1.3.3    2017-05-28 CRAN (R 3.3.3)
+ tools                  3.3.3    2017-05-18 local
+ utils                * 3.3.3    2017-05-18 local
+ VariantAnnotation      1.20.3   2017-03-21 Bioconductor
+ withr                  2.0.0    2017-07-28 CRAN (R 3.3.3)
+ XML                    3.98-1.9 2017-06-19 CRAN (R 3.3.3)
+ xtable                 1.8-2    2016-02-05 CRAN (R 3.3.0)
+ XVector                0.14.1   2017-03-21 Bioconductor
+ zlibbioc               1.20.0   2016-10-20 Bioconductor
