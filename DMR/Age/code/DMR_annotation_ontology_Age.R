@@ -39,7 +39,7 @@ grage$cds = ifelse(grage$rnum %in% queryHits(annotation[["CDS"]]), "CDS", NA)
 grage$intron = ifelse(grage$rnum %in% queryHits(annotation[["Introns"]]), "Intron", NA)
 grage$UTR5 = ifelse(grage$rnum %in% queryHits(annotation[["UTR5"]]), "UTR5", NA)
 grage$UTR3 = ifelse(grage$rnum %in% queryHits(annotation[["UTR3"]]), "UTR3", NA)
-grage$islands = ifelse(grage$rnum %in% queryHits(annotation[["islands"]]), "CpG_Island", "non-Island")
+grage$islands = ifelse(grage$rnum %in% queryHits(annotation[["islands"]]), "CpG Island", "Non-Island")
 grage$promoter = ifelse(grage$rnum %in% queryHits(annotation[["promoters"]]), "Promoter", NA)
 grage$anno = paste0(grage$cds,":",grage$intron, ":", grage$UTR5, ":", grage$UTR3, ":", grage$promoter)
 
@@ -68,7 +68,7 @@ dtage = data.table(age)
 
 ## how many fall within CpG islands?
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/Age/figures/DMR_overap_with_CpG_Islands_byAge.pdf")
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/Age/figures/DMR_overap_with_CpG_Islands_byAge.pdf",width = 8.5, height = 8)
 x = dtage[,length(unique(regionID)), by = "islands"]
 x$perc = round(x$V1/sum(x$V1)*100,2)
 ggplot(x, aes(x = islands, y = V1)) + geom_bar(stat = "identity") +
@@ -108,8 +108,8 @@ dev.off()
 
 # Is there a relationship between being significantly DM and overlapping a CpG island?
 
-fisher.test(data.frame(c(nrow(age[which(age$sig=="FWER < 0.05" & age$islands=="CpG_Island"),]),
-                         nrow(age[which(age$sig=="FWER > 0.05" & age$islands=="CpG_Island"),])),
+fisher.test(data.frame(c(nrow(age[which(age$sig=="FWER < 0.05" & age$islands=="CpG Island"),]),
+                         nrow(age[which(age$sig=="FWER > 0.05" & age$islands=="CpG Island"),])),
                        c(nrow(age[which(age$sig=="FWER < 0.05" & age$islands=="non-Island"),]),
                          nrow(age[which(age$sig=="FWER > 0.05" & age$islands=="non-Island"),]))))
 # CpG islands are overrepresented in DMRs
@@ -124,7 +124,7 @@ fisher.test(data.frame(c(nrow(age[which(age$sig=="FWER < 0.05" & age$islands=="C
 
 # assign genomic features
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/Age/figures/DMR_annotation_byAge.pdf")
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/Age/figures/DMR_annotation_byAge.pdf",width = 9)
 x = dtage[,length(unique(regionID)), by = "annotation"]
 x$perc = round(x$V1/sum(x$V1)*100,2)
 ggplot(x, aes(x = annotation, y = V1)) + geom_bar(stat = "identity") +
