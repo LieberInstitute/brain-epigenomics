@@ -40,17 +40,17 @@ annotation = lapply(features, function(y) findOverlaps(grCHneurons, y))
 grCHneurons$rnum = 1:length(grCHneurons)
 grCHneurons$cds = ifelse(grCHneurons$rnum %in% queryHits(annotation[["CDS"]]), "CDS", NA)
 grCHneurons$intron = ifelse(grCHneurons$rnum %in% queryHits(annotation[["Introns"]]), "Intron", NA)
-grCHneurons$UTR5 = ifelse(grCHneurons$rnum %in% queryHits(annotation[["UTR5"]]), "UTR5", NA)
-grCHneurons$UTR3 = ifelse(grCHneurons$rnum %in% queryHits(annotation[["UTR3"]]), "UTR3", NA)
-grCHneurons$islands = ifelse(grCHneurons$rnum %in% queryHits(annotation[["islands"]]), "CpG_Island", "non-Island")
+grCHneurons$UTR5 = ifelse(grCHneurons$rnum %in% queryHits(annotation[["UTR5"]]), "5'UTR", NA)
+grCHneurons$UTR3 = ifelse(grCHneurons$rnum %in% queryHits(annotation[["UTR3"]]), "3'UTR", NA)
+grCHneurons$islands = ifelse(grCHneurons$rnum %in% queryHits(annotation[["islands"]]), "CpG Island", "Non-Island")
 grCHneurons$promoter = ifelse(grCHneurons$rnum %in% queryHits(annotation[["promoters"]]), "Promoter", NA)
 grCHneurons$anno = paste0(grCHneurons$cds,":",grCHneurons$intron, ":", grCHneurons$UTR5, ":", grCHneurons$UTR3, ":", grCHneurons$promoter)
 
 CHneurons = as.data.frame(grCHneurons)
-CHneurons[which(CHneurons$anno == "NA:NA:NA:NA:NA"),"annotation"] = "Other" 
+CHneurons[which(CHneurons$anno == "NA:NA:NA:NA:NA"),"annotation"] = "Intergenic" 
 CHneurons[grep("CDS", CHneurons$cds),"annotation"] = "CDS"
-CHneurons[which(is.na(CHneurons$annotation) & CHneurons$UTR5 == "UTR5"),"annotation"] = "UTR5"
-CHneurons[which(is.na(CHneurons$annotation) & CHneurons$UTR3 == "UTR3"),"annotation"] = "UTR3"
+CHneurons[which(is.na(CHneurons$annotation) & CHneurons$UTR5 == "5'UTR"),"annotation"] = "5'UTR"
+CHneurons[which(is.na(CHneurons$annotation) & CHneurons$UTR3 == "3'UTR"),"annotation"] = "3'UTR"
 CHneurons[which(is.na(CHneurons$annotation) & CHneurons$intron == "Intron"),"annotation"] = "Intron"
 CHneurons[which(is.na(CHneurons$annotation) & CHneurons$promoter == "Promoter"),"annotation"] = "Promoter"
 
@@ -115,10 +115,10 @@ dev.off()
 
 # Is there a relationship between being significantly DM and overlapping a CpG island?
 
-fisher.test(data.frame(c(nrow(CHneurons[which(CHneurons$sig=="FDR < 0.05" & CHneurons$islands=="CpG_Island"),]),
-                         nrow(CHneurons[which(CHneurons$sig=="FDR > 0.05" & CHneurons$islands=="CpG_Island"),])),
-                       c(nrow(CHneurons[which(CHneurons$sig=="FDR < 0.05" & CHneurons$islands=="non-Island"),]),
-                         nrow(CHneurons[which(CHneurons$sig=="FDR > 0.05" & CHneurons$islands=="non-Island"),]))))
+fisher.test(data.frame(c(nrow(CHneurons[which(CHneurons$sig=="FDR < 0.05" & CHneurons$islands=="CpG Island"),]),
+                         nrow(CHneurons[which(CHneurons$sig=="FDR > 0.05" & CHneurons$islands=="CpG Island"),])),
+                       c(nrow(CHneurons[which(CHneurons$sig=="FDR < 0.05" & CHneurons$islands=="Non-Island"),]),
+                         nrow(CHneurons[which(CHneurons$sig=="FDR > 0.05" & CHneurons$islands=="Non-Island"),]))))
 # CpG islands are depleted in dmCH
 #p-value < 2.2e-16
 #alternative hypothesis: true odds ratio is not equal to 1
@@ -201,10 +201,10 @@ fisher.test(data.frame(c(nrow(CHneurons[which(CHneurons$sig=="FDR < 0.05" & CHne
 
 # Is there a relationship between being significantly DM and overlapping a gene and/or promoter?
 
-fisher.test(data.frame(c(nrow(CHneurons[which(CHneurons$sig=="FDR < 0.05" & CHneurons$annotation!="Other"),]),
-                         nrow(CHneurons[which(CHneurons$sig=="FDR > 0.05" & CHneurons$annotation!="Other"),])),
-                       c(nrow(CHneurons[which(CHneurons$sig=="FDR < 0.05" & CHneurons$annotation=="Other"),]),
-                         nrow(CHneurons[which(CHneurons$sig=="FDR > 0.05" & CHneurons$annotation=="Other"),]))))
+fisher.test(data.frame(c(nrow(CHneurons[which(CHneurons$sig=="FDR < 0.05" & CHneurons$annotation!="Intergenic"),]),
+                         nrow(CHneurons[which(CHneurons$sig=="FDR > 0.05" & CHneurons$annotation!="Intergenic"),])),
+                       c(nrow(CHneurons[which(CHneurons$sig=="FDR < 0.05" & CHneurons$annotation=="Intergenic"),]),
+                         nrow(CHneurons[which(CHneurons$sig=="FDR > 0.05" & CHneurons$annotation=="Intergenic"),]))))
 # genes and promoters together are underrepresented in dmCH
 #p-value < 2.2e-16
 #alternative hypothesis: true odds ratio is not equal to 1
@@ -217,15 +217,15 @@ fisher.test(data.frame(c(nrow(CHneurons[which(CHneurons$sig=="FDR < 0.05" & CHne
 
 ### Gene Ontology
 entrez = list(All = dtCHneurons[sig=="FDR < 0.05",list(na.omit(EntrezID)),], 
-              GenesPlusPromoters = dtCHneurons[annotation != "Other" & sig=="FDR < 0.05",list(na.omit(EntrezID)),],
+              GenesPlusPromoters = dtCHneurons[annotation != "Intergenic" & sig=="FDR < 0.05",list(na.omit(EntrezID)),],
               Genes = dtCHneurons[distToGene==0 & sig=="FDR < 0.05",list(na.omit(EntrezID)),],
               Promoters = dtCHneurons[annotation == "Promoter" & sig=="FDR < 0.05",list(na.omit(EntrezID)),])
 entrez.dir = list(All.pos = dtCHneurons[Tstat>0 & sig=="FDR < 0.05",list(na.omit(EntrezID)),], 
-                  GenesPlusPromoters.pos = dtCHneurons[Tstat>0 & annotation != "Other" & sig=="FDR < 0.05",list(na.omit(EntrezID)),],
+                  GenesPlusPromoters.pos = dtCHneurons[Tstat>0 & annotation != "Intergenic" & sig=="FDR < 0.05",list(na.omit(EntrezID)),],
                   Genes.pos = dtCHneurons[Tstat>0 & distToGene==0 & sig=="FDR < 0.05",list(na.omit(EntrezID)),],
                   Promoters.pos = dtCHneurons[Tstat>0 & annotation == "Promoter" & sig=="FDR < 0.05",list(na.omit(EntrezID)),],
                   All.neg = dtCHneurons[Tstat<0 & sig=="FDR < 0.05",list(na.omit(EntrezID)),], 
-                  GenesPlusPromoters.neg = dtCHneurons[Tstat<0 & annotation != "Other" & sig=="FDR < 0.05",list(na.omit(EntrezID)),],
+                  GenesPlusPromoters.neg = dtCHneurons[Tstat<0 & annotation != "Intergenic" & sig=="FDR < 0.05",list(na.omit(EntrezID)),],
                   Genes.neg = dtCHneurons[Tstat<0 & distToGene==0 & sig=="FDR < 0.05",list(na.omit(EntrezID)),],
                   Promoters.neg = dtCHneurons[Tstat<0 & annotation == "Promoter" & sig=="FDR < 0.05",list(na.omit(EntrezID)),])
 entrez = lapply(entrez, function(x) as.character(unique(x$V1)))              
@@ -312,8 +312,120 @@ plot(compareMF, colorBy="p.adjust", showCategory = 45, title= "Molecular Functio
 plot(compareCC, colorBy="p.adjust", showCategory = 45, title= "Cellular Compartment GO Enrichment")
 plot(compareDO, colorBy="p.adjust", showCategory = 30, title= "Disease Ontology Enrichment")
 plot(compareKegg.dir, colorBy="p.adjust", showCategory = 45, title= "KEGG Pathway Enrichment")
-plot(compareBP.dir, colorBy="p.adjust", showCategory = 45, title= "Biological Process GO Enrichment")
+plot(compareBP.dir, colorBy="p.adjust", showCategory = 100, title= "Biological Process GO Enrichment")
 plot(compareMF.dir, colorBy="p.adjust", showCategory = 45, title= "Molecular Function GO Enrichment")
 plot(compareCC.dir, colorBy="p.adjust", showCategory = 45, title= "Cellular Compartment GO Enrichment")
 plot(compareDO.dir, colorBy="p.adjust", showCategory = 30, title= "Disease Ontology Enrichment")
 dev.off()
+
+
+
+# Examine the terms that are enriched by direction only a bit closer
+
+combined = list(pos = unique(c(goListdf_BP.dir[["All.pos"]][,"ID"], goListdf_BP.dir[["GenesPlusPromoters.pos"]][,"ID"], goListdf_BP.dir[["Genes.pos"]][,"ID"],goListdf_BP.dir[["Promoters.pos"]][,"ID"])), neg = unique(c(goListdf_BP.dir[["All.neg"]][,"ID"],goListdf_BP.dir[["GenesPlusPromoters.neg"]][,"ID"],goListdf_BP.dir[["Genes.neg"]][,"ID"],goListdf_BP.dir[["Promoters.neg"]][,"ID"])))
+
+posOnly = combined$pos[!combined$pos %in% combined$neg]
+negOnly = combined$neg[!combined$neg %in% combined$pos]
+
+pos = do.call(rbind, goListdf_BP.dir[1:4])
+neg = do.call(rbind, goListdf_BP.dir[5:8])
+
+posOnly = pos[which(pos$ID %in% posOnly),c("p.adjust","Description")]
+negOnly = neg[which(neg$ID %in% negOnly),c("p.adjust","Description")]
+
+head(posOnly[order(posOnly$p.adjust),])
+#                                      p.adjust
+#Genes.pos.GO:0043062              1.345453e-13
+#Genes.pos.GO:0030198              1.345453e-13
+#GenesPlusPromoters.pos.GO:0043062 8.789851e-13
+#GenesPlusPromoters.pos.GO:0030198 8.789851e-13
+#GenesPlusPromoters.pos.GO:0050900 5.692108e-12
+#Promoters.pos.GO:0031424          8.968194e-12
+#                                                           Description
+#Genes.pos.GO:0043062              extracellular structure organization
+#Genes.pos.GO:0030198                 extracellular matrix organization
+#GenesPlusPromoters.pos.GO:0043062 extracellular structure organization
+#GenesPlusPromoters.pos.GO:0030198    extracellular matrix organization
+#GenesPlusPromoters.pos.GO:0050900                  leukocyte migration
+#Promoters.pos.GO:0031424                                keratinization
+
+head(negOnly[order(negOnly$p.adjust),])
+#                                      p.adjust
+#Genes.neg.GO:0061564              7.644055e-08
+#Genes.neg.GO:0050808              1.253498e-07
+#GenesPlusPromoters.neg.GO:0061564 1.499720e-07
+#GenesPlusPromoters.neg.GO:0050808 1.804499e-07
+#Genes.neg.GO:0007409              5.019120e-07
+#GenesPlusPromoters.neg.GO:0007409 1.688382e-06
+#All.neg.GO:0050804                3.135164e-06
+#GenesPlusPromoters.neg.GO:0051648 2.872301e-05
+#GenesPlusPromoters.neg.GO:0050804 3.745892e-05
+#All.neg.GO:0061564                3.839252e-05
+#Genes.neg.GO:0051648              4.162768e-05
+#Genes.neg.GO:0050804              4.206036e-05
+#GenesPlusPromoters.neg.GO:0016358 4.350339e-05
+#Genes.neg.GO:0016358              4.719040e-05
+#Genes.neg.GO:0007416              6.163492e-05
+#Genes.neg.GO:0010721              7.508933e-05
+#GenesPlusPromoters.neg.GO:0045666 7.560762e-05
+#GenesPlusPromoters.neg.GO:0051650 7.560762e-05
+#GenesPlusPromoters.neg.GO:0007416 8.129272e-05
+#All.neg.GO:0044708                9.700571e-05
+#                                                                    Description
+#Genes.neg.GO:0061564                                           axon development
+#Genes.neg.GO:0050808                                       synapse organization
+#GenesPlusPromoters.neg.GO:0061564                              axon development
+#GenesPlusPromoters.neg.GO:0050808                          synapse organization
+#Genes.neg.GO:0007409                                               axonogenesis
+#GenesPlusPromoters.neg.GO:0007409                                  axonogenesis
+#All.neg.GO:0050804                          modulation of synaptic transmission
+#GenesPlusPromoters.neg.GO:0051648                          vesicle localization
+#GenesPlusPromoters.neg.GO:0050804           modulation of synaptic transmission
+#All.neg.GO:0061564                                             axon development
+#Genes.neg.GO:0051648                                       vesicle localization
+#Genes.neg.GO:0050804                        modulation of synaptic transmission
+#GenesPlusPromoters.neg.GO:0016358                          dendrite development
+#Genes.neg.GO:0016358                                       dendrite development
+#Genes.neg.GO:0007416                                           synapse assembly
+#Genes.neg.GO:0010721                    negative regulation of cell development
+#GenesPlusPromoters.neg.GO:0045666 positive regulation of neuron differentiation
+#GenesPlusPromoters.neg.GO:0051650         establishment of vesicle localization
+#GenesPlusPromoters.neg.GO:0007416                              synapse assembly
+#All.neg.GO:0044708                                     single-organism behavior
+
+
+terms = list("Axon development" = data.frame(padj = unlist(lapply(goListdf_BP.dir, function(x) x[grep("axon development", x$Description),"p.adjust"])),
+							GeneRatio = unlist(lapply(goListdf_BP.dir, function(x) x[grep("axon development", x$Description),"GeneRatio"])),
+							Count = unlist(lapply(goListdf_BP.dir, function(x) x[grep("axon development", x$Description),"Count"]))),
+			"Axonogenesis" = data.frame(padj = unlist(lapply(goListdf_BP.dir, function(x) x[grep("GO:0007409", x$ID),"p.adjust"])),
+							GeneRatio = unlist(lapply(goListdf_BP.dir, function(x) x[grep("GO:0007409", x$ID),"GeneRatio"])),
+							Count = unlist(lapply(goListdf_BP.dir, function(x) x[grep("GO:0007409", x$ID),"Count"]))),
+			"Dendrite Development" = data.frame(padj = unlist(lapply(goListdf_BP.dir, function(x) x[grep("GO:0016358", x$ID),"p.adjust"])),
+							GeneRatio = unlist(lapply(goListdf_BP.dir, function(x) x[grep("GO:0016358", x$ID),"GeneRatio"])),
+							Count = unlist(lapply(goListdf_BP.dir, function(x) x[grep("GO:0016358", x$ID),"Count"]))),
+			"Synapse Organization" = data.frame(padj = unlist(lapply(goListdf_BP.dir, function(x) x[grep("GO:0050808", x$ID),"p.adjust"])),
+							GeneRatio = unlist(lapply(goListdf_BP.dir, function(x) x[grep("GO:0050808", x$ID),"GeneRatio"])),
+							Count = unlist(lapply(goListdf_BP.dir, function(x) x[grep("GO:0050808", x$ID),"Count"]))))
+							
+terms = Map(cbind, terms, Term = list("Axon Development", "Axonogenesis", "Dendrite Development", "Synapse Organization"))
+terms = do.call(rbind, terms)
+frac = terms$GeneRatio
+frac = strsplit(as.character(frac), "/")
+frac = lapply(frac, as.numeric)
+frac = unlist(lapply(frac, function(x) round(x[1]/x[2], 3)))
+terms$GeneRatio = frac
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/non-CpG_BP_enrichedInNeuronalOnly_Age_DecreasingMeth.pdf", height = 7, width = 8.5)
+ggplot(terms[grep(".Genes.neg", rownames(terms)),], aes(x = Term, y = GeneRatio)) + geom_point(aes(size = Count, colour = padj)) + scale_colour_gradient(low = "red") +
+  coord_flip() +
+  labs(fill="") +
+  xlab("") + 
+  ylab("Gene Ratio") +
+  ggtitle("Biological Processes:\nDecreasing Methylation") +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20))
+  dev.off()
+			
+
+
+

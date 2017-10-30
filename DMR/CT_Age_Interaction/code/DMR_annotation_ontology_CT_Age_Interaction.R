@@ -37,17 +37,17 @@ annotation = lapply(features, function(y) findOverlaps(grinteraction, y))
 grinteraction$rnum = 1:length(grinteraction)
 grinteraction$cds = ifelse(grinteraction$rnum %in% queryHits(annotation[["CDS"]]), "CDS", NA)
 grinteraction$intron = ifelse(grinteraction$rnum %in% queryHits(annotation[["Introns"]]), "Intron", NA)
-grinteraction$UTR5 = ifelse(grinteraction$rnum %in% queryHits(annotation[["UTR5"]]), "UTR5", NA)
-grinteraction$UTR3 = ifelse(grinteraction$rnum %in% queryHits(annotation[["UTR3"]]), "UTR3", NA)
-grinteraction$islands = ifelse(grinteraction$rnum %in% queryHits(annotation[["islands"]]), "CpG_Island", "non-Island")
+grinteraction$UTR5 = ifelse(grinteraction$rnum %in% queryHits(annotation[["UTR5"]]), "5'UTR", NA)
+grinteraction$UTR3 = ifelse(grinteraction$rnum %in% queryHits(annotation[["UTR3"]]), "3'UTR", NA)
+grinteraction$islands = ifelse(grinteraction$rnum %in% queryHits(annotation[["islands"]]), "CpG Island", "Non-Island")
 grinteraction$promoter = ifelse(grinteraction$rnum %in% queryHits(annotation[["promoters"]]), "Promoter", NA)
 grinteraction$anno = paste0(grinteraction$cds,":",grinteraction$intron, ":", grinteraction$UTR5, ":", grinteraction$UTR3, ":", grinteraction$promoter)
 
 interaction = as.data.frame(grinteraction)
-interaction[which(interaction$anno == "NA:NA:NA:NA:NA"),"annotation"] = "Other" 
+interaction[which(interaction$anno == "NA:NA:NA:NA:NA"),"annotation"] = "Intergenic" 
 interaction[grep("CDS", interaction$cds),"annotation"] = "CDS"
-interaction[which(is.na(interaction$annotation) & interaction$UTR5 == "UTR5"),"annotation"] = "UTR5"
-interaction[which(is.na(interaction$annotation) & interaction$UTR3 == "UTR3"),"annotation"] = "UTR3"
+interaction[which(is.na(interaction$annotation) & interaction$UTR5 == "5'UTR"),"annotation"] = "5'UTR"
+interaction[which(is.na(interaction$annotation) & interaction$UTR3 == "3'UTR"),"annotation"] = "3'UTR"
 interaction[which(is.na(interaction$annotation) & interaction$intron == "Intron"),"annotation"] = "Intron"
 interaction[which(is.na(interaction$annotation) & interaction$promoter == "Promoter"),"annotation"] = "Promoter"
 
@@ -68,7 +68,7 @@ dtinteraction = data.table(interaction)
 
 ## how many fall within CpG islands?
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/figures/DMR_overap_with_CpG_Islands_CT_Age_Interaction.pdf")
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/figures/DMR_overap_with_CpG_Islands_CT_Age_Interaction.pdf",width=8.5)
 x = dtinteraction[,length(unique(regionID)), by = "islands"]
 x$perc = round(x$V1/sum(x$V1)*100,2)
 ggplot(x, aes(x = islands, y = V1)) + geom_bar(stat = "identity") +
@@ -108,10 +108,10 @@ dev.off()
 
 # Is there a relationship between being significantly DM and overlapping a CpG island?
 
-fisher.test(data.frame(c(nrow(interaction[which(interaction$sig=="FWER < 0.05" & interaction$islands=="CpG_Island"),]),
-                         nrow(interaction[which(interaction$sig=="FWER > 0.05" & interaction$islands=="CpG_Island"),])),
-                       c(nrow(interaction[which(interaction$sig=="FWER < 0.05" & interaction$islands=="non-Island"),]),
-                         nrow(interaction[which(interaction$sig=="FWER > 0.05" & interaction$islands=="non-Island"),]))))
+fisher.test(data.frame(c(nrow(interaction[which(interaction$sig=="FWER < 0.05" & interaction$islands=="CpG Island"),]),
+                         nrow(interaction[which(interaction$sig=="FWER > 0.05" & interaction$islands=="CpG Island"),])),
+                       c(nrow(interaction[which(interaction$sig=="FWER < 0.05" & interaction$islands=="Non-Island"),]),
+                         nrow(interaction[which(interaction$sig=="FWER > 0.05" & interaction$islands=="Non-Island"),]))))
 # CpG islands are overrepresented in DMRs
 #p-value < 2.2e-16
 #alternative hypothesis: true odds ratio is not equal to 1
@@ -194,10 +194,10 @@ fisher.test(data.frame(c(nrow(interaction[which(interaction$sig=="FWER < 0.05" &
 
 # Is there a relationship between being significantly DM and overlapping a gene and/or promoter?
 
-fisher.test(data.frame(c(nrow(interaction[which(interaction$sig=="FWER < 0.05" & interaction$annotation!="Other"),]),
-                         nrow(interaction[which(interaction$sig=="FWER > 0.05" & interaction$annotation!="Other"),])),
-                       c(nrow(interaction[which(interaction$sig=="FWER < 0.05" & interaction$annotation=="Other"),]),
-                         nrow(interaction[which(interaction$sig=="FWER > 0.05" & interaction$annotation=="Other"),]))))
+fisher.test(data.frame(c(nrow(interaction[which(interaction$sig=="FWER < 0.05" & interaction$annotation!="Intergenic"),]),
+                         nrow(interaction[which(interaction$sig=="FWER > 0.05" & interaction$annotation!="Intergenic"),])),
+                       c(nrow(interaction[which(interaction$sig=="FWER < 0.05" & interaction$annotation=="Intergenic"),]),
+                         nrow(interaction[which(interaction$sig=="FWER > 0.05" & interaction$annotation=="Intergenic"),]))))
 # genes and promoters together are overrepresented in DMRs
 #p-value = 1.759e-14
 #alternative hypothesis: true odds ratio is not equal to 1
@@ -210,15 +210,15 @@ fisher.test(data.frame(c(nrow(interaction[which(interaction$sig=="FWER < 0.05" &
 
 ### Gene Ontology
 entrez = list(All = dtinteraction[sig=="FWER < 0.05",list(na.omit(EntrezID)),], 
-              GenesPlusPromoters = dtinteraction[annotation != "Other" & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
+              GenesPlusPromoters = dtinteraction[annotation != "Intergenic" & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
               Genes = dtinteraction[distToGene==0 & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
               Promoters = dtinteraction[annotation == "Promoter" & sig=="FWER < 0.05",list(na.omit(EntrezID)),])
 entrez.dir = list(All.pos = dtinteraction[value>0 & sig=="FWER < 0.05",list(na.omit(EntrezID)),], 
-                  GenesPlusPromoters.pos = dtinteraction[value>0 & annotation != "Other" & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
+                  GenesPlusPromoters.pos = dtinteraction[value>0 & annotation != "Intergenic" & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
                   Genes.pos = dtinteraction[value>0 & distToGene==0 & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
                   Promoters.pos = dtinteraction[value>0 & annotation == "Promoter" & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
                   All.neg = dtinteraction[value<0 & sig=="FWER < 0.05",list(na.omit(EntrezID)),], 
-                  GenesPlusPromoters.neg = dtinteraction[value<0 & annotation != "Other" & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
+                  GenesPlusPromoters.neg = dtinteraction[value<0 & annotation != "Intergenic" & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
                   Genes.neg = dtinteraction[value<0 & distToGene==0 & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
                   Promoters.neg = dtinteraction[value<0 & annotation == "Promoter" & sig=="FWER < 0.05",list(na.omit(EntrezID)),])
 entrez = lapply(entrez, function(x) as.character(unique(x$V1)))              
