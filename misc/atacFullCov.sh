@@ -4,8 +4,8 @@
 #$ -o ./logs/atacFullCov.txt
 #$ -e ./logs/atacFullCov.txt
 #$ -m e
-#$ -l bluejay,mem_free=15G,h_vmem=15G,h_fsize=100G
-#$ -pe local 10
+#$ -l mem_free=55G,h_vmem=55G,h_fsize=100G
+#$ -pe local 5
 
 echo "**** Job starts ****"
 date
