@@ -34,3 +34,19 @@ for (i in 1:length(means)){
   	print(g)
 }
 dev.off()
+
+
+# How many of the "Overall Age" DMRs overlap the "Age in a Cell Type" DMRs?
+
+fwer = lapply(DMR, function(x) x[which(x$fwer<=0.05),])
+fwer = lapply(fwer, function(x) makeGRangesFromDataFrame(x, keep.extra.columns=T))
+fwer_df = lapply(fwer, as.data.frame)
+hits = findOverlaps(fwer$Interaction, fwer$Age)
+age = cbind(fwer_df$Age[subjectHits(hits),], fwer_df$Interaction[queryHits(hits),])
+length(unique(subjectHits(hits))) # 59 of the 129 "Overall Age" DMRs overlap an "Interaction" DMR
+
+overlaps <- pintersect(fwer$Interaction[queryHits(hits)], fwer$Age[subjectHits(hits)])
+percentOverlap <- width(overlaps) / width(fwer$Age[subjectHits(hits)])
+c(mean = mean(percentOverlap), sd = sd(percentOverlap), min = min(percentOverlap), max = max(percentOverlap))
+#      mean         sd        min        max 
+# 0.62571268 0.28743417 0.09381592 1.00000000
