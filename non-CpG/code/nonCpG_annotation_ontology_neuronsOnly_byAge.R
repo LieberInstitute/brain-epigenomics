@@ -425,7 +425,37 @@ ggplot(terms[grep(".Genes.neg", rownames(terms)),], aes(x = Term, y = GeneRatio)
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
   dev.off()
-			
+
+
+
+plotExample = compareBP.dir # clusterProfiler output
+plotExample@compareClusterResult = plotExample@compareClusterResult[which(plotExample@compareClusterResult$ID%in%c("GO:0021953","GO:0051648","GO:0010977","GO:0050808","GO:0007612")),]   
+terms2 = as.data.frame(compareBP.dir)
+neg = unique(terms2$Description[grep("neg",terms2$Cluster)])
+pos = unique(terms2$Description[grep("pos",terms2$Cluster)])
+neg = neg[!(neg%in%pos)]
+pos = pos[!(pos%in%neg)]
+terms2 = terms2[which(terms2$ID%in%c("GO:0021953","GO:0051648","GO:0010977","GO:0050808","GO:0007612")),]
+terms2$Description = gsub("negative regulation of neuron projection development","negative regulation of\nneuron projection development", terms2$Description)
+terms2$Description = gsub("central nervous system neuron differentiation","central nervous system\nneuron differentiation", terms2$Description)
+frac = terms2$GeneRatio
+frac = strsplit(as.character(frac), "/")
+frac = lapply(frac, as.numeric)
+frac = unlist(lapply(frac, function(x) round(x[1]/x[2], 3)))
+terms2$GeneRatio = frac
+
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/non-CpG_BP_enrichedInNeuronalOnly_Age_DecreasingMeth_selectedTerms.pdf", width=9)
+plot(plotExample)
+ggplot(terms2[grep("Genes.neg", terms2$Cluster),], aes(x = Description, y = GeneRatio)) + geom_point(aes(size = Count, colour = p.adjust)) + scale_colour_gradient(low = "red") +
+  coord_flip() +
+  labs(fill="") +
+  xlab("") + 
+  ylab("Gene Ratio") +
+  ggtitle("Biological Processes:\nDecreasing Methylation") +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20))
+dev.off()
 
 
 

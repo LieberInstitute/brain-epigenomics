@@ -70,26 +70,9 @@ sdGlia = apply(glia, 1, sd)
 df = data.frame(mean = c(meanNeuron, meanGlia), sd = c(sdNeuron, sdGlia),
                 CellType = c(rep.int("Neuron", length(meanNeuron)), rep.int("Glia", length(meanGlia))))
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/meanMethylation_byCellType.pdf")
-ggplot(df, aes(x=CellType, y = mean)) + geom_boxplot() + 
-  ylab("Mean Methylation") + 
-  xlab("") +
-  ggtitle("Mean nonCpG Methylation By Cell Type") + 
-  theme(title = element_text(size = 20)) +
-  theme(text = element_text(size = 20))
-dev.off()
-
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/sdMethylation_byCellType.pdf")
-ggplot(df, aes(x=CellType, y = sd)) + geom_boxplot() + 
-  ylab("SD") + 
-  xlab("") +
-  ggtitle("nonCpG Methylation Standard Deviation By Cell Type") + 
-  theme(title = element_text(size = 20)) +
-  theme(text = element_text(size = 20))
-dev.off()
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/meanMethylation_byCellType_density.pdf")
-ggplot(df, aes(x=mean)) + geom_density(aes(group=CellType, colour=CellType)) + 
+ggplot(df, aes(x=mean)) + geom_density(aes(group=CellType, colour=CellType), size=2) + scale_color_brewer(palette = "Dark2") +
   ylab("Mean Methylation") + 
   xlab("") +
   ggtitle("Mean nonCpG Methylation By Cell Type") + 
@@ -98,7 +81,7 @@ ggplot(df, aes(x=mean)) + geom_density(aes(group=CellType, colour=CellType)) +
 dev.off()
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/sdMethylation_byCellType_density.pdf")
-ggplot(df, aes(x=sd)) + geom_density(aes(group=CellType, colour=CellType)) + 
+ggplot(df, aes(x=sd)) + geom_density(aes(group=CellType, colour=CellType), size=2) + scale_color_brewer(palette = "Dark2") +
   ylab("SD") + 
   xlab("") +
   ggtitle("nonCpG Methylation Standard Deviation By Cell Type") + 
