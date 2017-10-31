@@ -5,10 +5,13 @@ library('limma')
 library('rtracklayer')
 library('jaffelab')
 library("ggplot2")
+library(reshape2)
+library(data.table)
 
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/CH_object.rda")
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda")
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ATAC/CpG.single.site.ATAC.coverageMatrix.rda")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/CH_object.rda") # includes CH
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda") # includes DMR, geneMap
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ATAC/CpG.single.site.ATAC.coverageMatrix.rda") # includes ATACcovCpGs, ATACpd
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/processed_beta_values_plusMap.rda") # contains gr, meth, and pd
 
 #For all DMRs, compare ATAC-seq coverage within DMR to 1kbp up- and down-stream
 
@@ -78,7 +81,7 @@ covDiff_cellType = list("CellType" = rbind(covDiff_cellType$Neuron$CellType, cov
                         "Interaction" = rbind(covDiff_cellType$Neuron$Interaction, covDiff_cellType$Glia$Interaction))
 covDiff_cellType = Map(cbind, covDiff_cellType, 
                        Sig = mapply(function(x,y) ifelse(x$regionID %in% y[which(y$sig=="FWER < 0.05"),"regionID"], "FWER < 0.05", "FWER > 0.05"), covDiff_cellType, DMR),
-                       Direction = mapply(function(x,y) ifelse(x$regionID %in% y[which(y$Dir=="pos"),"regionID"], "Positive", "Negative"), covDiff_cellType, DMR))
+                       Direction = mapply(function(x,y) ifelse(x$regionID %in% y[which(y$Dir=="pos"),"regionID"], "More Methylated\nIn Neurons", "More Methylated\nIn Glia"), covDiff_cellType, DMR))
 
 aIndexes = splitit(ATACpd$Age.Bins)
 covDiff_age = list(Neonate = mapply(function(x,y) rowMeans(x[,aIndexes$Neonate] - y[,aIndexes$Neonate]), meanCov_inDMR, meanCov_outDMR),
@@ -143,22 +146,53 @@ covDiff_int = Map(cbind, covDiff_int, Sig = mapply(function(x,y) ifelse(rownames
 # Save objects
 save(covDiff, covDiff_cellType, covDiff_age, covDiff_int, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ATAC/DMR_ATACcovDiff_objects.rda")
 
+covDiff_cellType = Map(cbind, covDiff_cellType, direction = lapply(covDiff_cellType, function(x) ifelse(x$Direction=="Positive", "More Methylated\nIn Neurons", "More Methylated\nIn Glia")))
 
-## Plot histograms of distance by cell type, age, direction of methylation change and whether the DMR is significant or not
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/ATAC/ATAC_at_CpGs/figures/DMR_CpG_ATAC_coverage_vs_outDMR_byCellType.pdf",w=12)
+## Plot density of distance by cell type, age, direction of methylation change and whether the DMR is significant or not
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/ATAC/ATAC_at_CpGs/figures/DMR_CpG_ATAC_coverage_vs_outDMR_byCellType_redo.pdf",w=12)
 par(mar=c(5,6,2,2), cex.axis=2,cex.lab=2,cex.main=2)
 for (i in 1:3){
   p = ggplot(covDiff_cellType[[i]], aes(x=Difference)) + geom_density(aes(group=CellType, colour=CellType)) + 
     facet_grid(Direction ~ Sig) +
     ylab("Density") + ylim(0,30) +
-    xlab("(Inside Region) - (Outside Region)") +
+    xlab("(Inside Region) - (Outside Region)") + 
     ggtitle(paste0("Mean ATAC-seq Coverage Difference at CpGs\nBetween DMR and Flanking Regions: " , names(covDiff_cellType)[i], " Regions")) + 
     theme(title = element_text(size = 20)) +
     theme(text = element_text(size = 20))
   print(p)
 }
   dev.off()
+
+######## THIS ONE ########
+
+######## HERE ######
+
+x = Map(cbind, covDiff_cellType, Sig = mapply(function(x,y) ifelse(rownames(x) %in% y[which(y$sig=="FWER < 0.05"),"regionID"], "FWER < 0.05", "FWER > 0.05"), covDiff_cellType, DMR), covDiff_cellType, DMR)
+x = Map(cbind, x, CT = lapply(x, function(y) factor(x$CellType, levels = c("Neuron","Glia"))))
+
+
+x = covDiff_cellType$CellType
+x$regionID = rownames(x)
+x[x$CellType=="Glia","regionID"] = substr(x[x$CellType=="Glia","regionID"],1,nchar(x[x$CellType=="Glia","regionID"])-1)
+cell = DMR$CellType
+x$sig = ifelse(x$regionID %in% cell[which(cell$sig=="FWER < 0.05"),"regionID"], "FWER < 0.05","FWER > 0.05")
+x$CellType = factor(x$CellType, levels = c("Glia", "Neuron"))
+x$dir = ifelse(x$regionID %in% cell[which(cell$Dir=="pos"),"regionID"], "More Methylated\nIn Neurons", "More Methylated\nIn Glia")
+
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/ATAC/ATAC_at_CpGs/figures/DMR_CpG_ATAC_coverage_vs_outDMR_byCellType_fwer.0.05_redo.pdf",w=12)
+ggplot(x[which(x$sig=="FWER < 0.05"),], aes(x=Difference)) + geom_density(aes(group=CellType, colour=CellType)) + 
+    facet_grid(. ~ dir) + scale_color_brewer(palette = "Dark2") +
+    ylab("Density") + ylim(0,30) + 
+    xlab("(Inside Region) - (Outside Region)") + xlim(-0.5,0.5) +
+    ggtitle("Mean ATAC-seq Coverage Difference at CpGs\nBetween DMR and Flanking Regions: Cell Type Regions") + 
+    theme(title = element_text(size = 20)) +
+    theme(text = element_text(size = 20))
+dev.off()
+  
+  
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/ATAC/ATAC_at_CpGs/figures/DMR_CpG_ATAC_coverage_vs_outDMR_byAge.pdf",w=12)
 par(mar=c(5,6,2,2), cex.axis=2,cex.lab=2,cex.main=2)
@@ -198,15 +232,138 @@ for (i in 1:3){
 }
 dev.off()
 
-# get correlation of IN vs OUT coverage broken down by group
 
-correlation = data.frame(mapply(function(x,y,z) cor(x[which(x)], y covDiff_cellType
-    
+### Plot each DMR as a scatterplot, with each point being a sample, one axis being mean DNAm, and the other axis being mean ATAC coverage
+## Make list of data frames containing methylation and library normalized ATAC coverage for each sample at each DMR
+save(ATAC,meth,gr,ATACpd,pd,DMR, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ATAC/DMR_ATAC_plot_objects.rda")
 
-#Subset DNAm to set in ATAC-seq, then plot mean coverage in ATAC-seq vs mean methylation for a given DMR at a time. Take into account library size. 
-#`DMRcov_inDMR` vs `DMRcov_outDMR` from the previous code (something like that)
+ATAC = as.matrix(ATACcovCpGs/colSums(ATACcovCpGs)*(10^6))
 
-## load BSobj
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/processed_beta_values_plusMap.rda")
+sig = lapply(DMR, function(x) x[which(x$fwer<=0.05),])
+sig = lapply(sig, function(x) x[order(x$fwer),])
+
+sigDMRgr = lapply(sig, function(x) makeGRangesFromDataFrame(x, keep.extra.columns = T))
+ATACgr = GRanges(rownames(ATAC))
+
+oo = findOverlaps(gr, ATACgr)
+subsetATACgr = ATACgr[subjectHits(oo)]
+subsetgr = gr[queryHits(oo)]
+subsetATAC = ATAC[subjectHits(oo),]
+subsetmeth = meth[queryHits(oo),]
+
+cov = cbind(subsetATAC, subsetmeth)
+oo.DMRs = lapply(sigDMRgr, function(x) findOverlaps(x, subsetgr))
+rIndexes.DMRs = lapply(oo.DMRs, function(x) split(subjectHits(x), queryHits(x)))
+covDMRs = lapply(rIndexes.DMRs, function(x) lapply(x, function(ii) cov[ii,]))
+covDMRs = lapply(covDMRs, function(x) lapply(x, melt))
+CellType = mapply(function(x,y) c(x,y), split(as.character(ATACpd$SampleID),ATACpd$CellType),
+                 split(pd$Data.ID, pd$Cell.Type))
+AgeBin = mapply(function(x,y) c(x,y), split(as.character(ATACpd$SampleID), ATACpd$Age.Bin),
+                split(pd$Data.ID, pd$Age.Bin))
+keys = unique(c(ATACpd$BrainID,pd$Brain.ID))
+ID = setNames(mapply(c, split(as.character(ATACpd$SampleID), ATACpd$BrainID)[keys], split(pd$Data.ID, pd$Brain.ID)[keys]), keys)
+
+for (i in 1:length(sig)){ 
+  names(covDMRs[[i]]) = sig[[i]][,"regionID"]
+  for (j in 1:nrow(sig[[i]])){
+    tmp = covDMRs[[i]][[j]]
+    tmp[grep("WGC", tmp$Var2),"Experiment"] = "WGBS"
+    tmp[-grep("WGC", tmp$Var2),"Experiment"] = "ATAC"
+    tmp[which(tmp$Var2 %in% CellType$Neuron),"CellType"] = "Neuron"
+    tmp[which(tmp$Var2 %in% CellType$Glia),"CellType"] = "Glia"
+    tmp[which(tmp$Var2 %in% AgeBin$Child),"AgeBin"] = "Child"
+    tmp[which(tmp$Var2 %in% AgeBin$Early.Teen),"AgeBin"] = "Early.Teen"
+    tmp[which(tmp$Var2 %in% AgeBin$Neonate),"AgeBin"] = "Neonate"
+    tmp[which(tmp$Var2 %in% AgeBin$Teen),"AgeBin"] = "Teen"
+    tmp[which(tmp$Var2 %in% AgeBin$Toddler),"AgeBin"] = "Toddler"
+    tmp[which(tmp$Var2 %in% AgeBin$Young.Adult),"AgeBin"] = "Young.Adult"
+    tmp$Group = paste(tmp$Experiment, tmp$CellType, tmp$AgeBin, sep=":")
+    tmp$CTGroup = paste(tmp$Experiment, tmp$CellType, sep=":")
+    tmp$AgeGroup = paste(tmp$Experiment, tmp$AgeBin, sep=":")
+    covDMRs[[i]][[j]] = tmp
+  }}
+covDMRs = mapply(function(x,y) Map(cbind, x, DMR.Direction = as.list(y$Dir)), covDMRs, sig)
+
+# take means of groups before calculating correlation
+lapply(covDMRs, function(x) head(lapply(x,class)))
+covDMRs_dt = lapply(covDMRs, function(x) lapply(x,as.data.table))
+covDMRs_dt = lapply(covDMRs_dt, function(x) Map(cbind, x, "CpG" = lapply(x, function(z) z[,1])))
+
+means = list(allMean = lapply(covDMRs_dt, function(x) lapply(x, function(y) y[,mean(value), by=c("Var1","Experiment")])),
+             byCT = lapply(covDMRs_dt, function(x) lapply(x, function(y) y[,mean(value), by=c("Var1","Experiment","CellType", "CTGroup")])),
+             byAge = lapply(covDMRs_dt, function(x) lapply(x, function(y) y[,mean(value), by=c("Var1","Experiment","AgeBin", "AgeGroup")])))
+
+celltype = covDMRs_dt[["CellType"]]
+a = sapply(celltype, function(x) "Var1" %in% colnames(x))
+
+
+
+head(lapply(celltype, function(y) y[,mean(value), by=c("Var1","Experiment")]))
+
+
+
+
+celltype = Map(cbind, celltype, "CpG" = lapply(celltype, function(x) x[,1]))
+
+celltypebyAll = lapply(celltypebyAll, function(x) split(x, x$Experiment))
+celltypebyAll = lapply(celltypebyAll, function(y) cbind(y$ATAC[match(y$ATAC$CpG, y$WGBS$CpG),,],
+                                                      y$WGBS[match(y$ATAC$CpG, y$WGBS$CpG),,]))
+celltypebyAll = lapply(celltypebyAll, as.data.frame)
+celltypebyCT = lapply(celltypebyCT, function(x) split(x, x$Experiment))
+celltypebyCT = lapply(celltypebyCT, function(y) cbind(y$ATAC[match(y$ATAC$CpG, y$WGBS$CpG),,],
+                                                      y$WGBS[match(y$ATAC$CpG, y$WGBS$CpG),,]))
+celltypebyCT = lapply(celltypebyCT, as.data.frame)
+for (i in 1:length(celltypebyCT)) {colnames(celltypebyCT[[i]]) = c("CpG","Experiment","CellType","CTGroup","ATACmean","CpG","Experiment","CellType","CTGroup","WGBSmean")}
+
+celltypebyAge = lapply(celltypebyAge, function(x) split(x, x$Experiment))
+celltypebyAge = lapply(celltypebyAge, function(y) cbind(y$ATAC[match(y$ATAC$CpG, y$WGBS$CpG),,],
+                                                        y$WGBS[match(y$ATAC$CpG, y$WGBS$CpG),,]))
+celltypebyAge = lapply(celltypebyAge, as.data.frame)
+for (i in 1:length(celltypebyAge)) {colnames(celltypebyAge[[i]]) = c("CpG","Experiment","CellType","CTGroup","ATACmean","CpG","Experiment","CellType","CTGroup","WGBSmean")}
+
+
+toy = lapply(celltypebyCT[1:3],head)
+corr.CellType = list(byCT = lapply(toy, function(x) cor(x = x$WGBSmean, y = x$ATACmean)),
+                     byAge = lapply(celltypebyAge, function(x) cor(x = x$WGBSmean, y = x$ATACmean, use="complete.obs")))
+
+
+byCT = lapply(celltypebyCT, function(x) cor(x = x$WGBSmean, y = x$ATACmean))
+
+
+## Plot the top 100 regions for each comparison
+
+top = lapply(sig, function(x) x[1:100,"regionID"])
+top.celltypebyCT = celltypebyCT[which(names(celltypebyCT) %in% top$CellType)]
+top.celltypebyAge = celltypebyAge[which(names(celltypebyAge) %in% top$CellType)]
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/ATAC/ATAC_at_CpGs/figures/meth_vs.ATAC_inDMRs_CellType.pdf")
+for (i in 1:2){
+  g = ggplot(top.celltypebyCT[[i]],  aes(x = ATACmean, y =WGBSmean)) + geom_point(aes(colour = CellType)) +
+    geom_smooth(method = "lm", fullrange=TRUE) +
+    ylab("Mean Beta") + xlab("Mean ATAC Coverage/Million Reads") +
+    ggtitle(paste0(names(celltype)[1],": Methylation vs Accessibility")) +
+    theme(title = element_text(size = 20)) +
+    theme(text = element_text(size = 20))
+  print(g)
+  g = ggplot(top.celltypebyAge[[i]],  aes(x = ATACmean, y =WGBSmean)) + geom_point(aes(colour = AgeBin)) +
+    geom_smooth(method = "lm", fullrange=TRUE) +
+    ylab("Mean Beta") + xlab("Mean ATAC Coverage/Million Reads") +
+    ggtitle(paste0(names(celltype)[i],": Methylation vs Accessibility")) +
+    theme(title = element_text(size = 20)) +
+    theme(text = element_text(size = 20))
+  print(g)
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
