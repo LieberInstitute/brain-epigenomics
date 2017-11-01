@@ -29,8 +29,8 @@ f <- contrasts.fit(fits[[3]], c(0, 1, 0, 1))
 
 ## Check coefs
 ## they are basically identical
-identical(f$coef[, 1], age_coef[, 3])
-summary(abs(f$coef[, 1] - age_coef[, 3]))
+identical(f$coefficients[, 1], age_coef[, 3])
+summary(abs(f$coefficients[, 1] - age_coef[, 3]))
 
 ## Get the age t-statistics
 coefs <- list('age' = 2, 'age_glia' = 2, 'age_cell_difference' = 4)
