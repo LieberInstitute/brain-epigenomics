@@ -19,7 +19,7 @@ age_coef <- mapply(function(f, coef) {
     } else {
         f$coefficients[, coef]
     }
-}, fits[c(2, 3, 3)], coefs)
+}, fits[c(2, 3, 3, 3)], coefs)
 colnames(age_coef) <- c('overall', 'age_glia', 'age_neuron', 'age_cell_difference')
 head(age_coef)
 summary(age_coef)
