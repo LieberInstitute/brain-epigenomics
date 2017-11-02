@@ -1,0 +1,172 @@
+**** Job starts ****
+Mon Oct 30 17:42:07 EDT 2017
+**** JHPCE info ****
+User: lcollado
+Job id: 3421562
+Job name: limma_Neuron_CpGs_minCov_3
+Hostname: compute-099
+Task id: 
+Loading conda_R/3.4.x
+Using the following user library: ~/R/x86_64-pc-linux-gnu-library/3.4.x
+Loading required package: methods
+Loading required package: BiocGenerics
+Loading required package: parallel
+
+Attaching package: ‘BiocGenerics’
+
+The following objects are masked from ‘package:parallel’:
+
+    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+    clusterExport, clusterMap, parApply, parCapply, parLapply,
+    parLapplyLB, parRapply, parSapply, parSapplyLB
+
+The following objects are masked from ‘package:stats’:
+
+    IQR, mad, sd, var, xtabs
+
+The following objects are masked from ‘package:base’:
+
+    anyDuplicated, append, as.data.frame, cbind, colMeans, colnames,
+    colSums, do.call, duplicated, eval, evalq, Filter, Find, get, grep,
+    grepl, intersect, is.unsorted, lapply, lengths, Map, mapply, match,
+    mget, order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+    rbind, Reduce, rowMeans, rownames, rowSums, sapply, setdiff, sort,
+    table, tapply, union, unique, unsplit, which, which.max, which.min
+
+Loading required package: GenomicRanges
+Loading required package: stats4
+Loading required package: S4Vectors
+
+Attaching package: ‘S4Vectors’
+
+The following object is masked from ‘package:base’:
+
+    expand.grid
+
+Loading required package: IRanges
+Loading required package: GenomeInfoDb
+Loading required package: SummarizedExperiment
+Loading required package: Biobase
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+Loading required package: DelayedArray
+Loading required package: matrixStats
+
+Attaching package: ‘matrixStats’
+
+The following objects are masked from ‘package:Biobase’:
+
+    anyMissing, rowMedians
+
+
+Attaching package: ‘DelayedArray’
+
+The following objects are masked from ‘package:matrixStats’:
+
+    colMaxs, colMins, colRanges, rowMaxs, rowMins, rowRanges
+
+The following object is masked from ‘package:base’:
+
+    apply
+
+
+Attaching package: ‘limma’
+
+The following object is masked from ‘package:BiocGenerics’:
+
+    plotMA
+
+[1] "Glia"   "Neuron"
+[1] 18664892       32
+Warning messages:
+1: Zero sample variances detected, have been offset away from zero 
+2: Zero sample variances detected, have been offset away from zero 
+3: Zero sample variances detected, have been offset away from zero 
+      cell               age              interaction        
+ Min.   :-0.95263   Min.   :-0.0367559   Min.   :-0.0522598  
+ 1st Qu.:-0.01251   1st Qu.:-0.0006065   1st Qu.:-0.0026743  
+ Median : 0.01394   Median : 0.0005509   Median : 0.0000277  
+ Mean   : 0.02999   Mean   : 0.0009335   Mean   : 0.0003429  
+ 3rd Qu.: 0.06041   3rd Qu.: 0.0021174   3rd Qu.: 0.0029192  
+ Max.   : 0.97146   Max.   : 0.0377950   Max.   : 0.0638959  
+      cell              age             interaction      
+ Min.   :0.00000   Min.   :0.0000000   Min.   :0.000000  
+ 1st Qu.:0.01330   1st Qu.:0.0005755   1st Qu.:0.001200  
+ Median :0.03499   Median :0.0013537   Median :0.002790  
+ Mean   :0.08447   Mean   :0.0023545   Mean   :0.004200  
+ 3rd Qu.:0.09638   3rd Qu.:0.0029422   3rd Qu.:0.005596  
+ Max.   :0.97146   Max.   :0.0377950   Max.   :0.063896  
+            cell        age interaction
+[1,] -0.33552472  0.4930514 -0.61710838
+[2,]  0.52635052  0.1803407 -0.44706620
+[3,]  0.06837367  0.3400232  0.34548424
+[4,]  0.41670721  0.3969458  0.37954105
+[5,] -0.09308157 -0.3619376  0.12869248
+[6,]  0.59489353 -1.4453476  0.04786747
+    user   system  elapsed 
+2372.187   59.130 2431.886 
+2017-10-30 18:22:41
+Session info ----------------------------------------------------------------------------------------------------------
+ setting  value                                      
+ version  R version 3.4.2 Patched (2017-10-12 r73550)
+ system   x86_64, linux-gnu                          
+ ui       X11                                        
+ language (EN)                                       
+ collate  en_US.UTF-8                                
+ tz       <NA>                                       
+ date     2017-10-30                                 
+
+Packages --------------------------------------------------------------------------------------------------------------
+ package              * version  date       source        
+ base                 * 3.4.2    2017-10-13 local         
+ Biobase              * 2.37.2   2017-08-06 Bioconductor  
+ BiocGenerics         * 0.23.4   2017-10-27 Bioconductor  
+ bitops                 1.0-6    2013-08-17 CRAN (R 3.4.1)
+ bsseq                * 1.13.9   2017-10-20 Bioconductor  
+ colorspace             1.3-2    2016-12-14 CRAN (R 3.4.1)
+ compiler               3.4.2    2017-10-13 local         
+ data.table             1.10.4-3 2017-10-27 CRAN (R 3.4.2)
+ datasets             * 3.4.2    2017-10-13 local         
+ DelayedArray         * 0.3.21   2017-09-29 Bioconductor  
+ devtools             * 1.13.3   2017-08-02 CRAN (R 3.4.1)
+ digest                 0.6.12   2017-01-27 CRAN (R 3.4.1)
+ GenomeInfoDb         * 1.13.5   2017-10-16 Bioconductor  
+ GenomeInfoDbData       0.99.1   2017-08-06 Bioconductor  
+ GenomicRanges        * 1.29.15  2017-10-16 Bioconductor  
+ graphics             * 3.4.2    2017-10-13 local         
+ grDevices            * 3.4.2    2017-10-13 local         
+ grid                   3.4.2    2017-10-13 local         
+ gtools                 3.5.0    2015-05-29 CRAN (R 3.4.1)
+ IRanges              * 2.11.19  2017-10-16 Bioconductor  
+ lattice                0.20-35  2017-03-25 CRAN (R 3.4.2)
+ limma                * 3.33.14  2017-10-16 Bioconductor  
+ locfit                 1.5-9.1  2013-04-20 CRAN (R 3.4.1)
+ Matrix                 1.2-11   2017-08-21 CRAN (R 3.4.2)
+ matrixStats          * 0.52.2   2017-04-14 CRAN (R 3.4.1)
+ memoise                1.1.0    2017-04-21 CRAN (R 3.4.1)
+ methods              * 3.4.2    2017-10-13 local         
+ munsell                0.4.3    2016-02-13 CRAN (R 3.4.1)
+ parallel             * 3.4.2    2017-10-13 local         
+ permute                0.9-4    2016-09-09 CRAN (R 3.4.1)
+ plyr                   1.8.4    2016-06-08 CRAN (R 3.4.1)
+ R.methodsS3            1.7.1    2016-02-16 CRAN (R 3.4.1)
+ R.oo                   1.21.0   2016-11-01 CRAN (R 3.4.1)
+ R.utils                2.5.0    2016-11-07 CRAN (R 3.4.1)
+ Rcpp                   0.12.13  2017-09-28 CRAN (R 3.4.1)
+ RCurl                  1.95-4.8 2016-03-01 CRAN (R 3.4.1)
+ S4Vectors            * 0.15.14  2017-10-27 Bioconductor  
+ scales                 0.5.0    2017-08-24 CRAN (R 3.4.1)
+ stats                * 3.4.2    2017-10-13 local         
+ stats4               * 3.4.2    2017-10-13 local         
+ SummarizedExperiment * 1.7.10   2017-09-29 Bioconductor  
+ tools                  3.4.2    2017-10-13 local         
+ utils                * 3.4.2    2017-10-13 local         
+ withr                  2.0.0    2017-07-28 CRAN (R 3.4.1)
+ XVector                0.17.2   2017-10-27 Bioconductor  
+ zlibbioc               1.23.0   2017-08-06 Bioconductor  
+**** Job ends ****
+Mon Oct 30 18:22:42 EDT 2017
