@@ -308,3 +308,62 @@ plot(compareBP.dir, colorBy="p.adjust", showCategory = 45, title= "Biological Pr
 plot(compareMF.dir, colorBy="p.adjust", showCategory = 45, title= "Molecular Function GO Enrichment")
 plot(compareCC.dir, colorBy="p.adjust", showCategory = 45, title= "Cellular Compartment GO Enrichment")
 dev.off()
+
+
+### GO analysis of interaction DMRs that don't overlap cell type DMRs
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda")
+
+DMRgr = lapply(DMR, function(x) makeGRangesFromDataFrame(x[which(x$fwer<=0.05),], keep.extra.columns=T))
+CellTypexInt = findOverlaps(DMRgr$CellType, DMRgr$Interaction)
+
+int = DMR$Interaction[which(DMR$Interaction$fwer<=0.05),]
+int = int[-subjectHits(CellTypexInt),]
+
+### Gene Ontology
+entrez = list(GenesPlusPromoters = na.omit(int[int$annotation != "Intergenic","EntrezID"]),
+              Genes = na.omit(int[int$distToGene==0,"EntrezID"]),
+              Promoters = na.omit(int[int$annotation == "Promoter","EntrezID"]))
+entrez.dir = list(GenesPlusPromoters.pos = na.omit(int[int$value>0 & int$annotation != "Intergenic","EntrezID"]),
+                  Genes.pos = na.omit(int[int$value>0 & int$distToGene==0,"EntrezID"]),
+                  Promoters.pos = na.omit(int[int$value>0 & int$annotation == "Promoter","EntrezID"]),
+                  GenesPlusPromoters.neg = na.omit(int[int$value<0 & int$annotation != "Intergenic","EntrezID"]),
+                  Genes.neg = na.omit(int[int$value<0 & int$distToGene==0,"EntrezID"]),
+                  Promoters.neg = na.omit(int[int$value<0 & int$annotation == "Promoter","EntrezID"]))
+entrez = lapply(entrez, function(x) as.character(unique(x)))              
+entrez.dir = lapply(entrez.dir, function(x) as.character(unique(x)))       
+
+# Compare the enriched terms between 7 groups
+# KEGG
+compareKegg = compareCluster(entrez, fun="enrichKEGG", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+compareKegg.dir = compareCluster(entrez.dir, fun="enrichKEGG", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+# Biological Process
+compareBP = compareCluster(entrez, fun="enrichGO", ont = "BP", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+compareBP.dir = compareCluster(entrez.dir, fun="enrichGO",  ont = "BP", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+# Molecular Function
+compareMF = compareCluster(entrez, fun="enrichGO",  ont = "MF", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+compareMF.dir = compareCluster(entrez.dir, fun="enrichGO",  ont = "MF", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+# Cellular Component
+compareCC = compareCluster(entrez, fun="enrichGO",  ont = "CC", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+compareCC.dir = compareCluster(entrez.dir, fun="enrichGO",  ont = "CC", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+# Disease Ontology
+compareDO = compareCluster(entrez, fun="enrichDO",  ont = "DO", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+compareDO.dir = compareCluster(entrez.dir, fun="enrichDO",  ont = "DO", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+
+# save, write to csv
+save(compareKegg, compareKegg.dir, compareBP, compareBP.dir, compareMF, compareMF.dir, compareCC, compareCC.dir,compareDO, compareDO.dir,
+     file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/CT_Age_Interaction/DMR_KEGG_GO_DO_objects_Interaction_noCToverlap.rda")
+
+# plot compared results
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/figures/DMR_KEGG_GO_DO_plots_Interaction_noCToverlap.pdf", height = 20, width = 20)
+plot(compareKegg, colorBy="p.adjust", showCategory = 45, title= "KEGG Pathway Enrichment")
+plot(compareBP, colorBy="p.adjust", showCategory = 45, title= "Biological Process GO Enrichment")
+plot(compareMF, colorBy="p.adjust", showCategory = 45, title= "Molecular Function GO Enrichment")
+plot(compareCC, colorBy="p.adjust", showCategory = 45, title= "Cellular Compartment GO Enrichment")
+plot(compareDO, colorBy="p.adjust", showCategory = 45, title= "Disease Ontology Enrichment")
+plot(compareKegg.dir, colorBy="p.adjust", showCategory = 45, title= "KEGG Pathway Enrichment")
+plot(compareBP.dir, colorBy="p.adjust", showCategory = 45, title= "Biological Process GO Enrichment")
+plot(compareMF.dir, colorBy="p.adjust", showCategory = 45, title= "Molecular Function GO Enrichment")
+plot(compareCC.dir, colorBy="p.adjust", showCategory = 45, title= "Cellular Compartment GO Enrichment")
+plot(compareDO.dir, colorBy="p.adjust", showCategory = 45, title= "Disease Ontology Enrichment")
+dev.off()
+
