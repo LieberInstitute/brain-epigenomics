@@ -53,19 +53,3 @@ meanbygroup = list(Glia = meansig[,which(colnames(meansig) %in% pd[which(pd$Cell
 				   Neonatal.Neurons = meansig[,which(colnames(meansig) %in% pd[which(pd$Cell.Type=="Neuron" & pd$Age.Bin=="Neonate"),"Data.ID"])],
 				   Other.Neurons = meansig[,which(colnames(meansig) %in% pd[which(pd$Cell.Type=="Neuron" & pd$Age.Bin!="Neonate"),"Data.ID"])])
 meanbygroup = lapply(meanbygroup, function(x) split(x, seq(nrow(x))))
-
-
-
-## Calculate T statistics for each DMR between the groups
-
-tstats = list(GliavsNeonate = mapply(function(x, y) t.test(x, y), meanbygroup$Glia, meanbygroup$Neonatal.Neurons),
-			  NeuronsvsNeonate = mapply(function(x, y) t.test(x, y), meanbygroup$Other.Neurons, meanbygroup$Neonatal.Neurons))
-
-
-
-
-
-
-
-
-
