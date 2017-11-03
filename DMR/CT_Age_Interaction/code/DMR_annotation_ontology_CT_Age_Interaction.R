@@ -350,7 +350,7 @@ compareDO = compareCluster(entrez, fun="enrichDO",  ont = "DO", qvalueCutoff = 0
 compareDO.dir = compareCluster(entrez.dir, fun="enrichDO",  ont = "DO", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
 
 # save, write to csv
-save(compareKegg, compareKegg.dir, compareBP, compareBP.dir, compareMF, compareMF.dir, compareCC, compareCC.dir,compareDO, compareDO.dir,
+save(compareKegg, compareKegg.dir, compareBP, compareBP.dir, compareMF, compareMF.dir, compareCC, compareCC.dir,
      file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/CT_Age_Interaction/DMR_KEGG_GO_DO_objects_Interaction_noCToverlap.rda")
 
 # plot compared results
@@ -359,11 +359,9 @@ plot(compareKegg, colorBy="p.adjust", showCategory = 45, title= "KEGG Pathway En
 plot(compareBP, colorBy="p.adjust", showCategory = 45, title= "Biological Process GO Enrichment")
 plot(compareMF, colorBy="p.adjust", showCategory = 45, title= "Molecular Function GO Enrichment")
 plot(compareCC, colorBy="p.adjust", showCategory = 45, title= "Cellular Compartment GO Enrichment")
-plot(compareDO, colorBy="p.adjust", showCategory = 45, title= "Disease Ontology Enrichment")
 plot(compareKegg.dir, colorBy="p.adjust", showCategory = 45, title= "KEGG Pathway Enrichment")
 plot(compareBP.dir, colorBy="p.adjust", showCategory = 45, title= "Biological Process GO Enrichment")
 plot(compareMF.dir, colorBy="p.adjust", showCategory = 45, title= "Molecular Function GO Enrichment")
 plot(compareCC.dir, colorBy="p.adjust", showCategory = 45, title= "Cellular Compartment GO Enrichment")
-plot(compareDO.dir, colorBy="p.adjust", showCategory = 45, title= "Disease Ontology Enrichment")
 dev.off()
 
