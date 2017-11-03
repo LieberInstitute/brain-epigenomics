@@ -3,9 +3,24 @@
 # module load conda_R/3.4.x
 # R
 library('limma')
+library('GenomicRanges')
+library('GGally')
+library('bsseq')
 library('devtools')
 
+## Load the raw data
+system.time( load('BSobj_bsseqSmooth_Neuron_minCov_3.Rdata') )
+cpg <- rowRanges(BSobj)
+
+## Load the DMRs
+system.time( load('bumps_bsseqSmooth_Neuron_interaction_250_perm.Rdata') )
+dmrs <- GRanges(bumps$table[bumps$table$fwer < 0.05, ])
+
+## Load limma results
 system.time( load('limma_Neuron_CpGs_minCov_3.Rdata') )
+dim(BSobj)
+stopifnot(nrow(BSobj) == nrow(fits[[1]]))
+print(object.size(fits), units = 'Mb')
 
 ## Check the ordering of the coefficients
 sapply(fits[2:3], function(f) colnames(f$coef))
@@ -56,10 +71,12 @@ age_p <-  mapply(function(f, coef) {
 }, fits[c(2, 3, 3)], coefs)
 colnames(age_p) <- c('overall', 'age_glia', 'age_cell_difference')
 age_p <- cbind(age_p, 'age_neuron' = f$p.value[, 1])
-age_p <- cbind(age_p, 'age_neuron_F' = top$P.value)
+age_p <- cbind(age_p, 'age_neuron_F' = top$P.Value)
 head(age_p)
 summary(age_p)
 
+## F p-value for age and interaction == 0 is not the same as
+## t-stat p-value for age_neuron
 identical(age_p[, 4], age_p[, 5])
 summary(abs(age_p[, 4] - age_p[, 5]))
 
@@ -68,7 +85,116 @@ print(object.size(age_coef), units = 'Mb')
 print(object.size(age_t), units = 'Mb')
 print(object.size(age_p), units = 'Mb')
 
-save(age_coef, age_t, age_p, file = 'limma_Neuron_CpGs_minCov_3_ageInfo.Rdata')
+limma_age <- list('coef' = age_coef, 't' = age_t, 'pvalue' = age_p)
+
+## Relate DMRs to CpGs
+ov <- findOverlaps(cpg, dmrs)
+length(ov)
+
+## Check what's up with t-stats from the Nueron
+pd <- pData(BSobj)
+pd$Cell.Type <- relevel(factor(pd$Cell.Type), 'Neuron')
+levels(pd$Cell.Type)
+meth <- getMeth(BSobj, type = 'raw')
+dim(meth)
+
+system.time( f_neuron <- eBayes(lmFit(meth, with(pd, model.matrix(~ Age * Cell.Type)))) )
+
+## Check coefficients
+head(f_neuron$coefficients)
+head(limma_age$coef)
+identical(f_neuron$coefficients[, 'Age'], limma_age$coef[, 'age_neuron'])
+
+## They are the basically the same ones
+summary(abs(f_neuron$coefficients[, 'Age'] - limma_age$coef[, 'age_neuron']))
+
+## Check the t-stats
+head(f_neuron$t)
+head(limma_age$t)
+## Very different
+summary(abs(f_neuron$t[, 'Age'] - limma_age$t[, 'age_neuron']))
+table(sign(f_neuron$t[, 'Age']), sign(limma_age$t[, 'age_neuron']))
+
+## The interaction looks ok though
+summary(abs(abs(f_neuron$t[, 'Age:Cell.TypeGlia']) - abs(limma_age$t[, 'age_cell_difference'])))
+
+## Fix t-stats and p-value
+limma_age$t[, 'age_neuron'] <- f_neuron$t[, 'Age']
+limma_age$pvalue[, 'age_neuron'] <- f_neuron$p.value[, 'Age']
+
+
+## Save main pieces for later
+save(limma_age, dmrs, ov, file = 'limma_Neuron_CpGs_minCov_3_ageInfo.Rdata')
+
+# load('limma_Neuron_CpGs_minCov_3_ageInfo.Rdata')
+## In case the limma_age object was loaded
+age_coef <- limma_age$coef
+age_t <- limma_age$t
+
+## Check that the CpGs for a given DMR are next to each other
+stopifnot(identical(nrun(Rle(subjectHits(ov))), length(unique(subjectHits(ov)))))
+
+age_dmr <- function(age, type) {
+    new <- split(data.frame(age[queryHits(ov), ]), subjectHits(ov))
+    
+    mean <- do.call(rbind, lapply(new, colMeans))[unique(subjectHits(ov)), ]
+    sum <- do.call(rbind, lapply(new, colSums))[unique(subjectHits(ov)), ]
+    
+    colnames(mean) <- paste0(colnames(mean), '_', type, '_mean')
+    colnames(sum) <- paste0(colnames(sum), '_', type, '_sum')
+    cbind(mean, sum)
+}
+
+
+dmrs$coef <- bumps$coef[which(bumps$table$fwer < 0.05), 1]
+
+mcols(dmrs) <- cbind(mcols(dmrs), age_dmr(age_t[, match(colnames(age_coef), colnames(age_t))], 'tstat'), age_dmr(age_coef, 'coef'))
+
+
+pdf('age_for_interaction_dmrs.pdf', width = 10, height = 10)
+ggpairs(as.data.frame(mcols(dmrs)), columns = grep('tstat_mean', colnames(mcols(dmrs))), upper = list(continuous = 'points'))
+ggpairs(as.data.frame(mcols(dmrs)), columns = grep('tstat_sum', colnames(mcols(dmrs))), upper = list(continuous = 'points'))
+ggpairs(as.data.frame(mcols(dmrs)), columns = grep('coef_mean', colnames(mcols(dmrs))), upper = list(continuous = 'points'))
+ggpairs(as.data.frame(mcols(dmrs)), columns = grep('coef_sum', colnames(mcols(dmrs))), upper = list(continuous = 'points'))
+dev.off()
+
+
+pdf('age_for_interaction_dmrs_diff.pdf')
+
+boxplot(dmrs$age_glia_coef_mean, dmrs$age_neuron_coef_mean, names = paste0(c('Glia', 'Neuron'), ' (', round(c(mean(dmrs$age_glia_coef_mean > 0), mean(dmrs$age_neuron_coef_mean > 0)) * 100, 0), '% up)'), ylab = 'Age mean coefficient')
+legend('bottomright', legend = paste('p-value <', signif(t.test(dmrs$age_glia_coef_mean, dmrs$age_neuron_coef_mean, paired = TRUE)$p.value, 3)), bty = 'n')
+
+boxplot(abs(dmrs$age_glia_coef_mean), abs(dmrs$age_neuron_coef_mean), names = c('Glia', 'Neuron'), ylab = 'Absolute age mean coefficient')
+legend('topright', legend = paste('p-value <', signif(t.test(abs(dmrs$age_glia_coef_mean), abs(dmrs$age_neuron_coef_mean), paired = TRUE)$p.value, 3)), bty = 'n')
+
+t.test(abs(dmrs$age_glia_coef_mean), abs(dmrs$age_neuron_coef_mean), paired = TRUE)
+mean(abs(dmrs$age_glia_coef_mean))
+mean(abs(dmrs$age_neuron_coef_mean))
+mean(abs(dmrs$age_neuron_coef_mean)) / mean(abs(dmrs$age_glia_coef_mean))
+
+median(abs(dmrs$age_glia_coef_mean))
+median(abs(dmrs$age_neuron_coef_mean))
+median(abs(dmrs$age_neuron_coef_mean)) / median(abs(dmrs$age_glia_coef_mean))
+
+
+d <- abs(dmrs$age_glia_coef_mean) - abs(dmrs$age_neuron_coef_mean) > 0
+boxplot(abs(dmrs$age_glia_coef_mean) - abs(dmrs$age_neuron_coef_mean), xlab = paste0('Glia (', sum(d), ') - Neuron (', sum(!d), ')'), ylab = 'Absolute age mean coefficient difference')
+legend('topright', legend = paste('p-value <', signif(t.test(abs(dmrs$age_glia_coef_mean) - abs(dmrs$age_neuron_coef_mean))$p.value, 3)), bty = 'n')
+
+dev.off()
+
+save(dmrs, file = 'limma_Neuron_CpGs_minCov_3_ageInfo_dmrs.Rdata')
+
+
+t_cut <- function(var, cut = 1) {
+    rbind(table(abs(mcols(dmrs)[, var]) < cut),
+    round(table(abs(mcols(dmrs)[, var]) < cut) / length(dmrs) * 100, 2))
+}
+
+tcuts <- lapply(colnames(mcols(dmrs))[grep('tstat_mean', colnames(mcols(dmrs)))], t_cut, cut = quantile(abs(dmrs$age_cell_difference_tstat_mean), 0.025))
+names(tcuts) <- colnames(mcols(dmrs))[grep('tstat_mean', colnames(mcols(dmrs)))]
+tcuts
+
 
 ## Reproducibility info
 proc.time()
