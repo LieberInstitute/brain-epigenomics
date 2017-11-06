@@ -1,5 +1,6 @@
 ##
 library(bsseq)
+library(RColorBrewer)
 library(pheatmap)
 library(genefilter)
 library(data.table)
@@ -19,16 +20,23 @@ load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda")
 
 ## load data
 load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/BSobj_bsseqSmooth_Neuron_minCov_3.Rdata')
-pd = pData(BSobj)
-pd$Race[pd$Race== "CAUC "] <- 'CAUC'
-pd$Sex[pd$Sex == " M"] <- 'M'
-pd$RIN <- as.numeric(gsub(" ", "", pd$RIN))
-pd$pg.DNA.nuclei.input <- as.numeric(pd$pg.DNA.nuclei.input)
-pd$Reads <- as.numeric(pd$Reads)
-pd$Percent.GreaterThan.Q30 <- as.numeric(pd$Percent.GreaterThan.Q30)
+postpd = pData(BSobj)
+postpd$Race[postpd$Race== "CAUC "] <- 'CAUC'
+postpd$Sex[postpd$Sex == " M"] <- 'M'
+postpd$RIN <- as.numeric(gsub(" ", "", postpd$RIN))
+postpd$pg.DNA.nuclei.input <- as.numeric(postpd$pg.DNA.nuclei.input)
+postpd$Reads <- as.numeric(postpd$Reads)
+postpd$Percent.GreaterThan.Q30 <- as.numeric(postpd$Percent.GreaterThan.Q30)
 
 ## get mean meth per DMR
-meth <- getMeth(BSobj, type = 'raw')
+postmeth <- getMeth(BSobj, type = 'raw')
+
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/BSobj_bsseqSmooth_Neuron_minCov_3_prenatal.Rdata")
+prenmeth = getMeth(BSobj, type = 'raw')
+prenpd = pData(BSobj)
+
+meth = dataframe(postmeth, prenmeth)
+meth = as.matrix(meth)
 
 ### interaction
 topIndsInt = mapply(function(s,e) s:e, sigInt$indexStart, sigInt$indexEnd)
@@ -37,8 +45,8 @@ meanMethInt = do.call("rbind", meanMethInt)
 
 sampleDistsInt <- dist(t(meanMethInt))
 sampleDistMatrixInt <- as.matrix(sampleDistsInt)
-colnames(sampleDistMatrixInt) = rownames(sampleDistMatrixInt) = paste(
-		pd$Cell.Type, pd$Age.Bin, pd$Working.Num, sep = ":")
+colnames(sampleDistMatrixInt) = rownames(sampleDistMatrixInt) = c(paste(
+		pd$Cell.Type, pd$Age.Bin, pd$Working.Num, sep = ":"), paste0("Prenatal:",prenpd$Brain.Num))
 
 ### age
 topIndsAge = mapply(function(s,e) s:e, sigAge$indexStart, sigAge$indexEnd)
@@ -47,9 +55,9 @@ meanMethAge = do.call("rbind", meanMethAge)
 
 sampleDistsAge <- dist(t(meanMethAge))
 sampleDistMatrixAge <- as.matrix(sampleDistsAge)
-colnames(sampleDistMatrixAge) = rownames(sampleDistMatrixAge) = paste(
-		pd$Cell.Type, pd$Age.Bin, pd$Working.Num, sep = ":")
-
+colnames(sampleDistMatrixAge) = rownames(sampleDistMatrixAge) = c(paste(
+		pd$Cell.Type, pd$Age.Bin, pd$Working.Num, sep = ":"), paste0("Prenatal:",prenpd$Brain.Num))
+		
 ### cell type
 topIndsCT = mapply(function(s,e) s:e, sigCT$indexStart, sigCT$indexEnd)
 meanMethCT = sapply(topIndsCT, function(ii) colMeans(t(t(meth[ii,]))))
@@ -57,11 +65,11 @@ meanMethCT = do.call("rbind", meanMethCT)
 
 sampleDistsCT <- dist(t(meanMethCT))
 sampleDistMatrixCT <- as.matrix(sampleDistsCT)
-colnames(sampleDistMatrixCT) = rownames(sampleDistMatrixCT) = paste(
-  pd$Cell.Type, pd$Age.Bin, pd$Working.Num, sep = ":")
+colnames(sampleDistMatrixCT) = rownames(sampleDistMatrixCT) = c(paste(
+		pd$Cell.Type, pd$Age.Bin, pd$Working.Num, sep = ":"), paste0("Prenatal:",prenpd$Brain.Num))
 
 		
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/figures/heatmap_euclidean_dist_3models.pdf")
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/figures/heatmap_euclidean_dist_3models_includingFetals.pdf",width=10,height=10)
 colors <- colorRampPalette(rev(brewer.pal(9, "Blues")) )(255)
 pheatmap(sampleDistMatrixInt,clustering_distance_rows=sampleDistsInt, clustering_distance_cols=sampleDistsInt,
          col=colors, main = "2178 Interaction DMRs - Euclidean Distance")
@@ -72,14 +80,14 @@ pheatmap(sampleDistMatrixCT, clustering_distance_rows=sampleDistsCT, clustering_
 dev.off()
 
 ## which DMRs show the association?
-pd$Neonate = ifelse(pd$Age < 1, "Neonate", "Older") 
-gIndexes = list(YoungNeuronVsGlia = which(pd$Age < 1 | pd$Cell.Type == "Glia"),
-	YoungVsOldNeuron = which(pd$Cell.Type == "Neuron"))
+postpd$Neonate = ifelse(postpd$Age < 1, "Neonate", "Older") 
+gIndexes = list(YoungNeuronVsGlia = which(postpd$Age < 1 | postpd$Cell.Type == "Glia"),
+	YoungVsOldNeuron = which(postpd$Cell.Type == "Neuron"))
 
 tt_YoungNeuronVsGlia_Int = rowttests(meanMethInt[,gIndexes$YoungNeuronVsGlia],
-	factor(pd$Cell.Type[gIndexes$YoungNeuronVsGlia])) # neg is glia effect
+	factor(postpd$Cell.Type[gIndexes$YoungNeuronVsGlia])) # neg is glia effect
 tt_YoungVsOldNeuron_Int = rowttests(meanMethInt[,gIndexes$YoungVsOldNeuron],
-	factor(pd$Neonate[gIndexes$YoungVsOldNeuron])) # neg is neonate effect
+	factor(postpd$Neonate[gIndexes$YoungVsOldNeuron])) # neg is neonate effect
 plot(tt_YoungNeuronVsGlia_Int$statistic, tt_YoungVsOldNeuron_Int$statistic)
 plot(-log10(tt_YoungNeuronVsGlia_Int$p.value), -log10(tt_YoungVsOldNeuron_Int$p.value))
 
