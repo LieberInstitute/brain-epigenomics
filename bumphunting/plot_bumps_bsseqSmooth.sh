@@ -29,6 +29,7 @@ cat > .${SHORT}.sh <<EOF
 echo "**** Job starts ****"
 date
 
+module load conda_R/3.4.x
 Rscript plot_bumps_bsseqSmooth.R -m ${model} -s ${cell} -p ${permutations} -b FALSE -i FALSE
 
 echo "**** Job ends ****"
