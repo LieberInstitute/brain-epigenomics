@@ -68,6 +68,8 @@ plot(sign(dmrs_cell$value)*dmrs_cell$area, meanStats_cell$area,
 abline(0,1,col="blue")
 dev.off()
 
+cor(dmrs_cell$value, meanStats_cell$value,use="comp")
+table(dmrs_cell$value > 0, meanStats_cell$value > 0)
 
 #######################
 ## age dmrs ####
