@@ -29,7 +29,7 @@ if (!is.null(opt$help)) {
 ## For testing
 if(FALSE) {
     opt <- list('model' = 'cell', 'subset' = 'Neuron',
-        permutations = 0, 'bootstrap' = FALSE, 'top100' = TRUE)
+        permutations = 250, 'bootstrap' = FALSE, 'top100' = FALSE)
 }
 
 dir.create('pdf', showWarnings = FALSE)
@@ -41,16 +41,12 @@ stopifnot(file.exists(inputFile))
 
 load(inputFile)
 
-if(opt$permutations != 0) {
-    load(paste0('BSobj_bsseqSmooth_', opt$subset, '_minCov_3.Rdata'))
-    meth <- getMeth(BSobj, type = 'raw')
-    pd <- pData(BSobj)
-    rm(BSobj)
-} else {
-    load('../processed_beta_values_plusMap.rda')
-}
-
-## tale of top loci
+## Load methylation data
+load(paste0('BSobj_bsseqSmooth_', opt$subset, '_minCov_3.Rdata'))
+meth <- getMeth(BSobj, type = 'raw')
+pd <- pData(BSobj)
+    
+## table of top loci
 if(opt$top100) {
     top_set <- seq_len(100)
     top_n <- 100
@@ -83,37 +79,71 @@ for(i in 1:nrow(meanMeth)) {
 }
 dev.off()
 
-
-pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
-    '_', opt$permutations, '_CpG_in_DMR', ifelse(opt$bootstrap, '', '_perm'),
-    '.pdf'), width = 14)
-for(i in seq_len(top_n)) {
-    matplot(meth[topInds[[i]], ], pch = 20, bg = factor(pd$Cell.Type), ylim = c(0, 1), ylab = 'DNAm Level', xlab = 'CpG in DMR', col = factor(pd$Cell.Type))
-}
-dev.off()
-
+# pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
+#     '_', opt$permutations, '_CpG_in_DMR', ifelse(opt$bootstrap, '', '_perm'),
+#     '.pdf'), width = 14)
+# for(i in seq_len(top_n)) {
+#     matplot(meth[topInds[[i]], ], pch = 20, bg = factor(pd$Cell.Type), ylim = c(0, 1), ylab = 'DNAm Level', xlab = 'CpG in DMR', col = factor(pd$Cell.Type))
+# }
+# dev.off()
 
 
-pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
-    '_', opt$permutations, '_boxplot_by_age', ifelse(opt$bootstrap, '',
-    '_perm'), '.pdf'), width = 14)
-for(i in seq_len(top_n)) {
-    df <-  data.frame(
-        Meth = as.vector(t(meth[topInds[[i]], ])),
-        Age = rep(pd$Age, each = length(topInds[[i]])),
-        cell = rep(pd$Cell.Type, each = length(topInds[[i]])),
-        dmr = rep(seq_len(length(topInds[[i]])), each = nrow(pd))
-    )
-    g <- ggplot(data = df, aes(x = factor(Age), y = Meth, fill = cell)) + geom_boxplot() + theme_bw() + scale_fill_brewer(palette = 'Dark2') + xlab('Age') + ylab('DNAm Level')
-    print(g)
-}
-dev.off()
+
+# pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
+#     '_', opt$permutations, '_boxplot_by_age', ifelse(opt$bootstrap, '',
+#     '_perm'), '.pdf'), width = 14)
+# for(i in seq_len(top_n)) {
+#     df <-  data.frame(
+#         Meth = as.vector(t(meth[topInds[[i]], ])),
+#         Age = rep(pd$Age, each = length(topInds[[i]])),
+#         cell = rep(pd$Cell.Type, each = length(topInds[[i]])),
+#         dmr = rep(seq_len(length(topInds[[i]])), each = nrow(pd))
+#     )
+#     g <- ggplot(data = df, aes(x = factor(Age), y = Meth, fill = cell)) + geom_boxplot() + theme_bw() + scale_fill_brewer(palette = 'Dark2') + xlab('Age') + ylab('DNAm Level')
+#     print(g)
+# }
+# dev.off()
 
 ## Use the plotting code from bsseq
-load(paste0('BSobj_bsseqSmooth_', opt$subset, '_minCov_3.Rdata'))
-#load(paste0('BSobj_bsseqSmooth_', opt$subset, '.Rdata'))
+## Load prenatal data
+if(!file.exists('BSobj_bsseqSmooth_Neuron_minCov_3_prenatal_combined.Rdata')) {
+    foo <- function() {
+        load('BSobj_bsseqSmooth_Neuron_minCov_3_prenatal_combined.Rdata')
+        return(BSobj)
+    }
+    prenatal <- foo()
+
+    ## Prepare for combining them
+    map <- match(colnames(colData(BSobj)), colnames(colData(prenatal)))
+    colData(BSobj) <- colData(BSobj)[, !is.na(map)]
+    colData(prenatal) <- colData(prenatal)[, map[!is.na(map)]]
+
+    ## complicated merging...
+    # > ja <- function (x)
+    # + {
+    # +     y <- x
+    # +     ix <- which(x < 0)
+    # +     ix2 <- which(x > 0)
+    # +     y[ix] <- exp(x[ix])/(1 + exp(x[ix]))
+    # +     y[ix2] <- 1/(1 + exp(-x[ix2]))
+    # +     y
+    # + }
+    # > ja(0.1)
+    # [1] 0.5249792
+    # >
+    # > identical(plogis((1:10)/10), ja((1:10)/10))
+    # [1] TRUE
+    BSobj@trans <- plogis
+    BSobj <- combine(BSobj, prenatal)
+    save(BSobj, file = 'BSobj_bsseqSmooth_Neuron_minCov_3_prenatal_combined.Rdata')
+} else {
+    load('BSobj_bsseqSmooth_Neuron_minCov_3_prenatal_combined.Rdata')
+}
+dim(BSobj)
+
 ## Add colors
-colData(BSobj)$col <- brewer.pal(8,"Dark2")[factor(pd$Cell.Type)]
+colData(BSobj)$col <- brewer.pal(8,"Dark2")[ifelse(colData(BSobj)$Cell.Type == 'Glia', 1, 2)]
+colData(BSobj)$col[colData(BSobj)$Age < 0] <- 'grey50'
 
 ## To get an idea of how much to extend
 round(mean(tab$end - tab$start + 1))
@@ -137,24 +167,25 @@ palette(brewer.pal(8,"Dark2"))
 plotManyRegions(BSobj, regions = tab, extend = 20000, addRegions = subset(bumps$table, fwer < 0.05), annoTrack = list(genes = genes, exons = exons))
 dev.off()
 
-colData(BSobj)$age_group <- factor(ifelse(colData(BSobj)$Age < 1, 'Infant',
+colData(BSobj)$age_group <- factor(ifelse(colData(BSobj)$Age < 0, 'Prenatal',
+    ifelse(colData(BSobj)$Age < 1, 'Infant',
     ifelse(colData(BSobj)$Age <= 12, 'Child',
-    ifelse(colData(BSobj)$Age <= 17, 'Teen', 'Adult'))),
-    levels = c('Infant', 'Child', 'Teen', 'Adult'))
+    ifelse(colData(BSobj)$Age <= 17, 'Teen', 'Adult')))),
+    levels = c('Infant', 'Child', 'Teen', 'Adult', 'Prenatal'))
     
 colData(BSobj)$age_group_cell <- factor(paste0(colData(BSobj)$age_group, '_',
     colData(BSobj)$Cell.Type),
-    levels = paste0(rep(levels(colData(BSobj)$age_group), each = 2),
-    '_', c('Glia', 'Neuron')))
-colData(BSobj)$col <- brewer.pal(8, "Paired")[c(5:6, 7:8, 3:4, 1:2)][colData(BSobj)$age_group_cell]
+    levels = c(paste0(rep(levels(colData(BSobj)$age_group)[1:4], each = 2),
+    '_', c('Glia', 'Neuron')), 'Prenatal_H'))
+colData(BSobj)$col <- c(brewer.pal(8, "Paired"), 'grey50')[c(5:6, 7:8, 3:4, 1:2, 9)][colData(BSobj)$age_group_cell]
 
 pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
     '_', opt$permutations, '_with_bsseq_age_cell', ifelse(opt$bootstrap, '',
     '_perm'), '.pdf'), width = 14)
-palette(brewer.pal(8, "Paired")[c(5:6, 7:8, 3:4, 1:2)])
+palette(c(brewer.pal(8, "Paired")[c(5:6, 7:8, 3:4, 1:2)], 'grey50'))
 plot(colData(BSobj)$Age, type = 'p', pch = 21, ylab = 'Age',
     bg = colData(BSobj)$age_group_cell, cex = 3)
-legend("bottomright", levels(colData(BSobj)$age_group_cell), pch = 15, col=1:8, cex=1.4)
+legend("topright", levels(colData(BSobj)$age_group_cell), pch = 15, col=1:9, cex=1.4)
 plotManyRegions(BSobj, regions = tab, extend = 20000, addRegions = subset(bumps$table, fwer < 0.05), annoTrack = list(genes = genes, exons = exons), regionCol = brewer.pal(8, 'Greys')[2])
 dev.off()
 
@@ -173,22 +204,25 @@ if(opt$model == 'age') {
     seqlevels(exons) <- paste0('chr', seqlevels(exons))
     exons <- exons[countOverlaps(exons, regions_gr) > 0]
 
-    pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
-        '_', opt$permutations, '_ATAC_cell', ifelse(opt$bootstrap, '', '_perm'),
+    pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$permutations,
+        '_ATAC_cell', ifelse(opt$bootstrap, '', '_perm'),
         '.pdf'), width = 14)
-    colData(BSobj)$col <- brewer.pal(8,"Dark2")[factor(pd$Cell.Type)]
+    colData(BSobj)$col <- brewer.pal(8,"Dark2")[ifelse(colData(BSobj)$Cell.Type == 'Glia', 1, 2)]
+    colData(BSobj)$col[colData(BSobj)$Age < 0] <- 'grey50'
+    
     plotManyRegions(BSobj, regions = peaks_methDiffOrdered[seq_len(100)], extend = 2000, addRegions = peaks_methDiffOrdered, annoTrack = list(genes = genes, exons = exons))
     dev.off()
 
 
-    pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$model,
-        '_', opt$permutations, '_ATAC_age_cell', ifelse(opt$bootstrap, '',
-        '_perm'), '.pdf'), width = 14)
-    palette(brewer.pal(8, "Paired")[c(5:6, 7:8, 3:4, 1:2)])
-    colData(BSobj)$col <- brewer.pal(8, "Paired")[c(5:6, 7:8, 3:4, 1:2)][colData(BSobj)$age_group_cell]
+    pdf(paste0('pdf/bumps_bsseqSmooth_', opt$subset, '_', opt$permutations,
+        '_ATAC_age_cell', ifelse(opt$bootstrap, '', '_perm'), '.pdf'),
+        width = 14)
+    palette(c(brewer.pal(8, "Paired")[c(5:6, 7:8, 3:4, 1:2)], 'grey50'))
+    colData(BSobj)$col <- c(brewer.pal(8, "Paired"), 'grey50')[c(5:6, 7:8, 3:4, 1:2, 9)][colData(BSobj)$age_group_cell]
+    
     plot(colData(BSobj)$Age, type = 'p', pch = 21, ylab = 'Age',
         bg = colData(BSobj)$age_group_cell, cex = 3)
-    legend("bottomright", levels(colData(BSobj)$age_group_cell), pch = 15, col=1:8, cex=1.4)
+    legend("topright", levels(colData(BSobj)$age_group_cell), pch = 15, col=1:8, cex=1.4)
     plotManyRegions(BSobj, regions = peaks_methDiffOrdered[seq_len(100)], extend = 2000, addRegions = peaks_methDiffOrdered, annoTrack = list(genes = genes, exons = exons), regionCol = brewer.pal(8, 'Greys')[2])
     dev.off()
 }
