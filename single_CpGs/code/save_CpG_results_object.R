@@ -1,5 +1,6 @@
 library(bsseq)
 library('limma')
+library(GenomicFeatures)
 
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/limma_Neuron_CpGs_minCov_3.Rdata")
 load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/BSobj_bsseqSmooth_Neuron_minCov_3.Rdata')
@@ -28,12 +29,19 @@ ebList = lapply(fits, ebayes)
 
 ## Make CpG results dataframe
 
-CpG = data.frame(as.data.frame(gr), lods.CellType = ebList$cell$lods[,"Cell.TypeNeuron"], Tstat.CellType = ebList$cell$t[,"Cell.TypeNeuron"], 
-                   pval.CellType = ebList$cell$p.value[,"Cell.TypeNeuron"], padj.CellType = p.adjust(ebList$cell$p.value[,"Cell.TypeNeuron"], method = "fdr"),
-                   lods.Age = ebList$age$lods[,"Age"], Tstat.Age = ebList$age$t[,"Age"], 
-                   pval.Age = ebList$age$p.value[,"Age"], padj.Age = p.adjust(ebList$age$p.value[,"Age"], method = "fdr"),
-                   lods.Interaction = ebList$interaction$lods[,"Age:Cell.TypeNeuron"], Tstat.Interaction = ebList$interaction$t[,"Age:Cell.TypeNeuron"], 
-                   pval.Interaction = ebList$interaction$p.value[,"Age:Cell.TypeNeuron"], padj.Interaction = p.adjust(ebList$interaction$p.value[,"Age:Cell.TypeNeuron"], method = "fdr"))
+CpG = data.frame(as.data.frame(gr), 
+				 lods.CellType = ebList$cell$lods[,"Cell.TypeNeuron"], 
+				 Tstat.CellType = ebList$cell$t[,"Cell.TypeNeuron"], 
+                 pval.CellType = ebList$cell$p.value[,"Cell.TypeNeuron"], 
+                 padj.CellType = p.adjust(ebList$cell$p.value[,"Cell.TypeNeuron"], method = "fdr"),
+                 lods.Age = ebList$age$lods[,"Age"], 
+                 Tstat.Age = ebList$age$t[,"Age"], 
+                 pval.Age = ebList$age$p.value[,"Age"], 
+                 padj.Age = p.adjust(ebList$age$p.value[,"Age"], method = "fdr"),
+                 lods.Interaction = ebList$interaction$lods[,"Age:Cell.TypeNeuron"], 
+                 Tstat.Interaction = ebList$interaction$t[,"Age:Cell.TypeNeuron"], 
+                 pval.Interaction = ebList$interaction$p.value[,"Age:Cell.TypeNeuron"], 
+                 padj.Interaction = p.adjust(ebList$interaction$p.value[,"Age:Cell.TypeNeuron"], method = "fdr"))
 
 # Annotate editing sites to features in the genome
 txdb = loadDb("/dcl01/lieber/ajaffe/Amanda/annotation_objects/gencode.v25lift37.annotation.sqlite")
@@ -46,7 +54,7 @@ for (i in 1:length(features)){
   tmp$TxID = names(tmp)
   features[[i]] = tmp
 }
-features = c(features, islands = makeGRangesFromDataFrame(islands, keep.extra.columns = T, start.field = "CpGromStart", end.field = "CpGromEnd"),
+features = c(features, islands = makeGRangesFromDataFrame(islands, keep.extra.columns = T, start.field = "chromStart", end.field = "chromEnd"),
              promoters = promoters(txdb, upstream=2000, downstream=200))
 lapply(features, head)
 
