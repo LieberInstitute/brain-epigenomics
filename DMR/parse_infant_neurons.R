@@ -1,4 +1,3 @@
-##
 library(bsseq)
 library(RColorBrewer)
 library(pheatmap)
@@ -46,7 +45,7 @@ meanMethInt = do.call("rbind", meanMethInt)
 sampleDistsInt <- dist(t(meanMethInt))
 sampleDistMatrixInt <- as.matrix(sampleDistsInt)
 colnames(sampleDistMatrixInt) = rownames(sampleDistMatrixInt) = c(paste(
-		pd$Cell.Type, pd$Age.Bin, pd$Working.Num, sep = ":"), paste0("Prenatal:",prenpd$Brain.Num))
+		postpd$Cell.Type, postpd$Age.Bin, postpd$Working.Num, sep = ":"), paste0("Prenatal:",prenpd$Brain.Num))
 
 ### age
 topIndsAge = mapply(function(s,e) s:e, sigAge$indexStart, sigAge$indexEnd)
@@ -56,7 +55,7 @@ meanMethAge = do.call("rbind", meanMethAge)
 sampleDistsAge <- dist(t(meanMethAge))
 sampleDistMatrixAge <- as.matrix(sampleDistsAge)
 colnames(sampleDistMatrixAge) = rownames(sampleDistMatrixAge) = c(paste(
-		pd$Cell.Type, pd$Age.Bin, pd$Working.Num, sep = ":"), paste0("Prenatal:",prenpd$Brain.Num))
+		postpd$Cell.Type, postpd$Age.Bin, postpd$Working.Num, sep = ":"), paste0("Prenatal:",prenpd$Brain.Num))
 		
 ### cell type
 topIndsCT = mapply(function(s,e) s:e, sigCT$indexStart, sigCT$indexEnd)
@@ -66,7 +65,7 @@ meanMethCT = do.call("rbind", meanMethCT)
 sampleDistsCT <- dist(t(meanMethCT))
 sampleDistMatrixCT <- as.matrix(sampleDistsCT)
 colnames(sampleDistMatrixCT) = rownames(sampleDistMatrixCT) = c(paste(
-		pd$Cell.Type, pd$Age.Bin, pd$Working.Num, sep = ":"), paste0("Prenatal:",prenpd$Brain.Num))
+		postpd$Cell.Type, postpd$Age.Bin, postpd$Working.Num, sep = ":"), paste0("Prenatal:",prenpd$Brain.Num))
 
 		
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/figures/heatmap_euclidean_dist_3models_includingFetals.pdf",width=10,height=10)
@@ -102,7 +101,7 @@ tableCells = tableCells[names(tableCells)!="NA-NA"] # drop the missing one
 tableCells = Map(cbind, tableCells,regionID = lapply(tableCells, function(x) paste0(x$chr, ":", x$start,"-", x$end)))
 
 ## Plot distribution of annotated features
-tableCells = Map(cbind, lapply(tableCells, function(x) DMR$CellType[match(x$regionID,DMR$Interaction$regionID),]), quadrant = list("FALSE-FALSE", "FALSE-TRUE", "TRUE-FALSE", "TRUE-TRUE"))
+tableCells = Map(cbind, lapply(tableCells, function(x) DMR$Interaction[match(x$regionID,DMR$Interaction$regionID),]), quadrant = list("FALSE-FALSE", "FALSE-TRUE", "TRUE-FALSE", "TRUE-TRUE"))
 tableCells = do.call(rbind, tableCells)
 tableCellsdt = data.table(tableCells)
 
@@ -144,9 +143,9 @@ dev.off()
 ## Identify the Entrez IDs in each group
 entrez = split(tableCells[which(tableCells$annotation != "Intergenic" & tableCells$sig=="FWER < 0.05"),"EntrezID"], tableCells$quadrant) # DMRs overlapping genes and promoters
 entrez = lapply(entrez, function(x) as.character(unique(na.omit(x))))
-entrez.dir = list(GenesPlusPromoters.pos = tableCells[which(tableCells$value>0 & tableCells$annotation != "Intergenic" & 
+entrez.dir = list("GenesPlusPromoters.pos\n" = tableCells[which(tableCells$value>0 & tableCells$annotation != "Intergenic" & 
                                                                     tableCells$sig=="FWER < 0.05"),],
-                  GenesPlusPromoters.neg = tableCells[which(tableCells$value<0 & tableCells$annotation != "Intergenic" & 
+                  "GenesPlusPromoters.neg\n" = tableCells[which(tableCells$value<0 & tableCells$annotation != "Intergenic" & 
                                                                     tableCells$sig=="FWER < 0.05"),])
 entrez.dir = lapply(entrez.dir, function(x) split(x,x$quadrant))
 entrez.dir = lapply(entrez.dir, function(x) lapply(x, function(y) as.character(unique(na.omit(y$EntrezID)))))
@@ -158,48 +157,34 @@ GeneUniverse = as.character(unique(na.omit(tableCells$EntrezID)))
 elementNROWS(entrez)
 keggList = lapply(entrez, function(x) enrichKEGG(as.character(x), organism="human", universe= GeneUniverse, 
                                                  minGSSize=5, pAdjustMethod="BH", qvalueCutoff=1))
-keggListdf = lapply(keggList, function(x) as.data.frame(x))
 keggList.dir = lapply(entrez.dir, function(x) enrichKEGG(as.character(x), organism="human", universe= GeneUniverse, 
                                                          minGSSize=5, pAdjustMethod="BH", qvalueCutoff=1))
-keggList.dir.df = lapply(keggList.dir, function(x) as.data.frame(x))
-
 # Enriched Molecular Function GOs
 goList_MF = lapply(entrez, function(x) enrichGO(as.character(x), ont = "MF", OrgDb = org.Hs.eg.db, 
                                                 universe= GeneUniverse, minGSSize=5, pAdjustMethod="BH",
                                                 qvalueCutoff=1))
-goListdf_MF = lapply(goList_MF, function(x) as.data.frame(x))
 goList_MF.dir = lapply(entrez.dir, function(x) enrichGO(as.character(x), ont = "MF", OrgDb = org.Hs.eg.db, 
                                                         universe= GeneUniverse, minGSSize=5, pAdjustMethod="BH",
                                                         qvalueCutoff=1))
-goListdf_MF.dir = lapply(goList_MF.dir, function(x) as.data.frame(x))
-
 # Biological Process GO enrichment
 goList_BP = lapply(entrez, function(x) enrichGO(as.character(x), ont = "BP", OrgDb = org.Hs.eg.db, 
                                                 universe= GeneUniverse, minGSSize=5, pAdjustMethod="BH",
                                                 qvalueCutoff=1))
-goListdf_BP = lapply(goList_BP, function(x) as.data.frame(x))
 goList_BP.dir = lapply(entrez.dir, function(x) enrichGO(as.character(x), ont = "BP", OrgDb = org.Hs.eg.db, 
                                                         universe= GeneUniverse, minGSSize=5, pAdjustMethod="BH",
                                                         qvalueCutoff=1))
-goListdf_BP.dir = lapply(goList_BP.dir, function(x) as.data.frame(x))
-
 # Cellular Compartment GO enrichment
 goList_CC = lapply(entrez, function(x) enrichGO(as.character(x), ont = "CC", OrgDb = org.Hs.eg.db, 
                                                 universe= GeneUniverse, minGSSize=5, pAdjustMethod="BH",
                                                 qvalueCutoff=1))
-goListdf_CC = lapply(goList_CC, function(x) as.data.frame(x))
 goList_CC.dir = lapply(entrez.dir, function(x) enrichGO(as.character(x), ont = "CC", OrgDb = org.Hs.eg.db, 
                                                         universe= GeneUniverse, minGSSize=5, pAdjustMethod="BH",
                                                         qvalueCutoff=1))
-goListdf_CC.dir = lapply(goList_CC.dir, function(x) as.data.frame(x))
-
 # Disease Ontology
 goList_DO = lapply(entrez, function(x) enrichDO(as.character(x), ont = "DO", universe= GeneUniverse, 
                                                 minGSSize=5, pAdjustMethod="BH", qvalueCutoff=1, readable=TRUE))
-goListdf_DO = lapply(goList_DO, function(x) as.data.frame(x))
 goList_DO.dir = lapply(entrez.dir, function(x) enrichDO(as.character(x), ont = "DO", universe= GeneUniverse, 
                                                         minGSSize=5, pAdjustMethod="BH", qvalueCutoff=1, readable=TRUE))
-goListdf_DO.dir = lapply(goList_DO.dir, function(x) as.data.frame(x))
 
 # Compare the enriched terms between 7 groups
 # KEGG
