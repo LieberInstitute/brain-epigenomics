@@ -538,4 +538,3 @@ plot(IntcompareMF.dir, colorBy="p.adjust", showCategory = 45, title= "Single CpG
 plot(IntcompareCC.dir, colorBy="p.adjust", showCategory = 45, title= "Single CpG Cellular Compartment GO enrichment\nby Interaction")
 plot(IntcompareDO.dir, colorBy="p.adjust", showCategory = 30, title= "Single CpG Disease Ontology enrichment\nby Interaction")
 dev.off()
-
