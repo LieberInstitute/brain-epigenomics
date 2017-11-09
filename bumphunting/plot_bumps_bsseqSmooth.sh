@@ -20,7 +20,7 @@ echo "Creating script for chromosome Glia + ${cell} using model ${model} with ${
 cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l bluejay,mem_free=55G,h_vmem=55G,h_fsize=100G
+#$ -l bluejay,mem_free=85G,h_vmem=85G,h_fsize=100G
 #$ -N ${SHORT}
 #$ -o ./logs/${SHORT}.txt
 #$ -e ./logs/${SHORT}.txt
@@ -29,6 +29,7 @@ cat > .${SHORT}.sh <<EOF
 echo "**** Job starts ****"
 date
 
+module load conda_R/3.4.x
 Rscript plot_bumps_bsseqSmooth.R -m ${model} -s ${cell} -p ${permutations} -b FALSE -i FALSE
 
 echo "**** Job ends ****"
