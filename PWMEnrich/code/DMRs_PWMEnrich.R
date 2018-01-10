@@ -15,9 +15,9 @@ for (i in 1:length(DMR)) {
   DMR[[i]][,"annotation"] = gsub("Other", "Intergenic", DMR[[i]][,"annotation"])
 }
 
-promoters = lapply(DMR, function(x) x[which(x$promoter=="Promoter" & x$sig=="FWER < 0.05" & x$width>=6),]) # all DMRs that overlap a promoter
-intergenic = lapply(DMR, function(x) x[which(x$annotation=="Intergenic" & x$sig=="FWER < 0.05" & x$width>=6),]) # all intergenic DMRs
-introns = lapply(DMR, function(x) x[which(x$annotation=="Intron" & x$sig=="FWER < 0.05" & x$width>=6),]) #all DMRs that overlap exclusively introns
+promoters = lapply(DMR, function(x) x[which(x$promoter=="Promoter" & x$sig=="FWER < 0.05" & x$width>7),]) # all DMRs that overlap a promoter
+intergenic = lapply(DMR, function(x) x[which(x$annotation=="Intergenic" & x$sig=="FWER < 0.05" & x$width>=7),]) # all intergenic DMRs
+introns = lapply(DMR, function(x) x[which(x$annotation=="Intron" & x$sig=="FWER < 0.05" & x$width>=7),]) #all DMRs that overlap exclusively introns
 
 promotersgr = lapply(promoters, makeGRangesFromDataFrame)
 intergenicgr = lapply(intergenic, makeGRangesFromDataFrame)
@@ -41,8 +41,6 @@ promoters_res$CellType = motifEnrichment(promoters_seq$CellType, PWMLogn.hg19.Mo
 promoters_res$Age = motifEnrichment(promoters_seq$Age, PWMLogn.hg19.MotifDb.Hsap)
 promoters_res$Interaction = motifEnrichment(promoters_seq$Interaction, PWMLogn.hg19.MotifDb.Hsap)
 
-save(promoters_res, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_PWMEnrich_objects")
-
 intergenic_res$CellType = motifEnrichment(intergenic_seq$CellType, PWMLogn.hg19.MotifDb.Hsap)
 intergenic_res$Age = motifEnrichment(intergenic_seq$Age, PWMLogn.hg19.MotifDb.Hsap)
 intergenic_res$Interaction = motifEnrichment(intergenic_seq$Interaction, PWMLogn.hg19.MotifDb.Hsap)
@@ -60,11 +58,28 @@ lapply(promoters, function(x) min(x$width))
 lapply(intergenic, function(x) min(x$width))
 lapply(introns, function(x) min(x$width))
 
-
-
-
 promoters_groupReport = groupReport(promoters_res$Age)
 promoters_sequenceReport = sequenceReport(promoters_res$Age)
+
+
+
+## Split by direction
+
+promoters_split = intergenic_split = introns_split = list()
+promoters = unlist(lapply(promoters, function(x) split(x, x$Dir)), recursive = F)
+promotersgr = lapply(promoters, makeGRangesFromDataFrame)
+promoters_seq = lapply(promotersgr, function(x) getSeq(Hsapiens, x))
+
+promoters_split$CellType.pos = motifEnrichment(promoters_seq$CellType.pos, PWMLogn.hg19.MotifDb.Hsap)
+promoters_split$CellType.neg = motifEnrichment(promoters_seq$CellType.neg, PWMLogn.hg19.MotifDb.Hsap)
+promoters_split$Age.pos = motifEnrichment(promoters_seq$Age.pos, PWMLogn.hg19.MotifDb.Hsap)
+promoters_split$Age.neg = motifEnrichment(promoters_seq$Age.neg, PWMLogn.hg19.MotifDb.Hsap)
+promoters_split$Interaction.pos = motifEnrichment(promoters_seq$Interaction.pos, PWMLogn.hg19.MotifDb.Hsap)
+promoters_split$Interaction.neg = motifEnrichment(promoters_seq$Interaction.neg, PWMLogn.hg19.MotifDb.Hsap)
+
+
+
+
 
 
 
