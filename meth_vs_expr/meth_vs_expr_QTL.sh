@@ -1,19 +1,21 @@
 #!/bin/bash
 
 ## Usage:
-# sh meth_vs_psi_QTL.sh
+# mkdir -p logs
+# sh meth_vs_expr_QTL.sh
 
 mkdir -p logs
 
-for cpg in TRUE FALSE
+for cpg in FALSE
+#for cpg in TRUE FALSE
 do
-    for model in cell age interaction
+    for type in gene exon jx #psi
     do
 
-SHORT="meth_vs_psi_QTL_cpg${cpg}_${model}"
+SHORT="meth_vs_psi_QTL_cpg${cpg}_${type}"
 
 # Construct shell file
-echo "Creating script for cpg ${cpg}using model ${model}"
+echo "Creating script for cpg ${cpg} for feature type ${type}"
 
 cat > .${SHORT}.sh <<EOF
 #!/bin/bash
@@ -35,7 +37,7 @@ echo "Hostname: \${HOSTNAME}"
 echo "Task id: \${TASK_ID}"
 
 module load conda_R/3.4.x
-Rscript meth_vs_psi_QTL.R -m ${model} -c ${cpg}
+Rscript meth_vs_expr_QTL.R -c ${cpg} -f ${type}
 
 echo "**** Job ends ****"
 date
