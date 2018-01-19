@@ -29,7 +29,8 @@ load('rda/sgvc10_postnatal_polyA.Rdata', verbose = TRUE)
 cpg <- ifelse(opt$cpg, 'CpG', 'nonCpG')
 
 load_dmp <- function(is_cpg) {
-    load(paste0('rda/DMP_', cpg, '_', opt$model, '.Rdata'), verbose = TRUE)
+    load(paste0('../BSobj_subsets/rda/DMP_', cpg, '_', opt$model, '.Rdata'),
+        verbose = TRUE)
     if(is_cpg) {
         DMP <- DMP_CpG
     } else {
