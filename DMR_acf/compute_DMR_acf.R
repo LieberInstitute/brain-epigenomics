@@ -110,7 +110,7 @@ tapply(auto_long$acf, auto_long$lag, function(x) { summary(abs(x))})
 
 ## Save results
 dir.create('rda', showWarnings = FALSE)
-save(auto_long, file = paste0('rda/auto_long_', opt$chr, '_context',
+save(auto_long, file = paste0('rda/auto_long_context',
     opt$context, '_', opt$model, '.Rdata'))
 
 ## Reproducibility information
