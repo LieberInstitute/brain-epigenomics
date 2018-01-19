@@ -31,10 +31,13 @@ cpg <- ifelse(opt$cpg, 'CpG', 'nonCpG')
 load_dmp <- function(is_cpg) {
     load(paste0('rda/DMP_', cpg, '_', opt$model, '.Rdata'), verbose = TRUE)
     if(is_cpg) {
-        return(DMP_CpG)
+        DMP <- DMP_CpG
     } else {
-        return(DMP_nonCpG)
+        DMP <- DMP_nonCpG
     }
+    ## Keep Neurons only
+    DMP <- DMP[, colData(DMP)$Cell.Type == 'Neuron']
+    return(DMP)
 }
 DMP <- load_dmp(opt$cpg)
 
@@ -45,7 +48,7 @@ getid <- function(x) {
 
 ## Match and subset appropriately
 message(paste(Sys.time(), 'subsetting the data to use'))
-m  <- match(getid(colData(rse)$BrNum), getid(colData(DMP)$Brain.ID))
+m  <- match(getid(colData(sgvc10)$BrNum), getid(colData(DMP)$Brain.ID))
 sgvc10 <- sgvc10[, which(!is.na(m))]
 colnames(sgvc10) <- paste0('Br', getid(colData(sgvc10)$BrNum))
 DMP <- DMP[, m[!is.na(m)]]
@@ -86,7 +89,7 @@ psipos <- data.frame(
 message(paste(Sys.time(), 'running MatrixEQTL'))
 me <- Matrix_eQTL_main(snps = meth, gene = psi, 
     output_file_name.cis = paste0('.', cpg, '_', opt$model, '.txt'), # invis file, temporary
-    pvOutputThreshold = 0, pvOutputThreshold.cis = 1, 
+    pvOutputThreshold = 0, pvOutputThreshold.cis = 1e-5, 
 	useModel = modelLINEAR,
 	snpspos = methpos, genepos = genepos, cisDist = 1e4)
 
