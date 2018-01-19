@@ -9,7 +9,7 @@ library('limma')
 ## Specify parameters
 spec <- matrix(c(
     'cores', 't', 1, 'integer', 'Number of cores to use',
-    'model', 'm', 1, 'character', 'Either age, cell or interaction'
+    'model', 'm', 1, 'character', 'Either age, cell or interaction',
     'context', 'x', 1, 'character', 'Either nonCG, CG, CHG, CHH',
 	'help' , 'h', 0, 'logical', 'Display help'
 ), byrow=TRUE, ncol=5)

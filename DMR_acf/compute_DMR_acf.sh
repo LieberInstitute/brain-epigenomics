@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ## Usage:
+# mkdir -p logs
 # sh compute_DMR_acf.sh
 
 mkdir -p logs
