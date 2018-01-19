@@ -14,18 +14,18 @@ load("/dcl01/lieber/ajaffe/CellSorting/RNAseq_pipeline/rse_jx_CellSorting_July5_
 load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/BSobj_bsseqSmooth_Neuron_minCov_3.Rdata')
 keepIndex = which(pData(BSobj)$Working.Num %in% 12:14)
 BSobj_cpg = BSobj[,keepIndex]
-pd_cpg <- pData(BSobj)
-gr_cpg <- granges(BSobj)
-meth_cpg <- getMeth(BSobj, type = 'smooth')
+pd_cpg <- pData(BSobj_cpg)
+gr_cpg <- granges(BSobj_cpg)
+meth_cpg <- getMeth(BSobj_cpg, type = 'smooth')
 rm(BSobj)
 
 ## load non-CpG data
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/allChrs_postNatal_cleaned_nonCG_noHomogenate_highCov.Rdata")
 keepIndex = which(pData(BSobj)$Working.Num %in% 12:14)
 BSobj_non = BSobj[,keepIndex]
-pd_non <- pData(BSobj)
-gr_non <- granges(BSobj)
-meth_non <- getMeth(BSobj, type = 'raw')
+pd_non <- pData(BSobj_non)
+gr_non <- granges(BSobj_non)
+meth_non <- getMeth(BSobj_non, type = 'raw')
 
 
 meth_ch = meth
