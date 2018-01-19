@@ -12,7 +12,7 @@ do
     for type in gene exon jx #psi
     do
 
-SHORT="meth_vs_psi_QTL_cpg${cpg}_${type}"
+SHORT="meth_vs_expr_QTL_cpg${cpg}_${type}"
 
 # Construct shell file
 echo "Creating script for cpg ${cpg} for feature type ${type}"
