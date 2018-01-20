@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -cwd
-#$ -l bluejay,mem_free=80G,h_vmem=80G,h_fsize=200G
+#$ -l bluejay,mem_free=25G,h_vmem=25G,h_fsize=200G
 #$ -N extract_dmr_CpG
 #$ -o ./logs/extract_dmr_CpG.txt
 #$ -e ./logs/extract_dmr_CpG.txt
