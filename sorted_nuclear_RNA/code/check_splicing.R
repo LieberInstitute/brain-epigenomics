@@ -27,13 +27,6 @@ pd_non <- pData(BSobj_non)
 gr_non <- granges(BSobj_non)
 meth_non <- getMeth(BSobj_non, type = 'raw')
 
-
-meth_ch = meth
-methMap_ch = gr
-
-meth_cg =getMeth(BSobj, type = 'raw')
-methMap_cg =granges(BSobj)
-
 # get expression
 rowData(rse_jx)$bp_length = 100
 jRp10m = getRPKM(rse_jx)
