@@ -1,3 +1,5 @@
 pdf
 rda
 .*.sh
+*.Rdata
+
