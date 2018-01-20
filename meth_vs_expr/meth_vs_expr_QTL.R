@@ -65,7 +65,8 @@ load_expr <- function(type) {
         expr <- rse_exon
     } else if (type == 'jx') {
         if(file.exists(paste0('rda/expr_', opt$feature, '.Rdata'))) {
-            ## Ran interactively and saved the results on 2018-01-19
+            ## Ran interactively and saved the results on 2018-01-20
+            ## using a cutoff of 1 instead of the suggested one
             load(paste0('rda/expr_', opt$feature, '.Rdata'), verbose = TRUE)
             return(expr)
         }
