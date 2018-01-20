@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -cwd
-#$ -l mem_free=21G,h_vmem=21G,h_fsize=200G
+#$ -l mem_free=13G,h_vmem=13G,h_fsize=200G
 #$ -N calc_psi_postnatal_polyA
 #$ -pe local 10
 #$ -o ./logs/calc_psi_postnatal_polyA.txt

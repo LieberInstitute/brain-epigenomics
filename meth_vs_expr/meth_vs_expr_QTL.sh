@@ -9,7 +9,7 @@ mkdir -p logs
 for cpg in FALSE
 #for cpg in TRUE FALSE
 do
-    for type in gene exon jx #psi
+    for type in gene exon jx psi
     do
 
 SHORT="meth_vs_expr_QTL_cpg${cpg}_${type}"

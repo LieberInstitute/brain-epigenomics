@@ -27,6 +27,7 @@ if(FALSE) {
     opt <- list('cpg' = FALSE, 'feature' = 'gene')
     opt <- list('cpg' = FALSE, 'feature' = 'exon')
     opt <- list('cpg' = FALSE, 'feature' = 'jx')
+    opt <- list('cpg' = FALSE, 'feature' = 'psi')
 }
 
 stopifnot(opt$feature %in% c('psi', 'gene', 'exon', 'jx'))
@@ -50,7 +51,7 @@ BSobj <- load_dmp(opt$cpg)
 ## Load data
 load_expr <- function(type) {
     if(type == 'psi') {
-        load('rda/sgvc10_postnatal_polyA.Rdata', verbose = TRUE)
+        load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/psi/rda/sgvc10_postnatal_polyA.Rdata', verbose = TRUE)
         expr <- sgvc10
     } else if (type == 'gene') {
         load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/brainseq_pipeline/polyA_unstranded/rse_gene_polyA_dlpfc_n41.Rdata', verbose = TRUE)
@@ -131,7 +132,7 @@ methpos <- data.frame(
     stringsAsFactors = FALSE
 )
 
-## Get PSI
+## Get expression or PSI info
 message(paste(Sys.time(), 'preparing expression info'))
 if(opt$feature == 'psi') {
     exprinfo <- SlicedData$new(variantFreq(expr))
@@ -143,7 +144,7 @@ exprinfo$fileSliceSize <- 2000
 get_exprpos <- function(type) {
     if(type == 'psi') {
         exprpos <- data.frame(
-            spliceid = paste0('splice_', seq_len(nrow(expr))),
+            spliceid = rownames(exprinfo),
             chr = as.character(seqnames(unlist(range(rowRanges(expr))))),
             start = min(start(rowRanges(expr))),
             end = max(end(rowRanges(expr))),
