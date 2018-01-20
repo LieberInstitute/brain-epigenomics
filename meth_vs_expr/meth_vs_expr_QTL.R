@@ -5,6 +5,7 @@ library('MatrixEQTL')
 library('getopt')
 library('jaffelab')
 library('recount')
+library('devtools')
 
 ## Specify parameters
 spec <- matrix(c(
@@ -24,6 +25,8 @@ if (!is.null(opt$help)) {
 ## For testing
 if(FALSE) {
     opt <- list('cpg' = FALSE, 'feature' = 'gene')
+    opt <- list('cpg' = FALSE, 'feature' = 'exon')
+    opt <- list('cpg' = FALSE, 'feature' = 'jx')
 }
 
 stopifnot(opt$feature %in% c('psi', 'gene', 'exon', 'jx'))
@@ -61,8 +64,8 @@ load_expr <- function(type) {
         expr <- rse_exon
     } else if (type == 'jx') {
         load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/brainseq_pipeline/polyA_unstranded/rse_jx_polyA_dlpfc_n41.Rdata', verbose = TRUE)
-        rowRanges(rse_jx)$Length <- 100
-        ## RPM10
+        rowRanges(rse_jx)$Length <- 100 / 8
+        ## RP80m
         assays(rse_jx)$norm <- recount::getRPKM(rse_jx, 'Length')
         expr <- rse_jx
     }
@@ -141,7 +144,7 @@ get_exprpos <- function(type) {
             end = max(end(rowRanges(expr))),
             stringsAsFactors = FALSE
         )
-    } else if (type %in% c('gene', 'exon')) {
+    } else if (type == 'gene') {
         exprpos <- data.frame(
             spliceid = rowRanges(expr)$gencodeID,
             chr = as.character(seqnames(rowRanges(expr))),
@@ -149,7 +152,7 @@ get_exprpos <- function(type) {
             end = end(rowRanges(expr)),
             stringsAsFactors = FALSE
         )
-    } else if (type == 'jx') {
+    } else if (type %in% c('exon', 'jx')) {
         exprpos <- data.frame(
             spliceid = names(rowRanges(expr)),
             chr = as.character(seqnames(rowRanges(expr))),
