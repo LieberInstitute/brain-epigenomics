@@ -12,7 +12,7 @@ do
     for type in gene exon jx psi
     do
 
-SHORT="sh annotate_me_cpg${cpg}_${type}"
+SHORT="annotate_me_cpg${cpg}_${type}"
 
 # Construct shell file
 echo "Creating script for cpg ${cpg} for feature type ${type}"
