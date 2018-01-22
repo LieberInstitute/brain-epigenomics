@@ -85,11 +85,20 @@ load(paste0('rda/me_', cpg, '_', opt$feature, '.Rdata'), verbose = TRUE)
 
 ## Annotate meth vs expr results
 snp_id <- function(x) { as.integer(gsub('row', '', x)) }
-me_annotated <- list(
-    'eqtls' = DataFrame(me$cis$eqtls),
-    'cinfo' = rowRanges(BSobj)[snp_id(me$cis$eqtls$snps), ],
-    'exprinfo' = rowRanges(expr)[match(me$cis$eqtls$gene, names(rowRanges(expr))), ]
-)
+if(opt$feature == 'psi') {
+    me_annotated <- list(
+        'eqtls' = DataFrame(me$cis$eqtls),
+        'cinfo' = rowRanges(BSobj)[snp_id(me$cis$eqtls$snps), ],
+        'exprinfo' = rowRanges(expr)[snp_id(me$cis$eqtls$gene), ]
+    )
+} else {
+    me_annotated <- list(
+        'eqtls' = DataFrame(me$cis$eqtls),
+        'cinfo' = rowRanges(BSobj)[snp_id(me$cis$eqtls$snps), ],
+        'exprinfo' = rowRanges(expr)[match(me$cis$eqtls$gene, names(rowRanges(expr))), ]
+    )
+}
+
 
 ## Save the results
 dir.create('rda', showWarnings = FALSE)
