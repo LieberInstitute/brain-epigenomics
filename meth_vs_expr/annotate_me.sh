@@ -37,7 +37,7 @@ echo "Hostname: \${HOSTNAME}"
 echo "Task id: \${TASK_ID}"
 
 module load conda_R/3.4.x
-Rscript sh annotate_me.R -c ${cpg} -f ${type}
+Rscript annotate_me.R -c ${cpg} -f ${type}
 
 echo "**** Job ends ****"
 date
