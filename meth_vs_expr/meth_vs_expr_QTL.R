@@ -64,13 +64,6 @@ load_expr <- function(type) {
         ## RPKM
         expr <- rse_exon
     } else if (type == 'jx') {
-        if(file.exists(paste0('rda/expr_', opt$feature, '.Rdata'))) {
-            ## Ran interactively and saved the results on 2018-01-20
-            ## using a cutoff of 20 instead of the suggested one
-            ## (it failed with 1, 4, 8)
-            load(paste0('rda/expr_', opt$feature, '.Rdata'), verbose = TRUE)
-            return(expr)
-        }
         load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/brainseq_pipeline/polyA_unstranded/rse_jx_polyA_dlpfc_n41.Rdata', verbose = TRUE)
         rowRanges(rse_jx)$Length <- 100 / 8
         ## RP80m
@@ -99,14 +92,7 @@ load_expr <- function(type) {
             rowRanges(expr)$passExprsCut <- meanExpr > cut
             dir.create('rda', showWarnings = FALSE)
             save(expr, file = paste0('rda/expr_', opt$feature, '_unfiltered.Rdata'))
-        }
-        
-        if(opt$type == 'jx') {
-            ## No longer filter exon and gene data for low exprs
-            #expr <- expr[rowRanges(expr)$passExprsCut]
-            expr <- expr[rowRanges(expr)$meanExprs > 20]
-            save(expr, file = paste0('rda/expr_', opt$feature, '.Rdata'))
-        }        
+        }      
     }
         
     return(expr)
@@ -169,12 +155,22 @@ get_exprpos <- function(type) {
             end = end(rowRanges(expr)),
             stringsAsFactors = FALSE
         )
-    } else if (type %in% c('exon', 'jx')) {
+    } else if (type == 'exon') {
         exprpos <- data.frame(
             spliceid = names(rowRanges(expr)),
             chr = as.character(seqnames(rowRanges(expr))),
             start = start(rowRanges(expr)),
             end = end(rowRanges(expr)),
+            stringsAsFactors = FALSE
+        )
+    } else if (type == 'jx') {
+        set.seed(20180123)
+        exprpos <- data.frame(
+            spliceid = names(rowRanges(expr)),
+            chr = as.character(seqnames(rowRanges(expr))),
+            start = start(rowRanges(expr)),
+            end = end(rowRanges(expr)) + sample(seq_len(30), nrow(expr),
+                replace = TRUE),
             stringsAsFactors = FALSE
         )
     }
