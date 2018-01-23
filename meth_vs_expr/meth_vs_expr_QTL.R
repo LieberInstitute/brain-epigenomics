@@ -39,6 +39,8 @@ cpg <- ifelse(opt$cpg, 'CpG', 'nonCpG')
 load_dmp <- function(is_cpg) {
     if(is_cpg) {
         load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/BSobj_bsseqSmooth_Neuron_minCov_3.Rdata', verbose = TRUE)
+        rowRanges(BSobj)$c_context <- 'CG'
+        rowRanges(BSobj)$trinucleotide_context <- 'CpG'
     } else {
         load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/allChrs_postNatal_cleaned_nonCG_noHomogenate_highCov.Rdata', verbose = TRUE)
     }
