@@ -14,7 +14,7 @@ do
 
     chr="chr${chrnum}"
     
-    for context in all nonCG CG CHG CHH
+    for context in nonCG CG CHG CHH
     do
 
     
