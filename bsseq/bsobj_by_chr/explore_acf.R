@@ -40,7 +40,6 @@ context <- c(
 
 ## Filter low coverage bases
 cov <- getCoverage(BSobj, type = 'Cov')
-
 cov.ge5.cph <- cov[rowRanges(BSobj)$c_context != 'CG', ] >= 5
 cov.ge3.cpg <- cov[rowRanges(BSobj)$c_context == 'CG', ] >= 3
 
@@ -53,7 +52,7 @@ table(cov.filt)
 round(table(cov.filt) / length(cov.filt) * 100, 2)
 
 BSobj <- BSobj[cov.filt, ]
-rm(cov, cov.ge1, cov.filt)
+rm(cov, cov.ge5.cph, cov.ge3.cpg, cov.filt)
 
 
 ## Subset by context
