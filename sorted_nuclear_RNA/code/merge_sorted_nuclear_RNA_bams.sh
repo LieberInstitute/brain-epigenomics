@@ -11,4 +11,8 @@ echo ${ID}
 cd /dcl01/lieber/ajaffe/Amanda/sorted_nuclear_RNA/merged/
 module load samtools
 
+<<<<<<< HEAD
 samtools merge ${ID}_combinedLibraries.bam $polyA $Ribo
+=======
+samtools merge -f ${ID}_combinedLibraries.bam $polyA $Ribo
+>>>>>>> a76c7689d20f2c51dde82df9d1f0a1b53258f92e

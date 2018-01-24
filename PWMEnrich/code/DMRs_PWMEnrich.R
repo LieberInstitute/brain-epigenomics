@@ -2,10 +2,13 @@ library(PWMEnrich)
 library(GenomicRanges)
 library(PWMEnrich.Hsapiens.background)
 library(BSgenome.Hsapiens.UCSC.hg19)
+library(pheatmap)
+library(RColorBrewer)
 
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda")
 
-setwd("/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich")
+#load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda")
+#load("/media/Backup1_/amanda/DMR/DMR_objects.rda")
+load("./Desktop/BAMS/DMR_objects.rda")
 
 
 ## Get sequences from different annotations in the correct format
@@ -15,169 +18,117 @@ for (i in 1:length(DMR)) {
   DMR[[i]][,"annotation"] = gsub("Other", "Intergenic", DMR[[i]][,"annotation"])
 }
 
-promoters = lapply(DMR, function(x) x[which(x$promoter=="Promoter" & x$sig=="FWER < 0.05" & x$width>7),]) # all DMRs that overlap a promoter
-intergenic = lapply(DMR, function(x) x[which(x$annotation=="Intergenic" & x$sig=="FWER < 0.05" & x$width>=7),]) # all intergenic DMRs
-introns = lapply(DMR, function(x) x[which(x$annotation=="Intron" & x$sig=="FWER < 0.05" & x$width>=7),]) #all DMRs that overlap exclusively introns
-
-promotersgr = lapply(promoters, makeGRangesFromDataFrame)
-intergenicgr = lapply(intergenic, makeGRangesFromDataFrame)
-intronsgr = lapply(introns, makeGRangesFromDataFrame)
-allgr = lapply(DMR, function(x) makeGRangesFromDataFrame(x[which(x$sig=="FWER < 0.05" & x$width>=7),]))
-
-promoters_seq = lapply(promotersgr, function(x) getSeq(Hsapiens, x))
-intergenic_seq = lapply(intergenicgr, function(x) getSeq(Hsapiens, x))
-introns_seq = lapply(intronsgr, function(x) getSeq(Hsapiens, x))
-all_seq = lapply(allgr, function(x) getSeq(Hsapiens, x))
+data = list(promoters = lapply(DMR, function(x) x[which(x$promoter=="Promoter" & x$sig=="FWER < 0.05" & x$width>29),]), # all DMRs that overlap a promoter
+            intergenic = lapply(DMR, function(x) x[which(x$annotation=="Intergenic" & x$sig=="FWER < 0.05" & x$width>29),]), # all intergenic DMRs
+            introns = lapply(DMR, function(x) x[which(x$annotation=="Intron" & x$sig=="FWER < 0.05" & x$width>29),]), #all DMRs that overlap exclusively introns
+            all = lapply(DMR, function(x) x[which(x$sig=="FWER < 0.05" & x$width>29),]))
+gr = lapply(data, function(x) lapply(x, makeGRangesFromDataFrame))
+for (i in 1:length(gr)) { 
+  for (j in 1:length(gr[[i]])) { 
+    names(gr[[i]][[j]]) = data[[i]][[j]][,"regionID"] 
+  } 
+}
+seq = lapply(gr, function(y) lapply(y, function(x) getSeq(Hsapiens, x)))
 
 
 ### Run PWMEnrich
 
-useBigMemoryPWMEnrich(TRUE)
-registerCoresPWMEnrich(5)
+#useBigMemoryPWMEnrich(TRUE)
+registerCoresPWMEnrich(3)
 
 # load the pre-compiled lognormal background computed using promoters
 data(PWMLogn.hg19.MotifDb.Hsap)
 
-promoters_res = intergenic_res = introns_res = list()
-promoters_res$CellType = motifEnrichment(promoters_seq$CellType, PWMLogn.hg19.MotifDb.Hsap)
-promoters_res$Age = motifEnrichment(promoters_seq$Age, PWMLogn.hg19.MotifDb.Hsap)
-promoters_res$Interaction = motifEnrichment(promoters_seq$Interaction, PWMLogn.hg19.MotifDb.Hsap)
+promoters_int = motifEnrichment(promoters_seq$Interaction, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+intergenic_int = motifEnrichment(intergenic_seq$Interaction, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+introns_int = motifEnrichment(introns_seq$Interaction, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+all_int = motifEnrichment(all_seq$Interaction, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
 
-intergenic_res$CellType = motifEnrichment(intergenic_seq$CellType, PWMLogn.hg19.MotifDb.Hsap)
-intergenic_res$Age = motifEnrichment(intergenic_seq$Age, PWMLogn.hg19.MotifDb.Hsap)
-intergenic_res$Interaction = motifEnrichment(intergenic_seq$Interaction, PWMLogn.hg19.MotifDb.Hsap)
-
-introns_res$CellType = motifEnrichment(introns_seq$CellType, PWMLogn.hg19.MotifDb.Hsap)
-introns_res$Age = motifEnrichment(introns_seq$Age, PWMLogn.hg19.MotifDb.Hsap)
-introns_res$Interaction = motifEnrichment(introns_seq$Interaction, PWMLogn.hg19.MotifDb.Hsap)
-
-all_res = list()
-all_res$CellType = motifEnrichment(all_seq$CellType, PWMLogn.hg19.MotifDb.Hsap)
-all_res$Age = motifEnrichment(all_seq$Age, PWMLogn.hg19.MotifDb.Hsap)
-all_res$Interaction = motifEnrichment(all_seq$Interaction, PWMLogn.hg19.MotifDb.Hsap)
-
-
-save(all_res, promoters_res, intergenic_res, introns_res, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_PWMEnrich_objects")
+save(promoters_int, intergenic_int, introns_int, all_int, file="./Desktop/BAMS/DMR_PWMEnrich_objects.rda")
 
 
 ## Split by direction
 
-promoters_split = intergenic_split = introns_split = list()
-promoters = unlist(lapply(promoters, function(x) split(x, x$Dir)), recursive = F)
-promotersgr = lapply(promoters, makeGRangesFromDataFrame)
-promoters_seq = lapply(promotersgr, function(x) getSeq(Hsapiens, x))
-promoters_split$CellType.pos = motifEnrichment(promoters_seq$CellType.pos, PWMLogn.hg19.MotifDb.Hsap)
-promoters_split$CellType.neg = motifEnrichment(promoters_seq$CellType.neg, PWMLogn.hg19.MotifDb.Hsap)
-promoters_split$Age.pos = motifEnrichment(promoters_seq$Age.pos, PWMLogn.hg19.MotifDb.Hsap)
-promoters_split$Age.neg = motifEnrichment(promoters_seq$Age.neg, PWMLogn.hg19.MotifDb.Hsap)
-promoters_split$Interaction.pos = motifEnrichment(promoters_seq$Interaction.pos, PWMLogn.hg19.MotifDb.Hsap)
-promoters_split$Interaction.neg = motifEnrichment(promoters_seq$Interaction.neg, PWMLogn.hg19.MotifDb.Hsap)
-
-intergenic = unlist(lapply(intergenic, function(x) split(x, x$Dir)), recursive = F)
-intergenicgr = lapply(intergenic, makeGRangesFromDataFrame)
-intergenic_seq = lapply(intergenicgr, function(x) getSeq(Hsapiens, x))
-intergenic_split$CellType.pos = motifEnrichment(intergenic_seq$CellType.pos, PWMLogn.hg19.MotifDb.Hsap)
-intergenic_split$CellType.neg = motifEnrichment(intergenic_seq$CellType.neg, PWMLogn.hg19.MotifDb.Hsap)
-intergenic_split$Age.pos = motifEnrichment(intergenic_seq$Age.pos, PWMLogn.hg19.MotifDb.Hsap)
-intergenic_split$Age.neg = motifEnrichment(intergenic_seq$Age.neg, PWMLogn.hg19.MotifDb.Hsap)
-intergenic_split$Interaction.pos = motifEnrichment(intergenic_seq$Interaction.pos, PWMLogn.hg19.MotifDb.Hsap)
-intergenic_split$Interaction.neg = motifEnrichment(intergenic_seq$Interaction.neg, PWMLogn.hg19.MotifDb.Hsap)
-
-introns = unlist(lapply(introns, function(x) split(x, x$Dir)), recursive = F)
-intronsgr = lapply(introns, makeGRangesFromDataFrame)
-introns_seq = lapply(intronsgr, function(x) getSeq(Hsapiens, x))
-introns_split$CellType.pos = motifEnrichment(introns_seq$CellType.pos, PWMLogn.hg19.MotifDb.Hsap)
-introns_split$CellType.neg = motifEnrichment(introns_seq$CellType.neg, PWMLogn.hg19.MotifDb.Hsap)
-introns_split$Age.pos = motifEnrichment(introns_seq$Age.pos, PWMLogn.hg19.MotifDb.Hsap)
-introns_split$Age.neg = motifEnrichment(introns_seq$Age.neg, PWMLogn.hg19.MotifDb.Hsap)
-introns_split$Interaction.pos = motifEnrichment(introns_seq$Interaction.pos, PWMLogn.hg19.MotifDb.Hsap)
-introns_split$Interaction.neg = motifEnrichment(introns_seq$Interaction.neg, PWMLogn.hg19.MotifDb.Hsap)
-
-all = lapply(DMR, function(x) x[which(x$sig=="FWER < 0.05" & x$width>=7),])
-all = unlist(lapply(all, function(x) split(x, x$Dir)), recursive = F)
-allgr = lapply(all, makeGRangesFromDataFrame)
-all_seq = lapply(allgr, function(x) getSeq(Hsapiens, x))
-all_split$CellType.pos = motifEnrichment(all_seq$CellType.pos, PWMLogn.hg19.MotifDb.Hsap)
-all_split$CellType.neg = motifEnrichment(all_seq$CellType.neg, PWMLogn.hg19.MotifDb.Hsap)
-all_split$Age.pos = motifEnrichment(all_seq$Age.pos, PWMLogn.hg19.MotifDb.Hsap)
-all_split$Age.neg = motifEnrichment(all_seq$Age.neg, PWMLogn.hg19.MotifDb.Hsap)
-all_split$Interaction.pos = motifEnrichment(all_seq$Interaction.pos, PWMLogn.hg19.MotifDb.Hsap)
-all_split$Interaction.neg = motifEnrichment(all_seq$Interaction.neg, PWMLogn.hg19.MotifDb.Hsap)
-
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_PWMEnrich_objects")
-save(promoters_split, intergenic_split, introns_split, all_split, promoters_res, intergenic_res, introns_res,
-     file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_PWMEnrich_objects")
-
-
-### Extract results: group reports
-
-promoters_groupReport = groupReport(promoters_res$Age)
-promoters_sequenceReport = sapply(seq_along(promoters_seq$Age.pos), 
-                                  function(i) sequenceReport(promoters_split$Age.pos, seq.id=i))
-
-targ = promoters_sequenceReport[[1]]$target    
-pvalMat = sapply(promoters_sequenceReport, function(x)    {
-  x$p.value[match(targ, x$target)]
-})
-rownames(pvalMat) = targ
-colnames(pvalMat) = names(promoters_seq$Age.pos)
-
-
-
-## set of TFs as whole
-grp = motifRankingForGroup(res)
-s = cut(grp, c(0,1e-100,1e-20,1e-10, 1e-4, 0.05, 1),include.lowest=TRUE)
-table(s)
-length(unique(names(grp)[which(as.numeric(s)==1)]))
-length(unique(names(grp)[which(as.numeric(s)%in% 1:2)]))
-
-unique(names(grp)[which(as.numeric(s)==1)])
-unique(names(grp)[which(as.numeric(s)==2)])
-
-## plots
-pdf("plots/top_motifs_all.pdf", h=9, w= 12)
-
-### p-value for each sequencing by motif
-rn = names(motifRankingForSequence(res,1))
-resList = vector("list",nrow(sig))
-for(i in seq(along=resList)) {
-  if(i %% 1000 == 0) cat(".")
-  resList[[i]] = motifRankingForSequence(res,i)[rn]
+promoters_split = intergenic_split = introns_split = all_split = list()
+split = lapply(data, function(y) unlist(lapply(y, function(x) split(x, x$Dir)), recursive = F))
+gr = lapply(split, function(x) lapply(x, makeGRangesFromDataFrame))
+for (i in 1:length(gr)) { 
+  for (j in 1:length(gr[[i]])) { 
+    names(gr[[i]][[j]]) = split[[i]][[j]][,"regionID"] 
+  } 
 }
+seq = lapply(gr, function(y) lapply(y, function(x) getSeq(Hsapiens, x)))
 
-pMat = do.call("rbind",resList)
-save(grp,pMat,file="rdas/motif_summaries.rda")
+all_split$CellType.pos = motifEnrichment(seq$all$CellType.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+all_split$CellType.neg = motifEnrichment(seq$all$CellType.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+all_split$Age.pos = motifEnrichment(seq$all$Age.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+all_split$Age.neg = motifEnrichment(seq$all$Age.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+all_split$Interaction.pos = motifEnrichment(seq$all$Interaction.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+all_split$Interaction.neg = motifEnrichment(seq$all$Interaction.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
 
-#### keep unique
-load("rdas/motif_summaries.rda")
-table(duplicated(t(pMat)))
-pMat = pMat[,!duplicated(t(pMat))]
+promoters_split$CellType.pos = motifEnrichment(seq$promoters$CellType.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+promoters_split$CellType.neg = motifEnrichment(seq$promoters$CellType.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+promoters_split$Age.pos = motifEnrichment(seq$promoters$Age.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+promoters_split$Age.neg = motifEnrichment(seq$promoters$Age.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+promoters_split$Interaction.pos = motifEnrichment(seq$promoters$Interaction.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+promoters_split$Interaction.neg = motifEnrichment(seq$promoters$Interaction.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
 
-lMat = -log10(pMat)
+intergenic_split$CellType.pos = motifEnrichment(seq$intergenic$CellType.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+intergenic_split$CellType.neg = motifEnrichment(seq$intergenic$CellType.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+intergenic_split$Age.pos = motifEnrichment(seq$intergenic$Age.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+intergenic_split$Age.neg = motifEnrichment(seq$intergenic$Age.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+intergenic_split$Interaction.pos = motifEnrichment(seq$intergenic$Interaction.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+intergenic_split$Interaction.neg = motifEnrichment(seq$intergenic$Interaction.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
 
-# pca = prcomp(lMat)
-# pcat = prcomp(t(lMat))
+introns_split$CellType.pos = motifEnrichment(seq$intergenic$CellType.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+introns_split$CellType.neg = motifEnrichment(seq$intergenic$CellType.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+introns_split$Age.pos = motifEnrichment(seq$intergenic$Age.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+introns_split$Age.neg = motifEnrichment(seq$intergenic$Age.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+introns_split$Interaction.pos = motifEnrichment(seq$intergenic$Interaction.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+introns_split$Interaction.neg = motifEnrichment(seq$intergenic$Interaction.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
 
-pdf("heatmap.pdf",h=16,w=8)
-heatmap(zMat)
+save(promoters_split, intergenic_split, introns_split, all_split, promoters_int, intergenic_int, introns_int, all_int,
+     file = "./Desktop/BAMS/DMR_PWMEnrich_objects.rda")
+
+
+## Cluster Interaction DMRs by TF enrichment to see how the groups materialize
+
+load("./Desktop/BAMS/DMR_PWMEnrich_objects.rda")
+
+all_int_seqRep = list()
+for (i in 1:length(all_int$sequences)) {
+	all_int_seqRep[[i]] = sequenceReport(all_int, seq.id=i)
+}
+targ = all_int_seqRep[[1]]$target    
+pvalMat = do.call(cbind, lapply(all_int_seqRep, function(x) x$p.value[match(targ, x$target)]))
+rownames(pvalMat) = targ
+colnames(pvalMat) = names(all_int$sequences)
+
+lMat = -log10(pvalMat)
+
+pdf("./Desktop/BAMS/Interaction_DMR_TFenrichment_heatmap.pdf",h=16,w=8)
+sampleDists <- dist(t(lMat))
+sampleDistMatrix <- as.matrix(sampleDists)
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")) )(255)
+pheatmap(sampleDistMatrix,clustering_distance_rows=sampleDists, clustering_distance_cols=sampleDists,
+         col=colors, main="Euclidean Distance Between\nInteraction DMRs by TF Enrichment")
+sampleDists <- dist(lMat)
+sampleDistMatrix <- as.matrix(sampleDists)
+pheatmap(sampleDistMatrix,clustering_distance_rows=sampleDists, clustering_distance_cols=sampleDists,
+         col=colors, main="Euclidean Distance Between\nTFs by Enrichment in Interaction DMRs")
 dev.off()
+# too large to be informative
 
-km = kmeans(t(zMat), 5)
 
+pdf("./Desktop/BAMS/Interaction_DMR_TFenrichment_cluster.pdf", h = 5, w = 14)
 ##  cluster by TF
 hc = hclust(dist(t(lMat)))
 hc_cut = cutree(hc, k= 10)
 palette(brewer.pal(12,"Paired"))
-pdf("plots/dmrs_cluster_byTF.pdf", h = 5, w = 14)
 myplclust(hc, lab.col=hc_cut,xlab="",hang=0.05,cex=1.1)
-dev.off()
-
 # cluster by DMR
 hc2 = hclust(dist(lMat))
 hc2_cut = cutree(hc2, k= 10)
-
-pdf("plots/dmrs_cluster_byDMR.pdf", h = 5, w = 14)
-palette(brewer.pal(12,"Paired"))
 myplclust(hc2, lab.col=hc2_cut,xlab="",hang=0)
 dev.off()
 
@@ -187,11 +138,53 @@ nullgenes =  read.delim("/users/ajaffe/Lieber/Projects/450k/grant/ref_gene_hg19.
 genes = sig$annotation
 goListByTF = lapply(sIndexes, function(x) dogo(genes[x],nullgenes[,2])[,-8])
 
+# Compare the enriched terms between 7 groups
+# KEGG
+compareKegg = compareCluster(entrezID, fun="enrichKEGG", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+# Biological Process
+compareBP = compareCluster(entrezID, fun="enrichGO", ont = "BP", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+# Molecular Function
+compareMF = compareCluster(entrezID, fun="enrichGO",  ont = "MF", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+# Cellular Component
+compareCC = compareCluster(entrezID, fun="enrichGO",  ont = "CC", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+# Disease Ontology
+compareDO = compareCluster(entrezID, fun="enrichDO",  ont = "DO", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+
+# Save
+save(goList_MF, goList_BP, goList_CC, compareBP, compareMF, compareCC, 
+     file="./Desktop/BAMS/GO.objects.altSpliced_byCellType.rda")
+
+
+## plot
+pdf("./Desktop/BAMS/BP_altSpliced_byCellType.pdf", width=10,height=12)
+plot(compareBP,colorBy="p.adjust",  showCategory = 400, title= "Biological Process GO Enrichment")
+dev.off()
+pdf("./Desktop/BAMS/CC_altSpliced_byCellType.pdf", width=7,height=5)
+plot(compareCC,colorBy="p.adjust",  showCategory = 400, title= "Cellular Compartment GO Enrichment")
+dev.off()
+
+
+
+pca = prcomp(lMat)
+pcat = prcomp(t(lMat))
+ggplot(data = d, aes_string(x = "PC2", y = "PC3", color = "group")) + 
+  geom_point(size = 3) + 
+  ylab(paste0("PC3: ", round(percentVar[3] * 100), "% variance")) + 
+  xlab(paste0("PC2: ", round(percentVar[2] * 100), "% variance")) +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20))
 
 pca= prcomp(t(zMat))
+km = kmeans(t(zMat), 5)
 
 
+## Test for Differential TF binding
 
+TFbyAge = motifDiffEnrichment(all_seq$Age.pos, all_seq$Age.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE) 
+# motifs differentially enriched in the first sequence (with lognormal background correction) 
+head(sort(diff$group.bg, decreasing=TRUE)) 
+# motifs differentially enriched in the second sequence (with lognormal background correction) 
+head(sort(diff$group.bg))
 
 
 

@@ -4,11 +4,15 @@ library("GenomicRanges")
 library("ggplot2")
 library("DEXSeq")
 library(data.table)
-library(reshape2)
+library(clusterProfiler)
+library('org.Hs.eg.db')
+
+load("./Desktop/BAMS/DMR_objects.rda")
 
 
-# For SGSeq, create sample information dataframe
+## For SGSeq, create sample information dataframe
 
+names = c("NeuN_Plus_14","NeuN_Minus_14", "NeuN_Plus_13","NeuN_Minus_13","NeuN_Plus_12","NeuN_Minus_12")
 file_bam = paste0("/dcl01/lieber/ajaffe/Amanda/sorted_nuclear_RNA/merged/", frag_length$sample_name, "_combinedLibraries.bam")
 file_bam = paste0("./Desktop/BAMS/", frag_length$sample_name, "_combinedLibraries.bam")
 
@@ -18,8 +22,9 @@ si$file_bam = as.character(si$file_bam)
 si = getBamInfo(si)
 
 
-# Extract transcript features
-gencode = loadDb("/dcl01/lieber/ajaffe/Amanda/sorted_nuclear_RNA/gencode.v25lift37.annotation.sqlite")
+## Extract transcript features
+
+#gencode = loadDb("/dcl01/lieber/ajaffe/Amanda/sorted_nuclear_RNA/gencode.v25lift37.annotation.sqlite")
 gencode = loadDb("./Dropbox/sorted_figures/new/github_controlled/intron_retention/data/SGSeq_out/gencode.v25lift37.annotation.sqlite")
 
 txf = convertToTxFeatures(gencode)
@@ -35,51 +40,52 @@ notinheader = c("chr6_ssto_hap7", "chr6_mcf_hap5", "chr6_cox_hap2", "chr6_mann_h
                 "chrUn_gl000229", "chrUn_gl000226", "chr18_gl000207_random")
 seqlevels(txf) = seqlevels(txf)[!seqlevels(txf) %in% notinheader]
 
-# Analyze splice variants in our samples
+
+## Analyze splice variants in our samples
+
 sgfc = analyzeFeatures(si, features = txf)
-save(si, sgfc, file="./Desktop/BAMS/SGSeq_objects_sortedRNA.rda")
 sgvc = analyzeVariants(sgfc)
-save(si, sgfc, sgvc, file="./Desktop/BAMS/SGSeq_objects_sortedRNA.rda")
-
-
-## Compare individual splice variant differences by variant type across fraction and age
-# Construct the objects needed to test individual splice variant differences
 sgv = rowRanges(sgvc)
 sgv = getSGVariantCounts(sgv, sample_info = si)
-sgv
 save(si, sgfc, sgvc, sgv, file="./Desktop/BAMS/SGSeq_objects_sortedRNA.rda")
+
+
+### Compare individual splice variant differences by variant type across fraction and age
+
+## Construct the objects needed to test individual splice variant differences
+
+load("./Desktop/BAMS/SGSeq_objects_sortedRNA.rda")
 sgv.counts = counts(sgv)
 vid = as.character(variantID(sgv))
 eid = as.character(eventID(sgv))
 
-FullModel = ~ sample + exon + Zone:exon + Fetal:exon
-ReducedModel = ~ sample + exon + Zone:exon
+FullModel = ~ sample + exon + ageCat:exon + cellType:exon
+ReducedModel = ~ sample + exon + ageCat:exon
 
-sampleData = pd[match(colnames(sgv)[1:10], rownames(pd)),]
-sampleData = rbind(sampleData, pd[grep("Br5339C1_polyA", rownames(pd)),], pd[grep("Br5340C1_polyA", rownames(pd)),])
-rownames(sampleData) = c(rownames(sampleData)[1:10], "Br5339C1_downsamp", "Br5340C1_downsamp")
-sampleData$SampleID = rownames(sampleData)
+pd = data.frame(sample = c("NeuN_Plus_12","NeuN_Minus_12","NeuN_Plus_14","NeuN_Minus_14","NeuN_Plus_13","NeuN_Minus_13"),
+                cellType = rep.int(c("Neuron","Glia"),3),
+                ageNum = c(0.36,0.36,2.71,2.71,14.01,14.01),
+                ageCat = c("Infant","Infant","Toddler","Toddler","Teen","Teen"))
+sampleData = pd[match(colnames(sgv), pd$sample),]
+rownames(sampleData) = sampleData$sample
 
-agedxd = DEXSeqDataSet(countData = sgv.counts, featureID = vid, groupID = eid, sampleData = sampleData,
-                    design= ageFullModel)
-save(agedxd,fracdxd, file="./Dropbox/sorted_figures/new/github_controlled/intron_retention/data/SGSeq_out/DEXSeq_objects.rda")
+dxd = DEXSeqDataSet(countData = sgv.counts, featureID = vid, groupID = eid, sampleData = sampleData,
+                    design= FullModel)
 
 
-# Calculate differential splicing
-# by Cell Type
+# Calculate differential splicing by Cell Type
 dxd = estimateSizeFactors(dxd)
-dxd = estimateDispersions(dxd, formula = ageFullModel)
-plotDispEsts(agedxd)
-agedxd = testForDEU(agedxd, reducedModel = ageReducedModel, fullModel = ageFullModel)
-agedxd = estimateExonFoldChanges(agedxd, fitExpToVar="Fetal")
-agedxr = DEXSeqResults(agedxd)
-save(agedxd,agedxr, file="./Dropbox/sorted_figures/new/github_controlled/intron_retention/data/SGSeq_out/DEXSeq_objects.rda")
+dxd = estimateDispersions(dxd, formula = FullModel)
+plotDispEsts(dxd)
+dxd = testForDEU(dxd, reducedModel = ReducedModel, fullModel = FullModel)
+dxd = estimateExonFoldChanges(dxd, fitExpToVar="cellType")
+dxr = DEXSeqResults(dxd)
+save(dxd,dxr, file="./Desktop/BAMS/DEXSeq_objects_sortedRNA.rda")
 
 
 # Plot MA
-
-pdf("./Dropbox/sorted_figures/new/github_controlled/intron_retention/figures/SGSeq_out/MA_Plots_Differential_splicing_byFraction_byAge.pdf",height=6,width=6)
-plotMA(fracdxr, ylim = c(-15,15), main = "Differential Splicing by Fraction", alpha=0.05)
+pdf("./Desktop/BAMS/MA_Plots_Differential_splicing_byCellType.pdf",height=6,width=6)
+plotMA(dxr, ylim = c(-15,15), main = "Differential Splicing by Cell Type\nIn Sorted Nuclear RNA", alpha=0.05)
 dev.off()
 
 
@@ -88,141 +94,131 @@ dexres = dxr[order(dxr$padj),]
 mcols = mcols(sgv)
 dexres = DataFrame(dexres, vID = as.integer(dexres$featureID))
 dexres = cbind(dexres, mcols[match(dexres$vID, mcols$variantID),])
-dexres = DataFrame(dexres, more.in.nuc.prenatal = ifelse(dexres[,10]>0, "Yes", "No"))
+dexres = DataFrame(dexres, more.in.Neuronal = ifelse(dexres$log2fold_Neuron_Glia > 0, "Yes", "No"))
 dexres.sig = dexres[which(dexres$padj<=0.05),]
+dim(dexres.sig)
 
+# What are the types and numbers of significantly differently regulated splice variants?
 
-# Which genes contain splice variants that are differentially included by cell type?
+table(dexres.sig$more.in.Neuronal)
+#No Yes 
+#37  33
 
-elementNROWS(dexres.sig)
-#     Fraction           Age    frac.adult frac.prenatal   age.cytosol   age.nucleus 
-#         2158          4608          2512           131          2182          2226 
-type = lapply(dexres.sig, function(x) unlist(x$variantType))
-type = lapply(type, function(x) data.frame(table(x)[which(names(table(x)) %in% c("SE:S","S2E:S","RI:R","MXE","A5SS:D","A3SS:D","AFE"))]))
-type =  Map(cbind, type, comparison = list("By Fraction","By Age","By Fraction\nIn Adult","By Fraction\nIn Prenatal","By Age\nIn Cytosol","By Age\nIn Nucleus"))
-type = do.call(rbind, type)
-type$comparison = factor(type$comparison, 
-                         levels = c("By Age\nIn Nucleus","By Age\nIn Cytosol","By Age","By Fraction\nIn Prenatal","By Fraction\nIn Adult","By Fraction"))
+spl = split(data.frame(dexres.sig), elementNROWS(dexres.sig$variantType)<2)
+f = mapply(function(v,m,n) data.frame(variantType = v, more.in.Neuronal = m, variantName = n), 
+       dexres.sig$variantType[which(dexres.sig$variantName %in% spl$'FALSE'$variantName)],
+       as.list(dexres.sig$more.in.Neuronal[which(dexres.sig$variantName %in% spl$'FALSE'$variantName)]),
+       as.list(dexres.sig$variantName[which(dexres.sig$variantName %in% spl$'FALSE'$variantName)]))
+fa = list()
+for (i in 1:nrow(spl$'FALSE')) { fa[[i]] = f[,i] }
+f = do.call(rbind, lapply(fa, function(x) data.frame(variantType = x$variantType, more.in.Neuronal = x$more.in.Neuronal, variantName = x$variantName)))
+spl$'TRUE'[grep("OTHER", spl$'TRUE'$variantName),"variantType"] = list("OTHER")
+x = data.table(rbind(data.frame(variantType = unlist(spl$'TRUE'$variantType), more.in.Neuronal = spl$'TRUE'$more.in.Neuronal,
+                                variantName = spl$'TRUE'$variantName), f))
+x = x[,length(unique(variantName)), by = c("variantType","more.in.Neuronal")]
+x$more.in.Neuronal = ifelse(x$more.in.Neuronal == "Yes", "Greater in Neurons", "Greater in Glia")
 
-
-pdf("./Dropbox/sorted_figures/new/github_controlled/intron_retention/figures/SGSeq_out/DSE_counts_byGroup_byFrac_byAge.pdf")
-ggplot(type[which(type$comparison!="By Fraction" & type$comparison!="By Age"),], 
-       aes(x = comparison, y = Freq, fill = x)) + geom_bar(stat = "identity") +
-  coord_flip() +
+pdf("./Desktop/BAMS/DSEcounts_byVariantType_byCellTypeDirection.pdf", width = 13, height = 5)
+ggplot(x, aes(x = variantType, y = V1, fill = more.in.Neuronal)) + geom_bar(stat = "identity") +
   labs(fill="") +
   ylab("Count") + xlab("") +
   ggtitle("Differentially Spliced Events\n(FDR < 0.05)") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
-ggplot(type[grep("Fraction", type$comparison),], 
-       aes(x = comparison, y = Freq, fill = x)) + geom_bar(stat = "identity") +
-  coord_flip() +
-  labs(fill="") +
-  ylab("Count") + xlab("") +
-  ggtitle("Differentially Spliced Events\nBy Fraction (FDR < 0.05)") +
-  theme(title = element_text(size = 20)) +
-  theme(text = element_text(size = 20))
-ggplot(type[grep("Age", type$comparison),], 
-       aes(x = comparison, y = Freq, fill = x)) + geom_bar(stat = "identity") +
-  coord_flip() +
-  labs(fill="") +
-  ylab("Count") + xlab("") +
-  ggtitle("Differentially Spliced Events\nBy Age (FDR < 0.05)") +
-  theme(title = element_text(size = 20)) +
-  theme(text = element_text(size = 20))
 dev.off()
 
 
-## Which direction are the log fold changes by variant type?
+## Which genes contain splice variants that are differentially included by cell type?
 
-lapply(dexres,head)
-df = Map(cbind, lapply(dexres, function(x) data.frame(x[,c("groupID","featureID","padj")],LFC = x[,10], x[,c("more.in.nuc.prenatal","geneName","variantType","variantName")])),
-         comparison = list("By Fraction","By Age","By Fraction\nIn Adult","By Fraction\nIn Prenatal","By Age\nIn Cytosol","By Age\nIn Nucleus"))
-df = do.call(rbind, df)
-df$geneName = as.character(df$geneName)
-df$variantType = as.character(df$variantType)
-df$variantName = as.character(df$variantName)
-df$threshold = ifelse(df$padj<=0.05, "FDR < 0.05", "FDR > 0.05")
-dt = data.table(df)
-dt = dt[variantType %in% c("SE:S","S2E:S","RI:R","MXE","A5SS:P","A3SS:P","A5SS:D","A3SS:D","AFE","ALE"),,]
-dt = dt[threshold!="NA",,]
-dt$variantType = factor(dt$variantType, levels = c("SE:S","S2E:S","RI:R","MXE","A5SS:P","A3SS:P","A5SS:D","A3SS:D","AFE","ALE"))
+# get gene names
+
+spl = split(data.frame(dexres.sig), elementNROWS(dexres.sig$geneName)<2)
+f = mapply(function(v,m,n) data.frame(geneName = v, more.in.Neuronal = m, variantName = n), 
+           dexres.sig$geneName[which(dexres.sig$variantName %in% spl$'FALSE'$variantName)],
+           as.list(dexres.sig$more.in.Neuronal[which(dexres.sig$variantName %in% spl$'FALSE'$variantName)]),
+           as.list(dexres.sig$variantName[which(dexres.sig$variantName %in% spl$'FALSE'$variantName)]))
+fa = list()
+for (i in 1:nrow(spl$'FALSE')) { fa[[i]] = f[,i] }
+f = do.call(rbind, lapply(fa, function(x) data.frame(geneName = x$geneName, more.in.Neuronal = x$more.in.Neuronal, variantName = x$variantName)))
+spl$'TRUE'[grep("OTHER", spl$'TRUE'$variantName),"variantType"] = list("OTHER")
+x = data.table(rbind(data.frame(geneName = unlist(spl$'TRUE'$geneName), more.in.Neuronal = spl$'TRUE'$more.in.Neuronal,
+                                variantName = spl$'TRUE'$variantName), f))
+x$more.in.Neuronal = ifelse(x$more.in.Neuronal == "Yes", "Greater in Neurons", "Greater in Glia")
+
+sig = split(x$geneName, x$more.in.Neuronal)
+sig = lapply(sig, as.character)
+entrezID = lapply(sig, function(x) as.character(na.omit(geneMap[which(geneMap$gencodeID %in% x), "EntrezID"])))
+
+# Define universe as all genes expressed in each of the four groups
+
+GeneUniverse = as.character(unique(geneMap[which(geneMap$gencodeID %in% unlist(mcols$geneName)),"EntrezID"]))
+GeneUniverse = na.omit(GeneUniverse)
+
+# Find enriched Pathways via KEGG
+elementNROWS(entrezID)
+keggList = c(lapply(entrezID, function(x) enrichKEGG(as.character(x), organism="human", universe= GeneUniverse, 
+                                                   minGSSize=5, pAdjustMethod="BH", qvalueCutoff=1)),
+             combined = enrichKEGG(unlist(entrezID), organism="human", universe= GeneUniverse, 
+                                   minGSSize=5, pAdjustMethod="BH", qvalueCutoff=1))
+
+# Enriched Molecular Function GOs
+goList_MF = c(lapply(entrezID, function(x) enrichGO(as.character(x), ont = "MF", OrgDb = org.Hs.eg.db, 
+                                                  universe= GeneUniverse, minGSSize=5, pAdjustMethod="BH",
+                                                  qvalueCutoff=1)),
+              combined = enrichGO(unlist(entrezID), ont = "MF", OrgDb = org.Hs.eg.db, 
+                                  universe= GeneUniverse, minGSSize=5, pAdjustMethod="BH",
+                                  qvalueCutoff=1))
+
+# Biological Process GO enrichment
+goList_BP = c(lapply(entrezID, function(x) enrichGO(as.character(x), ont = "BP", OrgDb = org.Hs.eg.db, 
+                                                  universe= GeneUniverse, minGSSize=5, pAdjustMethod="BH",
+                                                  qvalueCutoff=1)),
+              combined = enrichGO(unlist(entrezID), ont = "BP", OrgDb = org.Hs.eg.db, 
+                                  universe= GeneUniverse, minGSSize=5, pAdjustMethod="BH",
+                                  qvalueCutoff=1))
+
+# Cellular Compartment GO enrichment
+goList_CC = c(lapply(entrezID, function(x) enrichGO(as.character(x), ont = "CC", OrgDb = org.Hs.eg.db, 
+                                                  universe= GeneUniverse, minGSSize=5, pAdjustMethod="BH",
+                                                  qvalueCutoff=1)),
+              combined = enrichGO(unlist(entrezID), ont = "CC", OrgDb = org.Hs.eg.db, 
+                                  universe= GeneUniverse, minGSSize=5, pAdjustMethod="BH",
+                                  qvalueCutoff=1))
+
+# Disease Ontology
+goList_DO = c(lapply(entrezID, function(x) enrichDO(as.character(x), ont = "DO", universe= GeneUniverse, 
+                                                  minGSSize=5, pAdjustMethod="BH", qvalueCutoff=1, readable=TRUE)),
+              combined = enrichDO(unlist(entrezID), ont = "DO", universe= GeneUniverse, 
+                                  minGSSize=5, pAdjustMethod="BH", qvalueCutoff=1, readable=TRUE))
 
 
-pdf("./Dropbox/sorted_figures/new/github_controlled/intron_retention/figures/SGSeq_out/volcano_plots_byComparison_byVariantType.pdf",width=30,height=10)
-ggplot(dt[grep("Fraction", dt$comparison),,], aes(x=LFC, y=-log10(padj), colour=threshold)) +
-  geom_point(alpha=0.4, size=1.75) +
-  geom_vline(xintercept=0, linetype="dotted") +
-  facet_grid(comparison ~ variantType) +
-  xlab("log2 fold change") + ylab("-log10(FDR)") +
-  ggtitle("Differential Splicing by Fraction and Variant Type") +
-  theme(title = element_text(size = 20)) +
-  theme(text = element_text(size = 14))
-ggplot(dt[grep("Age", dt$comparison),,], aes(x=LFC, y=-log10(padj), colour=threshold)) +
-  geom_point(alpha=0.4, size=1.75) + 
-  geom_vline(xintercept=0, linetype="dotted") +
-  facet_grid(comparison ~ variantType) +
-  xlab("log2 fold change") + ylab("-log10(FDR)") +
-  ggtitle("Differential Splicing by Age and Variant Type") +
-  theme(title = element_text(size = 20)) +
-  theme(text = element_text(size = 14))
+# Compare the enriched terms between 7 groups
+# KEGG
+compareKegg = compareCluster(entrezID, fun="enrichKEGG", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+# Biological Process
+compareBP = compareCluster(entrezID, fun="enrichGO", ont = "BP", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+# Molecular Function
+compareMF = compareCluster(entrezID, fun="enrichGO",  ont = "MF", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+# Cellular Component
+compareCC = compareCluster(entrezID, fun="enrichGO",  ont = "CC", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+# Disease Ontology
+compareDO = compareCluster(entrezID, fun="enrichDO",  ont = "DO", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+
+# Save
+save(goList_MF, goList_BP, goList_CC, compareBP, compareMF, compareCC, 
+     file="./Desktop/BAMS/GO.objects.altSpliced_byCellType.rda")
+
+
+## plot
+pdf("./Desktop/BAMS/BP_altSpliced_byCellType.pdf", width=10,height=12)
+plot(compareBP,colorBy="p.adjust",  showCategory = 400, title= "Biological Process GO Enrichment")
+dev.off()
+pdf("./Desktop/BAMS/CC_altSpliced_byCellType.pdf", width=7,height=5)
+plot(compareCC,colorBy="p.adjust",  showCategory = 400, title= "Cellular Compartment GO Enrichment")
 dev.off()
 
 
-# Calculate the proportion of splice variants that are significant vs not significant
-
-df$rnum = 1:nrow(df) 
-df$SE = ifelse(df$rnum %in% grep("SE:S", df$variantType), "SE", "no")
-df$S2E = ifelse(df$rnum %in% grep("S2E:S", df$variantType), "S2E", "no")
-df$RI = ifelse(df$rnum %in% grep("RI:R", df$variantType), "RI", "no")
-df$MXE = ifelse(df$rnum %in% grep("MXE", df$variantType), "MXE", "no")
-df$A5SS.P = ifelse(df$rnum %in% grep("A5SS:P", df$variantType), "A5SS:P", "no")
-df$A3SS.P = ifelse(df$rnum %in% grep("A3SS:P", df$variantType), "A3SS:P", "no")
-df$A5SS.D = ifelse(df$rnum %in% grep("A5SS:D", df$variantType), "A5SS:D", "no")
-df$A3SS.D = ifelse(df$rnum %in% grep("A3SS:D", df$variantType), "A3SS:D", "no")
-df$AFE = ifelse(df$rnum %in% grep("AFE", df$variantType), "AFE", "no")
-df$ALE = ifelse(df$rnum %in% grep("ALE", df$variantType), "ALE", "no")
-colnames(df)[12:21]
-
-prop = list(list(),list(),list(),list(),list(),list())
-for (i in (1:length(unique(df$comparison)))) {
-  for (j in 1:10) {
-    prop[[i]][[j]] = data.frame(Anno = c(length(unique(df[which(df$comparison==unique(df$comparison)[i] & df[,colnames(df)[11+j]]!="no" & df$threshold=="FDR < 0.05"),"variantName"])),
-                                         length(unique(df[which(df$comparison==unique(df$comparison)[i] & df[,colnames(df)[11+j]]!="no" & df$threshold!="FDR < 0.05"),"variantName"]))),
-                                notAnno = c(length(unique(df[which(df$comparison==unique(df$comparison)[i] & df[,colnames(df)[11+j]]=="no" & df$threshold=="FDR < 0.05"),"variantName"])),
-                                            length(unique(df[which(df$comparison==unique(df$comparison)[i] & df[,colnames(df)[11+j]]=="no" & df$threshold!="FDR < 0.05"),"variantName"]))),
-                                row.names = c("Sig","N.S."))
-  }
-names(prop[[i]]) = colnames(df)[12:21]
-}
-names(prop) = c("ByFraction","ByAge","ByFraction:Adult","ByFraction:Prenatal","ByAge:Cytosol","ByAge:Nucleus")
-fisher.prop = lapply(prop, function(x) lapply(x, fisher.test))
-write.csv(rbind(pvalue = data.frame(lapply(fisher.prop, function(x) unlist(lapply(x, function(y) y$p.value)))),
-                data.frame(lapply(fisher.prop, function(x) unlist(lapply(x, function(y) y$estimate))))),quote=F,
-          file="./Dropbox/sorted_figures/new/github_controlled/intron_retention/data/SGSeq_out/DSE_byComparison_byVariantType.csv")
-names(unlist(lapply(fisher.prop, function(x) unlist(lapply(x, function(y) y$p.value))))
-      )[which(unlist(lapply(fisher.prop, function(x) unlist(lapply(x, function(y) y$p.value))))<=0.0008333333)] 
-# 34 of 60 tests show a significant relationship between a variant being significantly regulated by fraction and/or age and being a certain type of variant
 
 
 
-### is there a relationship between proportion of sig vs non-sig and direction of expression in a variant type?
 
-prop = list(list(),list(),list(),list(),list(),list())
-for (i in (1:length(unique(df$comparison)))) {
-  for (j in 1:10) {
-    prop[[i]][[j]] = data.frame(Pos = c(length(unique(df[which(df$comparison==unique(df$comparison)[i] & df[,colnames(df)[11+j]]!="no" & df$LFC>0 & df$threshold=="FDR < 0.05"),"variantName"])),
-                                         length(unique(df[which(df$comparison==unique(df$comparison)[i] & df[,colnames(df)[11+j]]!="no" & df$LFC>0 & df$threshold!="FDR < 0.05"),"variantName"]))),
-                                Neg = c(length(unique(df[which(df$comparison==unique(df$comparison)[i] & df[,colnames(df)[11+j]]!="no" & df$LFC<0 & df$threshold=="FDR < 0.05"),"variantName"])),
-                                            length(unique(df[which(df$comparison==unique(df$comparison)[i] & df[,colnames(df)[11+j]]!="no" & df$LFC<0 & df$threshold!="FDR < 0.05"),"variantName"]))),
-                                row.names = c("Sig","N.S."))
-  }
-  names(prop[[i]]) = colnames(df)[12:21]
-}
-names(prop) = c("ByFraction","ByAge","ByFraction:Adult","ByFraction:Prenatal","ByAge:Cytosol","ByAge:Nucleus")
-fisher.prop = lapply(prop, function(x) lapply(x, fisher.test))
-write.csv(rbind(pvalue = data.frame(lapply(fisher.prop, function(x) unlist(lapply(x, function(y) y$p.value)))),
-                data.frame(lapply(fisher.prop, function(x) unlist(lapply(x, function(y) y$estimate))))),quote=F,
-          file="./Dropbox/sorted_figures/new/github_controlled/intron_retention/data/SGSeq_out/DSE_byComparison_byVariantType_byLFC_Dir.csv")
-names(unlist(lapply(fisher.prop, function(x) unlist(lapply(x, function(y) y$p.value))))
-)[which(unlist(lapply(fisher.prop, function(x) unlist(lapply(x, function(y) y$p.value))))<=0.0008333333)]

@@ -4,6 +4,11 @@ library(plyr)
 
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/CH_object.rda")
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/CHneurons_object.rda")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/methylSeekR_objects.rda")
+
+load("/media/Backup1_/amanda/CREs/methylSeekR_objects.rda")
+load("/media/Backup1_/amanda/non-CpG/CH_object.rda")
+
 
 table(CH$CT.dir=="pos")
 # FALSE     TRUE 
@@ -92,4 +97,27 @@ pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/nonCG_byContext_
   theme(text = element_text(size = 20)) +
   theme(legend.position="bottom", legend.direction="horizontal", legend.title = element_blank())
 dev.off()
+
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/nonCG_byContext_byAge_inNeurons.pdf", width = 10)
+  ggplot(x, aes(x = trinucleotide_context, y = V1), fill=sig) + geom_bar(stat = "identity") +
+  geom_text(label = perc, vjust = -.5) +
+  labs(fill="") +
+  ylab("Count") + 
+  xlab("Context") +
+  ggtitle("non-CpG Context: By Age in Neurons") +
+  theme(axis.text.x=element_text(angle=45,hjust=1)) +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20)) +
+  theme(legend.position="bottom", legend.direction="horizontal", legend.title = element_blank())
+dev.off()
+
+
+## Check coverage by CH context
+
+covdf = lapply(CHlist, as.data.frame)
+covdf = do.call(rbind, Map(cbind, covdf, ID = as.list(names(covdf))))
+covdt = data.table(covdf)
+covdt = covdt[,mean(T), by=c("ID", )]
+
 
