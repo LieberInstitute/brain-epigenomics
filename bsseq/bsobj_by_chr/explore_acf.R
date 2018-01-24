@@ -40,16 +40,16 @@ context <- c(
 
 ## Filter low coverage bases
 cov <- getCoverage(BSobj, type = 'Cov')
-cov.ge5.cph <- cov[rowRanges(BSobj)$c_context != 'CG', ] >= 5
-cov.ge3.cpg <- cov[rowRanges(BSobj)$c_context == 'CG', ] >= 3
+cov.ge5.cph <- cov[as.vector(rowRanges(BSobj)$c_context != 'CG'), ] >= 5
+cov.ge3.cpg <- cov[as.vector(rowRanges(BSobj)$c_context == 'CG'), ] >= 3
 
-cov.filt <- rep(FALSE, nrow(cov))
-cov.filt[rowRanges(BSobj)$c_context != 'CG'] <- rowSums(cov.ge5.cph) == ncol(cov)
-cov.filt[rowRanges(BSobj)$c_context == 'CG'] <- rowSums(cov.ge3.cpg) == ncol(cov)
+cov.filt <- rep(NA, nrow(cov))
+cov.filt[as.vector(rowRanges(BSobj)$c_context != 'CG')] <- rowSums(cov.ge5.cph) == ncol(cov)
+cov.filt[as.vector(rowRanges(BSobj)$c_context == 'CG')] <- rowSums(cov.ge3.cpg) == ncol(cov)
+
 print("Number of bases with Cov >=3 (CpG) or Cov >= 5 (CpH)")
-table(cov.filt)
-
-round(table(cov.filt) / length(cov.filt) * 100, 2)
+addmargins(table('Passing the cutoff' = cov.filt, 'CpG' = as.vector(rowRanges(BSobj)$c_context == 'CG'), useNA = 'ifany'))
+round(addmargins(table('Passing the cutoff' = cov.filt, 'CpG' = as.vector(rowRanges(BSobj)$c_context == 'CG'), useNA = 'ifany')) / length(cov.filt) * 100, 2)
 
 BSobj <- BSobj[cov.filt, ]
 rm(cov, cov.ge5.cph, cov.ge3.cpg, cov.filt)
