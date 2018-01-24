@@ -1,21 +1,22 @@
 library('devtools')
 library('ggplot2')
 
-files <- dir(pattern = '^auto_long_chr')
+files <- dir('rda', pattern = '^auto_long_chr')
 
 load_auto <- function(f) {
     chr <- gsub('_.*', '', gsub('auto_long_', '', f))
     message(paste(Sys.time(), 'loading', f))
-    load(f)
+    load(file.path('rda', f))
     auto_long$chr <- chr
     return(auto_long)
 }
 
-if(!file.exists('auto_long_combined.Rdata')) {
+dir.create('rda', showWarnings = FALSE)
+if(!file.exists('rda/auto_long_combined.Rdata')) {
     auto_long <- do.call(rbind, lapply(files, load_auto))
-    save(auto_long, file = 'auto_long_combined.Rdata')
+    save(auto_long, file = 'rda/auto_long_combined.Rdata')
 } else {
-    load('auto_long_combined.Rdata')
+    load('rda/auto_long_combined.Rdata', verbose = TRUE)
 }
 dim(auto_long)
 
