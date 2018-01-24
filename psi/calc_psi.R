@@ -4,7 +4,7 @@ library('GenomicFeatures')
 library('SGSeq')
 library('devtools')
 
-CORES <- 4
+CORES <- 10
 
 ## Find BAM files
 rse_files <- 
@@ -20,7 +20,7 @@ rse <- do.call(cbind, rse_all)
 ## Get the BAM info for SGSeq
 si <- data.frame(sample_name = colnames(rse), file_bam = rse$bamFile,
     stringsAsFactors = FALSE)
-si <- getBamInfo(si, cores = CORES)
+si <- getBamInfo(si, cores = 6)
 
 ## More setup for SGSeq
 gencode <- makeTxDbFromGFF('ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_25/GRCh37_mapping/gencode.v25lift37.annotation.gtf.gz', organism='Homo sapiens')

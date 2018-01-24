@@ -1,8 +1,8 @@
 #!/bin/bash
 #$ -cwd
-#$ -l bluejay,mem_free=45G,h_vmem=50G,h_fsize=200G
+#$ -l bluejay,mem_free=21G,h_vmem=21G,h_fsize=200G
 #$ -N calc_psi
-#$ -pe local 4
+#$ -pe local 10
 #$ -o ./logs/calc_psi.txt
 #$ -e ./logs/calc_psi.txt
 #$ -m e
