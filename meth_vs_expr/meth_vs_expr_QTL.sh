@@ -6,8 +6,7 @@
 
 mkdir -p logs
 
-for cpg in FALSE
-#for cpg in TRUE FALSE
+for cpg in TRUE FALSE
 do
     for type in gene exon jx psi
     do
