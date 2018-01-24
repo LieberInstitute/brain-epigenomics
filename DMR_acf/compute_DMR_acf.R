@@ -88,17 +88,18 @@ if(opt$cores == 1) {
 
 auto <- bplapply(meth_list, function(x) {
     ## Drop first row because it's always 1
-    apply(x, 2, function(y) { acf(y, plot = FALSE, lag.max = 4)$acf })[-1, ]
+    auto_res <- apply(x, 2, function(y) { acf(y, plot = FALSE, lag.max = 4)$acf })[-1, ]
+    rowMeans(auto_res, na.rm = TRUE)
 }, BPPARAM = bpparam)
 
 ## Make it long format
 auto_long <- do.call(rbind, lapply(seq_len(length(auto)), function(i) {
-    data.frame(acf = as.vector(auto[[i]]),
-    'lag' = rep(seq_len(4), ncol(auto[[i]])),
-    'clus' = rep(i, 4 * ncol(auto[[i]])),
-    'clus_n' = rep(nrow(meth_list[[i]]), 4 * ncol(auto[[i]])),
-    'clus_range' = rep(width(range(gr_list[[i]])), 4 * ncol(auto[[i]])),
-    'sample' = rep(colnames(auto[[i]]), each = 4))
+    data.frame(acf = auto[[i]],
+    'lag' = seq_len(4),
+    'clus' = rep(i, 4), 
+    'clus_n' = rep(NROW(meth_list[[i]]), 4),
+    'clus_range' = rep(width(range(gr_list[[i]], ignore.strand = TRUE)), 4),
+    stringsAsFactors = FALSE)
 }))
 auto_long$context <- opt$context
 auto_long$model <- opt$model
