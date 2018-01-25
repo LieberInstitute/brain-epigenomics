@@ -147,8 +147,8 @@ tapply(auto_long$acf_glia, auto_long$lag, function(x) { summary(abs(x))})
 
 ## Save results
 dir.create('rda', showWarnings = FALSE)
-save(auto_long, file = paste0('rda/auto_long_context',
-    opt$context, '_', opt$model, '.Rdata'))
+save(auto_long, file = paste0('rda/auto_long_context_',
+    opt$context, '.Rdata'))
 
 ## Reproducibility information
 print('Reproducibility information:')
