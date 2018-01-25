@@ -5,10 +5,7 @@ library(BSgenome.Hsapiens.UCSC.hg19)
 library(pheatmap)
 library(RColorBrewer)
 
-
-#load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda")
-#load("/media/Backup1_/amanda/DMR/DMR_objects.rda")
-load("./Desktop/BAMS/DMR_objects.rda")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda")
 
 
 ## Get sequences from different annotations in the correct format
@@ -44,7 +41,7 @@ intergenic_int = motifEnrichment(intergenic_seq$Interaction, PWMLogn.hg19.MotifD
 introns_int = motifEnrichment(introns_seq$Interaction, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
 all_int = motifEnrichment(all_seq$Interaction, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
 
-save(promoters_int, intergenic_int, introns_int, all_int, file="./Desktop/BAMS/DMR_PWMEnrich_objects.rda")
+save(promoters_int, intergenic_int, introns_int, all_int, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_PWMEnrich_objects.rda")
 
 
 ## Split by direction
@@ -87,13 +84,14 @@ introns_split$Age.neg = motifEnrichment(seq$intergenic$Age.neg, PWMLogn.hg19.Mot
 introns_split$Interaction.pos = motifEnrichment(seq$intergenic$Interaction.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
 introns_split$Interaction.neg = motifEnrichment(seq$intergenic$Interaction.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
 
+
 save(promoters_split, intergenic_split, introns_split, all_split, promoters_int, intergenic_int, introns_int, all_int,
-     file = "./Desktop/BAMS/DMR_PWMEnrich_objects.rda")
+     file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_PWMEnrich_objects.rda")
 
 
 ## Cluster Interaction DMRs by TF enrichment to see how the groups materialize
 
-load("./Desktop/BAMS/DMR_PWMEnrich_objects.rda")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_PWMEnrich_objects.rda")
 
 all_int_seqRep = list()
 for (i in 1:length(all_int$sequences)) {
@@ -106,7 +104,7 @@ colnames(pvalMat) = names(all_int$sequences)
 
 lMat = -log10(pvalMat)
 
-pdf("./Desktop/BAMS/Interaction_DMR_TFenrichment_heatmap.pdf",h=16,w=8)
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich/figures/Interaction_DMR_TFenrichment_heatmap.pdf",h=16,w=8)
 sampleDists <- dist(t(lMat))
 sampleDistMatrix <- as.matrix(sampleDists)
 colors <- colorRampPalette(rev(brewer.pal(9, "Blues")) )(255)
@@ -120,15 +118,17 @@ dev.off()
 # too large to be informative
 
 
-pdf("./Desktop/BAMS/Interaction_DMR_TFenrichment_cluster.pdf", h = 5, w = 14)
+
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich/figures/Interaction_DMR_TFenrichment_cluster.pdf", h = 5, w = 14)
 ##  cluster by TF
 hc = hclust(dist(t(lMat)))
-hc_cut = cutree(hc, k= 10)
+hc_cut = cutree(hc, h= 40)
 palette(brewer.pal(12,"Paired"))
 myplclust(hc, lab.col=hc_cut,xlab="",hang=0.05,cex=1.1)
 # cluster by DMR
 hc2 = hclust(dist(lMat))
-hc2_cut = cutree(hc2, k= 10)
+hc2_cut = cutree(hc2, k= 20)
 myplclust(hc2, lab.col=hc2_cut,xlab="",hang=0)
 dev.off()
 
@@ -152,7 +152,7 @@ compareDO = compareCluster(entrezID, fun="enrichDO",  ont = "DO", qvalueCutoff =
 
 # Save
 save(goList_MF, goList_BP, goList_CC, compareBP, compareMF, compareCC, 
-     file="./Desktop/BAMS/GO.objects.altSpliced_byCellType.rda")
+     file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/GO.objects.PWMEnrich.rda")
 
 
 ## plot
