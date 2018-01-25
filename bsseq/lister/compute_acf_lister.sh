@@ -1,14 +1,10 @@
 #!/bin/bash
 
 ## Usage:
-# sh explore_acf.sh
+# sh compute_acf_lister.sh
 
 mkdir -p logs
 
-#for chrnum in {1..22} X Y M
-#for chrnum in M Y 21 22
-#for chrnum in {2..20} X
-#for chrnum in {2..22} X Y M
 for chrnum in {1..22} X Y M
 do 
 
@@ -18,14 +14,14 @@ do
     do
 
     
-    SHORT="acf_${chr}_context_${context}"
+    SHORT="lister_acf_${chr}_context_${context}"
 
     # Construct shell file
     echo "Creating script for chromosome ${chr}"
     cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l bluejay,mem_free=70G,h_vmem=70G,h_fsize=100G
+#$ -l bluejay,mem_free=30G,h_vmem=30G,h_fsize=100G
 #$ -N ${SHORT}
 #$ -o ./logs/${SHORT}.txt
 #$ -e ./logs/${SHORT}.txt
@@ -42,7 +38,7 @@ echo "Hostname: \${HOSTNAME}"
 echo "Task id: \${TASK_ID}"
 
 module load conda_R/3.4.x
-Rscript explore_acf.R -c ${chr} -t 1 -x ${context}
+Rscript compute_acf_lister.R -c ${chr} -t 1 -x ${context}
 
 echo "**** Job ends ****"
 date
