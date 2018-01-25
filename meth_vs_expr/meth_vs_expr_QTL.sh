@@ -6,7 +6,7 @@
 
 mkdir -p logs
 
-for cpg in TRUE FALSE
+for cpg in TRUE #FALSE
 do
     for type in gene exon jx psi
     do
@@ -19,7 +19,7 @@ echo "Creating script for cpg ${cpg} for feature type ${type}"
 cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l bluejay,mem_free=170G,h_vmem=170G,h_fsize=200G
+#$ -l mem_free=170G,h_vmem=170G,h_fsize=200G
 #$ -N ${SHORT}
 #$ -o ./logs/${SHORT}.txt
 #$ -e ./logs/${SHORT}.txt
