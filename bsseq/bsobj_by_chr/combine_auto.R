@@ -31,21 +31,18 @@ dim(auto_long)
 # save(context_summary, file = 'autocorrelation_summary_by_context.Rdata')
 
 dir.create('pdf', showWarnings = FALSE)
-png('pdf/autocorrelation_by_context.png', width = 480 * 2, type = 'cairo')
-ggplot(auto_long, aes(x = lag, y = acf)) + geom_boxplot() + facet_grid(. ~ context) + theme_bw(base_size = 14)
-dev.off()
-
-png('pdf/autocorrelation_by_context_abs.png', width = 480 * 2, type = 'cairo')
-ggplot(auto_long, aes(x = lag, y = abs(acf))) + geom_boxplot() + facet_grid(. ~ context) + theme_bw(base_size = 14)
-dev.off()
-
 pdf('pdf/autocorrelation_by_context.pdf', width = 7 * 2, height = 7 * 2)
-ggplot(auto_long, aes(x = lag, y = acf)) + geom_boxplot() + facet_grid(. ~ context) + theme_bw(base_size = 14)
+ggplot(auto_long, aes(x = lag, y = acf_neuron)) + geom_boxplot() + facet_grid(. ~ context) + theme_bw(base_size = 30) + ggtitle('Neuron') + ylab('Auto correlation') + ylim(c(-1, 1))
+
+ggplot(auto_long, aes(x = lag, y = acf_glia)) + geom_boxplot() + facet_grid(. ~ context) + theme_bw(base_size = 30) + ggtitle('Glia') + ylab('Auto correlation')  + ylim(c(-1, 1))
 dev.off()
 
 pdf('pdf/autocorrelation_by_context_abs.pdf', width = 7 * 2, height = 7 * 2)
-ggplot(auto_long, aes(x = lag, y = abs(acf))) + geom_boxplot() + facet_grid(. ~ context) + theme_bw(base_size = 14)
+ggplot(auto_long, aes(x = lag, y = abs(acf_neuron))) + geom_boxplot() + facet_grid(. ~ context) + theme_bw(base_size = 30) + ggtitle('Neuron') + ylab('Absolute auto correlation') + ylim(c(0, 1))
+
+ggplot(auto_long, aes(x = lag, y = abs(acf_glia))) + geom_boxplot() + facet_grid(. ~ context) + theme_bw(base_size = 30) + ggtitle('Glia') + ylab('Absolute auto correlation') + ylim(c(0, 1))
 dev.off()
+
 
 
 ## Reproducibility information
