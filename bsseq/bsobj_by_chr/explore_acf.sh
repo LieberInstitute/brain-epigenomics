@@ -25,7 +25,7 @@ do
     cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l bluejay,mem_free=75G,h_vmem=80G,h_fsize=100G
+#$ -l bluejay,mem_free=70G,h_vmem=70G,h_fsize=100G
 #$ -N ${SHORT}
 #$ -o ./logs/${SHORT}.txt
 #$ -e ./logs/${SHORT}.txt
