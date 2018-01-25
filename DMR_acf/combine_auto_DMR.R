@@ -15,6 +15,7 @@ if(!file.exists('rda/auto_long_combined.Rdata')) {
     auto_long <- do.call(rbind, lapply(files, load_auto))
     # auto_long$context[auto_long$context == 'nonCG'] <- 'CpH'
     # auto_long$context[auto_long$context == 'CG'] <- 'CpG'
+    auto_long$lag <- as.factor(auto_long$lag)
     save(auto_long, file = 'rda/auto_long_combined.Rdata')
 } else {
     load('rda/auto_long_combined.Rdata')
@@ -31,23 +32,18 @@ dim(auto_long)
 # mod_context_summary
 # save(mod_context_summary, file = 'autocorrelation_summary_by_context_and_model.Rdata')
 
-auto_long$lag <- as.factor(auto_long$lag)
-
 dir.create('pdf', showWarnings = FALSE)
-png('pdf/autocorrelation_by_context_and_model.png', width = 480 * 2, height = 480 * 3, type = 'cairo')
-ggplot(auto_long, aes(x = lag, y = acf)) + geom_boxplot() + facet_grid(model ~ context) + theme_bw(base_size = 14)
-dev.off()
-
-png('pdf/autocorrelation_by_context_and_model_abs.png', width = 480 * 2, height = 480 * 3, type = 'cairo')
-ggplot(auto_long, aes(x = lag, y = abs(acf))) + geom_boxplot() + facet_grid(model ~ context) + theme_bw(base_size = 14)
-dev.off()
 
 pdf('pdf/autocorrelation_by_context_and_model.pdf', width = 7 * 2, height = 7 * 3)
-ggplot(auto_long, aes(x = lag, y = acf)) + geom_boxplot() + facet_grid(model ~ context) + theme_bw(base_size = 14)
+ggplot(auto_long, aes(x = lag, y = acf_neuron)) + geom_boxplot() + facet_grid(model ~ context) + theme_bw(base_size = 30) + ggtitle('Neuron') + ylab('Auto correlation') + ylim(c(-1, 1))
+
+ggplot(auto_long, aes(x = lag, y = acf_glia)) + geom_boxplot() + facet_grid(model ~ context) + theme_bw(base_size = 30) + ggtitle('Glia') + ylab('Auto correlation')  + ylim(c(-1, 1))
 dev.off()
 
 pdf('pdf/autocorrelation_by_context_and_model_abs.pdf', width = 7 * 2, height = 7 * 3)
-ggplot(auto_long, aes(x = lag, y = abs(acf))) + geom_boxplot() + facet_grid(model ~ context) + theme_bw(base_size = 14)
+ggplot(auto_long, aes(x = lag, y = abs(acf_neuron))) + geom_boxplot() + facet_grid(model ~ context) + theme_bw(base_size = 30) + ggtitle('Neuron') + ylab('Absolute auto correlation') + ylim(c(0, 1))
+
+ggplot(auto_long, aes(x = lag, y = abs(acf_glia))) + geom_boxplot() + facet_grid(model ~ context) + theme_bw(base_size = 30) + ggtitle('Glia') + ylab('Absolute auto correlation') + ylim(c(0, 1))
 dev.off()
 
 ## Reproducibility information
@@ -65,7 +61,7 @@ session_info()
 #  language (EN)
 #  collate  en_US.UTF-8
 #  tz       America/New_York
-#  date     2018-01-24
+#  date     2018-01-25
 #
 # Packages --------------------------------------------------------------------------------------------------------------
 #  package    * version date       source
