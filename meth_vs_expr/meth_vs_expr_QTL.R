@@ -98,7 +98,7 @@ load_expr <- function(type) {
         if(type == 'jx' & (!file.exists('rda/expr_jx.Rdata'))) {
             ## No longer filter exon and gene data for low exprs
             #expr <- expr[rowRanges(expr)$passExprsCut]
-            expr <- expr[rowRanges(expr)$meanExprs > 20]
+            expr <- expr[rowRanges(expr)$meanExprs > 30]
             save(expr, file = paste0('rda/expr_', opt$feature, '.Rdata'))
         }
     }
