@@ -19,7 +19,7 @@ echo "Creating script for cpg ${cpg} for feature type ${type}"
 cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l bluejay,mem_free=100G,h_vmem=100G,h_fsize=100G
+#$ -l mem_free=100G,h_vmem=100G,h_fsize=200G
 #$ -N ${SHORT}
 #$ -o ./logs/${SHORT}.txt
 #$ -e ./logs/${SHORT}.txt

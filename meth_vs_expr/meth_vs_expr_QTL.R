@@ -28,6 +28,7 @@ if(FALSE) {
     opt <- list('cpg' = FALSE, 'feature' = 'exon')
     opt <- list('cpg' = FALSE, 'feature' = 'jx')
     opt <- list('cpg' = FALSE, 'feature' = 'psi')
+    opt <- list('cpg' = TRUE, 'feature' = 'gene')
 }
 
 stopifnot(opt$feature %in% c('psi', 'gene', 'exon', 'jx'))
@@ -39,8 +40,8 @@ cpg <- ifelse(opt$cpg, 'CpG', 'nonCpG')
 load_dmp <- function(is_cpg) {
     if(is_cpg) {
         load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/BSobj_bsseqSmooth_Neuron_minCov_3.Rdata', verbose = TRUE)
-        rowRanges(BSobj)$c_context <- 'CG'
-        rowRanges(BSobj)$trinucleotide_context <- 'CpG'
+        rowRanges(BSobj)$c_context <- Rle('CG')
+        rowRanges(BSobj)$trinucleotide_context <- Rle('CpG')
     } else {
         load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/allChrs_postNatal_cleaned_nonCG_noHomogenate_highCov.Rdata', verbose = TRUE)
     }
@@ -66,7 +67,7 @@ load_expr <- function(type) {
         ## RPKM
         expr <- rse_exon
     } else if (type == 'jx') {
-        load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/brainseq_pipeline/polyA_unstranded/rse_jx_polyA_dlpfc_n41.Rdata', verbose = TRUE)
+                           load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/brainseq_pipeline/polyA_unstranded/rse_jx_polyA_dlpfc_n41.Rdata', verbose = TRUE)
         rowRanges(rse_jx)$Length <- 100 / 8
         ## RP80m
         assays(rse_jx)$norm <- recount::getRPKM(rse_jx, 'Length')
@@ -78,9 +79,7 @@ load_expr <- function(type) {
     
     ## Drop low expressed features
     if(type != 'psi') {
-        if(file.exists(paste0('rda/expr_', opt$feature, '_unfiltered.Rdata'))) {
-            load(paste0('rda/expr_', opt$feature, '_unfiltered.Rdata'), verbose = TRUE)
-        } else {
+        if(!file.exists(paste0('rda/expr_', opt$feature, '_unfiltered.Rdata'))) {
             dir.create('pdf', showWarnings = FALSE)
             pdf(paste0('pdf/suggested_expr_cutoffs_', tolower(opt$feature),
                 '.pdf'), width = 12)
@@ -94,7 +93,14 @@ load_expr <- function(type) {
             rowRanges(expr)$passExprsCut <- meanExpr > cut
             dir.create('rda', showWarnings = FALSE)
             save(expr, file = paste0('rda/expr_', opt$feature, '_unfiltered.Rdata'))
-        }      
+        }
+        
+        if(type == 'jx' & (!file.exists('rda/expr_jx.Rdata'))) {
+            ## No longer filter exon and gene data for low exprs
+            #expr <- expr[rowRanges(expr)$passExprsCut]
+            expr <- expr[rowRanges(expr)$meanExprs > 20]
+            save(expr, file = paste0('rda/expr_', opt$feature, '.Rdata'))
+        }
     }
         
     return(expr)
@@ -122,7 +128,7 @@ dim(expr)
 ## Get methylation
 message(paste(Sys.time(), 'preparing methylation info'))
 meth <- SlicedData$new( getMeth(BSobj, type = 'raw') )
-meth$fileSliceSize <- 2000
+meth$fileSliceSize <- ifelse(opt$cpg, 500, 2000)
 
 methpos <- data.frame(
     cname = paste0('row', seq_len(nrow(BSobj))),
@@ -138,7 +144,7 @@ if(opt$feature == 'psi') {
 } else {
     exprinfo <- SlicedData$new(log2(assays(expr)$norm + 1))
 }
-exprinfo$fileSliceSize <- 2000
+exprinfo$fileSliceSize <- ifelse(opt$cpg, 500, 2000)
 
 get_exprpos <- function(type) {
     if(type == 'psi') {
@@ -149,36 +155,21 @@ get_exprpos <- function(type) {
             end = max(end(rowRanges(expr))),
             stringsAsFactors = FALSE
         )
-    } else if (type == 'gene') {
-        exprpos <- data.frame(
-            spliceid = rowRanges(expr)$gencodeID,
-            chr = as.character(seqnames(rowRanges(expr))),
-            start = start(rowRanges(expr)),
-            end = end(rowRanges(expr)),
-            stringsAsFactors = FALSE
-        )
-    } else if (type == 'exon') {
+    } else {
         exprpos <- data.frame(
             spliceid = names(rowRanges(expr)),
             chr = as.character(seqnames(rowRanges(expr))),
             start = start(rowRanges(expr)),
             end = end(rowRanges(expr)),
-            stringsAsFactors = FALSE
-        )
-    } else if (type == 'jx') {
-        set.seed(20180123)
-        exprpos <- data.frame(
-            spliceid = names(rowRanges(expr)),
-            chr = as.character(seqnames(rowRanges(expr))),
-            start = start(rowRanges(expr)),
-            end = end(rowRanges(expr)) + sample(seq_len(30), nrow(expr),
-                replace = TRUE),
             stringsAsFactors = FALSE
         )
     }
     return(exprpos)
 }
 exprpos <- get_exprpos(opt$feature)
+
+## Delete the BSobj (in case that helps with mem)
+rm(BSobj)
 
 message(paste(Sys.time(), 'running MatrixEQTL'))
 me <- Matrix_eQTL_main(snps = meth, gene = exprinfo, 
@@ -191,6 +182,11 @@ me <- Matrix_eQTL_main(snps = meth, gene = exprinfo,
 message(paste(Sys.time(), 'saving MatrixEQTL results'))
 dir.create('rda', showWarnings = FALSE)
 save(me, file = paste0('rda/me_', cpg, '_', opt$feature, '.Rdata'))
+
+## Load the BSobj again
+BSobj <- load_dmp(opt$cpg)
+BSobj <- BSobj[, m[!is.na(m)]]
+colnames(BSobj) <- paste0('Br', getid(colData(BSobj)$Brain.ID))
 
 print('neqtls and ntests')
 me$cis$neqtls
@@ -244,8 +240,8 @@ table(table(me_annotated$eqtls$snps))
 
 print('C strand vs feature strand')
 if(opt$feature == 'psi') {
-    print(addmargins(table('C strand' = as.vector(strand(me_annotated$meth)), 'feature strand' = as.vector(strand(unlist(range(me_annotated$expr)))))))
-    print(chisq.test(table('C strand' = as.vector(strand(me_annotated$meth)), 'feature strand' = as.vector(strand(unlist(range(me_annotated$expr)))))))
+    print(addmargins(table('C strand' = as.vector(strand(me_annotated$meth)), 'feature strand' = as.vector(strand(unlist(range(rowRanges(me_annotated$expr))))))))
+    print(chisq.test(table('C strand' = as.vector(strand(me_annotated$meth)), 'feature strand' = as.vector(strand(unlist(range(rowRanges(me_annotated$expr))))))))
 } else {
     print(addmargins(table('C strand' = as.vector(strand(me_annotated$meth)), 'feature strand' = as.vector(strand(me_annotated$expr)))))
     print(chisq.test(table('C strand' = as.vector(strand(me_annotated$meth)), 'feature strand' = as.vector(strand(me_annotated$expr)))))
@@ -270,11 +266,11 @@ if(opt$feature %in% c('gene', 'exon')) {
 ylab <- ifelse(opt$feature == 'psi', 'PSI', ifelse(opt$feature == 'jx', 'log2 (RP80M + 1)', 'log2 (RPKM + 1)'))
 y <- if(opt$feature == 'psi') variantFreq(me_annotated$expr) else log2(assays(me_annotated$expr)$norm + 1)
 dir.create('pdf', showWarnings = FALSE)
-pdf(paste0('rda/top100_FDR5_', cpg, '_', opt$feature, '.pdf'))
+pdf(paste0('pdf/top100_FDR5_', cpg, '_', opt$feature, '.pdf'))
 for(i in seq_len(100)) {
-    plot(x = getMeth(me_annotated$meth[i, ], type = 'raw'), y = y[i, ], xlab = 'Methylation', ylab = ylab, main = paste(opt$feature, me_annotated$eqtls$gene[i], 'FDR', signif(me_annotated$eqtls$FDR[i], 3)), sub = paste(as.vector(seqnames(rowRanges(me_annotated$meth)[i])), start(rowRanges(me_annotated$meth)[i]), as.vector(strand(rowRanges(me_annotated$meth)[i])), as.vector(rowRanges(me_annotated$meth)$c_context[i])))
+    plot(x = jitter(getMeth(me_annotated$meth[i, ], type = 'raw'), 0.05), y = jitter(y[i, ], 0.05), xlab = 'Methylation', ylab = ylab, main = paste(opt$feature, me_annotated$eqtls$gene[i], 'FDR', signif(me_annotated$eqtls$FDR[i], 3)), sub = paste(as.vector(seqnames(rowRanges(me_annotated$meth)[i])), start(rowRanges(me_annotated$meth)[i]), as.vector(strand(rowRanges(me_annotated$meth)[i])), as.vector(rowRanges(me_annotated$meth)$c_context[i])))
 }
-
+dev.off()
 
 
 ## Reproducibility info
