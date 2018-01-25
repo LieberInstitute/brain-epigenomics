@@ -141,6 +141,44 @@ save(stats.CG, n.sel.CG, stats.CH, n.sel.CH, file="/media/Backup1_/amanda/NewFig
 UMRLMRsegments.CG <- mapply(function(CG,n,PMD) segmentUMRsLMRs(m = CG, meth.cutoff = m.sel, nCpG.cutoff= n, 
 					 PMDs = PMD, num.cores=1, myGenomeSeq = Hsapiens, seqLengths = sLengths), CGlist, n.sel.CG, PMDsegments.CG)  
 
-#save(UMRLMRsegments.CG, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMRs_LMRs_methylSeekR.rda")
+save(UMRLMRsegments.CG, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMRs_LMRs_methylSeekR.rda")
 
-save(UMRLMRsegments.CG, file="/media/Backup1_/amanda/NewFigures/UMRs_LMRs_methylSeekR.rda")
+
+## Call DMVs (parameters from Mo et al. 2015 supplement)
+
+DMVs = lapply(UMRLMRsegments.CG, function(x) x[which(x$type=="UMR" & x$pmeth <=0.15)])
+DMVs = lapply(DMVs, function(x) x[which(width(x)>=5000)])
+
+
+## Call large hypo-DMRs
+
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda")
+
+split = unlist(lapply(DMR, function(x) split(x, x$Dir)), recursive = F)
+gr <- lapply(lapply(lapply(split, makeGRangesFromDataFrame), sortSeqlevels), sort)
+gr2 <- lapply(lapply(UMRLMRsegments.CG, sortSeqlevels), sort)
+
+for (i in 1:length(gr)) {
+  write.table(gr[[i]], file=paste0("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/hypoDMRs_",names(split)[i],".tab"), 
+              sep="\t", row.names = F,quote = F,col.names = F) }
+for (i in 1:length(gr2)) {
+  write.table(gr2[[i]], file=paste0("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/hypoDMRs_",names(UMRLMRsegments.CG)[i],".tab"), 
+              sep="\t", row.names = F,quote = F,col.names = F) }
+write.table(data.frame(c(names(split),names(UMRLMRsegments.CG))), 
+            file="/dcl01/lieber/ajaffe/Amanda/sorted_nuclear_RNA/merged/hypoDMR_IDs.txt", 
+            sep="\t", row.names = F,quote = F,col.names = F)
+
+# run merge_hypoDMRs.sh
+
+hypoDMRs = lapply(as.list(c(names(split),names(UMRLMRsegments.CG))), function(x) 
+  read.table(paste0("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/",x,"_merged_hypoDMRs.tab"), 
+             col.names = c("chromosome", "start","end")))
+names(hypoDMRs) = c(names(split),names(UMRLMRsegments.CG))
+elementNROWS(hypoDMRs)
+hypoDMRs = lapply(hypoDMRs, makeGRangesFromDataFrame)
+hypoDMRs = lapply(hypoDMRs, function(x) split(x, width(x)>=2000))
+              
+save(hypoDMRs, DMVs, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMVs_hypoDMRs_methylSeekR.rda")
+
+              
+              
