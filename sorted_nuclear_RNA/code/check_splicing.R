@@ -38,6 +38,9 @@ load("/dcl01/lieber/ajaffe/CellSorting/RNAseq_pipeline/rse_gene_CellSorting_July
 load("/dcl01/lieber/ajaffe/CellSorting/RNAseq_pipeline/rse_exon_CellSorting_July5_n12.Rdata")
 load("/dcl01/lieber/ajaffe/CellSorting/RNAseq_pipeline/rse_jx_CellSorting_July5_n12.Rdata")
 
+# and SGESeq
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/sorted_nuclear_RNA/SGSeq_objects_sortedRNA.rda")
+
 ## keep only main chrs
 mainChrs = paste0("chr", c(1:22, "X","Y","M"))
 rse_gene = rse_gene[seqnames(rse_gene) %in% mainChrs,]
@@ -84,6 +87,8 @@ save(mean_jRp10m, mean_geneRpkm, mean_exonRpkm,
 ### link DNAm to expression ###
 ###############################
 
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/sorted_nuclear_RNA/matched_up_genomicData_meaned.rda")
+
 #######
 # Gene Level ##
 ###########
@@ -105,6 +110,7 @@ mean_meth_cpg_genePromoter = t(sapply(split(subjectHits(ooGene_promoter_cpg),
 }))
 mean_geneRpkm_cpg_genePromoter = mean_geneRpkm[
 	as.numeric(rownames(mean_meth_cpg_genePromoter)),]
+	
 ## check correlation
 signif(diag(cor(mean_meth_cpg_genePromoter,
 	log2(mean_geneRpkm_cpg_genePromoter+1))),3)

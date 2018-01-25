@@ -98,7 +98,7 @@ load_expr <- function(type) {
         if(type == 'jx' & (!file.exists('rda/expr_jx.Rdata'))) {
             ## No longer filter exon and gene data for low exprs
             #expr <- expr[rowRanges(expr)$passExprsCut]
-            expr <- expr[rowRanges(expr)$meanExprs > 30]
+            expr <- expr[rowRanges(expr)$meanExprs > 20]
             save(expr, file = paste0('rda/expr_', opt$feature, '.Rdata'))
         }
     }
@@ -128,7 +128,7 @@ dim(expr)
 ## Get methylation
 message(paste(Sys.time(), 'preparing methylation info'))
 meth <- SlicedData$new( getMeth(BSobj, type = 'raw') )
-meth$fileSliceSize <- ifelse(opt$cpg, 500, 2000)
+meth$fileSliceSize <- ifelse(opt$cpg, 300, 2000)
 
 methpos <- data.frame(
     cname = paste0('row', seq_len(nrow(BSobj))),
@@ -144,7 +144,7 @@ if(opt$feature == 'psi') {
 } else {
     exprinfo <- SlicedData$new(log2(assays(expr)$norm + 1))
 }
-exprinfo$fileSliceSize <- ifelse(opt$cpg, 500, 2000)
+exprinfo$fileSliceSize <- ifelse(opt$cpg, 300, 2000)
 
 get_exprpos <- function(type) {
     if(type == 'psi') {
