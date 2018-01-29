@@ -29,6 +29,9 @@ if(FALSE) {
     opt <- list('cpg' = FALSE, 'feature' = 'jx')
     opt <- list('cpg' = FALSE, 'feature' = 'psi')
     opt <- list('cpg' = TRUE, 'feature' = 'gene')
+    opt <- list('cpg' = TRUE, 'feature' = 'exon')
+    opt <- list('cpg' = TRUE, 'feature' = 'jx')
+    opt <- list('cpg' = TRUE, 'feature' = 'psi')
 }
 
 stopifnot(opt$feature %in% c('psi', 'gene', 'exon', 'jx'))
@@ -93,13 +96,6 @@ load_expr <- function(type) {
             rowRanges(expr)$passExprsCut <- meanExpr > cut
             dir.create('rda', showWarnings = FALSE)
             save(expr, file = paste0('rda/expr_', opt$feature, '_unfiltered.Rdata'))
-        }
-        
-        if(type == 'jx' & (!file.exists('rda/expr_jx.Rdata'))) {
-            ## No longer filter exon and gene data for low exprs
-            #expr <- expr[rowRanges(expr)$passExprsCut]
-            expr <- expr[rowRanges(expr)$meanExprs > 20]
-            save(expr, file = paste0('rda/expr_', opt$feature, '.Rdata'))
         }
     }
         
@@ -178,6 +174,8 @@ me <- Matrix_eQTL_main(snps = meth, gene = exprinfo,
     pvOutputThreshold = 0, pvOutputThreshold.cis = 5e-4, 
 	useModel = modelLINEAR,
 	snpspos = methpos, genepos = exprpos, cisDist = 1000)
+## Check warnings if any are present
+warnings()
     
 message(paste(Sys.time(), 'saving MatrixEQTL results'))
 dir.create('rda', showWarnings = FALSE)
@@ -191,6 +189,10 @@ colnames(BSobj) <- paste0('Br', getid(colData(BSobj)$Brain.ID))
 print('neqtls and ntests')
 me$cis$neqtls
 me$cis$ntests
+
+print('Number of meQTLs without row ids')
+table(!is.na(me$cis$eqtls$snps))
+me$cis$eqtls <- me$cis$eqtls[!is.na(me$cis$eqtls$snps), ]
 
 print('FDR distribution')
 summary(me$cis$eqtls$FDR)
@@ -265,12 +267,65 @@ if(opt$feature %in% c('gene', 'exon')) {
 ## Make scatter plots of the top 100
 ylab <- ifelse(opt$feature == 'psi', 'PSI', ifelse(opt$feature == 'jx', 'log2 (RP80M + 1)', 'log2 (RPKM + 1)'))
 y <- if(opt$feature == 'psi') variantFreq(me_annotated$expr) else log2(assays(me_annotated$expr)$norm + 1)
+
+plotting_code <- function(i) {
+    if(opt$feature == 'psi') {
+        main <- paste(opt$feature, mcols(me_annotated$expr)$variantName[i], 'FDR', signif(me_annotated$eqtls$FDR[i], 3))
+    } else {
+        main <- paste(opt$feature, me_annotated$eqtls$gene[i], 'FDR', signif(me_annotated$eqtls$FDR[i], 3))
+    }
+    
+    plot(x = jitter(getMeth(me_annotated$meth[i, ], type = 'raw'), 0.05), y = jitter(y[i, ], 0.05), xlab = 'Methylation', ylab = ylab, main = main, sub = paste(as.vector(seqnames(rowRanges(me_annotated$meth)[i])), start(rowRanges(me_annotated$meth)[i]), as.vector(strand(rowRanges(me_annotated$meth)[i])), as.vector(rowRanges(me_annotated$meth)$c_context[i])))
+}
+
 dir.create('pdf', showWarnings = FALSE)
 pdf(paste0('pdf/top100_FDR5_', cpg, '_', opt$feature, '.pdf'))
 for(i in seq_len(100)) {
-    plot(x = jitter(getMeth(me_annotated$meth[i, ], type = 'raw'), 0.05), y = jitter(y[i, ], 0.05), xlab = 'Methylation', ylab = ylab, main = paste(opt$feature, me_annotated$eqtls$gene[i], 'FDR', signif(me_annotated$eqtls$FDR[i], 3)), sub = paste(as.vector(seqnames(rowRanges(me_annotated$meth)[i])), start(rowRanges(me_annotated$meth)[i]), as.vector(strand(rowRanges(me_annotated$meth)[i])), as.vector(rowRanges(me_annotated$meth)$c_context[i])))
+    plotting_code(i)
 }
 dev.off()
+
+
+meth_n <- rowSums(getMeth(me_annotated$meth, type = 'raw') > 0)
+message(paste(Sys.time(), 'meth_n summary data (raw, percent, cumulative percent)'))
+table(meth_n)
+round(table(meth_n) / length(meth_n) * 100, 2)
+cumsum(round(table(meth_n) / length(meth_n) * 100, 2))
+
+if(opt$feature == 'psi') {
+    expr_delta <- apply(variantFreq(me_annotated$expr), 1, function(x) diff(range(x)) )
+} else {
+    expr_delta <- apply(log2(assays(me_annotated$expr)$norm + 1), 1, function(x) diff(range(x)) )
+}
+
+message(paste(Sys.time(), 'expression delta summary'))
+summary(expr_delta)
+
+addmargins(table('Expr Delta >= 0.1' = expr_delta >= 0.1, 'Meth N >= 4' = meth_n >= 4))
+round(addmargins(table('Expr Delta >= 0.1' = expr_delta >= 0.1, 'Meth N >= 4' = meth_n >= 4)) / length(meth_n) * 100, 2)
+
+## Make scatter plots of the top 100 with at least 4 samples with non-zero meth
+if(length(which(meth_n >= 4)) > 0) {
+    pdf(paste0('pdf/top100_FDR5_min_Meth4_', cpg, '_', opt$feature, '.pdf'))
+    for(i in head(which(meth_n >= 4), 100)) {
+        plotting_code(i)
+    }
+    dev.off()
+} else {
+    message(paste(Sys.time(), 'found no meQTLs with meth_n >= 4'))
+}
+
+## Make scatter plots of the top 100 with at least 4 samples with non-zero meth and a expr change of at least 0.1
+if(length()) {
+    pdf(paste0('pdf/top100_FDR5_min_Meth4_exprDelta0.1_', cpg, '_', opt$feature, '.pdf'))
+    for(i in head(which(meth_n >= 4 & expr_delta >= 0.1), 100)) {
+        plotting_code(i)
+    }
+    dev.off()
+} else {
+    message(paste(Sys.time(), 'found no meQTLs with meth_n >= 4 & expr_delta > 0.1'))
+}
+
 
 
 ## Reproducibility info
