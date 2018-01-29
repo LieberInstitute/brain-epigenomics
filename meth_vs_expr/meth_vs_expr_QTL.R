@@ -116,6 +116,18 @@ colnames(expr) <- paste0('Br', getid(colData(expr)$BrNum))
 BSobj <- BSobj[, m[!is.na(m)]]
 colnames(BSobj) <- paste0('Br', getid(colData(BSobj)$Brain.ID))
 
+if(FALSE) {
+    ## For debugging
+    BSobj_raw <- BSobj
+    expr_raw <- expr
+    
+    BSobj <- BSobj_raw
+    expr <- expr_raw
+        
+    BSobj <- BSobj[seqnames(rowRanges(BSobj)) == 'chr1', ]
+    expr <- expr[seqnames(rowRanges(expr)) == 'chr1', ]
+}
+
 print('BSobj info dimensions')
 dim(BSobj)
 print('Expression info dimensions')
