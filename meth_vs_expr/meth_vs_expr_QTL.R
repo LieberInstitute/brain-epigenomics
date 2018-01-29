@@ -124,8 +124,8 @@ if(FALSE) {
     BSobj <- BSobj_raw
     expr <- expr_raw
         
-    BSobj <- BSobj[seqnames(rowRanges(BSobj)) == 'chr1', ]
-    expr <- expr[seqnames(rowRanges(expr)) == 'chr1', ]
+    BSobj <- BSobj[seqnames(rowRanges(BSobj)) %in% c('chr1', 'chr6', 'chr10', 'chr21'), ]
+    expr <- expr[seqnames(rowRanges(expr)) %in% c('chr1', 'chr6', 'chr10', 'chr21'), ]
 }
 
 print('BSobj info dimensions')
