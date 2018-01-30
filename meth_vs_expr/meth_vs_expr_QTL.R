@@ -328,7 +328,7 @@ if(length(which(meth_n >= 4)) > 0) {
 }
 
 ## Make scatter plots of the top 100 with at least 4 samples with non-zero meth and a expr change of at least 0.1
-if(length()) {
+if(length(which(meth_n >= 4 & expr_delta >= 0.1)) > 0) {
     pdf(paste0('pdf/top100_FDR5_min_Meth4_exprDelta0.1_', cpg, '_', opt$feature, '.pdf'))
     for(i in head(which(meth_n >= 4 & expr_delta >= 0.1), 100)) {
         plotting_code(i)
