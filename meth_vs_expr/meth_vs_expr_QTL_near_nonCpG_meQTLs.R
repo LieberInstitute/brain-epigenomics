@@ -128,6 +128,7 @@ me_ov <- findOverlaps(resize(rowRanges(meqtl$expr), width(rowRanges(meqtl$expr))
 message(paste(Sys.time(), 'keeping the following percent of genes'))
 round(length(unique(subjectHits(me_ov))) / nrow(expr) * 100, 2)
 expr <- expr[sort(unique(subjectHits(me_ov))), ]
+rm(me_ov, meqtl)
 
 cp_ov <- findOverlaps(resize(rowRanges(expr), width(rowRanges(expr)) + 2000, fix = 'center'), BSobj)
 
