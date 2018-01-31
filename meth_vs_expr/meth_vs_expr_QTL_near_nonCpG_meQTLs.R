@@ -156,7 +156,7 @@ dim(expr)
 ## Get methylation
 message(paste(Sys.time(), 'preparing methylation info'))
 meth <- SlicedData$new( getMeth(BSobj, type = 'raw') )
-meth$fileSliceSize <- ifelse(opt$cpg, 300, 2000)
+meth$fileSliceSize <- ifelse(opt$feature == 'jx', 100, 300)
 
 methpos <- data.frame(
     cname = paste0('row', seq_len(nrow(BSobj))),
@@ -172,7 +172,7 @@ if(opt$feature == 'psi') {
 } else {
     exprinfo <- SlicedData$new(log2(assays(expr)$norm + 1))
 }
-exprinfo$fileSliceSize <- ifelse(opt$cpg, 300, 2000)
+exprinfo$fileSliceSize <- ifelse(opt$feature == 'jx', 100, 300)
 
 get_exprpos <- function(type) {
     if(type == 'psi') {
