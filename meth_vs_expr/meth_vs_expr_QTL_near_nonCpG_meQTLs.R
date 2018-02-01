@@ -52,7 +52,6 @@ load_dmp <- function(is_cpg) {
     BSobj <- BSobj[, colData(BSobj)$Cell.Type == 'Neuron']
     return(BSobj)
 }
-BSobj <- load_dmp(opt$cpg)
 
 ## Load data
 load_expr <- function(type) {
@@ -108,14 +107,6 @@ getid <- function(x) {
     as.integer(gsub('Br', '', x))
 }
 
-## Match and subset appropriately
-message(paste(Sys.time(), 'subsetting the data to use'))
-m  <- match(getid(colData(expr)$BrNum), getid(colData(BSobj)$Brain.ID))
-expr <- expr[, which(!is.na(m))]
-colnames(expr) <- paste0('Br', getid(colData(expr)$BrNum))
-BSobj <- BSobj[, m[!is.na(m)]]
-colnames(BSobj) <- paste0('Br', getid(colData(BSobj)$Brain.ID))
-
 ## Subset to around a 1kb window from the nonCpG meQTl results
 load_meqtl <- function() {
     load(paste0('rda/me_annotated_FDR5_nonCpG_', opt$feature,
@@ -129,6 +120,18 @@ message(paste(Sys.time(), 'keeping the following percent of genes'))
 round(length(unique(subjectHits(me_ov))) / nrow(expr) * 100, 2)
 expr <- expr[sort(unique(subjectHits(me_ov))), ]
 rm(me_ov, meqtl)
+
+BSobj <- load_dmp(opt$cpg)
+
+## Match and subset appropriately
+message(paste(Sys.time(), 'subsetting the data to use'))
+m  <- match(getid(colData(expr)$BrNum), getid(colData(BSobj)$Brain.ID))
+expr <- expr[, which(!is.na(m))]
+colnames(expr) <- paste0('Br', getid(colData(expr)$BrNum))
+BSobj <- BSobj[, m[!is.na(m)]]
+colnames(BSobj) <- paste0('Br', getid(colData(BSobj)$Brain.ID))
+
+
 
 cp_ov <- findOverlaps(resize(rowRanges(expr), width(rowRanges(expr)) + 2000, fix = 'center'), BSobj)
 
@@ -156,7 +159,7 @@ dim(expr)
 ## Get methylation
 message(paste(Sys.time(), 'preparing methylation info'))
 meth <- SlicedData$new( getMeth(BSobj, type = 'raw') )
-meth$fileSliceSize <- ifelse(opt$feature == 'jx', 100, 300)
+meth$fileSliceSize <- 300
 
 methpos <- data.frame(
     cname = paste0('row', seq_len(nrow(BSobj))),
@@ -172,7 +175,7 @@ if(opt$feature == 'psi') {
 } else {
     exprinfo <- SlicedData$new(log2(assays(expr)$norm + 1))
 }
-exprinfo$fileSliceSize <- ifelse(opt$feature == 'jx', 100, 300)
+exprinfo$fileSliceSize <- 300
 
 get_exprpos <- function(type) {
     if(type == 'psi') {

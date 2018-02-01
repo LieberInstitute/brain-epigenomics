@@ -8,7 +8,7 @@ mkdir -p logs
 
 for cpg in TRUE
 do
-    for type in gene exon jx psi
+    for type in jx #gene exon jx psi
     do
 
 SHORT="meth_vs_expr_QTL_cpg${cpg}_${type}_near_nonCpG_meQTLs"
@@ -19,7 +19,7 @@ echo "Creating script for cpg ${cpg} for feature type ${type}"
 cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l mem_free=200G,h_vmem=200G,h_fsize=200G
+#$ -l mem_free=300G,h_vmem=300G,h_fsize=200G
 #$ -N ${SHORT}
 #$ -o ./logs/${SHORT}.txt
 #$ -e ./logs/${SHORT}.txt
