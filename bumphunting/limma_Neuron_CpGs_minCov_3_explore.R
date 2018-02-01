@@ -8,6 +8,8 @@ library('GGally')
 library('bsseq')
 library('devtools')
 library('RColorBrewer')
+library('ggplot2')
+library('ggthemes')
 
 ## Load the raw data
 system.time( load('BSobj_bsseqSmooth_Neuron_minCov_3.Rdata') )
@@ -55,6 +57,7 @@ print('Number of CpGs and samples being considered')
 dim(meth)
 
 system.time( f_neuron <- eBayes(lmFit(meth, with(pd, model.matrix(~ Age * Cell.Type)))) )
+rm(meth)
 
 ## Check coefficients
 ## They are the basically the same ones
@@ -107,7 +110,7 @@ length(unique(queryHits(ov)))
 
 
 ## Save main pieces for later
-save(limma_age, dmrs, ov, file = 'limma_Neuron_CpGs_minCov_3_ageInfo.Rdata')
+save(limma_age, dmrs, ov, file = 'rda/limma_Neuron_CpGs_minCov_3_ageInfo.Rdata')
 
 ## Check that the CpGs for a given DMR are next to each other
 stopifnot(identical(nrun(Rle(subjectHits(ov))), length(unique(subjectHits(ov)))))
@@ -249,27 +252,141 @@ plot(x = dmrs$age_glia_coef_mean, y = dmrs$age_neuron_coef_mean, col = cols[ka8$
 points(ka8$centers, col = 'black', pch = 8, cex = 2)
 grey_lines()
 
+
+## Main one with letters, just to identify the clusters
+plot(x = dmrs$age_glia_coef_mean, y = dmrs$age_neuron_coef_mean, col = cols[k6$cluster], xlab = 'Glia mean coefficient', ylab = 'Neuron mean coefficient', pch = 20, cex = 0.5, main = 'K6 with clusters labeled a, b, ..., f')
+points(k6$centers, col = 'black', pch = letters[1:6], cex = 2)
+grey_lines()
+
+## Again but with numbers (they don't go counter clockwise like I thought 
+## they did)
+plot(x = dmrs$age_glia_coef_mean, y = dmrs$age_neuron_coef_mean, col = cols[k6$cluster], xlab = 'Glia mean coefficient', ylab = 'Neuron mean coefficient', pch = 20, cex = 0.5, main = 'K6 with clusters labeled 1, 2, ..., 6')
+points(k6$centers, col = 'black', pch = as.character(1:6), cex = 2)
+grey_lines()
+
+## Likely final picture
+plot(x = dmrs$age_glia_coef_mean, y = dmrs$age_neuron_coef_mean, col = cols[k6$cluster], xlab = 'Glia age mean coefficient', ylab = 'Neuron age mean coefficient', pch = 20, cex = 0.5, main = 'Interaction DMRs grouped by the age coefficients for glia and neuron')
+points(k6$centers, col = 'black', pch = 8, cex = 2)
+grey_lines()
+
+
 dev.off()
 
 
+## Assign the cluster labels
+dmrs$k6cluster <- k6$cluster
+k6_labels <- c('G_0_N_neg', 'G_pos_N_neg', 'G_neg_N_pos', 'G_0_N_pos', 'G_pos_N_0', 'G_neg_N_0')
+dmrs$k6cluster_label <- factor(k6_labels[k6$cluster], levels = k6_labels)
+
 ## Make a quick plot comparing many of the variables
+dmrs_df <- as.data.frame(mcols(dmrs))
+
+
+custom_col <- function(p) {
+    ## https://stackoverflow.com/questions/34740210/how-to-change-the-color-palette-for-ggallyggpairs
+    for(i in 1:p$nrow) {
+      for(j in 1:p$ncol){
+        p[i,j] <- p[i,j] + 
+            scale_fill_manual(values = cols[1:6]) +
+            scale_color_manual(values = cols[1:6]) +
+            theme_minimal(base_size = 15)
+            # https://cran.r-project.org/web/packages/ggthemes/vignettes/ggthemes.html
+      }
+    }
+    ## Disable the axis label for 1,1 because it's a density label
+    ## and doesn't match the rest
+    ## https://stackoverflow.com/questions/35090883/remove-all-of-x-axis-labels-in-ggplot
+    p[1, 1] <- p[1, 1] + theme(axis.text.y = element_blank())
+    return(p)
+}
+
 dir.create('pdf', showWarnings = FALSE)
+
+## Plot the t-stats and the coefficient metrics against each other,
+## colored by the 6 clusters we labeled already
 pdf('pdf/age_for_interaction_dmrs.pdf', width = 10, height = 10)
-ggpairs(as.data.frame(mcols(dmrs)), columns = grep('tstat_mean',
-    colnames(mcols(dmrs))), upper = list(continuous = 'points'))
-ggpairs(as.data.frame(mcols(dmrs)), columns = grep('tstat_sum',
-    colnames(mcols(dmrs))), upper = list(continuous = 'points'))
-ggpairs(as.data.frame(mcols(dmrs)), columns = grep('tstat_area',
-    colnames(mcols(dmrs))), upper = list(continuous = 'points'))
-ggpairs(as.data.frame(mcols(dmrs)),
-    columns = c(which(colnames(mcols(dmrs)) == 'value'), grep('coef_mean',
-    colnames(mcols(dmrs)))), upper = list(continuous = 'points'))
-ggpairs(as.data.frame(mcols(dmrs)),
-    columns = c(which(colnames(mcols(dmrs)) == 'value'), grep('coef_sum',
-    colnames(mcols(dmrs)))), upper = list(continuous = 'points'))
-ggpairs(as.data.frame(mcols(dmrs)),
-    columns = c(which(colnames(mcols(dmrs)) == 'value'), grep('coef_area',
-    colnames(mcols(dmrs)))), upper = list(continuous = 'points'))
+custom_col(ggpairs(dmrs_df, columns = grep('tstat_mean',
+    colnames(dmrs_df)), mapping = aes(color = k6cluster_label),
+    upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))
+    
+custom_col(ggpairs(dmrs_df, columns = grep('tstat_sum',
+    colnames(dmrs_df)), mapping = aes(color = k6cluster_label),
+    upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))
+        
+custom_col(ggpairs(dmrs_df, columns = grep('tstat_area',
+    colnames(dmrs_df)), mapping = aes(color = k6cluster_label),
+    upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))
+   
+
+custom_col(ggpairs(dmrs_df, columns = grep('coef_mean',
+    colnames(dmrs_df)), mapping = aes(color = k6cluster_label),
+    upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))
+    
+custom_col(ggpairs(dmrs_df, columns = grep('coef_sum',
+    colnames(dmrs_df)), mapping = aes(color = k6cluster_label),
+    upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))
+    
+custom_col(ggpairs(dmrs_df, columns = grep('coef_area',
+    colnames(dmrs_df)), mapping = aes(color = k6cluster_label),
+    upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))  
+    
+dev.off()  
+    
+# custom_col(ggpairs(dmrs_df, columns = c(which(colnames(dmrs_df) == 'value'),
+#     grep('coef_mean', colnames(dmrs_df))),
+#     mapping = aes(color = k6cluster_label),
+#     upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))
+#
+# custom_col(ggpairs(dmrs_df, columns = c(which(colnames(dmrs_df) == 'value'),
+#     grep('coef_sum', colnames(dmrs_df))),
+#     mapping = aes(color = k6cluster_label),
+#     upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))
+#
+# custom_col(ggpairs(dmrs_df, columns = c(which(colnames(dmrs_df) == 'area'),
+#     grep('coef_area', colnames(dmrs_df))),
+#     mapping = aes(color = k6cluster_label),
+#     upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))
+    
+pdf('pdf/interaction_dmrs_cpg_vs_dmr_metrics.pdf', width = 20, height = 20)
+dmrs_df2 <- dmrs_df
+colnames(dmrs_df2) <- gsub('age_cell_difference_', '', colnames(dmrs_df2))
+custom_col(ggpairs(dmrs_df2,
+    columns = c(which(colnames(dmrs_df) %in% c('value', 'area', 'coef')),
+    grep('age_cell_difference', colnames(dmrs_df))),
+    mapping = aes(color = k6cluster_label),
+    upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))
+dev.off()
+
+## Could this be because of the smoothed CpG data?
+meth2 <- getMeth(BSobj, type = 'smooth')
+print('Number of CpGs and samples being considered')
+dim(meth2)
+pd2 <- pData(BSobj)
+system.time( f_neuron2 <- eBayes(lmFit(meth2, with(pd2, model.matrix(~ Age * Cell.Type)))) )
+rm(meth2)
+
+print('Compare interaction coefs at the DMR level between using the smoothed and raw meth data')
+identical(f_neuron$coef[, 'Age:Cell.TypeNeuron'], limma_age$coef[, 'age_cell_difference'])
+summary(abs(f_neuron$coef[, 'Age:Cell.TypeNeuron'] - limma_age$coef[, 'age_cell_difference']))
+
+print('Compare interaction t-stats at the DMR level between using the smoothed and raw meth data')
+identical(f_neuron$t[, 'Age:Cell.TypeNeuron'], limma_age$t[, 'age_cell_difference'])
+summary(abs(f_neuron$t[, 'Age:Cell.TypeNeuron'] - limma_age$t[, 'age_cell_difference']))
+
+## For plotting
+dmrs_int <- cbind(
+    age_dmr(f_neuron$coef[, 'Age:Cell.TypeNeuron', drop = FALSE], 'coef'),
+    age_dmr(f_neuron$t[, 'Age:Cell.TypeNeuron', drop = FALSE], 'tstat'),
+    dmrs_df[, which(colnames(dmrs_df) %in% c('value', 'area', 'coef', 'k6_cluster_label'))]
+)
+
+## Save for later
+save(dmrs_int, file = 'rda/limma_Neuron_CpGs_minCov_3_interaction_smooth.Rdata')
+
+pdf('pdf/interaction_dmrs_cpg_vs_dmr_metrics_with_smooth.pdf', width = 15, height = 15)
+custom_col(ggpairs(dmrs_int, columns = 1:5,
+    mapping = aes(color = k6cluster_label),
+    upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))
 dev.off()
 
 
@@ -340,7 +457,8 @@ median(dmrs$age_neuron_coef_area) / median(dmrs$age_glia_coef_area)
 
 
 
-
+## Using the absolute t-stat means, compute the number and percent below some
+## cutoffs
 t_cut <- function(var, cut = 1) {
     rbind(table(abs(mcols(dmrs)[, var]) < cut),
     round(table(abs(mcols(dmrs)[, var]) < cut) / length(dmrs) * 100, 2))
@@ -351,11 +469,8 @@ names(tcuts) <- colnames(mcols(dmrs))[grep('tstat_mean', colnames(mcols(dmrs)))]
 tcuts
 
 
-
-
-
 ## Save results
-save(dmrs, file = 'limma_Neuron_CpGs_minCov_3_ageInfo_dmrs.Rdata')
+save(dmrs, file = 'rda/limma_Neuron_CpGs_minCov_3_ageInfo_dmrs.Rdata')
 
 
 ## Reproducibility info

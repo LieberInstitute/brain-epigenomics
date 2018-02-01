@@ -4,7 +4,7 @@
 #$ -o ./limma_Neuron_CpGs_minCov_3_explore_log.txt
 #$ -e ./limma_Neuron_CpGs_minCov_3_explore_log.txt
 #$ -m e
-#$ -l bluejay,mem_free=150G,h_vmem=150G,h_fsize=100G
+#$ -l mem_free=250G,h_vmem=250G,h_fsize=100G
 echo "**** Job starts ****"
 date
 
