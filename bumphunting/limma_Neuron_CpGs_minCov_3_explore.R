@@ -11,6 +11,9 @@ library('RColorBrewer')
 library('ggplot2')
 library('ggthemes')
 
+dir.create('rda', showWarnings = FALSE)
+dir.create('pdf', showWarnings = FALSE)
+
 ## Load the raw data
 system.time( load('BSobj_bsseqSmooth_Neuron_minCov_3.Rdata') )
 cpg <- rowRanges(BSobj)
@@ -300,8 +303,6 @@ custom_col <- function(p) {
     return(p)
 }
 
-dir.create('pdf', showWarnings = FALSE)
-
 ## Plot the t-stats and the coefficient metrics against each other,
 ## colored by the 6 clusters we labeled already
 pdf('pdf/age_for_interaction_dmrs.pdf', width = 10, height = 10)
@@ -381,7 +382,7 @@ dmrs_int <- cbind(
 )
 
 ## Save for later
-save(dmrs_int, file = 'rda/limma_Neuron_CpGs_minCov_3_interaction_smooth.Rdata')
+save(dmrs_int, file = 'rda/limma_Neuron_CpGs_minCov_3_ageInfo_interaction_smooth.Rdata')
 
 pdf('pdf/interaction_dmrs_cpg_vs_dmr_metrics_with_smooth.pdf', width = 15, height = 15)
 custom_col(ggpairs(dmrs_int, columns = 1:5,
