@@ -7,6 +7,7 @@ library('GenomicRanges')
 library('GGally')
 library('bsseq')
 library('devtools')
+library('RColorBrewer')
 
 ## Load the raw data
 system.time( load('BSobj_bsseqSmooth_Neuron_minCov_3.Rdata') )
@@ -142,6 +143,114 @@ print('Compare a bit the signs of some interaction coefficients')
 addmargins(table('DMR coef sign' = sign(dmrs$coef), 'interaction mean coef sign' = sign(dmrs$age_cell_difference_coef_mean)))
 addmargins(table('DMR value sign' = sign(dmrs$value), 'interaction mean coef sign' = sign(dmrs$age_cell_difference_coef_mean)))
 
+## Group DMRs by glia and neuron mean coefficients
+kdf <- data.frame('glia' = dmrs$age_glia_coef_mean,
+    'neuron' = dmrs$age_neuron_coef_mean)
+k2 <- kmeans(kdf, 2)
+k4 <- kmeans(kdf, 4)
+k6 <- kmeans(kdf, 6)
+k8 <- kmeans(kdf, 8)
+
+kadf <- data.frame('glia' = abs(dmrs$age_glia_coef_mean),
+    'neuron' = abs(dmrs$age_neuron_coef_mean))
+ka2 <- kmeans(kadf, 2)
+ka4 <- kmeans(kadf, 4)
+ka6 <- kmeans(kadf, 6)
+ka8 <- kmeans(kadf, 8)
+
+
+
+grey_lines <- function() {
+    abline(h = 0, col = 'grey80')
+    abline(v = 0, col = 'grey80')
+    abline(a = 0, b = 1, col = 'grey80')
+    abline(a = 0, b = -1, col = 'grey80')
+}
+cols <- brewer.pal(8, 'Dark2')
+
+
+## Compare glia vs neuron mean coefficient with K-means clusters
+pdf('pdf/glia_vs_neuron_mean_coef.pdf')
+
+## Basic plots without clusters
+plot(x = dmrs$age_glia_coef_mean, y = dmrs$age_neuron_coef_mean, xlab = 'Glia mean coefficient', ylab = 'Neuron mean coefficient', pch = 20, cex = 0.5)
+grey_lines()
+
+plot(x = abs(dmrs$age_glia_coef_mean), y = abs(dmrs$age_neuron_coef_mean), xlab = 'Glia abs mean coefficient', ylab = 'Neuron abs mean coefficient', pch = 20, cex = 0.5)
+grey_lines()
+
+
+## With clusters
+plot(x = dmrs$age_glia_coef_mean, y = dmrs$age_neuron_coef_mean, col = cols[k2$cluster], xlab = 'Glia mean coefficient', ylab = 'Neuron mean coefficient', pch = 20, cex = 0.5, main = 'K2')
+points(k2$centers, col = 'black', pch = 8, cex = 2)
+grey_lines()
+
+plot(x = dmrs$age_glia_coef_mean, y = dmrs$age_neuron_coef_mean, col = cols[k4$cluster], xlab = 'Glia mean coefficient', ylab = 'Neuron mean coefficient', pch = 20, cex = 0.5, main = 'K4')
+points(k4$centers, col = 'black', pch = 8, cex = 2)
+grey_lines()
+
+plot(x = dmrs$age_glia_coef_mean, y = dmrs$age_neuron_coef_mean, col = cols[k6$cluster], xlab = 'Glia mean coefficient', ylab = 'Neuron mean coefficient', pch = 20, cex = 0.5, main = 'K6')
+points(k6$centers, col = 'black', pch = 8, cex = 2)
+grey_lines()
+
+plot(x = dmrs$age_glia_coef_mean, y = dmrs$age_neuron_coef_mean, col = cols[k8$cluster], xlab = 'Glia mean coefficient', ylab = 'Neuron mean coefficient', pch = 20, cex = 0.5, main = 'K8')
+points(k8$centers, col = 'black', pch = 8, cex = 2)
+grey_lines()
+
+## Abs with coefs from non-abs
+plot(x = abs(dmrs$age_glia_coef_mean), y = abs(dmrs$age_neuron_coef_mean), xlab = 'Glia abs mean coefficient', ylab = 'Neuron abs mean coefficient', pch = 20, cex = 0.5, col = cols[k2$cluster], main = 'K2 (from non-abs)')
+points(abs(k2$centers), col = 'black', pch = 8, cex = 2)
+grey_lines()
+
+plot(x = abs(dmrs$age_glia_coef_mean), y = abs(dmrs$age_neuron_coef_mean), xlab = 'Glia abs mean coefficient', ylab = 'Neuron abs mean coefficient', pch = 20, cex = 0.5, col = cols[k4$cluster], main = 'K4 (from non-abs)')
+points(abs(k4$centers), col = 'black', pch = 8, cex = 2)
+grey_lines()
+
+plot(x = abs(dmrs$age_glia_coef_mean), y = abs(dmrs$age_neuron_coef_mean), xlab = 'Glia abs mean coefficient', ylab = 'Neuron abs mean coefficient', pch = 20, cex = 0.5, col = cols[k6$cluster], main = 'K6 (from non-abs)')
+points(abs(k6$centers), col = 'black', pch = 8, cex = 2)
+grey_lines()
+
+plot(x = abs(dmrs$age_glia_coef_mean), y = abs(dmrs$age_neuron_coef_mean), xlab = 'Glia abs mean coefficient', ylab = 'Neuron abs mean coefficient', pch = 20, cex = 0.5, col = cols[k8$cluster], main = 'K8 (from non-abs)')
+points(abs(k8$centers), col = 'black', pch = 8, cex = 2)
+grey_lines()
+
+## Abs with K from abs
+plot(x = abs(dmrs$age_glia_coef_mean), y = abs(dmrs$age_neuron_coef_mean), xlab = 'Glia abs mean coefficient', ylab = 'Neuron abs mean coefficient', pch = 20, cex = 0.5, col = cols[ka2$cluster], main = 'K2')
+points(abs(ka2$centers), col = 'black', pch = 8, cex = 2)
+grey_lines()
+
+plot(x = abs(dmrs$age_glia_coef_mean), y = abs(dmrs$age_neuron_coef_mean), xlab = 'Glia abs mean coefficient', ylab = 'Neuron abs mean coefficient', pch = 20, cex = 0.5, col = cols[ka4$cluster], main = 'K4')
+points(abs(ka4$centers), col = 'black', pch = 8, cex = 2)
+grey_lines()
+
+plot(x = abs(dmrs$age_glia_coef_mean), y = abs(dmrs$age_neuron_coef_mean), xlab = 'Glia abs mean coefficient', ylab = 'Neuron abs mean coefficient', pch = 20, cex = 0.5, col = cols[ka6$cluster], main = 'K6')
+points(abs(ka6$centers), col = 'black', pch = 8, cex = 2)
+grey_lines()
+
+plot(x = abs(dmrs$age_glia_coef_mean), y = abs(dmrs$age_neuron_coef_mean), xlab = 'Glia abs mean coefficient', ylab = 'Neuron abs mean coefficient', pch = 20, cex = 0.5, col = cols[ka8$cluster], main = 'K8')
+points(abs(ka8$centers), col = 'black', pch = 8, cex = 2)
+grey_lines()
+
+
+## Naive but with clusters from the abs scale
+plot(x = dmrs$age_glia_coef_mean, y = dmrs$age_neuron_coef_mean, col = cols[ka2$cluster], xlab = 'Glia mean coefficient', ylab = 'Neuron mean coefficient', pch = 20, cex = 0.5, main = 'K2 (from abs)')
+points(ka2$centers, col = 'black', pch = 8, cex = 2)
+grey_lines()
+
+plot(x = dmrs$age_glia_coef_mean, y = dmrs$age_neuron_coef_mean, col = cols[ka4$cluster], xlab = 'Glia mean coefficient', ylab = 'Neuron mean coefficient', pch = 20, cex = 0.5, main = 'K4 (from abs)')
+points(ka4$centers, col = 'black', pch = 8, cex = 2)
+grey_lines()
+
+plot(x = dmrs$age_glia_coef_mean, y = dmrs$age_neuron_coef_mean, col = cols[ka6$cluster], xlab = 'Glia mean coefficient', ylab = 'Neuron mean coefficient', pch = 20, cex = 0.5, main = 'K6 (from abs)')
+points(ka6$centers, col = 'black', pch = 8, cex = 2)
+grey_lines()
+
+plot(x = dmrs$age_glia_coef_mean, y = dmrs$age_neuron_coef_mean, col = cols[ka8$cluster], xlab = 'Glia mean coefficient', ylab = 'Neuron mean coefficient', pch = 20, cex = 0.5, main = 'K8 (from abs)')
+points(ka8$centers, col = 'black', pch = 8, cex = 2)
+grey_lines()
+
+dev.off()
+
 
 ## Make a quick plot comparing many of the variables
 dir.create('pdf', showWarnings = FALSE)
@@ -230,6 +339,8 @@ median(dmrs$age_neuron_coef_area)
 median(dmrs$age_neuron_coef_area) / median(dmrs$age_glia_coef_area)
 
 
+
+
 t_cut <- function(var, cut = 1) {
     rbind(table(abs(mcols(dmrs)[, var]) < cut),
     round(table(abs(mcols(dmrs)[, var]) < cut) / length(dmrs) * 100, 2))
@@ -239,6 +350,11 @@ tcuts <- lapply(colnames(mcols(dmrs))[grep('tstat_mean', colnames(mcols(dmrs)))]
 names(tcuts) <- colnames(mcols(dmrs))[grep('tstat_mean', colnames(mcols(dmrs)))]
 tcuts
 
+
+
+
+
+## Save results
 save(dmrs, file = 'limma_Neuron_CpGs_minCov_3_ageInfo_dmrs.Rdata')
 
 
