@@ -19,7 +19,7 @@ echo "Creating script for cpg ${cpg} for feature type ${type}"
 cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l mem_free=300G,h_vmem=300G,h_fsize=200G
+#$ -l mem_free=350G,h_vmem=350G,h_fsize=200G
 #$ -N ${SHORT}
 #$ -o ./logs/${SHORT}.txt
 #$ -e ./logs/${SHORT}.txt
