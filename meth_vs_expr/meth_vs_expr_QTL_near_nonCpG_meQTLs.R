@@ -24,16 +24,13 @@ if (!is.null(opt$help)) {
 
 ## For testing
 if(FALSE) {
-    opt <- list('cpg' = FALSE, 'feature' = 'gene')
-    opt <- list('cpg' = FALSE, 'feature' = 'exon')
-    opt <- list('cpg' = FALSE, 'feature' = 'jx')
-    opt <- list('cpg' = FALSE, 'feature' = 'psi')
     opt <- list('cpg' = TRUE, 'feature' = 'gene')
     opt <- list('cpg' = TRUE, 'feature' = 'exon')
     opt <- list('cpg' = TRUE, 'feature' = 'jx')
     opt <- list('cpg' = TRUE, 'feature' = 'psi')
 }
 
+stopifnot(opt$cpg)
 stopifnot(opt$feature %in% c('psi', 'gene', 'exon', 'jx'))
 cpg <- ifelse(opt$cpg, 'CpG', 'nonCpG')
 
@@ -113,13 +110,32 @@ load_meqtl <- function() {
         '.Rdata'), verbose = TRUE)
     return(me_annotated)
 }
-meqtl <- load_meqtl()
-me_ov <- findOverlaps(resize(rowRanges(meqtl$expr), width(rowRanges(meqtl$expr)) + 2000, fix = 'center'), expr)
+if(opt$feature == 'jx') {
+    
+    ## To deal with memory issues
+    #meqtl <- load_meqtl()
+    #expr_row <- rowRanges(meqtl$expr)
+    #save(expr_row, file = 'rda/me_annotated_FDR5_nonCpG_jx_only_rowExpr.Rdata')
+    
+    load('rda/me_annotated_FDR5_nonCpG_jx_only_rowExpr.Rdata', verbose = TRUE)
+    
+    me_ov <- findOverlaps(resize(expr_row, width(expr_row) + 2000, fix = 'center'), expr)
 
-message(paste(Sys.time(), 'keeping the following percent of genes'))
-round(length(unique(subjectHits(me_ov))) / nrow(expr) * 100, 2)
-expr <- expr[sort(unique(subjectHits(me_ov))), ]
-rm(me_ov, meqtl)
+    message(paste(Sys.time(), 'keeping the following percent of', opt$feature))
+    round(length(unique(subjectHits(me_ov))) / nrow(expr) * 100, 2)
+    expr <- expr[sort(unique(subjectHits(me_ov))), ]
+    rm(me_ov, expr_row)    
+}  else {
+    meqtl <- load_meqtl()
+    me_ov <- findOverlaps(resize(rowRanges(meqtl$expr), width(rowRanges(meqtl$expr)) + 2000, fix = 'center'), expr)
+
+    message(paste(Sys.time(), 'keeping the following percent of' , opt$feature))
+    round(length(unique(subjectHits(me_ov))) / nrow(expr) * 100, 2)
+    expr <- expr[sort(unique(subjectHits(me_ov))), ]
+    rm(me_ov, meqtl)
+}
+
+
 
 BSobj <- load_dmp(opt$cpg)
 
