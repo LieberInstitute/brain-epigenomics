@@ -105,29 +105,50 @@ print(object.size(age_p), units = 'Mb')
 ## Combine the coef, t stats and p values into a single list
 limma_age <- list('coef' = age_coef, 't' = age_t, 'pvalue' = age_p)
 
-## Relate DMRs to CpGs
-ov <- findOverlaps(cpg, dmrs)
-print('Number of CpGs that are inside the interaction DMRs')
-length(ov)
-length(unique(queryHits(ov)))
+# ## Relate DMRs to CpGs
+# ov <- findOverlaps(cpg, dmrs)
+# print('Number of CpGs that are inside the interaction DMRs')
+# length(ov)
+# length(unique(queryHits(ov)))
+#
+# ## Check that the CpGs for a given DMR are next to each other
+# stopifnot(identical(nrun(Rle(subjectHits(ov))), length(unique(subjectHits(ov)))))
+
+
+ov2 <- findOverlaps(dmrs, cpg)
 
 
 ## Save main pieces for later
-save(limma_age, dmrs, ov, file = 'rda/limma_Neuron_CpGs_minCov_3_ageInfo.Rdata')
+save(limma_age, dmrs, ov2, file = 'rda/limma_Neuron_CpGs_minCov_3_ageInfo.Rdata')
 
-## Check that the CpGs for a given DMR are next to each other
-stopifnot(identical(nrun(Rle(subjectHits(ov))), length(unique(subjectHits(ov)))))
+
 
 
 ## Compute mean, sum and area of the age values at the CpG level for each DMR
-age_dmr <- function(age, type) {
+# age_dmr <- function(age, type) {
+#     ## Group CpGs by the DMR they overlap
+#     new <- split(data.frame(age[queryHits(ov), , drop = FALSE]), subjectHits(ov))
+#
+#     ## Compute the mean and sum of the age information
+#     mean <- do.call(rbind, lapply(new, colMeans))[unique(subjectHits(ov)), , drop = FALSE]
+#     sum <- do.call(rbind, lapply(new, colSums))[unique(subjectHits(ov)), , drop = FALSE]
+#     area <- do.call(rbind, lapply(new, function(x) { colSums(abs(x)) }))[unique(subjectHits(ov)), , drop = FALSE]
+#
+#     ## Return the relevant values
+#     colnames(mean) <- paste0(colnames(mean), '_', type, '_mean')
+#     colnames(sum) <- paste0(colnames(sum), '_', type, '_sum')
+#     colnames(area) <- paste0(colnames(area), '_', type, '_area')
+#     cbind(mean, sum, area)
+# }
+
+age_dmr2 <- function(age, type) {
     ## Group CpGs by the DMR they overlap
-    new <- split(data.frame(age[queryHits(ov), ]), subjectHits(ov))
+    new <- split(data.frame(age[subjectHits(ov2), , drop = FALSE]), queryHits(ov2))
     
     ## Compute the mean and sum of the age information
-    mean <- do.call(rbind, lapply(new, colMeans))[unique(subjectHits(ov)), ]
-    sum <- do.call(rbind, lapply(new, colSums))[unique(subjectHits(ov)), ]
-    area <- do.call(rbind, lapply(new, function(x) { colSums(abs(x)) }))[unique(subjectHits(ov)), ]
+    mean <- do.call(rbind, lapply(new, colMeans))
+    sum <- do.call(rbind, lapply(new, colSums))
+    area <- do.call(rbind, lapply(new, function(x) { colSums(abs(x)) }))
     
     ## Return the relevant values
     colnames(mean) <- paste0(colnames(mean), '_', type, '_mean')
@@ -141,7 +162,7 @@ age_dmr <- function(age, type) {
 dmrs$coef <- bumps$coef[which(bumps$table$fwer < 0.05), 1]
 
 ## Add the mean and sum t-stat and coefficients to the dmr object
-mcols(dmrs) <- cbind(mcols(dmrs), age_dmr(limma_age$t[, match(colnames(limma_age$coef), colnames(limma_age$t))], 'tstat'), age_dmr(limma_age$coef, 'coef'))
+mcols(dmrs) <- cbind(mcols(dmrs), age_dmr2(limma_age$t[, match(colnames(limma_age$coef), colnames(limma_age$t))], 'tstat'), age_dmr2(limma_age$coef, 'coef'))
 print('head of the dmr info with CpG results appended at the end')
 head(dmrs)
 
@@ -152,17 +173,18 @@ addmargins(table('DMR value sign' = sign(dmrs$value), 'interaction mean coef sig
 ## Group DMRs by glia and neuron mean coefficients
 kdf <- data.frame('glia' = dmrs$age_glia_coef_mean,
     'neuron' = dmrs$age_neuron_coef_mean)
-k2 <- kmeans(kdf, 2)
-k4 <- kmeans(kdf, 4)
-k6 <- kmeans(kdf, 6)
-k8 <- kmeans(kdf, 8)
+set.seed(20180201)
+k2 <- kmeans(kdf, 2, nstart = 100)
+k4 <- kmeans(kdf, 4, nstart = 100)
+k6 <- kmeans(kdf, 6, nstart = 100)
+k8 <- kmeans(kdf, 8, nstart = 100)
 
 kadf <- data.frame('glia' = abs(dmrs$age_glia_coef_mean),
     'neuron' = abs(dmrs$age_neuron_coef_mean))
-ka2 <- kmeans(kadf, 2)
-ka4 <- kmeans(kadf, 4)
-ka6 <- kmeans(kadf, 6)
-ka8 <- kmeans(kadf, 8)
+ka2 <- kmeans(kadf, 2, nstart = 100)
+ka4 <- kmeans(kadf, 4, nstart = 100)
+ka6 <- kmeans(kadf, 6, nstart = 100)
+ka8 <- kmeans(kadf, 8, nstart = 100)
 
 
 
@@ -278,7 +300,8 @@ dev.off()
 
 ## Assign the cluster labels
 dmrs$k6cluster <- k6$cluster
-k6_labels <- c('G_0_N_neg', 'G_pos_N_neg', 'G_neg_N_pos', 'G_0_N_pos', 'G_pos_N_0', 'G_neg_N_0')
+## These can change order, but setting the seed earlier should fix this
+k6_labels <- c('1:G-N+', '2:G0N+', '3:G0N-', '4:G+N0', '5:G+N-', '6:G-N0')
 dmrs$k6cluster_label <- factor(k6_labels[k6$cluster], levels = k6_labels)
 
 ## Make a quick plot comparing many of the variables
@@ -331,22 +354,25 @@ custom_col(ggpairs(dmrs_df, columns = grep('coef_area',
     colnames(dmrs_df)), mapping = aes(color = k6cluster_label),
     upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))  
     
+custom_col(ggpairs(dmrs_df, columns = c(which(colnames(dmrs_df) == 'value'),
+    grep('coef_mean', colnames(dmrs_df))),
+    mapping = aes(color = k6cluster_label),
+    upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))
+    
+custom_col(ggpairs(dmrs_df, columns = c(which(colnames(dmrs_df) == 'area'),
+    grep('coef_area', colnames(dmrs_df))),
+    mapping = aes(color = k6cluster_label),
+    upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))
+        
 dev.off()  
     
-# custom_col(ggpairs(dmrs_df, columns = c(which(colnames(dmrs_df) == 'value'),
-#     grep('coef_mean', colnames(dmrs_df))),
-#     mapping = aes(color = k6cluster_label),
-#     upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))
-#
+
 # custom_col(ggpairs(dmrs_df, columns = c(which(colnames(dmrs_df) == 'value'),
 #     grep('coef_sum', colnames(dmrs_df))),
 #     mapping = aes(color = k6cluster_label),
 #     upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))
 #
-# custom_col(ggpairs(dmrs_df, columns = c(which(colnames(dmrs_df) == 'area'),
-#     grep('coef_area', colnames(dmrs_df))),
-#     mapping = aes(color = k6cluster_label),
-#     upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))
+
     
 pdf('pdf/interaction_dmrs_cpg_vs_dmr_metrics.pdf', width = 20, height = 20)
 dmrs_df2 <- dmrs_df
@@ -356,6 +382,13 @@ custom_col(ggpairs(dmrs_df2,
     grep('age_cell_difference', colnames(dmrs_df))),
     mapping = aes(color = k6cluster_label),
     upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))
+    
+custom_col(ggpairs(dmrs_df2,
+    columns = c(which(colnames(dmrs_df) %in% c('value', 'coef')),
+    grep('age_cell_difference_coef_[area|mean]', colnames(dmrs_df))),
+    mapping = aes(color = k6cluster_label),
+    upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8)))) 
+        
 dev.off()
 
 ## Could this be because of the smoothed CpG data?
@@ -363,31 +396,49 @@ meth2 <- getMeth(BSobj, type = 'smooth')
 print('Number of CpGs and samples being considered')
 dim(meth2)
 pd2 <- pData(BSobj)
-system.time( f_neuron2 <- eBayes(lmFit(meth2, with(pd2, model.matrix(~ Age * Cell.Type)))) )
+pd2$Cell.Type <- relevel(factor(pd2$Cell.Type), 'Glia')
+system.time( f_smooth <- eBayes(lmFit(meth2, with(pd2, model.matrix(~ Age * Cell.Type)))) )
 rm(meth2)
 
-print('Compare interaction coefs at the DMR level between using the smoothed and raw meth data')
-identical(f_neuron$coef[, 'Age:Cell.TypeNeuron'], limma_age$coef[, 'age_cell_difference'])
-summary(abs(f_neuron$coef[, 'Age:Cell.TypeNeuron'] - limma_age$coef[, 'age_cell_difference']))
+print('Compare interaction coefs for all CpGs between using the smoothed and raw meth data')
+identical(f_smooth$coef[, 'Age:Cell.TypeNeuron'], limma_age$coef[, 'age_cell_difference'])
+summary(abs(f_smooth$coef[, 'Age:Cell.TypeNeuron'] - limma_age$coef[, 'age_cell_difference']))
 
-print('Compare interaction t-stats at the DMR level between using the smoothed and raw meth data')
-identical(f_neuron$t[, 'Age:Cell.TypeNeuron'], limma_age$t[, 'age_cell_difference'])
-summary(abs(f_neuron$t[, 'Age:Cell.TypeNeuron'] - limma_age$t[, 'age_cell_difference']))
+print('Compare interaction t-stats for all CpGs between using the smoothed and raw meth data')
+identical(f_smooth$t[, 'Age:Cell.TypeNeuron'], limma_age$t[, 'age_cell_difference'])
+summary(abs(f_smooth$t[, 'Age:Cell.TypeNeuron'] - limma_age$t[, 'age_cell_difference']))
 
 ## For plotting
 dmrs_int <- cbind(
-    age_dmr(f_neuron$coef[, 'Age:Cell.TypeNeuron', drop = FALSE], 'coef'),
-    age_dmr(f_neuron$t[, 'Age:Cell.TypeNeuron', drop = FALSE], 'tstat'),
-    dmrs_df[, which(colnames(dmrs_df) %in% c('value', 'area', 'coef', 'k6_cluster_label'))]
+    age_dmr2(f_smooth$coef[, 'Age:Cell.TypeNeuron', drop = FALSE], 'coef'),
+    age_dmr2(f_smooth$t[, 'Age:Cell.TypeNeuron', drop = FALSE], 'tstat'),
+    dmrs_df[, which(colnames(dmrs_df) %in% c('value', 'area', 'coef', 'k6cluster_label'))]
 )
+colnames(dmrs_int) <- gsub('Age.Cell.TypeNeuron', 'intSmooth', colnames(dmrs_int))
 
 ## Save for later
 save(dmrs_int, file = 'rda/limma_Neuron_CpGs_minCov_3_ageInfo_interaction_smooth.Rdata')
 
 pdf('pdf/interaction_dmrs_cpg_vs_dmr_metrics_with_smooth.pdf', width = 15, height = 15)
-custom_col(ggpairs(dmrs_int, columns = 1:5,
+
+custom_col(ggpairs(dmrs_int,
+    columns = c(which(colnames(dmrs_int) %in% c('value', 'area', 'coef')),
+    grep('_mean', colnames(dmrs_int))),
+    mapping = aes(color = k6cluster_label),
+    upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))  
+   
+custom_col(ggpairs(dmrs_int,
+    columns = c(which(colnames(dmrs_int) %in% c('value', 'area', 'coef')),
+    grep('_sum', colnames(dmrs_int))),
     mapping = aes(color = k6cluster_label),
     upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))
+        
+custom_col(ggpairs(dmrs_int,
+    columns = c(which(colnames(dmrs_int) %in% c('value', 'area', 'coef')),
+    grep('_area', colnames(dmrs_int))),
+    mapping = aes(color = k6cluster_label),
+    upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))
+
 dev.off()
 
 
@@ -460,15 +511,46 @@ median(dmrs$age_neuron_coef_area) / median(dmrs$age_glia_coef_area)
 
 ## Using the absolute t-stat means, compute the number and percent below some
 ## cutoffs
+print('Checking the absolute t-stat means for the overall age changes')
 t_cut <- function(var, cut = 1) {
-    rbind(table(abs(mcols(dmrs)[, var]) < cut),
-    round(table(abs(mcols(dmrs)[, var]) < cut) / length(dmrs) * 100, 2))
+    x <- t(rbind(table(abs(mcols(dmrs)[, var]) < cut),
+    round(table(abs(mcols(dmrs)[, var]) < cut) / length(dmrs) * 100, 2)))
+    colnames(x) <- c('n', 'percent')
+    rownames(x) <- c('Above cut', 'Below cut')
+    return(x)
 }
 
-tcuts <- lapply(colnames(mcols(dmrs))[grep('tstat_mean', colnames(mcols(dmrs)))], t_cut, cut = quantile(abs(dmrs$age_cell_difference_tstat_mean), 0.025))
+cutoff <- quantile(abs(dmrs$age_cell_difference_tstat_mean), 0.025)
+print('Cutoff (based on 2.5% quantile of the abs interaction t-stat)')
+cutoff
+tcuts <- lapply(colnames(mcols(dmrs))[grep('tstat_mean', colnames(mcols(dmrs)))], t_cut, cut = cutoff)
 names(tcuts) <- colnames(mcols(dmrs))[grep('tstat_mean', colnames(mcols(dmrs)))]
 tcuts
 
+tcuts2 <- lapply(colnames(mcols(dmrs))[grep('tstat_mean', colnames(mcols(dmrs)))], t_cut, cut = 2)
+names(tcuts2) <- names(tcuts)
+print('Cutoff: 2')
+tcuts2
+
+
+pdf('pdf/age_for_interaction_dmrs_by_overall_mean_tstat.pdf')
+plot(x = dmrs$overall_tstat_mean, y = dmrs$age_cell_difference_tstat_mean, col = cols[k6$cluster], xlab = 'Overall age mean t-statistic', ylab = 'Interaction mean t-statistic', pch = 20, cex = 0.5, main = 't-statistics for global age vs interaction', sub = 'Lines at interaction quantile 2.5% and 2')
+abline(v = c(2, -2), col = 'grey80')
+abline(v = c(cutoff, - cutoff), col = 'grey80')
+
+
+plot(x = dmrs$age_glia_coef_mean, y = dmrs$age_neuron_coef_mean, col = cols[k6$cluster], xlab = 'Glia age mean coefficient', ylab = 'Neuron age mean coefficient', pch = ifelse(abs(dmrs$overall_tstat_mean) < cutoff, 20, 19), cex = 0.5, main = 'Interaction DMRs grouped by the age coefficients for glia and neuron', sub = 'Larger points for age mean t-statistic > interaction quantile 2.5%')
+points(k6$centers, col = 'black', pch = 8, cex = 2)
+grey_lines()
+
+plot(x = dmrs$age_glia_coef_mean, y = dmrs$age_neuron_coef_mean, col = cols[k6$cluster], xlab = 'Glia age mean coefficient', ylab = 'Neuron age mean coefficient', pch = ifelse(abs(dmrs$overall_tstat_mean) < 2, 20, 19), cex = 0.5, main = 'Interaction DMRs grouped by the age coefficients for glia and neuron', sub = 'Larger points for age mean t-statistic > 2')
+points(k6$centers, col = 'black', pch = 8, cex = 2)
+grey_lines()
+dev.off()
+
+## Save info for later (note reversal of sign: we want the TRUE ones here)
+dmrs$global_tcut_cut_quantile <- abs(dmrs$overall_tstat_mean) > cutoff
+dmrs$global_tcut_cut_2 <- abs(dmrs$overall_tstat_mean) > 2
 
 ## Save results
 save(dmrs, file = 'rda/limma_Neuron_CpGs_minCov_3_ageInfo_dmrs.Rdata')
