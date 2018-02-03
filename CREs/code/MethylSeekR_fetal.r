@@ -90,6 +90,26 @@ n.sel.CGpren = lapply(stats.CGpren, function(x) as.integer(names(x$FDRs[as.chara
 save(stats.CGpren, n.sel.CGpren, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/setting_n_methylSeekR_prenatal.rda")
 
 
+# Recalculate with limited PMDs to >100kb
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMDs_methylSeekR_100kbLimit.rda")
+
+names(total) = gsub("Prenatal-","", names(total))
+pmds = total[names(total) %in% names(CGPrenlist)]
+identical(names(pmds), names(CGPrenlist))
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/calculateFDRthreshold_methylSeekR_CG.100kb_prenatal.pdf")
+stats.CG.100kb.pren <- mapply(function(CG, PMD) calculateFDRs(m = CG, CGIs = CpGislands.gr, PMDs = PMD, num.cores=2), CGPrenlist, pmds)
+dev.off()
+statcg = list()
+for (i in 1:length(CGPrenlist)) { statcg[[i]] =  stats.CG.100kb.pren[,i] }
+names(statcg) = names(CGPrenlist)
+stats.CG.100kb.pren = statcg
+
+n.sel.CG.100kb.pren = lapply(stats.CG.100kb.pren, function(x) as.integer(names(x$FDRs[as.character(m.sel), ][x$FDRs[as.character(m.sel), ]<FDR.cutoff])[1]))
+
+save(stats.CG.100kb.pren, n.sel.CG.100kb.pren, stats.CGpren, n.sel.CGpren, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/setting_n_methylSeekR_prenatal.rda")
+
+
 ## Calculate UMRs and LMRs
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/UMRs_LMRs_methylSeekR_prenatal.pdf")
@@ -97,13 +117,22 @@ UMRLMRsegments.CGpren <- mapply(function(CG,n,PMD) segmentUMRsLMRs(m = CG, meth.
 					 PMDs = PMD, num.cores=1, myGenomeSeq = Hsapiens, seqLengths = sLengths), CGPrenlist, n.sel.CGpren, PMDsegments.CGpren)  
 dev.off()
 
-save(UMRLMRsegments.CGpren, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMRs_LMRs_methylSeekR_prenatal.rda")
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/UMRs_LMRs_methylSeekR.100kb_prenatal.pdf")
+UMRLMRsegments.CG.100kb.pren <- mapply(function(CG,n,PMD) segmentUMRsLMRs(m = CG, meth.cutoff = m.sel, nCpG.cutoff= n, 
+                                                                   PMDs = PMD, num.cores=2, myGenomeSeq = Hsapiens, seqLengths = sLengths), CGPrenlist, n.sel.CG.100kb.pren, pmds)  
+dev.off()
+
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMRs_LMRs_methylSeekR_prenatal.rda")
+save(UMRLMRsegments.CGpren,UMRLMRsegments.CG.100kb.pren, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMRs_LMRs_methylSeekR_prenatal.rda")
 
 
 ## Call DMVs_pren (parameters from Mo et al. 2015 supplement)
 
 DMVs_pren = lapply(UMRLMRsegments.CGpren, function(x) x[which(x$type=="UMR" & x$pmeth <=0.15)])
 DMVs_pren = lapply(DMVs_pren, function(x) x[which(width(x)>=5000)])
+
+DMVs_100kb.pren = lapply(UMRLMRsegments.CG.100kb.pren, function(x) x[which(x$type=="UMR" & x$pmeth <=0.15)])
+DMVs_100kb.pren = lapply(DMVs_100kb.pren, function(x) x[which(width(x)>=5000)])
 
 
 ## Call large hypo-DMRs
@@ -127,4 +156,5 @@ elementNROWS(hypoDMRspren)
 hypoDMRspren = lapply(hypoDMRspren, makeGRangesFromDataFrame)
 hypoDMRspren = lapply(hypoDMRspren, function(x) split(x, width(x)>=2000))
 
-save(hypoDMRspren, DMVs_pren, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMVs_hypoDMRs_methylSeekR_prenatal.rda")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMVs_hypoDMRs_methylSeekR_prenatal.rda")
+save(hypoDMRspren, DMVs_pren, DMVs_100kb.pren, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMVs_hypoDMRs_methylSeekR_prenatal.rda")

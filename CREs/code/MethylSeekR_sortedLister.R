@@ -91,15 +91,46 @@ n.sel.CG.sortedLister = lapply(stats.CG.sortedLister, function(x) as.integer(nam
 save(stats.CG.sortedLister, n.sel.CG.sortedLister, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/setting_n_methylSeekR_sortedLister.rda")
 
 
+# Recalculate with limited PMDs to >100kb
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMDs_methylSeekR_100kbLimit.rda")
+
+listernames = c("GSM1173773" = "ListerNeuron1", "GSM1173774" = "ListerGlia1", "GSM1173776" = "ListerNeuron2", "GSM1173777" = "ListerGlia2")
+names(CGlist) = listernames[match(names(CGlist), names(listernames))]
+pmds = total[names(total) %in% names(CGlist)]
+identical(names(pmds), names(CGlist))
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/calculateFDRthreshold_methylSeekR_CG.100kb_sortedLister.pdf")
+stats.CG.100kb.SL <- mapply(function(CG, PMD) calculateFDRs(m = CG, CGIs = CpGislands.gr, PMDs = PMD, num.cores=2), CGlist, pmds)
+dev.off()
+statcg = list()
+for (i in 1:length(CGlist)) { statcg[[i]] =  stats.CG.100kb.SL[,i] }
+names(statcg) = names(CGlist)
+stats.CG.100kb.SL = statcg
+
+n.sel.CG.100kb.SL = lapply(stats.CG.100kb.SL, function(x) as.integer(names(x$FDRs[as.character(m.sel), ][x$FDRs[as.character(m.sel), ]<FDR.cutoff])[1]))
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/setting_n_methylSeekR_sortedLister.rda")
+save(stats.CG.100kb.SL, n.sel.CG.100kb.SL, stats.CG.sortedLister, n.sel.CG.sortedLister, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/setting_n_methylSeekR_sortedLister.rda")
+
+
 ## Calculate UMRs and LMRs
 
 UMRLMRsegments.CG.sortedLister <- mapply(function(CG,n,PMD) segmentUMRsLMRs(m = CG, meth.cutoff = m.sel, nCpG.cutoff= n, 
                                                                PMDs = PMD, num.cores=1, myGenomeSeq = Hsapiens, seqLengths = sLengths), CGlist, n.sel.CG.sortedLister, PMDsegments.CG.sortedLister)  
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/UMRs_LMRs_methylSeekR.100kb_SL.pdf")
+UMRLMRsegments.CG.100kb.SL <- mapply(function(CG,n,PMD) segmentUMRsLMRs(m = CG, meth.cutoff = m.sel, nCpG.cutoff= n, 
+                                                                        PMDs = PMD, num.cores=2, myGenomeSeq = Hsapiens, seqLengths = sLengths), CGlist, n.sel.CG.100kb.SL, pmds)  
+dev.off()
+
 
 ## Call DMVs (parameters from Mo et al. 2015 supplement)
 
 DMVs.sortedLister = lapply(UMRLMRsegments.CG.sortedLister, function(x) x[which(x$type=="UMR" & x$pmeth <=0.15)])
 DMVs.sortedLister = lapply(DMVs.sortedLister, function(x) x[which(width(x)>=5000)])
 
-save(UMRLMRsegments.CG.sortedLister,DMVs.sortedLister,
+DMVs.100kb.SL = lapply(UMRLMRsegments.CG.100kb.SL, function(x) x[which(x$type=="UMR" & x$pmeth <=0.15)])
+DMVs.100kb.SL = lapply(DMVs.100kb.SL, function(x) x[which(width(x)>=5000)])
+
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMRs_LMRs_DMVs_methylSeekR_sortedLister.rda")
+save(UMRLMRsegments.CG.sortedLister,DMVs.sortedLister,UMRLMRsegments.CG.100kb.SL,DMVs.100kb.SL,
      file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMRs_LMRs_DMVs_methylSeekR_sortedLister.rda")
