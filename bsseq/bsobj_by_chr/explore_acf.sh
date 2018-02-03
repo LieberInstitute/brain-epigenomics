@@ -9,12 +9,12 @@ mkdir -p logs
 #for chrnum in M Y 21 22
 #for chrnum in {2..20} X
 #for chrnum in {2..22} X Y M
-for chrnum in {1..22} X Y M
+for chrnum in 8 10 11 X
 do 
 
     chr="chr${chrnum}"
     
-    for context in nonCG CG CHG CHH
+    for context in all nonCG CG CHG CHH
     do
 
     
@@ -25,7 +25,7 @@ do
     cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l bluejay,mem_free=70G,h_vmem=70G,h_fsize=100G
+#$ -l mem_free=75G,h_vmem=80G,h_fsize=100G
 #$ -N ${SHORT}
 #$ -o ./logs/${SHORT}.txt
 #$ -e ./logs/${SHORT}.txt
@@ -34,14 +34,6 @@ do
 echo "**** Job starts ****"
 date
 
-echo "**** JHPCE info ****"
-echo "User: \${USER}"
-echo "Job id: \${JOB_ID}"
-echo "Job name: \${JOB_NAME}"
-echo "Hostname: \${HOSTNAME}"
-echo "Task id: \${TASK_ID}"
-
-module load conda_R/3.4.x
 Rscript explore_acf.R -c ${chr} -t 1 -x ${context}
 
 echo "**** Job ends ****"

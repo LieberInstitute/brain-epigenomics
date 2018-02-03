@@ -30,7 +30,7 @@ if(FALSE) {
 stopifnot(opt$context %in% c('all', 'nonCG', 'CG', 'CHG', 'CHH'))
 
 message(paste(Sys.time(), 'loading the data'))
-load(paste0('rda/', opt$chr, '_postNatal_cleaned_CX_noHomogenate.Rdata'))
+load(paste0(opt$chr, '_postNatal_cleaned_CX_noHomogenate.Rdata'))
 
 ## Original bases in each context
 gr <- rowRanges(BSobj)
@@ -40,19 +40,17 @@ context <- c(
 
 ## Filter low coverage bases
 cov <- getCoverage(BSobj, type = 'Cov')
-cov.ge5.cph <- cov[as.vector(rowRanges(BSobj)$c_context != 'CG'), ] >= 5
-cov.ge3.cpg <- cov[as.vector(rowRanges(BSobj)$c_context == 'CG'), ] >= 3
-
-cov.filt <- rep(NA, nrow(cov))
-cov.filt[as.vector(rowRanges(BSobj)$c_context != 'CG')] <- rowSums(cov.ge5.cph) == ncol(cov)
-cov.filt[as.vector(rowRanges(BSobj)$c_context == 'CG')] <- rowSums(cov.ge3.cpg) == ncol(cov)
-
-print("Number of bases with Cov >=3 (CpG) or Cov >= 5 (CpH)")
-addmargins(table('Passing the cutoff' = cov.filt, 'CpG' = as.vector(rowRanges(BSobj)$c_context == 'CG'), useNA = 'ifany'))
-round(addmargins(table('Passing the cutoff' = cov.filt, 'CpG' = as.vector(rowRanges(BSobj)$c_context == 'CG'), useNA = 'ifany')) / length(cov.filt) * 100, 2)
-
+cov.ge1 <- cov >= 1
+cov.filt <- rowSums(cov.ge1) == ncol(cov)
+print("Number of bases with Cov >=1")
+table(cov.filt)
+#   FALSE    TRUE
+# 6801196 7533737
+round(table(cov.filt) / length(cov.filt) * 100, 2)
+#FALSE  TRUE
+#47.44 52.56
 BSobj <- BSobj[cov.filt, ]
-rm(cov, cov.ge5.cph, cov.ge3.cpg, cov.filt)
+rm(cov, cov.ge1, cov.filt)
 
 
 ## Subset by context
@@ -90,6 +88,27 @@ print('Size of the groups by number of bases of interest')
 summary(width(clus))
 split.idx <- Rle(seq_len(length(clus)), width(clus))
 
+if(FALSE) {
+    ## Groups based on number of observations nearby
+    chunksize <- 3000
+
+    ## Determine number of loops
+    lastloop <- trunc(nrow(BSobj) /  chunksize)
+    ## Fix the lastloop in case that the N is a factor of
+    ## chunksize
+    if (nrow(BSobj) %% chunksize == 0 & lastloop > 0) {
+        lastloop <- lastloop - 1
+    }
+
+    ## Build the index for splitting
+    split.len <- rep(chunksize, lastloop)
+    split.len.sum <- nrow(BSobj) - sum(split.len)
+    if (split.len.sum > 0) {
+        split.len <- c(split.len, split.len.sum)
+    }
+    split.idx <- Rle(seq_len(lastloop + 1), split.len)
+}
+
 ## Size of the groups by genomic range
 gr_list <- split(gr, split.idx)
 chunk_width <- width(range(gr_list))
@@ -112,70 +131,31 @@ if(opt$cores == 1) {
     bpparam <- SnowParam(opt$cores, outfile =  Sys.getenv('SGE_STDERR_PATH'))
 }
 
-## Just for chr21 re-make the previous results
-if(opt$chr == 'chr21') {
-    auto <- bplapply(meth_list, function(x) {
-    ## Drop first row because it's always 1
-    apply(x, 2, function(y) { acf(y, plot = FALSE, lag.max = 4)$acf })[-1, ]
-}, BPPARAM = bpparam)
 
-    auto_long <- do.call(rbind, lapply(seq_len(length(auto)), function(i) {
-        data.frame(acf = as.vector(auto[[i]]),
-        'lag' = rep(seq_len(4), ncol(auto[[i]])),
-        'clus' = rep(i, 4 * ncol(auto[[i]])),
-        'clus_n' = rep(nrow(meth_list[[i]]), 4 * ncol(auto[[i]])),
-        'clus_range' = rep(width(range(gr_list[[i]])), 4 * ncol(auto[[i]])),
-        'sample' = rep(colnames(auto[[i]]), each = 4))
-    }))
-    auto_long$context <- opt$context
-    
-    ## Global ACF summary by lag
-    print('ACF by lag, then abs(ACF) by lag')
-    print(tapply(auto_long$acf, auto_long$lag, summary))
-    print(tapply(auto_long$acf, auto_long$lag, function(x) { summary(abs(x))}))
-
-    ## Save results
-    dir.create('rda', showWarnings = FALSE)
-    save(auto_long, file = paste0('rda/custom_acf_', opt$chr, '_context', opt$context, '.Rdata'))
-
-    rm(auto, auto_long)
-}
-
-neurons <- colData(BSobj)$Cell.Type == 'Neuron'
 auto <- bplapply(meth_list, function(x) {
     ## Drop first row because it's always 1
-    auto_res <- apply(x, 2, function(y) { acf(y, plot = FALSE, lag.max = 4)$acf })[-1, ]
-    c('neuron' = rowMeans(auto_res[, neurons], na.rm = TRUE),
-        'glia' = rowMeans(auto_res[, !neurons], na.rm = TRUE))
+    apply(x, 2, function(y) { acf(y, plot = FALSE, lag.max = 4)$acf })[-1, ]
 }, BPPARAM = bpparam)
 
 
 ## Make it long format
 auto_long <- do.call(rbind, lapply(seq_len(length(auto)), function(i) {
-    data.frame('acf_neuron' = auto[[i]][1:4],
-        'acf_glia' = auto[[i]][5:8],
-        'lag' = seq_len(4),
-        'clus' = rep(i, 4), 
-        'clus_n' = rep(NROW(meth_list[[i]]), 4),
-        'clus_range' = rep(width(range(gr_list[[i]], ignore.strand = TRUE)), 4),
-    stringsAsFactors = FALSE)
+    data.frame(acf = as.vector(auto[[i]]),
+    'lag' = rep(seq_len(4), ncol(auto[[i]])),
+    'clus' = rep(i, 4 * ncol(auto[[i]])),
+    'clus_n' = rep(nrow(meth_list[[i]]), 4 * ncol(auto[[i]])),
+    'clus_range' = rep(width(range(gr_list[[i]])), 4 * ncol(auto[[i]])),
+    'sample' = rep(colnames(auto[[i]]), each = 4))
 }))
 auto_long$context <- opt$context
-rownames(auto_long) <- NULL
 
 ## Global ACF summary by lag
-print('ACF by lag, then abs(ACF) by lag -- neurons')
-tapply(auto_long$acf_neuron, auto_long$lag, summary)
-tapply(auto_long$acf_neuron, auto_long$lag, function(x) { summary(abs(x))})
-
-print('ACF by lag, then abs(ACF) by lag -- glia')
-tapply(auto_long$acf_glia, auto_long$lag, summary)
-tapply(auto_long$acf_glia, auto_long$lag, function(x) { summary(abs(x))})
+print('ACF by lag, then abs(ACF) by lag')
+tapply(auto_long$acf, auto_long$lag, summary)
+tapply(auto_long$acf, auto_long$lag, function(x) { summary(abs(x))})
 
 ## Save results
-dir.create('rda', showWarnings = FALSE)
-save(auto_long, file = paste0('rda/auto_long_', opt$chr, '_context',
-    opt$context, '.Rdata'))
+save(auto_long, file = paste0('auto_long_', opt$chr, '_context', opt$context, '.Rdata'))
 
 
 ## extract pheno
@@ -200,8 +180,7 @@ coef_interest <- mapply(function(f, coef) {
 summary(coef_interest)
 summary(abs(coef_interest))
 
-save(fits, models, coef_interest, file = paste0('rda/limma_exploration_',
-    opt$chr, '_context', opt$context, '.Rdata'))
+save(fits, models, coef_interest, file = paste0('limma_exploration_', opt$chr, '_context', opt$context, '.Rdata'))
 
 
 
