@@ -6,9 +6,6 @@ load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/CH_object.rda")
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/CHneurons_object.rda")
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/methylSeekR_objects.rda")
 
-load("/media/Backup1_/amanda/CREs/methylSeekR_objects.rda")
-load("/media/Backup1_/amanda/non-CpG/CH_object.rda")
-
 
 table(CH$CT.dir=="pos")
 # FALSE     TRUE 
