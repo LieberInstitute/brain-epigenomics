@@ -130,14 +130,16 @@ v <- venn.diagram(vinfo, filename = NULL,
     alpha = 0.50, fontface = "bold",
     cat.col = c("palevioletred4", "darkblue", "olivedrab4"),
     margin=0.2)
+grid.newpage()
 grid.draw(v)
 
 v5k <- venn.diagram(vinfo5k, filename = NULL,
     main = paste0('meQTLs at FDR 5%, CpGs only in proximity to nonCpG\nBased on top ', nrow(top5k), ' ', opt$feature, 's expressed in Neurons'),
     col = "transparent", fill = c("lightpink2","cornflowerblue", "olivedrab2"),
-    alpha = 0.50, ffontface = "bold",
+    alpha = 0.50, fontface = "bold",
     cat.col = c("palevioletred4", "darkblue", "olivedrab4"),
     margin=0.2)
+grid.newpage()
 grid.draw(v5k)
 dev.off()
 
