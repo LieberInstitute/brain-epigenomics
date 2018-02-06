@@ -4,6 +4,7 @@ library('getopt')
 library('devtools')
 library('limma')
 library('gplots')
+library('VennDiagram')
 
 ## Specify parameters
 spec <- matrix(c(
@@ -121,13 +122,33 @@ vennres <- venn(vinfo) + title('meQTLs at FDR 5%, CpGs only in proximity to nonC
 vennres5k <- venn(vinfo5k) + title(paste0('meQTLs at FDR 5%, CpGs only in proximity to nonCpG\nBased on top ', nrow(top5k), ' ', opt$feature, 's expressed in Neurons'))
 dev.off()
 
+## Prettier venn diagrams
+pdf(paste0('pdf/meqtl_venn_pretty_', opt$feature, '_using_near.pdf'))
+v <- venn.diagram(vinfo, filename = NULL,
+    main = 'meQTLs at FDR 5%, CpGs only in proximity to nonCpG',
+    col = "transparent", fill = c("lightpink2","cornflowerblue", "olivedrab2"),
+    alpha = 0.50, fontface = "bold",
+    cat.col = c("palevioletred4", "darkblue", "olivedrab4"),
+    margin=0.2)
+grid.draw(v)
+
+v5k <- venn.diagram(vinfo5k, filename = NULL,
+    main = paste0('meQTLs at FDR 5%, CpGs only in proximity to nonCpG\nBased on top ', nrow(top5k), ' ', opt$feature, 's expressed in Neurons'),
+    col = "transparent", fill = c("lightpink2","cornflowerblue", "olivedrab2"),
+    alpha = 0.50, ffontface = "bold",
+    cat.col = c("palevioletred4", "darkblue", "olivedrab4"),
+    margin=0.2)
+grid.draw(v5k)
+dev.off()
+
+
 dir.create('rda', showWarnings = FALSE)
-save(vennres, vennres5k, top5k, top, file = paste0('rda/meqtl_venn_',
+save(vennres, vennres5k, top5k, top, v, v5k, file = paste0('rda/meqtl_venn_',
     opt$feature, '_using_near.Rdata'))
 
 
 message(paste(Sys.time(), 'summarizing the meQTL data by', opt$feature))
-m_summary <- do.call(rbind, lapply(1:2, function(i) {
+m_summary <- do.call(rbind, lapply(1:length(mres), function(i) {
     message(paste(Sys.time(), 'processing', names(mres)[i]))
     me <- mres[[i]]
     gdata <- split(me$eqtls, me$eqtls$gene)
