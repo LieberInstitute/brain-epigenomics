@@ -29,19 +29,31 @@ if(FALSE) {
 }
 
 stopifnot(opt$feature %in% c('psi', 'gene', 'exon', 'jx'))
-cpgs <- c('CpG', 'nonCpG')
+cpgs <- c('CpG', 'nonCpG', 'CpGmarg')
 
 ## Load annotated meQTL results at FDR 5%
 ## for the CpG data, I'm using the results near the nonCpG meQTLs
+## For the marginal CpG data I'm using the results from 'near'
+## just dropping those with infinite statistics
 mres <- lapply(cpgs, function(cpg) {
     if(cpg == 'CpG') {
         f <- paste0('rda/me_annotated_FDR5_', cpg, '_', opt$feature,
             '_near_nonCpG_meQTLs.Rdata')
-    } else {
+    } else if (cpg == 'nonCpG') {
         f <- paste0('rda/me_annotated_FDR5_', cpg, '_', opt$feature, '.Rdata')
+    } else if (cpg == 'CpGmarg') {
+        f <- paste0('rda/me_CpG_', opt$feature, '_near_nonCpG_meQTLs.Rdata')
     }
     message(paste(Sys.time(), 'loading the file', f))
     load(f, verbose = TRUE)
+    
+    ## Just keep those with a finite statistic
+    if(cpg == 'CpGmarg') {
+        print('Keeping only those with finite statistics')
+        print(table(is.finite(me$cis$eqtls$statistic)))
+        me_annotated <- list('eqtls' = me$cis$eqtls[is.finite(me$cis$eqtls$statistic), ])
+    }
+    
     return(me_annotated)
 })
 names(mres) <- cpgs
