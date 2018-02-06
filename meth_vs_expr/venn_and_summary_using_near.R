@@ -173,7 +173,7 @@ save(m_summary, file = paste0('rda/meqtl_summary_', opt$feature,
     '_using_near.Rdata'))
 
 
-common <- names(table(m_summary$gene)[table(m_summary$gene) == 2])
+common <- names(table(m_summary$gene)[table(m_summary$gene) == 3])
 find_pval <- function(type, t5k = FALSE) {
     res <- -log10(m_summary$FDR[m_summary$gene %in% common & m_summary$type == type])
     if(t5k) {
@@ -185,6 +185,10 @@ find_pval <- function(type, t5k = FALSE) {
 pdf(paste0('pdf/scatter_FDR_', opt$feature, '_using_near.pdf'))
 plot(x = find_pval('CpG'), y = find_pval('nonCpG'), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste(length(common), 'common', opt$feature, 'meQTLs'))
 plot(x = find_pval('CpG', TRUE), y = find_pval('nonCpG', TRUE), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste0(sum(common %in% rownames(top5k)), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5k), ' ', opt$feature, 's expressed in Neurons'))
+
+## Leads to the same plot
+# plot(x = find_pval('CpGmarg'), y = find_pval('nonCpG'), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs (marg)', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste(length(common), 'common', opt$feature, 'meQTLs'))
+# plot(x = find_pval('CpGmarg', TRUE), y = find_pval('nonCpG', TRUE), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs (marg)', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste0(sum(common %in% rownames(top5k)), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5k), ' ', opt$feature, 's expressed in Neurons'))
 dev.off()
 
 
