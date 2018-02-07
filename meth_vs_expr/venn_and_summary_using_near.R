@@ -5,6 +5,7 @@ library('devtools')
 library('limma')
 library('gplots')
 library('VennDiagram')
+library('RColorBrewer')
 
 ## Specify parameters
 spec <- matrix(c(
@@ -331,7 +332,7 @@ delta_pval$i_nonCpG <- mapply(function(g, s) {
 #     which(mres[['CpGmarg']]$eqtls$gene == g & mres[['CpGmarg']]$eqtls$snps == s)
 # }, delta_pval$gene, delta_pval$snps)
 
-save(delta_pval, file = paste0('rda/meqtl_delta_pval_', opt$feature,
+save(delta_pval, common, file = paste0('rda/meqtl_delta_pval_', opt$feature,
     '_using_near.Rdata'))
 head(delta_pval)
 
@@ -388,10 +389,35 @@ get_y <- function(type, i) {
     return(res)
 }
 
+## Function for getting age colors that match those used in
+## bumphunting/plot_bumps_bsseqSmooth.R
+get_col <- function(type = 'nonCpG', ag = FALSE) {
+    age_group <- factor(ifelse(colData(mres[[type]]$meth)$Age < 0, 'Prenatal',
+        ifelse(colData(mres[[type]]$meth)$Age < 1, 'Infant',
+        ifelse(colData(mres[[type]]$meth)$Age <= 12, 'Child',
+        ifelse(colData(mres[[type]]$meth)$Age <= 17, 'Teen', 'Adult')))),
+        levels = c('Infant', 'Child', 'Teen', 'Adult', 'Prenatal'))
+    
+    age_group_cell <- factor(paste0(age_group, '_', colData(mres[[type]]$meth)$Cell.Type),
+        levels = c(paste0(rep(levels(age_group)[1:4], each = 2),
+        '_', c('Glia', 'Neuron')), 'Prenatal_H'))
+    if(ag) return(age_group_cell)
+    col <- c(brewer.pal(8, "Paired"), 'grey50')[c(5:6, 7:8, 3:4, 1:2, 9)][age_group_cell]
+    return(col)
+}
+
+pdf('pdf/meth_vs_expr_scatter_color_labels.pdf', width = 14)
+palette(c(brewer.pal(8, "Paired")[c(5:6, 7:8, 3:4, 1:2)], 'grey50'))
+plot(colData(mres[['nonCpG']]$meth)$Age, type = 'p', pch = 21, ylab = 'Age',
+    bg = get_col(ag = TRUE), cex = 3, xlim = c(0, 30))
+legend("topright", levels(get_col(ag = TRUE)), pch = 15, col=1:9, cex=1.4)
+dev.off()
+
+set.seed(20180207)
 plotting_code <- function(i, type = 'nonCpG') {
     main <- paste(opt$feature, ifelse(opt$feature == 'gene', mres[[type]]$eqtls$gene[i], rowRanges(mres[[type]]$expr[i])$exon_gencodeID), 'FDR', signif(mres[[type]]$eqtls$FDR[i], 3), '\n',  rowRanges(mres[[type]]$expr[i])$Symbol)
     
-    plot(x = jitter(getMeth(mres[[type]]$meth[i, ], type = 'raw'), 0.05), y = jitter(get_y(type, i), 0.05), xlab = 'Methylation', ylab = ylab, main = main, sub = paste(as.vector(seqnames(rowRanges(mres[[type]]$meth)[i])), start(rowRanges(mres[[type]]$meth)[i]), as.vector(strand(rowRanges(mres[[type]]$meth)[i])), as.vector(rowRanges(mres[[type]]$meth)$c_context[i])))
+    plot(x = jitter(getMeth(mres[[type]]$meth[i, ], type = 'raw'), 2), y = jitter(get_y(type, i), 2), xlab = 'Methylation', ylab = ylab, main = main, sub = paste(as.vector(seqnames(rowRanges(mres[[type]]$meth)[i])), start(rowRanges(mres[[type]]$meth)[i]), as.vector(strand(rowRanges(mres[[type]]$meth)[i])), as.vector(rowRanges(mres[[type]]$meth)$c_context[i])), col = get_col(type))
 }
 
 
@@ -440,4 +466,15 @@ proc.time()
 message(Sys.time())
 options(width = 120)
 session_info()
+
+
+
+## For re-loading
+saved_files <- c(paste0('rda/meqtl_mres_', opt$feature, '_using_near.Rdata'),
+    paste0('rda/meqtl_venn_',opt$feature, '_using_near.Rdata'),
+    paste0('rda/meqtl_summary_', opt$feature, '_using_near.Rdata'),
+    paste0('rda/meqtl_delta_pval_', opt$feature, '_using_near.Rdata')
+)
+for(i in saved_files) load(i, verbose = TRUE)
+rm(i)
 
