@@ -233,17 +233,26 @@ top5k <- top5k[order(top5k$adj.P.Val, decreasing = FALSE), ]
 top5k <- head(top5k, 5000)
 nrow(top5k)
 
+## Keep only those with positive log FC (higher in Glia)
+top5kglia <- top[sign(top$logFC) == 1, ]
+nrow(top5kglia)
+top5kglia <- top5kglia[order(top5kglia$adj.P.Val, decreasing = FALSE), ]
+top5kglia <- head(top5kglia, 5000)
+
 vinfo <- lapply(mres, function(me) { unique(as.character(me$eqtls$gene)) })
 vinfo5k <- lapply(vinfo, function(me) { me[me %in% rownames(top5k)] })
+vinfo5kglia <- lapply(vinfo, function(me) { me[me %in% rownames(top5kglia)] })
 
 dir.create('pdf', showWarnings = FALSE)
 pdf(paste0('pdf/meqtl_venn_', opt$feature, '_using_near.pdf'))
 vennres <- venn(vinfo) + title('meQTLs at FDR 5%, CpGs only in proximity to nonCpG')
 vennres5k <- venn(vinfo5k) + title(paste0('meQTLs at FDR 5%, CpGs only in proximity to nonCpG\nBased on top ', nrow(top5k), ' ', opt$feature, 's expressed in Neurons'))
+vennres5kglia <- venn(vinfo5kglia) + title(paste0('meQTLs at FDR 5%, CpGs only in proximity to nonCpG\nBased on top ', nrow(top5kglia), ' ', opt$feature, 's expressed in Glia'))
 dev.off()
 
 vennres <- venn(vinfo, show.plot = FALSE)
 vennres5k <- venn(vinfo5k, show.plot = FALSE)
+vennres5kglia <- venn(vinfo5kglia, show.plot = FALSE)
 
 ## Prettier venn diagrams
 pdf(paste0('pdf/meqtl_venn_pretty_', opt$feature, '_using_near.pdf'))
@@ -264,11 +273,22 @@ v5k <- venn.diagram(vinfo5k, filename = NULL,
     margin=0.2)
 grid.newpage()
 grid.draw(v5k)
+
+
+v5kglia <- venn.diagram(vinfo5kglia, filename = NULL,
+    main = paste0('meQTLs at FDR 5%, CpGs only in proximity to nonCpG\nBased on top ', nrow(top5k), ' ', opt$feature, 's expressed in Glia'),
+    col = "transparent", fill = c("lightpink2","cornflowerblue", "olivedrab2"),
+    alpha = 0.50, fontface = "bold",
+    cat.col = c("palevioletred4", "darkblue", "olivedrab4"),
+    margin=0.2)
+grid.newpage()
+grid.draw(v5kglia)
+
 dev.off()
 
 
-save(vennres, vennres5k, top5k, top, v, v5k, file = paste0('rda/meqtl_venn_',
-    opt$feature, '_using_near.Rdata'))
+save(vennres, vennres5k, vennres5kglia, top, top5k, top5kglia, v, v5k, v5kglia,
+    file = paste0('rda/meqtl_venn_', opt$feature, '_using_near.Rdata'))
 
 
 message(paste(Sys.time(), 'summarizing the meQTL data by', opt$feature))
@@ -296,7 +316,7 @@ save(m_summary, file = paste0('rda/meqtl_summary_', opt$feature,
 
 
 common <- names(table(m_summary$gene)[table(m_summary$gene) == 3])
-find_pval <- function(type, t5k = FALSE) {
+find_pval <- function(type, t5k = FALSE, t5kg = FALSE) {
     res <- -log10(m_summary$FDR[m_summary$gene %in% common & m_summary$type == type])
     ## Add the name
     names(res) <- m_summary$gene[m_summary$gene %in% common & m_summary$type == type]
@@ -304,6 +324,8 @@ find_pval <- function(type, t5k = FALSE) {
     res <- res[match(common, names(res))]
     if(t5k) {
         res <- res[names(res) %in% rownames(top5k)]
+    } else if (t5kg) {
+        res <- res[names(res) %in% rownames(top5kglia)]
     }
     return(res)
 }
@@ -314,17 +336,20 @@ stopifnot(identical(names(find_pval('CpG')), names(find_pval('nonCpG'))))
 pdf(paste0('pdf/scatter_FDR_', opt$feature, '_using_near.pdf'))
 plot(x = find_pval('CpG'), y = find_pval('nonCpG'), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste(length(common), 'common', opt$feature, 'meQTLs'))
 plot(x = find_pval('CpG', TRUE), y = find_pval('nonCpG', TRUE), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste0(sum(common %in% rownames(top5k)), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5k), ' ', opt$feature, 's expressed in Neurons'))
+plot(x = find_pval('CpG', t5kg = TRUE), y = find_pval('nonCpG', t5kg = TRUE), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste0(sum(common %in% rownames(top5kglia)), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5kglia), ' ', opt$feature, 's expressed in Glia'))
 
 ## Limiting the x and y axes
 xylim <- c(0, round(max(find_pval('nonCpG')) + 0.5, 0))
 plot(x = find_pval('CpG'), y = find_pval('nonCpG'), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste(length(common), 'common', opt$feature, 'meQTLs'), xlim = xylim, ylim = xylim)
 plot(x = find_pval('CpG', TRUE), y = find_pval('nonCpG', TRUE), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste0(sum(common %in% rownames(top5k)), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5k), ' ', opt$feature, 's expressed in Neurons'), xlim = xylim, ylim = xylim)
+plot(x = find_pval('CpG', t5kg = TRUE), y = find_pval('nonCpG', t5kg = TRUE), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste0(sum(common %in% rownames(top5kglia)), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5kglia), ' ', opt$feature, 's expressed in Glia'), xlim = xylim, ylim = xylim)
 
 dev.off()
 
 ## Make some scatter plots of the methylation vs expr
 delta_pval <- data.frame(delta = find_pval('nonCpG') - find_pval('CpG'), gene = names(find_pval('CpG')), nonCpG = find_pval('nonCpG'), CpG = find_pval('CpG'), stringsAsFactors = FALSE)
 delta_pval$top5k <- delta_pval$gene %in% rownames(top5k)
+delta_pval$top5kglia <- delta_pval$gene %in% rownames(top5kglia)
 delta_pval$snps <- with(subset(m_summary, type == 'nonCpG'), snps[match(delta_pval$gene, gene)])
 delta_pval <- delta_pval[order(delta_pval$delta, decreasing = TRUE), ]
 
@@ -355,10 +380,12 @@ tapply(m_summary$meth_n, m_summary$type, function(x) {
 tapply(m_summary$expr_delta, m_summary$type, summary)
 
 
-find_i <- function(n = 10, t5k = FALSE, c_max = 200, nc_max = 200) {
+find_i <- function(n = 10, t5k = FALSE, c_max = 200, nc_max = 200, t5kg = FALSE) {
     use <- delta_pval[sign(delta_pval$delta) == 1, ]
     if(t5k) {
         use <- use[use$top5k, ]
+    } else if (t5kg) {
+        use <- use[use$top5kglia, ]
     }
     use <- use[use$CpG < c_max, ]
     use <- use[use$nonCpG < nc_max, ]
@@ -366,12 +393,14 @@ find_i <- function(n = 10, t5k = FALSE, c_max = 200, nc_max = 200) {
 }
 
 
-find_i_venn <- function(mtype = 'nonCpG', vennset = 'nonCpG', t5k = FALSE, n = 100) {
+find_i_venn <- function(mtype = 'nonCpG', vennset = 'nonCpG', t5k = FALSE, n = 100, t5kg = FALSE) {
     
     use <- subset(m_summary, type == mtype)
     use <- use[order(use$FDR, decreasing = FALSE), ]
     if(t5k) {
         use <- use[use$gene %in% attr(vennres5k, 'intersections')[[vennset]], ]
+    } else if (t5kg) {
+        use <- use[use$gene %in% attr(vennres5kglia, 'intersections')[[vennset]], ]
     } else {
         use <- use[use$gene %in% attr(vennres, 'intersections')[[vennset]], ]
     }
@@ -444,9 +473,19 @@ dev.off()
 
 pdf(paste0('pdf/meth_vs_expr_scatter_', 'nonCpG', '_', opt$feature, '_common_high_delta_top5k.pdf'))
 ## Just for checking which am I plotting later
-plot(x = delta_pval$CpG[delta_pval$top5k], y = delta_pval$nonCpG[delta_pval$top5k], pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste(sum(delta_pval$top5k), 'common', opt$feature, 'meQTLs\nBased on top ', nrow(top5k), ' ', opt$feature, 's expressed in Neurons'), col = ifelse(sign(delta_pval$delta[delta_pval$top5k]) == 1, 'red', 'black'))
+plot(x = delta_pval$CpG[delta_pval$top5k], y = delta_pval$nonCpG[delta_pval$top5k], pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste0(sum(delta_pval$top5k), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5k), ' ', opt$feature, 's expressed in Neurons'), col = ifelse(sign(delta_pval$delta[delta_pval$top5k]) == 1, 'red', 'black'))
 abline(a = 0, b = 1, col = 'grey80')
 for(i in find_i(100, t5k = TRUE)) {
+    plotting_code(i)
+}
+dev.off()
+
+
+pdf(paste0('pdf/meth_vs_expr_scatter_', 'nonCpG', '_', opt$feature, '_common_high_delta_top5kglia.pdf'))
+## Just for checking which am I plotting later
+plot(x = delta_pval$CpG[delta_pval$top5kglia], y = delta_pval$nonCpG[delta_pval$top5kglia], pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste0(sum(delta_pval$top5kglia), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5kglia), ' ', opt$feature, 's expressed in Glia'), col = ifelse(sign(delta_pval$delta[delta_pval$top5kglia]) == 1, 'red', 'black'))
+abline(a = 0, b = 1, col = 'grey80')
+for(i in find_i(100, t5kg = TRUE)) {
     plotting_code(i)
 }
 dev.off()
@@ -466,6 +505,11 @@ for(i in find_i_venn(t5k = TRUE)) {
 }
 dev.off()
 
+pdf(paste0('pdf/meth_vs_expr_scatter_venn_', 'nonCpG', '_', opt$feature, '_top5kglia.pdf'))
+for(i in find_i_venn(t5kg = TRUE)) {
+    plotting_code(i)
+}
+dev.off()
 
 ## Reproducibility info
 proc.time()
