@@ -429,7 +429,7 @@ dir.create('pdf', showWarnings = FALSE)
 
 pdf(paste0('pdf/meth_vs_expr_scatter_', 'nonCpG', '_', opt$feature, '_common_high_delta.pdf'))
 ## Just for checking which am I plotting later
-plot(x = delta_pval$CpG, y = delta_pval$nonCpG, pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste(length(common), 'common', opt$feature, 'meQTLs'), col = ifelse(delta_pval$gene %in%delta_pval$gene[head(order(delta_pval$delta, decreasing = TRUE), n = 100)], 'red', 'black'))
+plot(x = delta_pval$CpG, y = delta_pval$nonCpG, pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste(length(common), 'common', opt$feature, 'meQTLs'), col = ifelse(delta_pval$gene %in% delta_pval$gene[head(order(delta_pval$delta, decreasing = TRUE), n = 100)], 'red', 'black'))
 abline(a = 0, b = 1, col = 'grey80')
 for(i in find_i(100)) {
     plotting_code(i)
@@ -438,7 +438,7 @@ dev.off()
 
 pdf(paste0('pdf/meth_vs_expr_scatter_', 'nonCpG', '_', opt$feature, '_common_high_delta_top5k.pdf'))
 ## Just for checking which am I plotting later
-plot(x = delta_pval$CpG[delta_pval$top5k], y = delta_pval$nonCpG[delta_pval$top5k], pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste(sum(delta_pval$top5k), 'common', opt$feature, 'meQTLs\nBased on top ', nrow(top5k), ' ', opt$feature, 's expressed in Neurons'), col = ifelse(1:sum(delta_pval$top5k) %in% 1:100, 'red', 'black'))
+plot(x = delta_pval$CpG[delta_pval$top5k], y = delta_pval$nonCpG[delta_pval$top5k], pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste(sum(delta_pval$top5k), 'common', opt$feature, 'meQTLs\nBased on top ', nrow(top5k), ' ', opt$feature, 's expressed in Neurons'), col = ifelse(sign(delta_pval$delta[delta_pval$top5k]) == 1, 'red', 'black'))
 abline(a = 0, b = 1, col = 'grey80')
 for(i in find_i(100, t5k = TRUE)) {
     plotting_code(i)
