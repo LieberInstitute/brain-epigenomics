@@ -634,7 +634,7 @@ lapply(names(go_cluster_comp), function(bp) {
 dev.off()
 
 
-save(go_venn_res, uni, v_symb, file = paste0('rda/meqtl_venn_go_', opt$feature, '_using_near.Rdata'))
+save(go_venn_res, go_cluster_comp, uni, v_symb, file = paste0('rda/meqtl_venn_go_', opt$feature, '_using_near.Rdata'))
 
 
 ## Reproducibility info
