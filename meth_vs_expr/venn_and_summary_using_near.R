@@ -29,7 +29,8 @@ if(FALSE) {
     opt <- list('feature' = 'exon')
     opt <- list('feature' = 'psi')
     ## Not yet adapted/designed for the other two
-    #opt <- list('feature' = 'jx')
+    #opt <- list('feature' = 'jx', 'jxside' = 'left')
+    #opt <- list('feature' = 'jx', 'jxside' = 'right')
 }
 
 stopifnot(opt$feature %in% c('psi', 'gene', 'exon', 'jx'))
@@ -585,9 +586,14 @@ dev.off()
 
 
 ## Gene ontology for each of the sets of the main venn diagram
-opt$feature <- 'gene'
-expr <- load_expr(opt$feature)
-opt$feature <- 'psi'
+if(opt$feature == 'psi') {
+    opt$feature <- 'gene'
+    expr <- load_expr(opt$feature)
+    opt$feature <- 'psi'
+} else {
+    expr <- load_expr(opt$feature)
+}
+
 uni <- unique(rowRanges(expr)$ensemblID[rowRanges(expr)$gene_type == 'protein_coding'])
 length(uni)
 
@@ -610,6 +616,24 @@ lapply(names(v_symb), function(vname) {
 })
 dev.off()
 
+
+go_cluster_comp <- lapply(c('BP', 'MF', 'CC'), function(bp) {
+    compareCluster(v_symb, fun = "enrichGO",
+        universe = uni, OrgDb = 'org.Hs.eg.db',
+        ont = bp, pAdjustMethod = "BH",
+        pvalueCutoff  = 0.1, qvalueCutoff  = 0.05,
+        readable= TRUE, keyType = 'ENSEMBL')
+})
+names(go_cluster_comp) <- c('BP', 'MF', 'CC')
+
+pdf(paste0('pdf/meth_vs_expr_venn_GO_compare_clusters_', opt$feature, '.pdf'), width = 20)
+lapply(names(go_cluster_comp), function(bp) {
+    print(plot(go_cluster_comp[[bp]], title = paste('ontology:', bp), font.size = 18))
+    return(NULL)
+})
+dev.off()
+
+
 save(go_venn_res, uni, v_symb, file = paste0('rda/meqtl_venn_go_', opt$feature, '_using_near.Rdata'))
 
 
@@ -626,7 +650,8 @@ saved_files <- c(paste0('rda/meqtl_mres_', opt$feature,
     '_using_near_meth11_proteincoding.Rdata'),
     paste0('rda/meqtl_venn_',opt$feature, '_using_near.Rdata'),
     paste0('rda/meqtl_summary_', opt$feature, '_using_near.Rdata'),
-    paste0('rda/meqtl_delta_pval_', opt$feature, '_using_near.Rdata')
+    paste0('rda/meqtl_delta_pval_', opt$feature, '_using_near.Rdata'),
+    paste0('rda/meqtl_venn_go_', opt$feature, '_using_near.Rdata')
 )
 for(i in saved_files) load(i, verbose = TRUE)
 rm(i)
