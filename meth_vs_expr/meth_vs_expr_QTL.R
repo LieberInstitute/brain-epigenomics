@@ -11,6 +11,7 @@ library('devtools')
 spec <- matrix(c(
     'cpg', 'c', 1, 'logical', 'Either TRUE for CpG or FALSE for nonCpG',
     'feature', 'f', 1, 'character', 'Either: gene, exon, jx or psi',
+    'jxside', 'j', 2, 'character', 'Either: right or left',
 	'help' , 'h', 0, 'logical', 'Display help'
 ), byrow=TRUE, ncol=5)
 opt <- getopt(spec)
@@ -31,13 +32,17 @@ if(FALSE) {
     opt <- list('cpg' = TRUE, 'feature' = 'gene')
     opt <- list('cpg' = TRUE, 'feature' = 'exon')
     opt <- list('cpg' = TRUE, 'feature' = 'jx')
+    opt <- list('cpg' = TRUE, 'feature' = 'jx', 'jxside' = 'left')
+    opt <- list('cpg' = TRUE, 'feature' = 'jx', 'jxside' = 'right')
     opt <- list('cpg' = TRUE, 'feature' = 'psi')
 }
 
 stopifnot(opt$feature %in% c('psi', 'gene', 'exon', 'jx'))
 cpg <- ifelse(opt$cpg, 'CpG', 'nonCpG')
 
-
+if(opt$feature == 'jx' & opt$cpg) {
+    stopifnot(opt$jxside %in% c('right', 'left'))
+}
 
 ## Load methylation data
 load_dmp <- function(is_cpg) {
@@ -102,6 +107,12 @@ load_expr <- function(type) {
     return(expr)
 }
 expr <- load_expr(opt$feature)
+
+if(opt$feature == 'jx' & opt$cpg) {
+    rowRanges(expr) <- resize(rowRanges(expr), width = 1,
+        fix = ifelse(opt$jxside == 'left', 'start', 'end'),
+        ignore.strand = TRUE)  
+}
 
 ## For matching the brain ids
 getid <- function(x) {
@@ -191,7 +202,8 @@ warnings()
     
 message(paste(Sys.time(), 'saving MatrixEQTL results'))
 dir.create('rda', showWarnings = FALSE)
-save(me, file = paste0('rda/me_', cpg, '_', opt$feature, '.Rdata'))
+save(me, file = paste0('rda/me_', cpg, '_', opt$feature,
+    ifelse(opt$feature == 'jx' & opt$cpg, opt$jxside, ''),'.Rdata'))
 
 ## Load the BSobj again
 BSobj <- load_dmp(opt$cpg)
@@ -236,7 +248,7 @@ if(opt$feature == 'psi') {
 }
 save(me_annotated,
     file = paste0('rda/me_annotated_FDR5_', cpg, '_', opt$feature,
-    '.Rdata'))
+    ifelse(opt$feature == 'jx' & opt$cpg, opt$jxside, ''), '.Rdata'))
     
 ## Explore annotated mEQTLs with FDR < 5%
 print('Trinucleotide vs C context')
@@ -291,7 +303,8 @@ plotting_code <- function(i) {
 }
 
 dir.create('pdf', showWarnings = FALSE)
-pdf(paste0('pdf/top100_FDR5_', cpg, '_', opt$feature, '.pdf'))
+pdf(paste0('pdf/top100_FDR5_', cpg, '_', opt$feature,
+    ifelse(opt$feature == 'jx' & opt$cpg, opt$jxside, ''), '.pdf'))
 for(i in seq_len(100)) {
     plotting_code(i)
 }
@@ -318,7 +331,8 @@ round(addmargins(table('Expr Delta >= 0.1' = expr_delta >= 0.1, 'Meth N >= 4' = 
 
 ## Make scatter plots of the top 100 with at least 4 samples with non-zero meth
 if(length(which(meth_n >= 4)) > 0) {
-    pdf(paste0('pdf/top100_FDR5_min_Meth4_', cpg, '_', opt$feature, '.pdf'))
+    pdf(paste0('pdf/top100_FDR5_min_Meth4_', cpg, '_', opt$feature,
+        ifelse(opt$feature == 'jx' & opt$cpg, opt$jxside, ''), '.pdf'))
     for(i in head(which(meth_n >= 4), 100)) {
         plotting_code(i)
     }
@@ -329,7 +343,9 @@ if(length(which(meth_n >= 4)) > 0) {
 
 ## Make scatter plots of the top 100 with at least 4 samples with non-zero meth and a expr change of at least 0.1
 if(length(which(meth_n >= 4 & expr_delta >= 0.1)) > 0) {
-    pdf(paste0('pdf/top100_FDR5_min_Meth4_exprDelta0.1_', cpg, '_', opt$feature, '.pdf'))
+    pdf(paste0('pdf/top100_FDR5_min_Meth4_exprDelta0.1_', cpg, '_',
+        opt$feature, ifelse(opt$feature == 'jx' & opt$cpg, opt$jxside, ''),
+        '.pdf'))
     for(i in head(which(meth_n >= 4 & expr_delta >= 0.1), 100)) {
         plotting_code(i)
     }
