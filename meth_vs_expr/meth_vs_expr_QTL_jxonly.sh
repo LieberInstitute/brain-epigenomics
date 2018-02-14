@@ -21,7 +21,7 @@ echo "Creating script for cpg ${cpg} for feature type ${type} side ${jxside} (ne
 cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l mem_free=180G,h_vmem=180G,h_fsize=200G
+#$ -l bluejay,mem_free=140G,h_vmem=140G,h_fsize=200G
 #$ -N ${SHORT}
 #$ -o ./logs/${SHORT}.txt
 #$ -e ./logs/${SHORT}.txt
