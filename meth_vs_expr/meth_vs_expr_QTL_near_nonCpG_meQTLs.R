@@ -134,12 +134,12 @@ if(opt$feature == 'jx') {
     
     ## Take a window around the end of the jx, then reduce to reduce
     ## mem needed for this step
-    expr_row <- reduce(resize(expr_row, width(expr_row) + 2000, fix = 'center'))
+    expr_row <- reduce(resize(expr_row, width(expr_row) + 1000, fix = 'center'))
     
     me_ov <- findOverlaps(expr_row, expr)
 
     message(paste(Sys.time(), 'keeping the following percent of', opt$feature, opt$jxside, 'side'))
-    round(length(unique(subjectHits(me_ov))) / nrow(expr) * 100, 2)
+    print(round(length(unique(subjectHits(me_ov))) / nrow(expr) * 100, 2))
     expr <- expr[sort(unique(subjectHits(me_ov))), ]
     rm(me_ov, expr_row)    
 }  else {
@@ -147,7 +147,7 @@ if(opt$feature == 'jx') {
     me_ov <- findOverlaps(resize(rowRanges(meqtl$expr), width(rowRanges(meqtl$expr)) + 2000, fix = 'center'), expr)
 
     message(paste(Sys.time(), 'keeping the following percent of' , opt$feature))
-    round(length(unique(subjectHits(me_ov))) / nrow(expr) * 100, 2)
+    print(round(length(unique(subjectHits(me_ov))) / nrow(expr) * 100, 2))
     expr <- expr[sort(unique(subjectHits(me_ov))), ]
     rm(me_ov, meqtl)
 }
