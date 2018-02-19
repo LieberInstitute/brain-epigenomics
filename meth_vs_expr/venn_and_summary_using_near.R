@@ -679,6 +679,27 @@ dev.off()
 save(go_venn_res, go_cluster_comp, uni, v_symb, file = paste0('rda/meqtl_venn_go_', opt$feature, '_using_near.Rdata'))
 
 
+
+## Compute coefficient, stats and p-value for methylation vs age
+get_age <- function(type) {
+    colData(mres[[type]]$meth)$Age
+}
+get_meth <- function(type, i) {
+    as.vector(getMeth(mres[[type]]$meth[i, ], type = 'raw'))
+}
+
+age_coef <- lapply(names(mres), function(type) {
+    message(paste(Sys.time(), 'processing', type))
+    age <- get_age(type)
+    as.data.frame(t(apply(getMeth(mres[[type]]$meth, type = 'raw'), 1, function(row_i) {
+        fit <- lm(age ~ row_i)
+        summary(fit)$coef[2, ]
+    })))
+})
+save(age_coef, file = paste0('rda/meqtl_age_coef_', opt$feature, '_using_near.Rdata'))
+
+
+
 ## Reproducibility info
 proc.time()
 message(Sys.time())
@@ -693,7 +714,8 @@ saved_files <- c(paste0('rda/meqtl_mres_', opt$feature,
     paste0('rda/meqtl_venn_',opt$feature, '_using_near.Rdata'),
     paste0('rda/meqtl_summary_', opt$feature, '_using_near.Rdata'),
     paste0('rda/meqtl_delta_pval_', opt$feature, '_using_near.Rdata'),
-    paste0('rda/meqtl_venn_go_', opt$feature, '_using_near.Rdata')
+    paste0('rda/meqtl_venn_go_', opt$feature, '_using_near.Rdata'),
+    paste0('rda/meqtl_age_coef_', opt$feature, '_using_near.Rdata')
 )
 for(i in saved_files) load(i, verbose = TRUE)
 rm(i)
