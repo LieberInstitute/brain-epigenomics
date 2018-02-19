@@ -741,6 +741,28 @@ ggplot(as.data.frame(data_by_venn), aes(y = Estimate, x = beta)) + geom_bin2d() 
 dev.off()
 
 
+## For top in neurons, then in glia
+venn_5k <- function(sub5k) {
+    print(ggplot(sub5k, aes(y = beta, x = vset, fill = vset)) + geom_boxplot() + facet_grid(typeref ~ .) + scale_fill_discrete(name = 'Venn group') + xlab('Venn group') + theme_grey(base_size = 18) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + ylab('Beta: expr by methylation') + stat_summary(fun.data = give.n, geom = "text", position = position_nudge(y = min(sub5k$beta))))
+
+    print(ggplot(sub5k, aes(y = Estimate, x = vset, fill = vset)) + geom_boxplot() + facet_grid(typeref ~ .) + scale_fill_discrete(name = 'Venn group') + xlab('Venn group') + theme_grey(base_size = 18) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + ylab('Beta: age by methylation') + stat_summary(fun.data = give.n, geom = "text", position = position_nudge(y = min(sub5k$Estimate))))
+
+    print(ggplot(sub5k, aes(y = Estimate, x = beta)) + geom_density_2d() + facet_grid(typeref ~ vset) + xlab('Beta: expr by methylation') + theme_grey(base_size = 18) + ylab('Beta: age by methylation'))
+
+    print(ggplot(sub5k, aes(y = Estimate, x = beta)) + geom_bin2d() + facet_grid(typeref ~ vset) + xlab('Beta: expr by methylation') + theme_grey(base_size = 18) + ylab('Beta: age by methylation'))
+    return(NULL)
+}
+
+pdf(paste0('pdf/meth_vs_expr_venn_beta_', opt$feature, '_top5k.pdf'), width = 14, height = 10)
+venn_5k(as.data.frame(subset(data_by_venn, gene %in% rownames(top5k))))
+dev.off()
+
+pdf(paste0('pdf/meth_vs_expr_venn_beta_', opt$feature, '_top5kglia.pdf'), width = 14, height = 10)
+venn_5k(as.data.frame(subset(data_by_venn, gene %in% rownames(top5kglia))))
+dev.off()
+
+
+
 
 ## Reproducibility info
 proc.time()
