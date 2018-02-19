@@ -72,10 +72,10 @@ load_expr <- function(type) {
         assays(rse_jx)$norm <- recount::getRPKM(rse_jx, 'Length')
         expr <- rse_jx
     }
-    
+
     ## Subset to postnatal and PolyA only
     expr <- expr[, colData(expr)$Age > 0 & colData(expr)$Experiment == 'PolyA']
-    
+
     ## Drop low expressed features
     if(type != 'psi') {
         if(!file.exists(paste0('rda/expr_', opt$feature, '_unfiltered.Rdata'))) {
@@ -86,7 +86,7 @@ load_expr <- function(type) {
             message(paste(cuts, collapse = ' '))
             cut <- max(cuts)
             dev.off()
-    
+
             meanExpr <- rowMeans(assays(expr)$norm)
             rowRanges(expr)$meanExprs <- meanExpr
             rowRanges(expr)$passExprsCut <- meanExpr > cut
@@ -94,7 +94,7 @@ load_expr <- function(type) {
             save(expr, file = paste0('rda/expr_', opt$feature, '_unfiltered.Rdata'))
         }
     }
-        
+
     return(expr)
 }
 
@@ -128,14 +128,14 @@ mres <- lapply(cpgs, function(cpg) {
     }
     message(paste(Sys.time(), 'loading the file', f))
     load(f, verbose = TRUE)
-    
+
     ## Just keep those with a finite statistic
     if(cpg == 'CpGmarg') {
         message(paste(Sys.time(), 'Keeping only those with finite statistics'))
         print(table(is.finite(me$cis$eqtls$statistic)))
         me_annotated <- list('eqtls' = me$cis$eqtls[is.finite(me$cis$eqtls$statistic), ], 'meth' = 1, 'expr' = 2)
-        
-        
+
+
         ## For getting the meth_n part
         message(paste(Sys.time(), 'computing the parts for meth_n'))
         expr <- load_expr(opt$feature)
@@ -151,12 +151,12 @@ mres <- lapply(cpgs, function(cpg) {
         colnames(BSobj) <- paste0('Br', getid(colData(BSobj)$Brain.ID))
         cp_ov <- findOverlaps(resize(rowRanges(expr), width(rowRanges(expr)) + 2000, fix = 'center'), BSobj)
         BSobj <- BSobj[sort(unique(subjectHits(cp_ov))), ]
-        
+
         ## Finally get meth_n
         snp_id <- function(x) { as.integer(gsub('row', '', x)) }
-        
+
         BSobj <- BSobj[snp_id(me_annotated$eqtls$snps), ]
-        
+
         meth_n <- rowSums(getMeth(BSobj, type = 'raw') > 0)
         me_annotated$eqtls <- me_annotated$eqtls[meth_n >= 4, ]
         me_annotated$meth <- BSobj[meth_n >= 4, ]
@@ -166,7 +166,7 @@ mres <- lapply(cpgs, function(cpg) {
         } else {
             me_annotated$expr <- expr[match(me_annotated$eqtls$gene, names(rowRanges(expr))), ]
         }
-    
+
         me_annotated$eqtls$meth_n <- meth_n[meth_n >= 4]
     } else {
         meth_n <- rowSums(getMeth(me_annotated$meth, type = 'raw') > 0)
@@ -175,15 +175,15 @@ mres <- lapply(cpgs, function(cpg) {
         me_annotated$expr <- me_annotated$expr[meth_n >= 4, ]
         me_annotated$eqtls$meth_n <- meth_n[meth_n >= 4]
     }
-    
+
     message(paste(Sys.time(), 'computing the expression delta'))
     if(opt$feature == 'psi') {
         me_annotated$eqtls$expr_delta <- apply(variantFreq(me_annotated$expr), 1, function(x) diff(range(x)) )
     } else {
         me_annotated$eqtls$expr_delta <- apply(log2(assays(me_annotated$expr)$norm + 1), 1, function(x) diff(range(x)) )
     }
-    
-    
+
+
     return(me_annotated)
 })
 names(mres) <- cpgs
@@ -192,7 +192,7 @@ dir.create('rda', showWarnings = FALSE)
 message(paste(Sys.time(), 'saving the mres object'))
 save(mres, file = paste0('rda/meqtl_mres_', opt$feature,
     '_using_near.Rdata'))
-    
+
 
 ## Simplify rowRanges() for the psi info just to make the rest of the
 ## code work
@@ -202,7 +202,7 @@ if(opt$feature == 'psi') {
     gene <- load_expr('gene')
     ## Change back to normal
     opt$feature <- 'psi'
-    
+
     ## Use the gene-level info to simplify things
     for(cp in names(mres)) {
         newgr <- unlist(range(rowRanges(mres[[cp]]$expr)))
@@ -211,7 +211,7 @@ if(opt$feature == 'psi') {
         mcols(newgr) <- mcols(gene)[mgr, ]
         names(newgr) <- names(gene)[mgr]
         mres[[cp]]$eqtls$gene <- names(newgr)
-        
+
         #mres[[cp]]$eqtls$gene_name <- names(gene)[mgr]
         #names(newgr) <- mres[[cp]]$eqtls$gene
         rowRanges(mres[[cp]]$expr) <- newgr
@@ -219,7 +219,7 @@ if(opt$feature == 'psi') {
     }
     rm(cp, gene)
 }
-    
+
 ## Filter further to keep only those with meth_n >= 11
 ## and protein coding
 for(cp in names(mres)) {
@@ -254,7 +254,7 @@ if(opt$feature == 'gene') {
     print(colnames(fit_exon_combined$p.value)[co])
     top <- topTable(fit_exon_combined, coef = co, sort.by = 'none',
         number = nrow(fit_exon_combined$p.value))
-        
+
     ## Exon names don't match, load the required data
     load("/dcl01/lieber/ajaffe/CellSorting/RNAseq_pipeline/rawCounts_CellSorting_July5_n12.rda", verbose = TRUE)
     load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/brainseq_pipeline/polyA_unstranded/rse_exon_polyA_dlpfc_n41.Rdata', verbose = TRUE)
@@ -278,7 +278,7 @@ if(opt$feature == 'gene') {
 
     ## Clean up
     rm(check_gr, rse_exon, ov, m1, exonCounts, exonMap, geneCounts, geneMap, jCounts, jMap, metrics, txMap, txNumReads, getRPKM)
-        
+
 } else if (opt$feature == 'psi') {
     ## Use the gene info here
     load(paste0('rda/meqtl_venn_gene_using_near.Rdata'), verbose = TRUE)
@@ -289,7 +289,7 @@ print('Number of DE features at FDR 5%')
 table(top$adj.P.Val < 0.05)
 
 ## Keep the top 5k DE features (there's enough for genes and exons)
-top <- top[top$adj.P.Val < 0.05, ] 
+top <- top[top$adj.P.Val < 0.05, ]
 
 ## Keep only those with negative log FC (higher in Neurons)
 top5k <- top[sign(top$logFC) == -1, ]
@@ -408,8 +408,50 @@ xylim <- c(0, round(max(find_pval('nonCpG')) + 0.5, 0))
 plot(x = find_pval('CpG'), y = find_pval('nonCpG'), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste(length(common), 'common', opt$feature, 'meQTLs'), xlim = xylim, ylim = xylim)
 plot(x = find_pval('CpG', TRUE), y = find_pval('nonCpG', TRUE), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste0(sum(common %in% rownames(top5k)), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5k), ' ', ifelse(opt$feature == 'psi', 'gene', opt$feature), 's expressed in Neurons'), xlim = xylim, ylim = xylim)
 plot(x = find_pval('CpG', t5kg = TRUE), y = find_pval('nonCpG', t5kg = TRUE), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste0(sum(common %in% rownames(top5kglia)), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5kglia), ' ', ifelse(opt$feature == 'psi', 'gene', opt$feature), 's expressed in Glia'), xlim = xylim, ylim = xylim)
-
 dev.off()
+
+
+## beta instead of FDR
+## beta is the coef for change in expr explained by a 1 unit change in meth
+find_beta <- function(type, t5k = FALSE, t5kg = FALSE) {
+    res <- m_summary$beta[m_summary$gene %in% common & m_summary$type == type]
+    ## Add the name
+    names(res) <- m_summary$gene[m_summary$gene %in% common & m_summary$type == type]
+    ## Match the order
+    res <- res[match(common, names(res))]
+    if(t5k) {
+        res <- res[names(res) %in% rownames(top5k)]
+    } else if (t5kg) {
+        res <- res[names(res) %in% rownames(top5kglia)]
+    }
+    return(res)
+}
+
+pdf(paste0('pdf/scatter_beta_', opt$feature, '_using_near.pdf'))
+plot(x = find_beta('CpG'), y = find_beta('nonCpG'), pch = 20, xlab = 'Beta from best FDR p-value with CpGs', ylab = 'Beta from best FDR p-value with non CpGs', main = paste(length(common), 'common', opt$feature, 'meQTLs'))
+abline(v = 0, col = 'grey80')
+abline(h = 0, col = 'grey80')
+plot(x = find_beta('CpG', TRUE), y = find_beta('nonCpG', TRUE), pch = 20, xlab = 'Beta from best FDR p-value with CpGs', ylab = 'Beta from best FDR p-value with non CpGs', main = paste0(sum(common %in% rownames(top5k)), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5k), ' ', ifelse(opt$feature == 'psi', 'gene', opt$feature), 's expressed in Neurons'))
+abline(v = 0, col = 'grey80')
+abline(h = 0, col = 'grey80')
+plot(x = find_beta('CpG', t5kg = TRUE), y = find_beta('nonCpG', t5kg = TRUE), pch = 20, xlab = 'Beta from best FDR p-value with CpGs', ylab = 'Beta from best FDR p-value with non CpGs', main = paste0(sum(common %in% rownames(top5kglia)), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5kglia), ' ', ifelse(opt$feature == 'psi', 'gene', opt$feature), 's expressed in Glia'))
+abline(v = 0, col = 'grey80')
+abline(h = 0, col = 'grey80')
+
+## Limiting axes
+xylim <- range(c(find_beta('CpG'), find_beta('nonCpG')))
+plot(x = find_beta('CpG'), y = find_beta('nonCpG'), pch = 20, xlab = 'Beta from best FDR p-value with CpGs', ylab = 'Beta from best FDR p-value with non CpGs', main = paste(length(common), 'common', opt$feature, 'meQTLs'), xlim = xylim, ylim = xylim)
+abline(v = 0, col = 'grey80')
+abline(h = 0, col = 'grey80')
+plot(x = find_beta('CpG', TRUE), y = find_beta('nonCpG', TRUE), pch = 20, xlab = 'Beta from best FDR p-value with CpGs', ylab = 'Beta from best FDR p-value with non CpGs', main = paste0(sum(common %in% rownames(top5k)), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5k), ' ', ifelse(opt$feature == 'psi', 'gene', opt$feature), 's expressed in Neurons'), xlim = xylim, ylim = xylim)
+abline(v = 0, col = 'grey80')
+abline(h = 0, col = 'grey80')
+plot(x = find_beta('CpG', t5kg = TRUE), y = find_beta('nonCpG', t5kg = TRUE), pch = 20, xlab = 'Beta from best FDR p-value with CpGs', ylab = 'Beta from best FDR p-value with non CpGs', main = paste0(sum(common %in% rownames(top5kglia)), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5kglia), ' ', ifelse(opt$feature == 'psi', 'gene', opt$feature), 's expressed in Glia'), xlim = xylim, ylim = xylim)
+abline(v = 0, col = 'grey80')
+abline(h = 0, col = 'grey80')
+dev.off()
+
+
 
 ## Make some scatter plots of the methylation vs expr
 delta_pval <- data.frame(delta = find_pval('nonCpG') - find_pval('CpG'), gene = names(find_pval('CpG')), nonCpG = find_pval('nonCpG'), CpG = find_pval('CpG'), stringsAsFactors = FALSE)
@@ -459,7 +501,7 @@ find_i <- function(n = 10, t5k = FALSE, c_max = 200, nc_max = 200, t5kg = FALSE)
 
 
 find_i_venn <- function(mtype = 'nonCpG', vennset = 'nonCpG', t5k = FALSE, n = 100, t5kg = FALSE) {
-    
+
     use <- subset(m_summary, type == mtype)
     use <- use[order(use$FDR, decreasing = FALSE), ]
     if(t5k) {
@@ -497,7 +539,7 @@ get_col <- function(type = 'nonCpG', ag = FALSE) {
         ifelse(colData(mres[[type]]$meth)$Age <= 12, 'Child',
         ifelse(colData(mres[[type]]$meth)$Age <= 17, 'Teen', 'Adult')))),
         levels = c('Infant', 'Child', 'Teen', 'Adult', 'Prenatal'))
-    
+
     age_group_cell <- factor(paste0(age_group, '_', colData(mres[[type]]$meth)$Cell.Type),
         levels = c(paste0(rep(levels(age_group)[1:4], each = 2),
         '_', c('Glia', 'Neuron')), 'Prenatal_H'))
@@ -518,12 +560,12 @@ if(opt$feature == 'gene') {
 
 set.seed(20180207)
 plotting_code <- function(i, type = 'nonCpG') {
-    if(length(i) > 1) { 
+    if(length(i) > 1) {
         sapply(i, plotting_code, type = type)
         return(NULL)
     }
     main <- paste(opt$feature, ifelse(opt$feature %in% c('gene', 'psi'), mres[[type]]$eqtls$gene[i], rowRanges(mres[[type]]$expr[i])$exon_gencodeID), 'FDR', signif(mres[[type]]$eqtls$FDR[i], 3), '\n',  rowRanges(mres[[type]]$expr[i])$Symbol)
-    
+
     plot(x = jitter(getMeth(mres[[type]]$meth[i, ], type = 'raw'), 0.05), y = jitter(get_y(type, i), 0.05), xlab = 'Methylation', ylab = ylab, main = main, sub = paste(as.vector(seqnames(rowRanges(mres[[type]]$meth)[i])), start(rowRanges(mres[[type]]$meth)[i]), as.vector(strand(rowRanges(mres[[type]]$meth)[i])), as.vector(rowRanges(mres[[type]]$meth)$c_context[i])), col = get_col(type))
 }
 
