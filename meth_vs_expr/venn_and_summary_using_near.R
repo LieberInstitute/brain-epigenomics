@@ -8,6 +8,7 @@ library('VennDiagram')
 library('RColorBrewer')
 library('clusterProfiler')
 library('org.Hs.eg.db')
+library('ggplot2')
 
 ## Specify parameters
 spec <- matrix(c(
@@ -696,7 +697,48 @@ age_coef <- lapply(names(mres), function(type) {
         summary(fit)$coef[2, ]
     })))
 })
+names(age_coef) <- names(mres)
 save(age_coef, file = paste0('rda/meqtl_age_coef_', opt$feature, '_using_near.Rdata'))
+
+
+## Extract beta and age coef info for the venn groups
+data_by_venn <- do.call(rbind, lapply(c('nonCpG', 'CpGmarg'), function(typeref) {
+    which_v <- grep(typeref, names(attr(vennres, 'intersections')))
+    res_ref <- mapply(function(vset, vname) {
+        iset <- which(mres[[typeref]]$eqtls$gene %in% vset)
+        ## Put together eQTL info and age coef data
+        res <- cbind(DataFrame(mres[[typeref]]$eqtls[iset, ]), age_coef[[typeref]][iset, ])
+        ## Fix column names
+        colnames(res)[(ncol(mres[[typeref]]$eqtls) + 1):ncol(res)] <- colnames(age_coef[[typeref]])
+        res$vset <- vname
+        return(res)
+    }, attr(vennres, 'intersections')[which_v], names(attr(vennres, 'intersections')[which_v]))
+    res_ref <- do.call(rbind, res_ref)
+    res_ref$typeref <- typeref
+    return(res_ref)
+}))
+save(data_by_venn, file = paste0('rda/meqtldata_by_venn_', opt$feature, '_using_near.Rdata'))
+
+## Compare beta, then by venn groups
+
+# From https://stackoverflow.com/questions/3483203/create-a-boxplot-in-r-that-labels-a-box-with-the-sample-size-n
+give.n <- function(x){
+    return(c(y = mean(x), label = length(x)))
+}
+
+pdf(paste0('pdf/meth_vs_expr_venn_beta_', opt$feature, '.pdf'), width = 14, height = 10)
+ggplot(as.data.frame(data_by_venn), aes(y = beta, x = vset, fill = vset)) + geom_boxplot() + facet_grid(typeref ~ .) + scale_fill_discrete(name = 'Venn group') + xlab('Venn group') + theme_grey(base_size = 18) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + ylab('Beta: expr by methylation') + stat_summary(fun.data = give.n, geom = "text", position = position_nudge(y = min(data_by_venn$beta)))
+
+ggplot(as.data.frame(data_by_venn), aes(y = Estimate, x = vset, fill = vset)) + geom_boxplot() + facet_grid(typeref ~ .) + scale_fill_discrete(name = 'Venn group') + xlab('Venn group') + theme_grey(base_size = 18) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + ylab('Beta: age by methylation') + stat_summary(fun.data = give.n, geom = "text", position = position_nudge(y = min(data_by_venn$Estimate)))
+
+ggplot(as.data.frame(data_by_venn), aes(y = Estimate, x = beta)) + geom_density_2d() + facet_grid(typeref ~ vset) + xlab('Beta: expr by methylation') + theme_grey(base_size = 18) + ylab('Beta: age by methylation')
+
+ggplot(as.data.frame(data_by_venn), aes(y = Estimate, x = beta)) + geom_bin2d() + facet_grid(typeref ~ vset) + xlab('Beta: expr by methylation') + theme_grey(base_size = 18) + ylab('Beta: age by methylation')
+
+
+#ggplot(as.data.frame(data_by_venn), aes(y = Estimate, x = beta, colour = vset)) + geom_point() + facet_grid(typeref ~ vset) + scale_colour_discrete(name = 'Venn group') + xlab('Beta: expr by methylation') + theme_grey(base_size = 18) + ylab('Beta: age by methylation')
+
+dev.off()
 
 
 
@@ -715,7 +757,8 @@ saved_files <- c(paste0('rda/meqtl_mres_', opt$feature,
     paste0('rda/meqtl_summary_', opt$feature, '_using_near.Rdata'),
     paste0('rda/meqtl_delta_pval_', opt$feature, '_using_near.Rdata'),
     paste0('rda/meqtl_venn_go_', opt$feature, '_using_near.Rdata'),
-    paste0('rda/meqtl_age_coef_', opt$feature, '_using_near.Rdata')
+    paste0('rda/meqtl_age_coef_', opt$feature, '_using_near.Rdata'),
+    paste0('rda/meqtldata_by_venn_', opt$feature, '_using_near.Rdata')
 )
 for(i in saved_files) load(i, verbose = TRUE)
 rm(i)
