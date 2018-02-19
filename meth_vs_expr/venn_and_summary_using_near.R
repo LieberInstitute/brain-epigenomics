@@ -733,7 +733,7 @@ ggplot(as.data.frame(data_by_venn), aes(y = Estimate, x = vset, fill = vset)) + 
 
 ggplot(as.data.frame(data_by_venn), aes(y = Estimate, x = beta)) + geom_density_2d() + facet_grid(typeref ~ vset) + xlab('Beta: expr by methylation') + theme_grey(base_size = 18) + ylab('Beta: age by methylation')
 
-ggplot(as.data.frame(data_by_venn), aes(y = Estimate, x = beta)) + geom_bin2d() + facet_grid(typeref ~ vset) + xlab('Beta: expr by methylation') + theme_grey(base_size = 18) + ylab('Beta: age by methylation')
+ggplot(as.data.frame(data_by_venn), aes(y = Estimate, x = beta)) + geom_bin2d(bins = 100) + facet_grid(typeref ~ vset) + xlab('Beta: expr by methylation') + theme_grey(base_size = 18) + ylab('Beta: age by methylation')
 
 
 #ggplot(as.data.frame(data_by_venn), aes(y = Estimate, x = beta, colour = vset)) + geom_point() + facet_grid(typeref ~ vset) + scale_colour_discrete(name = 'Venn group') + xlab('Beta: expr by methylation') + theme_grey(base_size = 18) + ylab('Beta: age by methylation')
@@ -749,7 +749,7 @@ venn_5k <- function(sub5k) {
 
     print(ggplot(sub5k, aes(y = Estimate, x = beta)) + geom_density_2d() + facet_grid(typeref ~ vset) + xlab('Beta: expr by methylation') + theme_grey(base_size = 18) + ylab('Beta: age by methylation'))
 
-    print(ggplot(sub5k, aes(y = Estimate, x = beta)) + geom_bin2d() + facet_grid(typeref ~ vset) + xlab('Beta: expr by methylation') + theme_grey(base_size = 18) + ylab('Beta: age by methylation'))
+    print(ggplot(sub5k, aes(y = Estimate, x = beta)) + geom_bin2d(bins = 100) + facet_grid(typeref ~ vset) + xlab('Beta: expr by methylation') + theme_grey(base_size = 18) + ylab('Beta: age by methylation'))
     return(NULL)
 }
 
