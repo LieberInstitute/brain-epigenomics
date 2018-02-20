@@ -703,6 +703,25 @@ names(age_coef) <- names(mres)
 save(age_coef, file = paste0('rda/meqtl_age_coef_', opt$feature, '_using_near.Rdata'))
 
 
+beta_common <- do.call(rbind, lapply(seq_len(nrow(delta_pval)), function(i) {
+    di <- delta_pval$i_nonCpG[[i]]
+    data.frame(
+        beta = mres[['nonCpG']]$eqtls$beta[di],
+        t = mres[['nonCpG']]$eqtls$statistic[di],
+        agebeta = age_coef[['nonCpG']]$Estimate[di],
+        aget = age_coef[['nonCpG']][, 't value'][di],
+        gtype = ifelse(delta_pval$top5k[i], 'neuron', ifelse(delta_pval$top5kglia[i], 'glia', 'none')),
+        stringsAsFactors = FALSE
+    )
+}))
+
+pdf(paste0('pdf/scatter_beta_vs_agebeta_nonCpGbackground_', opt$feature, '.pdf'), width = 15)
+ggplot(beta_common, aes(x = beta, y = agebeta, colour = gtype)) + geom_point() + ylab('Age by methylation beta') + theme_grey(base_size = 18) + xlab('Expr by methylation beta') + scale_colour_discrete(name = 'Feature\ntype') + facet_grid(. ~ gtype) + ggtitle('nonCpGs common with CpGs: best meQTL by FDR per gene')
+ggplot(beta_common, aes(x = t, y = aget, colour = gtype)) + geom_point() + ylab('Age by methylation statistic') + theme_grey(base_size = 18) + xlab('Expr by methylation statistic') + scale_colour_discrete(name = 'Feature\ntype') + facet_grid(. ~ gtype) + ggtitle('nonCpGs common with CpGs: best meQTL by FDR per gene')
+dev.off()
+
+
+
 ## Extract beta and age coef info for the venn groups
 data_by_venn <- do.call(rbind, lapply(c('nonCpG', 'CpGmarg'), function(typeref) {
     which_v <- grep(typeref, names(attr(vennres, 'intersections')))
