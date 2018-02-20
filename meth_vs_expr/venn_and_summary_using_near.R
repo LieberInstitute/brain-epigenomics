@@ -793,13 +793,21 @@ data_venn_summ <- DataFrame(
     beta_t_median = get_summary(data_by_venn$statistic, median),
     agebeta_t_mean = get_summary(data_by_venn[, 't value'], mean),
     agebeta_t_median = get_summary(data_by_venn[, 't value'], median),
+    n_meqtls = get_summary(data_by_venn$beta, elementNROWS),
     typeref = sapply(strsplit(unique(grp), '_'), '[[', 1),
     vset = sapply(strsplit(unique(grp), '_'), '[[', 2),
-    gene = sapply(strsplit(unique(grp), '_'), '[[', 3)
+    gene = sapply(strsplit(unique(grp), '_'), function(x) { paste(x[3:length(x)], collapse = '_') })
 )
+data_venn_summ$gtype <- ifelse(data_venn_summ$gene %in% rownames(top5k), 'neuron', ifelse(data_venn_summ$gene %in% rownames(top5kglia), 'glia', 'none'))
 save(data_venn_summ, file = paste0('rda/meqtl_data_venn_summ_', opt$feature, '_using_near.Rdata'))
 
+## Explore briefly
+dim(data_venn_summ)
+head(data_venn_summ)
+summary(as.data.frame(data_venn_summ))
+table(data_venn_summ$gtype)
 
+d <- data_venn_summ
 
 
 
