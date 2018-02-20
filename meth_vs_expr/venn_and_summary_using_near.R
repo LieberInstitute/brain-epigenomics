@@ -729,22 +729,6 @@ give.n <- function(x){
     return(c(y = mean(x), label = length(x)))
 }
 
-pdf(paste0('pdf/meth_vs_expr_venn_beta_', opt$feature, '.pdf'), width = 14, height = 10)
-ggplot(as.data.frame(data_by_venn), aes(y = beta, x = vset, fill = vset)) + geom_boxplot() + facet_grid(typeref ~ .) + scale_fill_discrete(name = 'Venn group') + xlab('Venn group') + theme_grey(base_size = 18) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + ylab('Beta: expr by methylation') + stat_summary(fun.data = give.n, geom = "text", position = position_nudge(y = min(data_by_venn$beta)))
-
-ggplot(as.data.frame(data_by_venn), aes(y = Estimate, x = vset, fill = vset)) + geom_boxplot() + facet_grid(typeref ~ .) + scale_fill_discrete(name = 'Venn group') + xlab('Venn group') + theme_grey(base_size = 18) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + ylab('Beta: age by methylation') + stat_summary(fun.data = give.n, geom = "text", position = position_nudge(y = min(data_by_venn$Estimate)))
-
-ggplot(as.data.frame(data_by_venn), aes(y = Estimate, x = beta)) + geom_density_2d() + facet_grid(typeref ~ vset) + xlab('Beta: expr by methylation') + theme_grey(base_size = 18) + ylab('Beta: age by methylation')
-
-ggplot(as.data.frame(data_by_venn), aes(y = Estimate, x = beta)) + geom_bin2d(bins = 100) + facet_grid(typeref ~ vset) + xlab('Beta: expr by methylation') + theme_grey(base_size = 18) + ylab('Beta: age by methylation')
-
-
-#ggplot(as.data.frame(data_by_venn), aes(y = Estimate, x = beta, colour = vset)) + geom_point() + facet_grid(typeref ~ vset) + scale_colour_discrete(name = 'Venn group') + xlab('Beta: expr by methylation') + theme_grey(base_size = 18) + ylab('Beta: age by methylation')
-
-dev.off()
-
-
-## For top in neurons, then in glia
 venn_5k <- function(sub5k) {
     print(ggplot(sub5k, aes(y = beta, x = vset, fill = vset)) + geom_boxplot() + facet_grid(typeref ~ .) + scale_fill_discrete(name = 'Venn group') + xlab('Venn group') + theme_grey(base_size = 18) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + ylab('Beta: expr by methylation') + stat_summary(fun.data = give.n, geom = "text", position = position_nudge(y = min(sub5k$beta))))
 
@@ -753,9 +737,17 @@ venn_5k <- function(sub5k) {
     print(ggplot(sub5k, aes(y = Estimate, x = beta)) + geom_density_2d() + facet_grid(typeref ~ vset) + xlab('Beta: expr by methylation') + theme_grey(base_size = 18) + ylab('Beta: age by methylation'))
 
     print(ggplot(sub5k, aes(y = Estimate, x = beta)) + geom_bin2d(bins = 100) + facet_grid(typeref ~ vset) + xlab('Beta: expr by methylation') + theme_grey(base_size = 18) + ylab('Beta: age by methylation'))
+
+    #print(ggplot(sub5k, aes(y = Estimate, x = beta, colour = vset)) + geom_point() + facet_grid(typeref ~ vset) + scale_colour_discrete(name = 'Venn group') + xlab('Beta: expr by methylation') + theme_grey(base_size = 18) + ylab('Beta: age by methylation'))
     return(NULL)
 }
 
+
+pdf(paste0('pdf/meth_vs_expr_venn_beta_', opt$feature, '.pdf'), width = 14, height = 10)
+venn_5k(as.data.frame(data_by_venn))
+dev.off()
+
+## For top in neurons, then in glia
 pdf(paste0('pdf/meth_vs_expr_venn_beta_', opt$feature, '_top5k.pdf'), width = 14, height = 10)
 venn_5k(as.data.frame(subset(data_by_venn, gene %in% rownames(top5k))))
 dev.off()
@@ -776,9 +768,11 @@ data_venn_summ <- DataFrame(
     beta_mean = get_summary(data_by_venn$beta, mean),
     beta_median = get_summary(data_by_venn$beta, median),
     beta_prop_pos = get_summary(sign(data_by_venn$beta) == 1, mean),
+    beta_sign_mean = get_summary(sign(data_by_venn$beta), mean),
     agebeta_mean = get_summary(data_by_venn$Estimate, mean),
     agebeta_median = get_summary(data_by_venn$Estimate, median),
     agebeta_prop_pos = get_summary(sign(data_by_venn$Estimate) == 1, mean),
+    agebeta_sign_mean = get_summary(sign(data_by_venn$Estimate), mean),
     beta_neglog10FDR_mean = get_summary(-log10(data_by_venn$FDR), mean),
     beta_neglog10FDR_median = get_summary(-log10(data_by_venn$FDR), median),
     beta_neglog10pval_mean = get_summary(-log10(data_by_venn$FDR), mean),
@@ -799,6 +793,8 @@ data_venn_summ <- DataFrame(
     gene = sapply(strsplit(unique(grp), '_'), function(x) { paste(x[3:length(x)], collapse = '_') })
 )
 data_venn_summ$gtype <- ifelse(data_venn_summ$gene %in% rownames(top5k), 'neuron', ifelse(data_venn_summ$gene %in% rownames(top5kglia), 'glia', 'none'))
+## https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
+data_venn_summ$distance_diag <- with(data_venn_summ, abs( abs(beta_sign_mean) - abs(agebeta_sign_mean)) / sqrt(2))
 save(data_venn_summ, file = paste0('rda/meqtl_data_venn_summ_', opt$feature, '_using_near.Rdata'))
 
 ## Explore briefly
@@ -807,8 +803,37 @@ head(data_venn_summ)
 summary(as.data.frame(data_venn_summ))
 table(data_venn_summ$gtype)
 
-d <- data_venn_summ
+d <- as.data.frame(data_venn_summ)
 
+
+## Explore at the feature level
+pdf(paste0('pdf/meth_vs_expr_venn_byfeature_', opt$feature, '.pdf'), width = 14, height = 10)
+ggplot(d, aes(y = agebeta_mean, x = beta_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation mean beta') + theme_grey(base_size = 18) + ylab('Age by methylation mean beta') + scale_colour_discrete(name = 'Feature\ntype')
+ggplot(d, aes(y = agebeta_median, x = beta_median, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation median beta') + theme_grey(base_size = 18) + ylab('Age by methylation median beta') + scale_colour_discrete(name = 'Feature\ntype')
+
+ggplot(d, aes(y = agebeta_neglog10FDR_mean, x = beta_neglog10FDR_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation mean neg log 10 FDR') + theme_grey(base_size = 18) + ylab('Age by methylation mean neg log 10 FDR') + scale_colour_discrete(name = 'Feature\ntype')
+ggplot(d, aes(y = agebeta_neglog10FDR_median, x = beta_neglog10FDR_median, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation median neg log 10 FDR') + theme_grey(base_size = 18) + ylab('Age by methylation median neg log 10 FDR') + scale_colour_discrete(name = 'Feature\ntype')
+ggplot(d, aes(y = agebeta_neglog10pval_mean, x = beta_neglog10pval_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation mean neg log 10 pval') + theme_grey(base_size = 18) + ylab('Age by methylation mean neg log 10 pval') + scale_colour_discrete(name = 'Feature\ntype')
+ggplot(d, aes(y = agebeta_t_mean, x = beta_t_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation mean t') + theme_grey(base_size = 18) + ylab('Age by methylation mean t') + scale_colour_discrete(name = 'Feature\ntype')
+ggplot(d, aes(y = agebeta_t_median, x = beta_t_median, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation median t') + theme_grey(base_size = 18) + ylab('Age by methylation median t') + scale_colour_discrete(name = 'Feature\ntype')
+
+ggplot(d, aes(y = agebeta_prop_pos, x = beta_prop_pos, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation proportion positive') + theme_grey(base_size = 18) + ylab('Age by methylation proportion positive') + scale_colour_discrete(name = 'Feature\ntype')
+ggplot(d, aes(y = agebeta_sign_mean, x = beta_sign_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation sign mean') + theme_grey(base_size = 18) + ylab('Age by methylation sign mean') + scale_colour_discrete(name = 'Feature\ntype')
+## Lots of points on the diagonals in the previous 2 plots (at least at the gene level)
+## Take absolute on both axes
+ggplot(d, aes(y = abs(agebeta_sign_mean), x = abs(beta_sign_mean), colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation sign mean (abs)') + theme_grey(base_size = 18) + ylab('Age by methylation sign mean (abs)') + scale_colour_discrete(name = 'Feature\ntype')
+ggplot(d, aes(y = distance_diag, x = n_meqtls, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + ylab('Expr and age by methylation sign distance to diagonal') + theme_grey(base_size = 18) + xlab('Number of meQTLs') + scale_colour_discrete(name = 'Feature\ntype')
+ggplot(d, aes(y = distance_diag, x = beta_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + ylab('Expr and age by methylation sign distance to diagonal') + theme_grey(base_size = 18) + xlab('Expr by methylation mean beta') + scale_colour_discrete(name = 'Feature\ntype')
+ggplot(d, aes(y = distance_diag, x = beta_median, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + ylab('Expr and age by methylation sign distance to diagonal') + theme_grey(base_size = 18) + xlab('Expr by methylation median beta') + scale_colour_discrete(name = 'Feature\ntype')
+ggplot(d, aes(y = distance_diag, x = agebeta_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + ylab('Expr and age by methylation sign distance to diagonal') + theme_grey(base_size = 18) + xlab('Age by methylation mean beta') + scale_colour_discrete(name = 'Feature\ntype')
+ggplot(d, aes(y = distance_diag, x = gtype, colour = gtype)) + geom_boxplot() + facet_grid(typeref ~ vset) + ylab('Expr and age by methylation sign distance to diagonal') + theme_grey(base_size = 18) + xlab('Feature type') + scale_colour_discrete(name = 'Feature\ntype')
+
+ggplot(d, aes(x = distance_diag < 0.1, y = n_meqtls, colour = gtype)) + geom_boxplot() + facet_grid(typeref ~ vset) + xlab('Expr and age by methylation sign distance to diagonal < 0.1') + theme_grey(base_size = 18) + ylab('Number of meQTLs') + scale_colour_discrete(name = 'Feature\ntype') + stat_summary(fun.data = give.n, geom = "text", position = position_nudge(y = max(d$n_meqtls) * c(0.95, 1, 1.05), x = c(-0.2, 0, 0.2)))
+ggplot(d, aes(x = distance_diag < 0.1, y = n_meqtls, colour = gtype)) + geom_boxplot() + facet_grid(typeref ~ vset) + xlab('Expr and age by methylation sign distance to diagonal < 0.1') + theme_grey(base_size = 18) + ylab('Number of meQTLs') + scale_colour_discrete(name = 'Feature\ntype') + stat_summary(fun.data = give.n, geom = "text", position = position_nudge(y = log10(max(d$n_meqtls)) * c(0.65, 0.675, 0.7), x = c(-0.2, 0, 0.2))) + scale_y_log10()
+
+d$close <- d$distance_diag < 0.1
+ggplot(d, aes(y = agebeta_sign_mean, x = beta_sign_mean, colour = gtype)) + geom_point() + facet_grid(typeref + close ~ vset) + xlab('Expr by methylation sign mean') + theme_grey(base_size = 18) + ylab('Age by methylation sign mean') + scale_colour_discrete(name = 'Feature\ntype')
+dev.off()
 
 
 ## Reproducibility info
