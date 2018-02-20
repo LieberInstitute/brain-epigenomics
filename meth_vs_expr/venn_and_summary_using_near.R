@@ -692,10 +692,12 @@ get_meth <- function(type, i) {
 age_coef <- lapply(names(mres), function(type) {
     message(paste(Sys.time(), 'processing', type))
     age <- get_age(type)
-    as.data.frame(t(apply(getMeth(mres[[type]]$meth, type = 'raw'), 1, function(row_i) {
+    res <- as.data.frame(t(apply(getMeth(mres[[type]]$meth, type = 'raw'), 1, function(row_i) {
         fit <- lm(age ~ row_i)
         summary(fit)$coef[2, ]
     })))
+    res$ageFDR <- p.adjust(res[, 'Pr(>|t|)'], 'fdr')
+    return(res)
 })
 names(age_coef) <- names(mres)
 save(age_coef, file = paste0('rda/meqtl_age_coef_', opt$feature, '_using_near.Rdata'))
@@ -717,7 +719,8 @@ data_by_venn <- do.call(rbind, lapply(c('nonCpG', 'CpGmarg'), function(typeref) 
     res_ref$typeref <- typeref
     return(res_ref)
 }))
-save(data_by_venn, file = paste0('rda/meqtldata_by_venn_', opt$feature, '_using_near.Rdata'))
+save(data_by_venn, file = paste0('rda/meqtl_data_by_venn_', opt$feature, '_using_near.Rdata'))
+
 
 ## Compare beta, then by venn groups
 
@@ -763,6 +766,42 @@ dev.off()
 
 
 
+## Summarize at the gene level, kind of like m_summary
+grp <- with(data_by_venn, paste0(typeref, '_', vset, '_', gene))
+get_summary <- function(var, fun) {
+    fun(NumericList(split(var, grp)))
+}
+
+data_venn_summ <- DataFrame(
+    beta_mean = get_summary(data_by_venn$beta, mean),
+    beta_median = get_summary(data_by_venn$beta, median),
+    beta_prop_pos = get_summary(sign(data_by_venn$beta) == 1, mean),
+    agebeta_mean = get_summary(data_by_venn$Estimate, mean),
+    agebeta_median = get_summary(data_by_venn$Estimate, median),
+    agebeta_prop_pos = get_summary(sign(data_by_venn$Estimate) == 1, mean),
+    beta_neglog10FDR_mean = get_summary(-log10(data_by_venn$FDR), mean),
+    beta_neglog10FDR_median = get_summary(-log10(data_by_venn$FDR), median),
+    beta_neglog10pval_mean = get_summary(-log10(data_by_venn$FDR), mean),
+    beta_neglog10pval_median = get_summary(-log10(data_by_venn$FDR), median),
+    agebeta_neglog10FDR_mean = get_summary(-log10(data_by_venn$ageFDR), mean),
+    agebeta_neglog10FDR_median = get_summary(-log10(data_by_venn$ageFDR), median),
+    agebeta_neglog10pval_mean = get_summary(-log10(data_by_venn[, 'Pr(>|t|)']), mean),
+    agebeta_neglog10pval_median = get_summary(-log10(data_by_venn[, 'Pr(>|t|)']), median),
+    meth_n_mean = get_summary(data_by_venn$meth_n, mean),
+    meth_n_median = get_summary(data_by_venn$meth_n, median),
+    beta_t_mean = get_summary(data_by_venn$statistic, mean),
+    beta_t_median = get_summary(data_by_venn$statistic, median),
+    agebeta_t_mean = get_summary(data_by_venn[, 't value'], mean),
+    agebeta_t_median = get_summary(data_by_venn[, 't value'], median),
+    typeref = sapply(strsplit(unique(grp), '_'), '[[', 1),
+    vset = sapply(strsplit(unique(grp), '_'), '[[', 2),
+    gene = sapply(strsplit(unique(grp), '_'), '[[', 3)
+)
+save(data_venn_summ, file = paste0('rda/meqtl_data_venn_summ_', opt$feature, '_using_near.Rdata'))
+
+
+
+
 
 ## Reproducibility info
 proc.time()
@@ -780,7 +819,8 @@ saved_files <- c(paste0('rda/meqtl_mres_', opt$feature,
     paste0('rda/meqtl_delta_pval_', opt$feature, '_using_near.Rdata'),
     paste0('rda/meqtl_venn_go_', opt$feature, '_using_near.Rdata'),
     paste0('rda/meqtl_age_coef_', opt$feature, '_using_near.Rdata'),
-    paste0('rda/meqtldata_by_venn_', opt$feature, '_using_near.Rdata')
+    paste0('rda/meqtl_data_by_venn_', opt$feature, '_using_near.Rdata'),
+    paste0('rda/meqtl_data_venn_summ_', opt$feature, '_using_near.Rdata')
 )
 for(i in saved_files) load(i, verbose = TRUE)
 rm(i)
