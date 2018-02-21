@@ -72,9 +72,7 @@ rowRanges(BSobj) <- context_gr
 ## append phenotype data
 rownames(pd) <- pd$Data.ID
 pData(BSobj) <- DataFrame(pd)
-dir.create('rda', showWarnings = FALSE)
-save(BSobj, file = paste0('rda/', opt$chr,
-    '_postNatal_cleaned_CX_noHomogenate.Rdata'))
+save(BSobj, file = paste0(opt$chr, '_postNatal_cleaned_CX_noHomogenate.Rdata'))
 
 ## Reproducibility information
 print('Reproducibility information:')

@@ -7,7 +7,7 @@ chrs <- gsub('_.*', '', files)
 ## Load and filter:
 load_filt <- function(f) {
     chr <- gsub('_.*', '', f)
-    res_file <- paste0('rda/', chr,
+    res_file <- paste0(chr,
         '_postNatal_cleaned_nonCG_noHomogenate_highCov.Rdata')
     
     if(!file.exists(res_file)) {

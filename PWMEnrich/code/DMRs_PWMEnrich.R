@@ -138,31 +138,6 @@ nullgenes =  read.delim("/users/ajaffe/Lieber/Projects/450k/grant/ref_gene_hg19.
 genes = sig$annotation
 goListByTF = lapply(sIndexes, function(x) dogo(genes[x],nullgenes[,2])[,-8])
 
-# Compare the enriched terms between 7 groups
-# KEGG
-compareKegg = compareCluster(entrezID, fun="enrichKEGG", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
-# Biological Process
-compareBP = compareCluster(entrezID, fun="enrichGO", ont = "BP", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
-# Molecular Function
-compareMF = compareCluster(entrezID, fun="enrichGO",  ont = "MF", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
-# Cellular Component
-compareCC = compareCluster(entrezID, fun="enrichGO",  ont = "CC", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
-# Disease Ontology
-compareDO = compareCluster(entrezID, fun="enrichDO",  ont = "DO", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
-
-# Save
-save(goList_MF, goList_BP, goList_CC, compareBP, compareMF, compareCC, 
-     file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/GO.objects.PWMEnrich.rda")
-
-
-## plot
-pdf("./Desktop/BAMS/BP_altSpliced_byCellType.pdf", width=10,height=12)
-plot(compareBP,colorBy="p.adjust",  showCategory = 400, title= "Biological Process GO Enrichment")
-dev.off()
-pdf("./Desktop/BAMS/CC_altSpliced_byCellType.pdf", width=7,height=5)
-plot(compareCC,colorBy="p.adjust",  showCategory = 400, title= "Cellular Compartment GO Enrichment")
-dev.off()
-
 
 
 pca = prcomp(lMat)
@@ -180,12 +155,31 @@ km = kmeans(t(zMat), 5)
 
 ## Test for Differential TF binding
 
-TFbyAge = motifDiffEnrichment(all_seq$Age.pos, all_seq$Age.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE) 
-# motifs differentially enriched in the first sequence (with lognormal background correction) 
-head(sort(diff$group.bg, decreasing=TRUE)) 
-# motifs differentially enriched in the second sequence (with lognormal background correction) 
-head(sort(diff$group.bg))
+pos = c(all_split[grep("pos", names(all_split))], promoters_split[grep("pos", names(promoters_split))],
+        introns_split[grep("pos", names(introns_split))], intergenic_split[grep("pos", names(intergenic_split))])
+neg = c(all_split[grep("neg", names(all_split))], promoters_split[grep("neg", names(promoters_split))],
+        introns_split[grep("neg", names(introns_split))], intergenic_split[grep("neg", names(intergenic_split))])
+names(pos) = c("allAge","allInt","allCT","promCT","promAge","promInt","intronsCT","intronsAge","intronsInt","interCT","interAge","interInt")
+pos = pos[!names(pos) %in% c("intronsAge","interAge")]
+names(neg) = names(pos)
+seqpos = c(allAge = seq$all$Age.pos, allInt = seq$all$Interaction.pos, allCT = seq$all$CellType.pos,
+           promCT = seq$promoters$CellType.pos, promAge = seq$promoters$Age.pos, promInt = seq$promoters$Interaction.pos,
+           intronsCT = seq$introns$CellType.pos, intronsAge = seq$introns$Age.pos, intronsInt = seq$introns$Interaction.pos,
+           interCT = seq$intergenic$CellType.pos, interAge = seq$intergenic$Age.pos, interInt = seq$intergenic$Interaction.pos)
+seqneg = c(allAge = seq$all$Age.neg, allInt = seq$all$Interaction.neg, allCT = seq$all$CellType.neg,
+           promCT = seq$promoters$CellType.neg, promAge = seq$promoters$Age.neg, promInt = seq$promoters$Interaction.neg,
+           intronsCT = seq$introns$CellType.neg, intronsInt = seq$introns$Interaction.neg,
+           interCT = seq$intergenic$CellType.neg, interInt = seq$intergenic$Interaction.neg)
 
+TFdiff = list()
+for (i in 1:length(pos)) {
+  TFdiff[[i]] = motifDiffEnrichment(sequences1 = seqpos[[i]], sequences2 = seqneg[[i]],
+                                    res1 = pos[[i]], res2 = neg[[i]], PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE)
+}
+names(TFdiff) = names(pos)
+
+save(TFdiff, promoters_split, intergenic_split, introns_split, all_split, promoters_int, intergenic_int, introns_int, all_int,
+     file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_PWMEnrich_objects.rda")
 
 
 

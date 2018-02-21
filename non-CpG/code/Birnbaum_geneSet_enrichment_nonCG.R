@@ -48,3 +48,21 @@ CHNeuronsenrich = sapply(splitSets, function(x) {
 })
 
 write.csv(CHNeuronsenrich,file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/Birnbaum_geneSet_enrichment_nonCG_byAge_neuronsOnly.csv",quote=F)
+
+x =read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/Birnbaum_geneSet_enrichment_nonCG_byAge_neuronsOnly.csv")
+x = cbind(x, data.frame(PGC2 = c(5.142322e-06,0.6116810)))
+x = data.frame(t(x))
+x = x[-1,]
+x$X1 = as.numeric(as.character(x$X1))
+x$X2 = as.numeric(as.character(x$X2))
+
+x$padj = p.adjust(x$P.Value, method = "fdr")
+
+
+
+
+
+
+
+
+

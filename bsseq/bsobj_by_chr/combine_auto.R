@@ -1,26 +1,27 @@
 library('devtools')
 library('ggplot2')
 
-files <- dir('rda', pattern = '^auto_long_chr')
+files <- dir(pattern = '^auto_long_chr')
 
 load_auto <- function(f) {
     chr <- gsub('_.*', '', gsub('auto_long_', '', f))
     message(paste(Sys.time(), 'loading', f))
-    load(file.path('rda', f))
+    load(f)
     auto_long$chr <- chr
     return(auto_long)
 }
 
-dir.create('rda', showWarnings = FALSE)
-if(!file.exists('rda/auto_long_combined.Rdata')) {
+if(!file.exists('auto_long_combined.Rdata')) {
     auto_long <- do.call(rbind, lapply(files, load_auto))
-    auto_long$lag <- as.factor(auto_long$lag)
-    save(auto_long, file = 'rda/auto_long_combined.Rdata')
+    save(auto_long, file = 'auto_long_combined.Rdata')
 } else {
-    load('rda/auto_long_combined.Rdata', verbose = TRUE)
+    load('auto_long_combined.Rdata')
 }
 dim(auto_long)
+<<<<<<< HEAD
+=======
 # [1] 7090476       8
+>>>>>>> c342a3e8636f5c1dab8031343885425bc57c00f7
 
 ## This never finished running:
 # context_summary <- lapply(unique(auto_long)$context, function(context) {
@@ -30,6 +31,18 @@ dim(auto_long)
 # context_summary
 # save(context_summary, file = 'autocorrelation_summary_by_context.Rdata')
 
+<<<<<<< HEAD
+auto_long$lag <- as.factor(auto_long$lag)
+
+png('autocorrelation_by_context.png', width = 480 * 2)
+ggplot(auto_long, aes(x = lag, y = acf)) + geom_boxplot() + facet_grid(. ~ context) + theme_bw(base_size = 14)
+dev.off()
+
+png('autocorrelation_by_context_abs.png', width = 480 * 2)
+ggplot(auto_long, aes(x = lag, y = abs(acf))) + geom_boxplot() + facet_grid(. ~ context) + theme_bw(base_size = 14)
+dev.off()
+
+=======
 dir.create('pdf', showWarnings = FALSE)
 pdf('pdf/autocorrelation_by_context.pdf', width = 7 * 2, height = 7 * 2)
 ggplot(auto_long, aes(x = lag, y = acf_neuron)) + geom_boxplot() + facet_grid(. ~ context) + theme_bw(base_size = 30) + ggtitle('Neuron') + ylab('Auto correlation') + ylim(c(-1, 1))
@@ -72,12 +85,15 @@ pdf('pdf/autocorrelation_by_context_abs_by_sample_chr21.pdf', width = 7 * 2, hei
 ggplot(auto_long, aes(x = lag, y = abs(acf))) + geom_boxplot() + facet_grid(cell ~ context) + theme_bw(base_size = 30) + ggtitle('By sample (chr21 only)') + ylab('Absolute auto correlation') + ylim(c(0, 1))
 dev.off()
 
+>>>>>>> c342a3e8636f5c1dab8031343885425bc57c00f7
 ## Reproducibility information
 print('Reproducibility information:')
 Sys.time()
 proc.time()
 options(width = 120)
 session_info()
+<<<<<<< HEAD
+=======
 
 # Session info ----------------------------------------------------------------------------------------------------------
 #  setting  value
@@ -150,3 +166,4 @@ session_info()
 #  withr                  2.1.1     2017-12-19 CRAN (R 3.4.2)
 #  XVector                0.18.0    2017-11-29 Bioconductor
 #  zlibbioc               1.24.0    2017-11-07 Bioconductor
+>>>>>>> c342a3e8636f5c1dab8031343885425bc57c00f7

@@ -88,7 +88,7 @@ geneuniverse = unique(geneMap$gencodeID)
 sig = lapply(DMR, function(x) unique(x[which(x$fwer<=0.05),"nearestID"]))
 notsig = lapply(sig, function(x) geneuniverse[!(geneuniverse %in% x)])
 
-DMRenrich = mapply(function(sig,notsig) {
+DMRenrichPGC = mapply(function(sig,notsig) {
   DE_OVERLAP = c( sum( sig %in% PGCgenes$gencodeID),sum(!(sig %in% PGCgenes$gencodeID)))
   NOT_DE_OVERLAP= c(sum(notsig %in% PGCgenes$gencodeID), sum(!(notsig %in% PGCgenes$gencodeID)))
   enrich_table = cbind(DE_OVERLAP, NOT_DE_OVERLAP)
@@ -98,8 +98,11 @@ DMRenrich = mapply(function(sig,notsig) {
   return(dat)
 }, sig, notsig, SIMPLIFY = F) 
 
-data.frame(do.call(rbind, DMRenrich), row.names=names(DMRenrich))
+data.frame(do.call(rbind, DMRenrichPGC), row.names=names(DMRenrichPGC))
 #                 P.Value Odds.Ratio
-#CellType    2.512262e-06   1.694533
-#Age         3.665844e-02   3.308604
-#Interaction 7.462028e-05   2.087669
+#CellType    3.612019e-08   1.776787
+#Age         2.071183e-02   3.300659
+#Interaction 4.356683e-04   1.898462
+
+
+unique(DMR$Interaction[which(DMR$Interaction$nearestID %in% PGCgenes$gencodeID & DMR$Interaction$distToGene==0),"nearestSymbol"])

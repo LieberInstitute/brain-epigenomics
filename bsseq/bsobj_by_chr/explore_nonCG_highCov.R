@@ -37,7 +37,7 @@ pcs <- prcomp(t(meth))
 pcaVars <- getPcaVars(pcs)
 names(pcaVars) <- paste0('PC', seq_len(length(pcaVars)))
 
-pdf('pdf/pca_nonCG_highCov.pdf')
+pdf('pca_nonCG_highCov.pdf')
 barplot(pcaVars[1:10], col = '#377EB8', ylab = 'Percent of Variance Explained')
 
 plot(pcs$x[, 1] ~ pcs$x[, 2],
@@ -58,7 +58,7 @@ for(pc in 1:4) {
 }
 dev.off()
 
-pdf('pdf/pca_nonCG_highCov_PC1vsAge.pdf')
+pdf('pca_nonCG_highCov_PC1vsAge.pdf')
 palette(brewer.pal(8,"Dark2"))
 par(mar=c(5,6,2,2), cex.axis=2, cex.lab=2)
 plot(pcs$x[, 1] ~ pd$Age, cex=2, pch = 21, bg=factor(pd$Cell.Type),
@@ -92,7 +92,7 @@ rm(fits, models, coef_interest)
 
 
 ### examples to plot ###
-pdf("pdf/cellType_DMPs_nonCG_highCov.pdf")
+pdf("cellType_DMPs_nonCG_highCov.pdf")
 par(mar=c(5,6,2,2),cex.axis=2,cex.lab=2)
 sigIndex_cell = order(ebList[[1]]$p[,2])[1:50]
 for(i in seq(along=sigIndex_cell)) {
@@ -105,7 +105,7 @@ for(i in seq(along=sigIndex_cell)) {
 }
 dev.off()
 		
-pdf("pdf/overallAge_DMPs_nonCG_highCov.pdf")
+pdf("overallAge_DMPs_nonCG_highCov.pdf")
 par(mar=c(5,6,2,2),cex.axis=2,cex.lab=2)
 sigIndex_age = order(ebList[[2]]$p[,2])[1:50]
 for(i in seq(along=sigIndex_age)) {
@@ -120,7 +120,7 @@ for(i in seq(along=sigIndex_age)) {
 }
 dev.off()		
 
-pdf("pdf/interactionCelltypeAge_DMPs_nonCG_highCov.pdf")
+pdf("interactionCelltypeAge_DMPs_nonCG_highCov.pdf")
 par(mar=c(5,6,2,2),cex.axis=2,cex.lab=2)
 sigIndex_int = order(ebList[[3]]$p[,4])[1:50]
 for(i in seq(along=sigIndex_int)) {
