@@ -11,6 +11,7 @@ library('devtools')
 spec <- matrix(c(
     'cpg', 'c', 1, 'logical', 'Either TRUE for CpG or FALSE for nonCpG',
     'feature', 'f', 1, 'character', 'Either: gene, exon, jx or psi',
+    'jxside', 'j', 2, 'character', 'Either: right or left',
 	'help' , 'h', 0, 'logical', 'Display help'
 ), byrow=TRUE, ncol=5)
 opt <- getopt(spec)
@@ -26,7 +27,8 @@ if (!is.null(opt$help)) {
 if(FALSE) {
     opt <- list('cpg' = TRUE, 'feature' = 'gene')
     opt <- list('cpg' = TRUE, 'feature' = 'exon')
-    opt <- list('cpg' = TRUE, 'feature' = 'jx')
+    opt <- list('cpg' = TRUE, 'feature' = 'jx', 'jxside' = 'left')
+    opt <- list('cpg' = TRUE, 'feature' = 'jx', 'jxside' = 'right')
     opt <- list('cpg' = TRUE, 'feature' = 'psi')
 }
 
@@ -34,6 +36,9 @@ stopifnot(opt$cpg)
 stopifnot(opt$feature %in% c('psi', 'gene', 'exon', 'jx'))
 cpg <- ifelse(opt$cpg, 'CpG', 'nonCpG')
 
+if(opt$feature == 'jx' & opt$cpg) {
+    stopifnot(opt$jxside %in% c('right', 'left'))
+}
 
 
 ## Load methylation data
@@ -119,10 +124,22 @@ if(opt$feature == 'jx') {
     
     load('rda/me_annotated_FDR5_nonCpG_jx_only_rowExpr.Rdata', verbose = TRUE)
     
-    me_ov <- findOverlaps(resize(expr_row, width(expr_row) + 2000, fix = 'center'), expr)
+    ## Subset data to only only 1 side for the junctions
+    expr_row <- resize(expr_row, width = 1,
+        fix = ifelse(opt$jxside == 'left', 'start', 'end'),
+        ignore.strand = TRUE)
+    rowRanges(expr) <- resize(rowRanges(expr), width = 1,
+        fix = ifelse(opt$jxside == 'left', 'start', 'end'),
+        ignore.strand = TRUE)    
+    
+    ## Take a window around the end of the jx, then reduce to reduce
+    ## mem needed for this step
+    expr_row <- reduce(resize(expr_row, width(expr_row) + 1000, fix = 'center'))
+    
+    me_ov <- findOverlaps(expr_row, expr)
 
-    message(paste(Sys.time(), 'keeping the following percent of', opt$feature))
-    round(length(unique(subjectHits(me_ov))) / nrow(expr) * 100, 2)
+    message(paste(Sys.time(), 'keeping the following percent of', opt$feature, opt$jxside, 'side'))
+    print(round(length(unique(subjectHits(me_ov))) / nrow(expr) * 100, 2))
     expr <- expr[sort(unique(subjectHits(me_ov))), ]
     rm(me_ov, expr_row)    
 }  else {
@@ -130,7 +147,7 @@ if(opt$feature == 'jx') {
     me_ov <- findOverlaps(resize(rowRanges(meqtl$expr), width(rowRanges(meqtl$expr)) + 2000, fix = 'center'), expr)
 
     message(paste(Sys.time(), 'keeping the following percent of' , opt$feature))
-    round(length(unique(subjectHits(me_ov))) / nrow(expr) * 100, 2)
+    print(round(length(unique(subjectHits(me_ov))) / nrow(expr) * 100, 2))
     expr <- expr[sort(unique(subjectHits(me_ov))), ]
     rm(me_ov, meqtl)
 }
@@ -227,7 +244,8 @@ warnings()
     
 message(paste(Sys.time(), 'saving MatrixEQTL results'))
 dir.create('rda', showWarnings = FALSE)
-save(me, file = paste0('rda/me_', cpg, '_', opt$feature, '_near_nonCpG_meQTLs.Rdata'))
+save(me, file = paste0('rda/me_', cpg, '_', opt$feature,
+    ifelse(opt$feature == 'jx', opt$jxside, ''), '_near_nonCpG_meQTLs.Rdata'))
 
 print('neqtls and ntests')
 me$cis$neqtls
@@ -267,7 +285,7 @@ if(opt$feature == 'psi') {
 }
 save(me_annotated,
     file = paste0('rda/me_annotated_FDR5_', cpg, '_', opt$feature,
-    '_near_nonCpG_meQTLs.Rdata'))
+    ifelse(opt$feature == 'jx', opt$jxside, ''), '_near_nonCpG_meQTLs.Rdata'))
     
 ## Explore annotated mEQTLs with FDR < 5%
 print('Trinucleotide vs C context')
@@ -322,7 +340,8 @@ plotting_code <- function(i) {
 }
 
 dir.create('pdf', showWarnings = FALSE)
-pdf(paste0('pdf/top100_FDR5_', cpg, '_', opt$feature, '_near_nonCpG_meQTLs.pdf'))
+pdf(paste0('pdf/top100_FDR5_', cpg, '_', opt$feature,
+    ifelse(opt$feature == 'jx', opt$jxside, ''),  '_near_nonCpG_meQTLs.pdf'))
 for(i in seq_len(100)) {
     plotting_code(i)
 }
@@ -349,7 +368,8 @@ round(addmargins(table('Expr Delta >= 0.1' = expr_delta >= 0.1, 'Meth N >= 4' = 
 
 ## Make scatter plots of the top 100 with at least 4 samples with non-zero meth
 if(length(which(meth_n >= 4)) > 0) {
-    pdf(paste0('pdf/top100_FDR5_min_Meth4_', cpg, '_', opt$feature, '_near_nonCpG_meQTLs.pdf'))
+    pdf(paste0('pdf/top100_FDR5_min_Meth4_', cpg, '_', opt$feature,
+        ifelse(opt$feature == 'jx', opt$jxside, ''), '_near_nonCpG_meQTLs.pdf'))
     for(i in head(which(meth_n >= 4), 100)) {
         plotting_code(i)
     }
@@ -360,7 +380,9 @@ if(length(which(meth_n >= 4)) > 0) {
 
 ## Make scatter plots of the top 100 with at least 4 samples with non-zero meth and a expr change of at least 0.1
 if(length(which(meth_n >= 4 & expr_delta >= 0.1)) > 0) {
-    pdf(paste0('pdf/top100_FDR5_min_Meth4_exprDelta0.1_', cpg, '_', opt$feature, '_near_nonCpG_meQTLs.pdf'))
+    pdf(paste0('pdf/top100_FDR5_min_Meth4_exprDelta0.1_', cpg, '_',
+        opt$feature, ifelse(opt$feature == 'jx', opt$jxside, ''),
+        '_near_nonCpG_meQTLs.pdf'))
     for(i in head(which(meth_n >= 4 & expr_delta >= 0.1), 100)) {
         plotting_code(i)
     }
