@@ -15,7 +15,18 @@ metrics$CellType = ifelse(metrics$NeuN=="NeuN_Minus", "Glia", "Neuron")
 dds = DESeqDataSetFromMatrix(countData = geneCounts, colData = metrics, design = ~ Prep + Age + CellType)
 rlog.dds  = rlog(dds)
 rlog = rlog(geneCounts)
-save(rlog,rlog.dds,file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/sorted_nuclear_RNA/rlog_transformed_dds_sorted_nuclear_RNA.rda")
+
+geneCounts = geneCounts[rowSums(geneCounts)>0,]
+polyaCounts = geneCounts[,grep("PolyA", colnames(geneCounts))]
+riboCounts = geneCounts[,grep("Ribo", colnames(geneCounts))]
+combinedCounts = polyaCounts + riboCounts
+polya = metrics[which(metrics$Prep=="PolyA"),]
+match(rownames(polya), colnames(combinedCounts))
+cdds = DESeqDataSetFromMatrix(countData = combinedCounts, colData = polya, design = ~ Age + CellType)
+crlog.dds  = rlog(cdds)
+crlog = rlog(combinedCounts)
+
+save(crlog,crlog.dds,rlog,rlog.dds,file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/sorted_nuclear_RNA/rlog_transformed_dds_sorted_nuclear_RNA.rda")
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/sorted_nuclear_RNA/rlog_transformed_dds_sorted_nuclear_RNA.rda")
 
 ### PCA Functions ###
@@ -144,11 +155,16 @@ colors <- colorRampPalette(rev(brewer.pal(9, "Blues")) )(255)
 pheatmap(sampleDistMatrix,clustering_distance_rows=sampleDists, clustering_distance_cols=sampleDists,
          col=colors, main="Euclidean Distance Between Samples")
 
-sampleDists <- dist(t(rlog.down))
+sampleDists <- dist(t(crlog))
 sampleDistMatrix <- as.matrix(sampleDists)
-colnames(sampleDistMatrix) = rownames(sampleDistMatrix) = pd$WorkingID
+head(sampleDistMatrix)
+colnames(metrics)
+match(colnames(combinedCounts),polya$SAMPLE_ID)
+colnames(sampleDistMatrix) = rownames(sampleDistMatrix) = paste0(polya$CellType,":",polya$Age)
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")) )(255)
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/sorted_nuclear_RNA/figures/euclidean_distance_heatmap_combined_sortedRNA.pdf")
 pheatmap(sampleDistMatrix,clustering_distance_rows=sampleDists, clustering_distance_cols=sampleDists,
-         col=colors, main="Euclidean Distance Between Samples (Downsampled)")
-
+         col=colors, main="Euclidean Distance Between Samples")
+dev.off()
 
 

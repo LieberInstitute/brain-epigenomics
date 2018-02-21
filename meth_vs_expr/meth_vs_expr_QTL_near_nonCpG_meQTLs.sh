@@ -2,16 +2,16 @@
 
 ## Usage:
 # mkdir -p logs
-# sh meth_vs_expr_QTL.sh
+# sh meth_vs_expr_QTL_near_nonCpG_meQTLs.sh
 
 mkdir -p logs
 
-for cpg in TRUE #FALSE
+for cpg in TRUE
 do
-    for type in gene exon jx psi
+    for type in jx #gene exon jx psi
     do
 
-SHORT="meth_vs_expr_QTL_cpg${cpg}_${type}"
+SHORT="meth_vs_expr_QTL_cpg${cpg}_${type}_near_nonCpG_meQTLs"
 
 # Construct shell file
 echo "Creating script for cpg ${cpg} for feature type ${type}"
@@ -19,7 +19,7 @@ echo "Creating script for cpg ${cpg} for feature type ${type}"
 cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l bluejay,mem_free=200G,h_vmem=200G,h_fsize=200G
+#$ -l mem_free=350G,h_vmem=350G,h_fsize=200G
 #$ -N ${SHORT}
 #$ -o ./logs/${SHORT}.txt
 #$ -e ./logs/${SHORT}.txt
@@ -36,7 +36,7 @@ echo "Hostname: \${HOSTNAME}"
 echo "Task id: \${TASK_ID}"
 
 module load conda_R/3.4.x
-Rscript meth_vs_expr_QTL.R -c ${cpg} -f ${type}
+Rscript meth_vs_expr_QTL_near_nonCpG_meQTLs.R -c ${cpg} -f ${type}
 
 echo "**** Job ends ****"
 date

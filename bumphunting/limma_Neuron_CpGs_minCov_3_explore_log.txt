@@ -1,0 +1,466 @@
+**** Job starts ****
+Fri Feb  2 00:48:58 EST 2018
+**** JHPCE info ****
+User: lcollado
+Job id: 4435594
+Job name: limma_Neuron_CpGs_minCov_3_explore
+Hostname: compute-074
+Task id: 
+Unloading conda_R/3.4.x
+Loading conda_R/3.4.x
+Using the following user library: ~/R/x86_64-pc-linux-gnu-library/3.4.x
+Loading required package: methods
+Loading required package: stats4
+Loading required package: BiocGenerics
+Loading required package: parallel
+
+Attaching package: ‘BiocGenerics’
+
+The following objects are masked from ‘package:parallel’:
+
+    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+    clusterExport, clusterMap, parApply, parCapply, parLapply,
+    parLapplyLB, parRapply, parSapply, parSapplyLB
+
+The following object is masked from ‘package:limma’:
+
+    plotMA
+
+The following objects are masked from ‘package:stats’:
+
+    IQR, mad, sd, var, xtabs
+
+The following objects are masked from ‘package:base’:
+
+    anyDuplicated, append, as.data.frame, cbind, colMeans, colnames,
+    colSums, do.call, duplicated, eval, evalq, Filter, Find, get, grep,
+    grepl, intersect, is.unsorted, lapply, lengths, Map, mapply, match,
+    mget, order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+    rbind, Reduce, rowMeans, rownames, rowSums, sapply, setdiff, sort,
+    table, tapply, union, unique, unsplit, which, which.max, which.min
+
+Loading required package: S4Vectors
+
+Attaching package: ‘S4Vectors’
+
+The following object is masked from ‘package:base’:
+
+    expand.grid
+
+Loading required package: IRanges
+Loading required package: GenomeInfoDb
+Loading required package: SummarizedExperiment
+Loading required package: Biobase
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+Loading required package: DelayedArray
+Loading required package: matrixStats
+
+Attaching package: ‘matrixStats’
+
+The following objects are masked from ‘package:Biobase’:
+
+    anyMissing, rowMedians
+
+
+Attaching package: ‘DelayedArray’
+
+The following objects are masked from ‘package:matrixStats’:
+
+    colMaxs, colMins, colRanges, rowMaxs, rowMins, rowRanges
+
+The following object is masked from ‘package:base’:
+
+    apply
+
+   user  system elapsed 
+178.232  14.871 193.243 
+   user  system elapsed 
+  7.264   0.657   7.996 
+[1] "Number of interaction DMRs"
+[1] 2178
+   user  system elapsed 
+192.691  17.210 210.021 
+[1] 18664892       32
+9897 Mb
+$age
+[1] "(Intercept)"     "Age"             "Cell.TypeNeuron"
+
+$interaction
+[1] "(Intercept)"         "Age"                 "Cell.TypeNeuron"    
+[4] "Age:Cell.TypeNeuron"
+
+[1] "Summary of the age coefficients at the CpG level. Overall: age while adjusting for cell type. Age glia: age for glia cells. Age neuron: same but for neurons. Age cell difference: the age and cell type interaction."
+           overall      age_glia    age_neuron age_cell_difference
+[1,]  2.020222e-04  0.0006382228  5.372831e-05       -5.844945e-04
+[2,]  7.952751e-05  0.0004208314 -3.650466e-05       -4.573361e-04
+[3,]  1.452126e-04 -0.0001104948  2.321448e-04        3.426396e-04
+[4,]  1.825990e-04 -0.0001200182  2.854790e-04        4.054972e-04
+[5,] -1.815912e-04 -0.0002937977 -1.434447e-04        1.503530e-04
+[6,] -6.765894e-04 -0.0007155229 -6.633532e-04        5.216968e-05
+    overall              age_glia            age_neuron       
+ Min.   :-0.0367559   Min.   :-0.0559406   Min.   :-0.036376  
+ 1st Qu.:-0.0006065   1st Qu.:-0.0015573   1st Qu.:-0.000715  
+ Median : 0.0005509   Median : 0.0004900   Median : 0.000532  
+ Mean   : 0.0009335   Mean   : 0.0006776   Mean   : 0.001020  
+ 3rd Qu.: 0.0021174   3rd Qu.: 0.0029840   3rd Qu.: 0.002260  
+ Max.   : 0.0377950   Max.   : 0.0558925   Max.   : 0.040684  
+ age_cell_difference 
+ Min.   :-0.0522598  
+ 1st Qu.:-0.0026743  
+ Median : 0.0000277  
+ Mean   : 0.0003429  
+ 3rd Qu.: 0.0029192  
+ Max.   : 0.0638959  
+[1] "Neuron" "Glia"  
+[1] "Number of CpGs and samples being considered"
+[1] 18664892       32
+   user  system elapsed 
+160.073  11.459 171.566 
+Warning message:
+Zero sample variances detected, have been offset away from zero 
+[1] "Checking the coefficients from this model vs the original one. Basically, they are the same."
+[1] FALSE
+     Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+0.000e+00 3.253e-19 8.674e-19 1.190e-18 1.735e-18 2.949e-17 
+[1] "Head and summary of the t-statistics for each of the coefficients. age_neuron_F is an F-statistic for change in age for neuron cells extract from the interaction model."
+        overall   age_glia age_cell_difference  age_neuron
+[1,]  0.4930514  0.7800105         -0.61710838  0.11261929
+[2,]  0.1803407  0.4762025         -0.44706620 -0.07084565
+[3,]  0.3400232 -0.1289673          0.34548424  0.46470588
+[4,]  0.3969458 -0.1300365          0.37954105  0.53048555
+[5,] -0.3619376 -0.2910962          0.12869248 -0.24375535
+[6,] -1.4453476 -0.7599639          0.04786747 -1.20835820
+    overall           age_glia        age_cell_difference    age_neuron      
+ Min.   :-9.9800   Min.   :-16.3618   Min.   :-13.693554   Min.   :-11.3628  
+ 1st Qu.:-0.4368   1st Qu.: -0.5065   1st Qu.: -0.756590   1st Qu.: -0.4485  
+ Median : 0.4074   Median :  0.1598   Median :  0.008545   Median :  0.3390  
+ Mean   : 0.4688   Mean   :  0.2086   Mean   :  0.036025   Mean   :  0.4293  
+ 3rd Qu.: 1.2966   3rd Qu.:  0.9346   3rd Qu.:  0.794352   3rd Qu.:  1.2008  
+ Max.   :12.3905   Max.   : 15.9487   Max.   : 14.667504   Max.   : 13.8290  
+[1] "t-statistics basically match for the interaction term in both models (as expected)"
+     Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+0.000e+00 2.776e-16 6.661e-16 8.418e-16 1.221e-15 1.954e-14 
+[1] "Head and summary of the p-values for each of the coefficients."
+       overall  age_glia age_cell_difference age_neuron
+[1,] 0.6254228 0.4414433           0.5417791  0.9110762
+[2,] 0.8580494 0.6373505           0.6580108  0.9439867
+[3,] 0.7361137 0.8982369           0.7321206  0.6454685
+[4,] 0.6941051 0.8973981           0.7069367  0.5996471
+[5,] 0.7198344 0.7729637           0.8984525  0.8090653
+[6,] 0.1583132 0.4531566           0.9621364  0.2362678
+    overall          age_glia      age_cell_difference   age_neuron    
+ Min.   :0.0000   Min.   :0.0000   Min.   :0.0000      Min.   :0.0000  
+ 1st Qu.:0.1244   1st Qu.:0.1857   1st Qu.:0.1813      1st Qu.:0.1431  
+ Median :0.3757   Median :0.4704   Median :0.4443      Median :0.4078  
+ Mean   :0.4125   Mean   :0.4765   Mean   :0.4570      Mean   :0.4314  
+ 3rd Qu.:0.6769   3rd Qu.:0.7555   3rd Qu.:0.7206      3rd Qu.:0.6999  
+ Max.   :1.0000   Max.   :1.0000   Max.   :1.0000      Max.   :1.0000  
+[1] "Object sizes for age_coef, age_t and age_p"
+569.6 Mb
+569.6 Mb
+569.6 Mb
+[1] "head of the dmr info with CpG results appended at the end"
+GRanges object with 6 ranges and 36 metadata columns:
+        seqnames                 ranges strand |               value
+           <Rle>              <IRanges>  <Rle> |           <numeric>
+   8307    chr18 [ 74712838,  74729551]      * |  0.0163400542629108
+   8306    chr18 [ 74697305,  74712378]      * |  0.0163727834211345
+   5886    chr15 [ 74424587,  74427137]      * |  0.0137924859489863
+  26011     chr9 [137981386, 137993460]      * | -0.0151539588037357
+  19972    chr11 [  1324616,   1329721]      * | -0.0173009717686242
+  22563    chr19 [ 17836943,  17839206]      * | -0.0160837398368306
+                    area   cluster indexStart  indexEnd         L  clusterL
+               <numeric> <numeric>  <integer> <integer> <numeric> <integer>
+   8307 5.50659828660095    165286   16319623  16319959       337      1160
+   8306 4.87908945949808    165286   16319314  16319611       298      1160
+   5886 3.03434690877698    135918   14003692  14003911       220       824
+  26011 2.81863633749484    435072    9692308   9692493       186      3566
+  19972   2.577844793525     52329   10748137  10748285       149      3001
+  22563  2.5251471543824    165992   16695211  16695367       157       705
+          p.value      fwer p.valueArea  fwerArea                  coef
+        <numeric> <numeric>   <numeric> <numeric>             <numeric>
+   8307         0         0           0         0 -0.000162557644801421
+   8306         0         0           0         0 -0.000170974973621842
+   5886         0         0           0         0 -0.000175302157912263
+  26011         0         0           0         0 -0.000175772495336171
+  19972         0         0           0         0 -0.000178214123474149
+  22563         0         0           0         0 -0.000179242932329759
+        overall_tstat_mean age_glia_tstat_mean age_neuron_tstat_mean
+                 <numeric>           <numeric>             <numeric>
+   8307  -1.28034525625408   -3.53385223365119      0.27747028094832
+   8306  -1.13296144253421   -3.46631894903594     0.409334008628005
+   5886   1.26225876343582   -1.04599692575283      2.15979446246887
+  26011  -2.14239725238731    0.47885926022016     -2.91517089912813
+  19972  -3.30824519421213  0.0505801459998637     -4.19564500167553
+  22563  -3.50945729463209  0.0194841661168965      -4.4671332471076
+        age_cell_difference_tstat_mean overall_tstat_sum age_glia_tstat_sum
+                             <numeric>         <numeric>          <numeric>
+   8307               3.19258225432665 -431.476351357625  -1190.90820274045
+   8306               3.20066135551653 -337.622509875194  -1032.96304681271
+   5886               1.99150200525227  277.696927955881  -230.119323665622
+  26011              -1.88204638954054  -398.48588894404   89.0678224009498
+  19972              -2.15703915561032 -492.928533937608   7.53644175397969
+  22563              -2.26692446928301 -550.984795257238   3.05901408035275
+        age_neuron_tstat_sum age_cell_difference_tstat_sum overall_tstat_area
+                   <numeric>                     <numeric>          <numeric>
+   8307     93.5074846795839              1075.90021970808   500.801744956124
+   8306     121.981534571145              953.797083943926   432.848256454588
+   5886     475.154781743152              438.130441155499   295.794842018554
+  26011    -542.221787237833              -350.06062845454   415.642395419785
+  19972    -625.151105249654             -321.398834185938   492.928533937608
+  22563    -701.339919795894             -355.907141677433   550.984795257238
+        age_glia_tstat_area age_neuron_tstat_area
+                  <numeric>             <numeric>
+   8307     1195.8006482169      255.500389638424
+   8306    1042.17397475125      205.070775498833
+   5886    246.080958895699      475.704521856586
+  26011    144.884640252681      547.901094092412
+  19972    83.8566114448007      627.537219892203
+  22563    73.0119089945904      701.339919795894
+        age_cell_difference_tstat_area    overall_coef_mean
+                             <numeric>            <numeric>
+   8307               1081.21001957302 -0.00351136377013404
+   8306               961.512499980936 -0.00291340898834597
+   5886               438.153254377944  0.00402609862329665
+  26011               354.495702697007 -0.00823279561920907
+  19972                  331.482326416  -0.0125411940932679
+  22563               357.895640453733  -0.0120340237028996
+           age_glia_coef_mean age_neuron_coef_mean
+                    <numeric>            <numeric>
+   8307    -0.015797784035808 0.000665617191193412
+   8306   -0.0152690028105186  0.00128708871929769
+   5886  -0.00649152896355628  0.00760174793682004
+  26011   0.00301408028149119  -0.0120563655033425
+  19972  0.000429215412452235  -0.0169507090206853
+  22563 -3.71900315755355e-05   -0.016112554695473
+        age_cell_difference_coef_mean   overall_coef_sum    age_glia_coef_sum
+                            <numeric>          <numeric>            <numeric>
+   8307            0.0164634012270015  -1.18332959053517    -5.32385322006731
+   8306            0.0165560915298163 -0.868195878527099    -4.55016283753455
+   5886            0.0140932769003763  0.885741697125264    -1.42813637198238
+  26011           -0.0150704457848337  -1.53129998517289    0.560618932357361
+  19972           -0.0173799244331376  -1.86863791989692    0.063953096455383
+  22563           -0.0160753646638975  -1.88934172135524 -0.00583883495735908
+        age_neuron_coef_sum age_cell_difference_coef_sum overall_coef_area
+                  <numeric>                    <numeric>         <numeric>
+   8307    0.22431299343218             5.54816621349949  1.37626351335709
+   8306   0.383552438350712             4.93371527588526  1.17641434696075
+   5886    1.67238454610041             3.10052091808279 0.946608538874941
+  26011    -2.2424839836217            -2.80310291597906  1.57168195615981
+  19972   -2.52565564408212             -2.5896087405375  1.86863791989692
+  22563   -2.52967108718926             -2.5238322522319  1.88934172135524
+        age_glia_coef_area age_neuron_coef_area age_cell_difference_coef_area
+                 <numeric>            <numeric>                     <numeric>
+   8307   5.34072120292258    0.734160967671757              5.57335995034227
+   8306   4.58352388945334    0.619723676438409              4.97370677631653
+   5886   1.51671372312336     1.67416558572538               3.1006295552236
+  26011  0.941720370017055     2.25552648017426              2.83797569439403
+  19972   0.58485443762777     2.53154325349746              2.65883516942005
+  22563  0.477395097518592     2.52967108718926              2.54106654905005
+  -------
+  seqinfo: 23 sequences from an unspecified genome; no seqlengths
+[1] "Compare a bit the signs of some interaction coefficients"
+             interaction mean coef sign
+DMR coef sign   -1    1  Sum
+          -1   339  743 1082
+          1    288  808 1096
+          Sum  627 1551 2178
+              interaction mean coef sign
+DMR value sign   -1    1  Sum
+           -1   624    6  630
+           1      3 1545 1548
+           Sum  627 1551 2178
+null device 
+          1 
+null device 
+          1 
+null device 
+          1 
+[1] "Number of CpGs and samples being considered"
+[1] 18664892       32
+   user  system elapsed 
+172.399  15.134 187.569 
+[1] "Compare interaction coefs for all CpGs between using the smoothed and raw meth data"
+[1] FALSE
+    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+0.000000 0.001217 0.002781 0.003901 0.005332 0.055867 
+[1] "Compare interaction t-stats for all CpGs between using the smoothed and raw meth data"
+[1] FALSE
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.0000  0.4605  0.9875  1.2229  1.7323 15.9203 
+null device 
+          1 
+null device 
+          1 
+[1] "Compare glia coef mean vs neurons"
+             abs(glia) > abs(neuron)
+Glia > Neuron FALSE TRUE  Sum
+        FALSE   790  761 1551
+        TRUE    474  153  627
+        Sum    1264  914 2178
+[1] "Compare the two groups using coef mean and coef area (pages 3 and 5 of pdf/age_for_interaction_dmrs_diff.pdf)"
+                       Glia area > neuron area
+abs(glia) > abs(neuron) FALSE TRUE  Sum
+                  FALSE  1204   60 1264
+                  TRUE      6  908  914
+                  Sum    1210  968 2178
+[1] "t test comparing absolute glia vs neuron mean coefficients"
+
+	Paired t-test
+
+data:  abs(dmrs$age_glia_coef_mean) and abs(dmrs$age_neuron_coef_mean)
+t = -9.1041, df = 2177, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.002363767 -0.001525913
+sample estimates:
+mean of the differences 
+            -0.00194484 
+
+[1] "Glia mean, then neuron mean, then the ratio (N/G) of the absolute coefficient mean"
+[1] 0.006822218
+[1] 0.008767058
+[1] 1.285074
+[1] "Glia median, then neuron median, then the ratio (N/G) of the absolute coefficient mean"
+[1] 0.005824861
+[1] 0.00884293
+[1] 1.518136
+[1] "Glia mean, then neuron mean, then the ratio (N/G) of the coefficient area"
+[1] 0.2092012
+[1] 0.2635064
+[1] 1.259584
+[1] "Glia median, then neuron median, then the ratio (N/G) of the coefficient area"
+[1] 0.1364508
+[1] 0.1627952
+[1] 1.193069
+[1] "Checking the absolute t-stat means for the overall age changes"
+[1] "Cutoff (based on 2.5% quantile of the abs interaction t-stat)"
+    2.5% 
+1.276699 
+$overall_tstat_mean
+             n percent
+Above cut 1302   59.78
+Below cut  876   40.22
+
+$age_glia_tstat_mean
+             n percent
+Above cut  921   42.29
+Below cut 1257   57.71
+
+$age_neuron_tstat_mean
+             n percent
+Above cut 1634   75.02
+Below cut  544   24.98
+
+$age_cell_difference_tstat_mean
+             n percent
+Above cut 2123   97.47
+Below cut   55    2.53
+
+[1] "Cutoff: 2"
+$overall_tstat_mean
+             n percent
+Above cut  928   42.61
+Below cut 1250   57.39
+
+$age_glia_tstat_mean
+             n percent
+Above cut  561   25.76
+Below cut 1617   74.24
+
+$age_neuron_tstat_mean
+             n percent
+Above cut 1306   59.96
+Below cut  872   40.04
+
+$age_cell_difference_tstat_mean
+             n percent
+Above cut 1481      68
+Below cut  697      32
+
+null device 
+          1 
+    user   system  elapsed 
+1161.890   88.816 1253.566 
+2018-02-02 01:09:55
+Session info ----------------------------------------------------------------------------------------------------------
+ setting  value                                      
+ version  R version 3.4.3 Patched (2018-01-20 r74142)
+ system   x86_64, linux-gnu                          
+ ui       X11                                        
+ language (EN)                                       
+ collate  en_US.UTF-8                                
+ tz       US/Eastern                                 
+ date     2018-02-02                                 
+
+Packages --------------------------------------------------------------------------------------------------------------
+ package              * version   date       source        
+ assertthat             0.2.0     2017-04-11 CRAN (R 3.4.1)
+ base                 * 3.4.3     2018-01-20 local         
+ Biobase              * 2.38.0    2017-11-07 Bioconductor  
+ BiocGenerics         * 0.24.0    2017-11-29 Bioconductor  
+ bitops                 1.0-6     2013-08-17 CRAN (R 3.4.1)
+ bsseq                * 1.14.0    2017-11-07 Bioconductor  
+ colorspace             1.3-2     2016-12-14 CRAN (R 3.4.1)
+ compiler               3.4.3     2018-01-20 local         
+ data.table             1.10.4-3  2017-10-27 CRAN (R 3.4.2)
+ datasets             * 3.4.3     2018-01-20 local         
+ DelayedArray         * 0.4.1     2017-11-07 Bioconductor  
+ devtools             * 1.13.4    2017-11-09 CRAN (R 3.4.2)
+ digest                 0.6.14    2018-01-14 CRAN (R 3.4.2)
+ GenomeInfoDb         * 1.14.0    2017-11-29 Bioconductor  
+ GenomeInfoDbData       1.0.0     2018-01-09 Bioconductor  
+ GenomicRanges        * 1.30.1    2018-01-09 Bioconductor  
+ GGally               * 1.3.2     2017-08-02 CRAN (R 3.4.1)
+ ggplot2              * 2.2.1     2016-12-30 CRAN (R 3.4.1)
+ ggthemes             * 3.4.0     2017-02-19 CRAN (R 3.4.1)
+ graphics             * 3.4.3     2018-01-20 local         
+ grDevices            * 3.4.3     2018-01-20 local         
+ grid                   3.4.3     2018-01-20 local         
+ gtable                 0.2.0     2016-02-26 CRAN (R 3.4.1)
+ gtools                 3.5.0     2015-05-29 CRAN (R 3.4.1)
+ IRanges              * 2.12.0    2017-11-29 Bioconductor  
+ labeling               0.3       2014-08-23 CRAN (R 3.4.1)
+ lattice                0.20-35   2017-03-25 CRAN (R 3.4.3)
+ lazyeval               0.2.1     2017-10-29 CRAN (R 3.4.2)
+ limma                * 3.34.5    2018-01-16 Bioconductor  
+ locfit                 1.5-9.1   2013-04-20 CRAN (R 3.4.1)
+ magrittr               1.5       2014-11-22 CRAN (R 3.4.1)
+ Matrix                 1.2-12    2017-11-30 CRAN (R 3.4.3)
+ matrixStats          * 0.52.2    2017-04-14 CRAN (R 3.4.1)
+ memoise                1.1.0     2017-04-21 CRAN (R 3.4.1)
+ methods              * 3.4.3     2018-01-20 local         
+ munsell                0.4.3     2016-02-13 CRAN (R 3.4.1)
+ parallel             * 3.4.3     2018-01-20 local         
+ permute                0.9-4     2016-09-09 CRAN (R 3.4.1)
+ pillar                 1.1.0     2018-01-14 CRAN (R 3.4.2)
+ plyr                   1.8.4     2016-06-08 CRAN (R 3.4.1)
+ R.methodsS3            1.7.1     2016-02-16 CRAN (R 3.4.1)
+ R.oo                   1.21.0    2016-11-01 CRAN (R 3.4.1)
+ R.utils                2.6.0     2017-11-05 CRAN (R 3.4.2)
+ RColorBrewer         * 1.1-2     2014-12-07 CRAN (R 3.4.1)
+ Rcpp                   0.12.14   2017-11-23 CRAN (R 3.4.2)
+ RCurl                  1.95-4.10 2018-01-04 CRAN (R 3.4.2)
+ reshape                0.8.7     2017-08-06 CRAN (R 3.4.1)
+ reshape2               1.4.3     2017-12-11 CRAN (R 3.4.2)
+ rlang                  0.1.6     2017-12-21 CRAN (R 3.4.2)
+ S4Vectors            * 0.16.0    2017-11-29 Bioconductor  
+ scales                 0.5.0     2017-08-24 CRAN (R 3.4.1)
+ stats                * 3.4.3     2018-01-20 local         
+ stats4               * 3.4.3     2018-01-20 local         
+ stringi                1.1.6     2017-11-17 CRAN (R 3.4.2)
+ stringr                1.2.0     2017-02-18 CRAN (R 3.4.1)
+ SummarizedExperiment * 1.8.1     2018-01-09 Bioconductor  
+ tibble                 1.4.1     2017-12-25 CRAN (R 3.4.2)
+ tools                  3.4.3     2018-01-20 local         
+ utils                * 3.4.3     2018-01-20 local         
+ withr                  2.1.1     2017-12-19 CRAN (R 3.4.2)
+ XVector                0.18.0    2017-11-29 Bioconductor  
+ zlibbioc               1.24.0    2017-11-07 Bioconductor  
+**** Job ends ****
+Fri Feb  2 01:09:55 EST 2018

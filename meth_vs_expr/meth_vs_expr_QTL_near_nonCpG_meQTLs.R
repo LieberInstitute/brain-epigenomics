@@ -24,16 +24,13 @@ if (!is.null(opt$help)) {
 
 ## For testing
 if(FALSE) {
-    opt <- list('cpg' = FALSE, 'feature' = 'gene')
-    opt <- list('cpg' = FALSE, 'feature' = 'exon')
-    opt <- list('cpg' = FALSE, 'feature' = 'jx')
-    opt <- list('cpg' = FALSE, 'feature' = 'psi')
     opt <- list('cpg' = TRUE, 'feature' = 'gene')
     opt <- list('cpg' = TRUE, 'feature' = 'exon')
     opt <- list('cpg' = TRUE, 'feature' = 'jx')
     opt <- list('cpg' = TRUE, 'feature' = 'psi')
 }
 
+stopifnot(opt$cpg)
 stopifnot(opt$feature %in% c('psi', 'gene', 'exon', 'jx'))
 cpg <- ifelse(opt$cpg, 'CpG', 'nonCpG')
 
@@ -52,7 +49,6 @@ load_dmp <- function(is_cpg) {
     BSobj <- BSobj[, colData(BSobj)$Cell.Type == 'Neuron']
     return(BSobj)
 }
-BSobj <- load_dmp(opt$cpg)
 
 ## Load data
 load_expr <- function(type) {
@@ -108,6 +104,41 @@ getid <- function(x) {
     as.integer(gsub('Br', '', x))
 }
 
+## Subset to around a 1kb window from the nonCpG meQTl results
+load_meqtl <- function() {
+    load(paste0('rda/me_annotated_FDR5_nonCpG_', opt$feature,
+        '.Rdata'), verbose = TRUE)
+    return(me_annotated)
+}
+if(opt$feature == 'jx') {
+    
+    ## To deal with memory issues
+    #meqtl <- load_meqtl()
+    #expr_row <- rowRanges(meqtl$expr)
+    #save(expr_row, file = 'rda/me_annotated_FDR5_nonCpG_jx_only_rowExpr.Rdata')
+    
+    load('rda/me_annotated_FDR5_nonCpG_jx_only_rowExpr.Rdata', verbose = TRUE)
+    
+    me_ov <- findOverlaps(resize(expr_row, width(expr_row) + 2000, fix = 'center'), expr)
+
+    message(paste(Sys.time(), 'keeping the following percent of', opt$feature))
+    round(length(unique(subjectHits(me_ov))) / nrow(expr) * 100, 2)
+    expr <- expr[sort(unique(subjectHits(me_ov))), ]
+    rm(me_ov, expr_row)    
+}  else {
+    meqtl <- load_meqtl()
+    me_ov <- findOverlaps(resize(rowRanges(meqtl$expr), width(rowRanges(meqtl$expr)) + 2000, fix = 'center'), expr)
+
+    message(paste(Sys.time(), 'keeping the following percent of' , opt$feature))
+    round(length(unique(subjectHits(me_ov))) / nrow(expr) * 100, 2)
+    expr <- expr[sort(unique(subjectHits(me_ov))), ]
+    rm(me_ov, meqtl)
+}
+
+
+
+BSobj <- load_dmp(opt$cpg)
+
 ## Match and subset appropriately
 message(paste(Sys.time(), 'subsetting the data to use'))
 m  <- match(getid(colData(expr)$BrNum), getid(colData(BSobj)$Brain.ID))
@@ -115,6 +146,14 @@ expr <- expr[, which(!is.na(m))]
 colnames(expr) <- paste0('Br', getid(colData(expr)$BrNum))
 BSobj <- BSobj[, m[!is.na(m)]]
 colnames(BSobj) <- paste0('Br', getid(colData(BSobj)$Brain.ID))
+
+
+
+cp_ov <- findOverlaps(resize(rowRanges(expr), width(rowRanges(expr)) + 2000, fix = 'center'), BSobj)
+
+message(paste(Sys.time(), 'keeping the following percent of CpGs'))
+round(length(unique(subjectHits(cp_ov))) / nrow(BSobj) * 100, 2)
+BSobj <- BSobj[sort(unique(subjectHits(cp_ov))), ]
 
 if(FALSE) {
     ## For debugging
@@ -136,7 +175,7 @@ dim(expr)
 ## Get methylation
 message(paste(Sys.time(), 'preparing methylation info'))
 meth <- SlicedData$new( getMeth(BSobj, type = 'raw') )
-meth$fileSliceSize <- ifelse(opt$cpg, 300, 2000)
+meth$fileSliceSize <- 300
 
 methpos <- data.frame(
     cname = paste0('row', seq_len(nrow(BSobj))),
@@ -152,7 +191,7 @@ if(opt$feature == 'psi') {
 } else {
     exprinfo <- SlicedData$new(log2(assays(expr)$norm + 1))
 }
-exprinfo$fileSliceSize <- ifelse(opt$cpg, 300, 2000)
+exprinfo$fileSliceSize <- 300
 
 get_exprpos <- function(type) {
     if(type == 'psi') {
@@ -176,14 +215,11 @@ get_exprpos <- function(type) {
 }
 exprpos <- get_exprpos(opt$feature)
 
-## Delete the BSobj (in case that helps with mem)
-rm(BSobj)
-
 message(paste(Sys.time(), 'running MatrixEQTL'))
 me <- Matrix_eQTL_main(snps = meth, gene = exprinfo, 
     output_file_name.cis = paste0('.', cpg, '_', opt$feature,
-        '.txt'), # invis file, temporary
-    pvOutputThreshold = 0, pvOutputThreshold.cis = 5e-4, 
+        '_near_nonCpG_meQTLs.txt'), # invis file, temporary
+    pvOutputThreshold = 0, pvOutputThreshold.cis = 0.01, 
 	useModel = modelLINEAR,
 	snpspos = methpos, genepos = exprpos, cisDist = 1000)
 ## Check warnings if any are present
@@ -191,12 +227,7 @@ warnings()
     
 message(paste(Sys.time(), 'saving MatrixEQTL results'))
 dir.create('rda', showWarnings = FALSE)
-save(me, file = paste0('rda/me_', cpg, '_', opt$feature, '.Rdata'))
-
-## Load the BSobj again
-BSobj <- load_dmp(opt$cpg)
-BSobj <- BSobj[, m[!is.na(m)]]
-colnames(BSobj) <- paste0('Br', getid(colData(BSobj)$Brain.ID))
+save(me, file = paste0('rda/me_', cpg, '_', opt$feature, '_near_nonCpG_meQTLs.Rdata'))
 
 print('neqtls and ntests')
 me$cis$neqtls
@@ -236,7 +267,7 @@ if(opt$feature == 'psi') {
 }
 save(me_annotated,
     file = paste0('rda/me_annotated_FDR5_', cpg, '_', opt$feature,
-    '.Rdata'))
+    '_near_nonCpG_meQTLs.Rdata'))
     
 ## Explore annotated mEQTLs with FDR < 5%
 print('Trinucleotide vs C context')
@@ -291,7 +322,7 @@ plotting_code <- function(i) {
 }
 
 dir.create('pdf', showWarnings = FALSE)
-pdf(paste0('pdf/top100_FDR5_', cpg, '_', opt$feature, '.pdf'))
+pdf(paste0('pdf/top100_FDR5_', cpg, '_', opt$feature, '_near_nonCpG_meQTLs.pdf'))
 for(i in seq_len(100)) {
     plotting_code(i)
 }
@@ -318,7 +349,7 @@ round(addmargins(table('Expr Delta >= 0.1' = expr_delta >= 0.1, 'Meth N >= 4' = 
 
 ## Make scatter plots of the top 100 with at least 4 samples with non-zero meth
 if(length(which(meth_n >= 4)) > 0) {
-    pdf(paste0('pdf/top100_FDR5_min_Meth4_', cpg, '_', opt$feature, '.pdf'))
+    pdf(paste0('pdf/top100_FDR5_min_Meth4_', cpg, '_', opt$feature, '_near_nonCpG_meQTLs.pdf'))
     for(i in head(which(meth_n >= 4), 100)) {
         plotting_code(i)
     }
@@ -329,7 +360,7 @@ if(length(which(meth_n >= 4)) > 0) {
 
 ## Make scatter plots of the top 100 with at least 4 samples with non-zero meth and a expr change of at least 0.1
 if(length(which(meth_n >= 4 & expr_delta >= 0.1)) > 0) {
-    pdf(paste0('pdf/top100_FDR5_min_Meth4_exprDelta0.1_', cpg, '_', opt$feature, '.pdf'))
+    pdf(paste0('pdf/top100_FDR5_min_Meth4_exprDelta0.1_', cpg, '_', opt$feature, '_near_nonCpG_meQTLs.pdf'))
     for(i in head(which(meth_n >= 4 & expr_delta >= 0.1), 100)) {
         plotting_code(i)
     }

@@ -1,4 +1,6 @@
 library("bsseq")
+library(ggplot2)
+library(data.table)
 
 load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/BSobj_bsseqSmooth_Neuron_minCov_3.Rdata')
 
@@ -82,7 +84,7 @@ round(table(gliaHmean>0.8)/length(gliaHmean)*100,1)
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/BSobj_bsseqSmooth_Neuron_minCov_3_prenatal.Rdata")
 
 fGmeth <- getMeth(BSobj, type = 'raw')
-dim(fGmeth) # 58109566 CpHs measured
+dim(fGmeth) # 
 mean1 = rowMeans(fGmeth[1:9332446,], na.rm = T)
 mean2 = rowMeans(fGmeth[9332447:nrow(fGmeth),], na.rm = T)
 Mean = c(mean1,mean2)
@@ -99,6 +101,28 @@ round(table(Mean>=0.2 & Mean<=0.8)/length(Mean)*100,1)
 round(table(Mean>0.8)/length(Mean)*100,1)
 #FALSE  TRUE 
 #29.4  70.6
+
+
+# load methylation matrix for homogenate postnatal CpGs
+
+load("/dcl01/lieber/WGBS/LIBD_Data/bsseqObj/bsseqObj_postNatal_cleaned_CpGonly.rda")
+
+hGmeth <- getMeth(BSobj, type = 'raw')
+dim(hGmeth) #  28217448 CpGs measured
+Mean = rowMeans(hGmeth, na.rm = T)
+length(na.omit(Mean)) # 27983221
+
+## Get stats: homogenate CpGs
+
+round(table(Mean<0.2)/length(Mean)*100,1)
+#FALSE  TRUE 
+# 90.7   8.5
+round(table(Mean>=0.2 & Mean<=0.8)/length(Mean)*100,1)
+#FALSE  TRUE 
+# 82.2  16.9
+round(table(Mean>0.8)/length(Mean)*100,1)
+#FALSE  TRUE 
+# 25.4  73.7 
 
 
 ## Get numbers of significant bases
@@ -130,6 +154,7 @@ round(nrow(CHneurons[which(CHneurons$padj<=0.05),])/nrow(CH)*100,1) # 9.8%
 ## What is the global proportion of methylated C's, and how does that change by cell type and age?
 
 # At CpGs
+
 Gmeth = getMeth(BSobj, type = 'raw')
 neurGmeth = Gmeth[,which(colnames(Gmeth) %in% pd$Data.ID[which(pd$Cell.Type=="Neuron")])]
 gliaGmeth = Gmeth[,which(colnames(Gmeth) %in% pd$Data.ID[which(pd$Cell.Type=="Glia")])]
@@ -142,18 +167,248 @@ methCG = data.frame(prop = round(methCG/nrow(Gmeth)*100,1),
                     CellType = ifelse(colnames(Gmeth) %in% pd[which(pd$Cell.Type=="Neuron"),"Data.ID"],"Neuron","Glia"),
                     Age.Bin = pd[match(colnames(Gmeth), pd$Data.ID),"Age.Bin"],
                     Age = pd[match(colnames(Gmeth), pd$Data.ID),"Age"])
+methCG$Age.Bin = factor(methCG$Age.Bin, levels = c("Neonate","Toddler","Child","Early.Teen","Teen","Young.Adult"))
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/singleCpG/figures/global_methylation.pdf")
-ggplot(df, aes(x=mean)) + geom_density(aes(group=CellType, colour=CellType), size=2) + scale_color_brewer(palette = "Dark2") +
-  ylab("Mean Methylation") + 
-  xlab("") +
-  ggtitle("Mean nonCpG Methylation By Cell Type") + 
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/single_CpGs/figures/global_methylation.pdf")
+ggplot(methCG, aes(x = CellType, y = prop)) + geom_boxplot() +
+  ylab("mCpG / CpG") + xlab("") +
+  ggtitle("Global Proportion of Methylated CpGs") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20))
+ggplot(methCG, aes(x = Age.Bin, y = prop)) + geom_boxplot() +
+  ylab("mCpG / CpG") + xlab("") +
+  ggtitle("Global Proportion of Methylated CpGs") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20))
+ggplot(methCG, aes(x = Age.Bin, y = prop)) + geom_boxplot() +
+  ylab("mCpG / CpG") + xlab("") + facet_grid(. ~ CellType)
+  ggtitle("Global Proportion of Methylated CpGs") + 
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 dev.off()
 
+# At nonCpGs
+
+Hmeth = getMeth(BSobj, type = 'raw')
+Hgr = granges(BSobj)
+Hdf = data.frame(Hgr)
+rownames(Hmeth) = paste0(Hdf$seqnames, ":", Hdf$start, "-", Hdf$end)
+
+methCH = c()
+for(i in 1:ncol(Hmeth)) {
+  methCH[i] = nrow(Hmeth[which(Hmeth[,i]>0),])
+}
+methCH10 = c()
+for(i in 1:ncol(Hmeth)) {
+  methCH10[i] = nrow(Hmeth[which(Hmeth[,i]>0.1),])
+}
+
+methCH = data.frame(prop = round(methCH/nrow(Hmeth)*100,1), prop10 = round(methCH10/nrow(Hmeth)*100,1),
+                    CellType = ifelse(colnames(Hmeth) %in% pd[which(pd$Cell.Type=="Neuron"),"Data.ID"],"Neuron","Glia"),
+                    Age.Bin = pd[match(colnames(Hmeth), pd$Data.ID),"Age.Bin"],
+                    Age = pd[match(colnames(Hmeth), pd$Data.ID),"Age"])
+methCH$Age.Bin = factor(methCH$Age.Bin, levels = c("Neonate","Toddler","Child","Early.Teen","Teen","Young.Adult"))
+write.csv(methCH, quote = F, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/proportion_mCH_byCellType_byAge.csv")
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/nonCG_global_methylation.pdf")
+ggplot(methCH, aes(x = CellType, y = prop)) + geom_boxplot() +
+  theme_classic() +
+  ylab("mCpH / CpH") + xlab("") + ylim(0,50) +
+  ggtitle("Global Proportion of Methylated CpHs") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(methCH, aes(x = Age.Bin, y = prop)) + geom_boxplot() +
+  theme_classic() +
+  ylab("mCpH / CpH") + xlab("") + ylim(0,50) +
+  ggtitle("Global Proportion of Methylated CpHs") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(methCH, aes(x = Age.Bin, y = prop)) + geom_boxplot() +
+  theme_classic() +  ylim(0,50) +
+  ylab("mCpH / CpH") + xlab("") + facet_grid(. ~ CellType) +
+  theme(axis.text.x=element_text(angle = -90, hjust = 0)) +
+  ggtitle("Global Proportion of Methylated CpHs") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(methCH, aes(x = Age, y = prop, colour = CellType)) + geom_point() +
+  geom_smooth(method = "lm") +  ylim(0,50) +
+  theme_classic() + scale_colour_brewer(8, palette="Dark2") +
+  ylab("mCpH / CpH") + xlab("") +
+  ggtitle("Global Proportion of Methylated CpHs") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(methCH, aes(x = CellType, y = prop10)) + geom_boxplot() +
+  theme_classic() +  ylim(0,30) +
+  ylab("mCpH / CpH") + xlab("") +
+  ggtitle("Global Proportion of\nCpHs Methylated >10%") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(methCH, aes(x = Age.Bin, y = prop10)) + geom_boxplot() +
+  theme_classic() +  ylim(0,30) +
+  ylab("mCpH / CpH") + xlab("") +
+  ggtitle("Global Proportion of\nCpHs Methylated >10%") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(methCH, aes(x = Age.Bin, y = prop10)) + geom_boxplot() +
+  theme_classic() +  ylim(0,30) +
+  ylab("mCpH / CpH") + xlab("") + facet_grid(. ~ CellType) +
+  theme(axis.text.x=element_text(angle = -90, hjust = 0)) +
+  ggtitle("Global Proportion of\nCpHs Methylated >10%") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(methCH, aes(x = Age, y = prop10, colour = CellType)) + geom_point() +
+  geom_smooth(method = "lm") +  ylim(0,30) +
+  theme_classic() + scale_colour_brewer(8, palette="Dark2") +
+  ylab("mCpH / CpH") + xlab("") +
+  ggtitle("Global Proportion of\nCpHs Methylated >10%") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+dev.off()
 
 
+## Separate into trinucleotide contexts
+
+freq = table(as.character(Hdf$trinucleotide_context))
+x = cbind(as.data.frame(Hmeth), ID = rownames(Hmeth), trinucleotide_context = Hdf$trinucleotide_context)
+
+Group = pd[match(as.character(Hdt$variable), as.character(pd$Data.ID)),"Group"]
+x = t(Hmeth)
+Hdt = reshape2::melt(x)
+rm(x)
+Hdt = data.table(Hdt)
+pd$Group = paste(pd$Cell.Type, pd$Age.Bin, sep="\n")
 
 
+tri = Hdt[value>0,length(unique(ID)), by= c("variable","trinucleotide_context")]
+tri10 = Hdt[value>0.10,length(unique(ID)), by= c("variable","trinucleotide_context")]
+nrowHmeth = nrow(Hmeth)
+rm(Hmeth)
+save(tri,tri10, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/number_mCH_bytrinucleotideContext.rda")
 
+methCH = data.frame(rbind(data.frame(tri), data.frame(tri10)), prop = c(round(tri$V1/nrowHmeth,3), round(tri10$V1/nrowHmeth,3)),
+                    perc = c(rep.int("nonzero",nrow(tri)), rep.int("ten",nrow(tri10))),
+                    triFreq = freq[match(c(as.character(tri$trinucleotide_context),as.character(tri10$trinucleotide_context)), names(freq))],
+                    CellType = pd[match(c(as.character(tri$variable),as.character(tri10$variable)), pd$Data.ID),"Cell.Type"],
+                    Age.Bin = pd[match(c(as.character(tri$variable),as.character(tri10$variable)), pd$Data.ID),"Age.Bin"],
+                    Age = pd[match(c(as.character(tri$variable),as.character(tri10$variable)), pd$Data.ID),"Age"])
+methCH$triprop = round(methCH$V1 / methCH$triFreq.Freq,3)
+methCH$Age.Bin  = factor(methCH$Age.Bin, levels = c("Neonate","Toddler","Child","Early.Teen","Teen","Young.Adult"))
+write.csv(methCH, quote = F, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/proportion_mCH_byCellType_byAge_byTrinucleotideContext.csv")
+
+
+ageprop = rbind(cbind(Hdt[value>0, length(unique(ID)), by= c("Group","trinucleotide_context")], perc = "nonzero"),
+                cbind(Hdt[value>0.10,length(unique(ID)), by= c("Group","trinucleotide_context")], perc = "ten"))
+ageprop = cbind(ageprop, triFreq = freq[match(as.character(ageprop$trinucleotide_context), names(freq))])
+ageprop$Age.Bin = factor(ageprop$Age.Bin, levels = c("Neonate","Toddler","Child","Early.Teen","Teen","Young.Adult"))
+ageprop$triprop = round(ageprop$V1 / ageprop$triFreq.Freq,3)
+
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/nonCG_global_methylation_byTrinucleotideContext.pdf")
+ggplot(ageprop[ageprop$perc=="nonzero",], aes(x = Group, y = triprop, fill=trinucleotide_context), color=trinucleotide_context) + 
+  geom_bar(position = "fill",stat = "identity", width=0.75) +
+  scale_y_continuous(labels = percent_format()) +
+  ylab("Percent mCpH / CpH") + 
+  theme_classic() + xlab("") +
+  ggtitle("Global Methylation of CpHs") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(ageprop[ageprop$perc=="ten",], aes(x = Group, y = triprop, fill=trinucleotide_context), color=trinucleotide_context) + 
+  geom_bar(position = "fill",stat = "identity", width=0.75) +
+  scale_y_continuous(labels = percent_format()) +
+  ylab("Percent mCpH / CpH") + 
+  theme_classic() + xlab("") +
+  ggtitle("Global Methylation of CpHs (>10%)") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(methCH[methCH$perc=="nonzero",], aes(x = trinucleotide_context, y = triprop), fill=CellType) + geom_boxplot() +
+  theme_classic() + scale_fill_brewer(8, palette="Dark2") +
+  ylab("mCpH / CpH") + xlab("") + ylim(0,50) +
+  ggtitle("Global Proportion of Methylated CpHs\nContext Proportion") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(methCH[methCH$perc=="nonzero",], aes(x = trinucleotide_context, y = triprop), fill = Age.Bin) + geom_boxplot() +
+  theme_classic() +
+  ylab("mCpH / CpH") + xlab("") + ylim(0,50) +
+  ggtitle("Global Proportion of Methylated CpHs\nContext Proportion") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(methCH[methCH$perc=="nonzero",], aes(x = trinucleotide_context, y = triprop), fill = Age.Bin) + geom_boxplot() +
+  theme_classic() +  ylim(0,50) +
+  ylab("mCpH / CpH") + xlab("") + facet_grid(. ~ CellType) +
+  theme(axis.text.x=element_text(angle = -90, hjust = 0)) +
+  ggtitle("Global Proportion of Methylated CpHs\nContext Proportion") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(methCH[which(methCH$perc=="nonzero" & methCH$trinucleotide_context %in% c("CAG","CAC")),], 
+       aes(x = Age, y = triprop, colour = CellType)) + geom_point() + facet_grid(. ~ trinucleotide_context) +
+  geom_smooth(method = "lm") +  ylim(0,50) +
+  theme_classic() + scale_colour_brewer(8, palette="Dark2") +
+  ylab("mCpH / CpH") + xlab("") +
+  ggtitle("Global Proportion of Methylated CpHs\nContext Proportion") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(methCH[which(methCH$perc=="nonzero" & methCH$trinucleotide_context %in% c("CAG","CAC")),], 
+       aes(x = Age, y = prop, colour = CellType)) + geom_point() + facet_grid(. ~ trinucleotide_context) +
+  geom_smooth(method = "lm") +  ylim(0,50) +
+  theme_classic() + scale_colour_brewer(8, palette="Dark2") +
+  ylab("mCpH / CpH") + xlab("") +
+  ggtitle("Global Proportion of Methylated CpHs\nTotal Proportion") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+
+ggplot(methCH[methCH$perc=="ten",], aes(x = trinucleotide_context, y = triprop), fill = CellType) + geom_boxplot() +
+  theme_classic() +  ylim(0,30) + scale_fill_brewer(8, palette="Dark2") +
+  ylab("mCpH / CpH") + xlab("") +
+  ggtitle("Global Proportion of\nCpHs Methylated >10%\nContext Proportion") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(methCH[methCH$perc=="ten",], aes(x = trinucleotide_context, y = triprop), fill = Age.Bin) + geom_boxplot() +
+  theme_classic() +  ylim(0,30) +
+  ylab("mCpH / CpH") + xlab("") +
+  ggtitle("Global Proportion of\nCpHs Methylated >10%\nContext Proportion") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(methCH[methCH$perc=="ten",], aes(x = trinucleotide_context, y = triprop), fill = Age.Bin) + geom_boxplot() +
+  theme_classic() +  ylim(0,30) +
+  ylab("mCpH / CpH") + xlab("") + facet_grid(. ~ CellType) +
+  theme(axis.text.x=element_text(angle = -90, hjust = 0)) +
+  ggtitle("Global Proportion of\nCpHs Methylated >10%\nContext Proportion") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(methCH[which(methCH$perc=="ten" & methCH$trinucleotide_context %in% c("CAG","CAC")),], 
+       aes(x = Age, y = triprop, colour = CellType)) + geom_point() +
+  geom_smooth(method = "lm") +  ylim(0,30) +
+  theme_classic() + scale_colour_brewer(8, palette="Dark2") +
+  ylab("mCpH / CpH") + xlab("") +
+  ggtitle("Global Proportion of\nCpHs Methylated >10%\nContext Proportion") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(methCH[which(methCH$perc=="ten" & methCH$trinucleotide_context %in% c("CAG","CAC")),], 
+       aes(x = Age, y = prop, colour = CellType)) + geom_point() +
+  geom_smooth(method = "lm") +  ylim(0,30) +
+  theme_classic() + scale_colour_brewer(8, palette="Dark2") +
+  ylab("mCpH / CpH") + xlab("") +
+  ggtitle("Global Proportion of\nCpHs Methylated >10%\nTotal Proportion") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+dev.off()
+
+
+## Correlations of different context proportions by age
+
+methCH$c_context = ifelse(methCH$trinucleotide_context %in% c("CTG", "CAG", "CCG"), "CHG", "CHH")
+methCH$context_total = ifelse(methCH$c_context=="CHG", sum(freq[which(names(freq) %in% c("CTG", "CAG", "CCG"))]),sum(freq[-which(names(freq) %in% c("CTG", "CAG", "CCG"))]))
+cont = data.table(methCH)[,sum(V1), by=c("c_context","variable", "perc","CellType","Age.Bin","Age","context_total")]
+cont$prop = round(cont$V1 / cont$context_total,3)
+
+cor = list(nonzero.glia.CHG = cor.test(cont[perc=="nonzero" & CellType=="Glia" & c_context=="CHG",,]$Age, cont[perc=="nonzero" & CellType=="Glia" & c_context=="CHG",,]$prop),
+           nonzero.glia.CHH = cor.test(cont[perc=="nonzero" & CellType=="Glia" & c_context=="CHH",,]$Age, cont[perc=="nonzero" & CellType=="Glia" & c_context=="CHH",,]$prop),
+           nonzero.neuron.CHG = cor.test(cont[perc=="nonzero" & CellType=="Neuron" & c_context=="CHG",,]$Age, cont[perc=="nonzero" & CellType=="Neuron" & c_context=="CHG",,]$prop),
+           nonzero.neuron.CHH = cor.test(cont[perc=="nonzero" & CellType=="Neuron" & c_context=="CHH",,]$Age, cont[perc=="nonzero" & CellType=="Neuron" & c_context=="CHH",,]$prop),
+           ten.glia.CHG = cor.test(cont[perc=="ten" & CellType=="Glia" & c_context=="CHG",,]$Age, cont[perc=="ten" & CellType=="Glia" & c_context=="CHG",,]$prop),
+           ten.glia.CHH = cor.test(cont[perc=="ten" & CellType=="Glia" & c_context=="CHH",,]$Age, cont[perc=="ten" & CellType=="Glia" & c_context=="CHH",,]$prop),
+           ten.neuron.CHG = cor.test(cont[perc=="ten" & CellType=="Neuron" & c_context=="CHG",,]$Age, cont[perc=="ten" & CellType=="Neuron" & c_context=="CHG",,]$prop),
+           ten.neuron.CHH = cor.test(cont[perc=="ten" & CellType=="Neuron" & c_context=="CHH",,]$Age, cont[perc=="ten" & CellType=="Neuron" & c_context=="CHH",,]$prop))
+write.csv(data.frame(comparison = names(cor), tstat=unlist(lapply(cor, function(x) x$statistic)), 
+          pval = unlist(lapply(cor, function(x) x$p.value)), rho = unlist(lapply(cor, function(x) x$estimate))), quote=F,
+          file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/proportion_mCH_byCellType_byAge_byTrinucleotideContext_correlation.csv")

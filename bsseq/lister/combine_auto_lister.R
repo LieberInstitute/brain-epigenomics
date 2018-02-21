@@ -1,49 +1,38 @@
-## Based on https://github.com/LieberInstitute/brain-epigenomics/blob/master/bsseq/bsobj_by_chr/combine_auto.R
-
 library('devtools')
 library('ggplot2')
 
-files <- dir('rda', pattern = '^auto_long', full.names = TRUE)
+files <- dir('rda', pattern = '^auto_long_chr')
 
 load_auto <- function(f) {
+    chr <- gsub('_.*', '', gsub('auto_long_', '', f))
     message(paste(Sys.time(), 'loading', f))
-    load(f)
+    load(file.path('rda', f))
+    auto_long$chr <- chr
     return(auto_long)
 }
 
+dir.create('rda', showWarnings = FALSE)
 if(!file.exists('rda/auto_long_combined.Rdata')) {
     auto_long <- do.call(rbind, lapply(files, load_auto))
-    # auto_long$context[auto_long$context == 'nonCG'] <- 'CpH'
-    # auto_long$context[auto_long$context == 'CG'] <- 'CpG'
     auto_long$lag <- as.factor(auto_long$lag)
     save(auto_long, file = 'rda/auto_long_combined.Rdata')
 } else {
-    load('rda/auto_long_combined.Rdata')
+    load('rda/auto_long_combined.Rdata', verbose = TRUE)
 }
 dim(auto_long)
-
-## This never finished running:
-# mod_context_summary <- lapply(unique(auto_long)$model, function(model) {
-#     lapply(unique(auto_long)$context, function(context) {
-#          sub <- auto_long[auto_long$context == context & auto_long$model == model, ]
-#          tapply(sub$acf, sub$lag, summary)
-#      })
-# })
-# mod_context_summary
-# save(mod_context_summary, file = 'autocorrelation_summary_by_context_and_model.Rdata')
+# [1] 7043476       8
 
 dir.create('pdf', showWarnings = FALSE)
+pdf('pdf/autocorrelation_by_context.pdf', width = 7 * 2, height = 7 * 2)
+ggplot(auto_long, aes(x = lag, y = acf_neuron)) + geom_boxplot() + facet_grid(. ~ context) + theme_bw(base_size = 30) + ggtitle('Neuron') + ylab('Auto correlation') + ylim(c(-1, 1))
 
-pdf('pdf/autocorrelation_by_context_and_model.pdf', width = 7 * 2, height = 7 * 3)
-ggplot(auto_long, aes(x = lag, y = acf_neuron)) + geom_boxplot() + facet_grid(model ~ context) + theme_bw(base_size = 30) + ggtitle('Neuron') + ylab('Auto correlation') + ylim(c(-1, 1))
-
-ggplot(auto_long, aes(x = lag, y = acf_glia)) + geom_boxplot() + facet_grid(model ~ context) + theme_bw(base_size = 30) + ggtitle('Glia') + ylab('Auto correlation')  + ylim(c(-1, 1))
+ggplot(auto_long, aes(x = lag, y = acf_glia)) + geom_boxplot() + facet_grid(. ~ context) + theme_bw(base_size = 30) + ggtitle('Glia') + ylab('Auto correlation')  + ylim(c(-1, 1))
 dev.off()
 
-pdf('pdf/autocorrelation_by_context_and_model_abs.pdf', width = 7 * 2, height = 7 * 3)
-ggplot(auto_long, aes(x = lag, y = abs(acf_neuron))) + geom_boxplot() + facet_grid(model ~ context) + theme_bw(base_size = 30) + ggtitle('Neuron') + ylab('Absolute auto correlation') + ylim(c(0, 1))
+pdf('pdf/autocorrelation_by_context_abs.pdf', width = 7 * 2, height = 7 * 2)
+ggplot(auto_long, aes(x = lag, y = abs(acf_neuron))) + geom_boxplot() + facet_grid(. ~ context) + theme_bw(base_size = 30) + ggtitle('Neuron') + ylab('Absolute auto correlation') + ylim(c(0, 1))
 
-ggplot(auto_long, aes(x = lag, y = abs(acf_glia))) + geom_boxplot() + facet_grid(model ~ context) + theme_bw(base_size = 30) + ggtitle('Glia') + ylab('Absolute auto correlation') + ylim(c(0, 1))
+ggplot(auto_long, aes(x = lag, y = abs(acf_glia))) + geom_boxplot() + facet_grid(. ~ context) + theme_bw(base_size = 30) + ggtitle('Glia') + ylab('Absolute auto correlation') + ylim(c(0, 1))
 dev.off()
 
 ## Reproducibility information
@@ -52,7 +41,7 @@ Sys.time()
 proc.time()
 options(width = 120)
 session_info()
-#
+
 # Session info ----------------------------------------------------------------------------------------------------------
 #  setting  value
 #  version  R version 3.4.3 Patched (2018-01-20 r74142)
@@ -61,7 +50,7 @@ session_info()
 #  language (EN)
 #  collate  en_US.UTF-8
 #  tz       America/New_York
-#  date     2018-01-25
+#  date     2018-01-26
 #
 # Packages --------------------------------------------------------------------------------------------------------------
 #  package    * version date       source

@@ -121,13 +121,6 @@ nucRNAexonres$padj.CellTypeNeuron = p.adjust(nucRNAexonres$pval.CellTypeNeuron, 
 nucRNAexonres$gencodeID = rownames(nucRNAexonres)
 
 
-save(fit_gene_polya,fit_gene_ribo,fit_exon_polya,fit_exon_ribo, 
+save(fit_gene_polya,fit_gene_ribo,fit_exon_polya,fit_exon_ribo, geneMap, metrics,
      fit_gene_combined, fit_exon_combined, nucRNAres, nucRNAexonres, 
      file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/sorted_nuclear_RNA/DE_limma_results_objects.rda")
-
-
-
-
-
-
-

@@ -4,87 +4,59 @@ library(data.table)
 library(ggplot2)
 library(clusterProfiler)
 require(org.Hs.eg.db)
+library(RColorBrewer)
+library(bumphunter)
+
 
 load("/dcl01/lieber/ajaffe/CellSorting/RNAseq_pipeline/rawCounts_CellSorting_July5_n12.rda")
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/bumps_bsseqSmooth_Neuron_cell_250_perm.Rdata")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda")
+load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/BSobj_bsseqSmooth_Neuron_minCov_3.Rdata')
 
+# Identify all CpG clusters in the genome
+gr = granges(BSobj)
+cl = clusterMaker( chr = as.character(seqnames(gr)), 
+                   pos = start(gr),   maxGap = 1000)
+gr.clusters = split(gr, cl)
+gr.clusters = unlist(range(gr.clusters))
+df.clusters = as.data.frame(gr.clusters)
+df.clusters$regionID = paste0(df.clusters$seqnames,":",df.clusters$start,"-",df.clusters$end)
+df.clusters$rnum = 1:length(gr.clusters)
 
-## How many regions are DMRs? (model: ~ age + cell)
+dtcell = data.table(DMR$CellType)
+oo = findOverlaps(gr.clusters, makeGRangesFromDataFrame(dtcell[sig=="FWER < 0.05",,]))
+length(unique(queryHits(oo)))
+df.clusters$CellType = ifelse(df.clusters$rnum %in% queryHits(oo), "CellType","no")
 
-cell = bumps[[1]]
-dim(cell) # 241924     14
-dim(cell[which(cell$fwer<=0.05),]) # 11179    14
-
-
-# Annotate editing sites to features in the genome
 txdb = loadDb("/dcl01/lieber/ajaffe/Amanda/annotation_objects/gencode.v25lift37.annotation.sqlite")
 islands = read.table("/dcl01/lieber/ajaffe/Amanda/annotation_objects/cpgIslandExt.hg19.txt", sep="\t", header = T)
+rpmsk = read.table("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/RepeatMasker_genomewide_HG19.txt", header=T)
 features = list(CDS = cdsBy(txdb, by="tx", use.names=T), Introns = intronsByTranscript(txdb, use.names=T), 
                 UTR5 = fiveUTRsByTranscript(txdb, use.names=T), UTR3 = threeUTRsByTranscript(txdb, use.names=T))
 features = lapply(features, function(x) unlist(x, recursive = TRUE, use.names = TRUE))
 for (i in 1:length(features)){
   tmp = features[[i]]
   tmp$TxID = names(tmp)
-  features[[i]] = tmp
-}
-features = c(features, islands = makeGRangesFromDataFrame(islands, keep.extra.columns = T, start.field = "chromStart", end.field = "chromEnd"),
+  features[[i]] = tmp }
+features = c(features, 
+             rpmskgr = makeGRangesFromDataFrame(rpmsk, seqnames.field="genoName",start.field="genoStart",end.field="genoEnd",keep.extra.columns=TRUE),
+             islands = makeGRangesFromDataFrame(islands, keep.extra.columns = T, start.field = "chromStart", end.field = "chromEnd"),
              promoters = promoters(txdb, upstream=2000, downstream=200))
 lapply(features, head)
 
-grcell = makeGRangesFromDataFrame(cell, keep.extra.columns = T)
-annotation = lapply(features, function(y) findOverlaps(grcell, y))
+df.clusters$Islands = ifelse(df.clusters$rnum %in% subjectHits(findOverlaps(features$islands, gr.clusters)), "island","no")
+df.clusters$repeats = ifelse(df.clusters$rnum %in% subjectHits(findOverlaps(features$rpmskgr, gr.clusters)), "repeat","no")
+df.clusters$promoters = ifelse(df.clusters$rnum %in% subjectHits(findOverlaps(features$promoters, gr.clusters)), "promoter","no")
+df.clusters$genes = ifelse(df.clusters$rnum %in% subjectHits(findOverlaps(makeGRangesFromDataFrame(geneMap), gr.clusters)), "gene","no")
 
-grcell$rnum = 1:length(grcell)
-grcell$cds = ifelse(grcell$rnum %in% queryHits(annotation[["CDS"]]), "CDS", NA)
-grcell$intron = ifelse(grcell$rnum %in% queryHits(annotation[["Introns"]]), "Intron", NA)
-grcell$UTR5 = ifelse(grcell$rnum %in% queryHits(annotation[["UTR5"]]), "UTR5", NA)
-grcell$UTR3 = ifelse(grcell$rnum %in% queryHits(annotation[["UTR3"]]), "UTR3", NA)
-grcell$islands = ifelse(grcell$rnum %in% queryHits(annotation[["islands"]]), "CpG_Island", "non-Island")
-grcell$promoter = ifelse(grcell$rnum %in% queryHits(annotation[["promoters"]]), "Promoter", NA)
-grcell$anno = paste0(grcell$cds,":",grcell$intron, ":", grcell$UTR5, ":", grcell$UTR3, ":", grcell$promoter)
-
-cell = as.data.frame(grcell)
-cell[which(cell$anno == "NA:NA:NA:NA:NA"),"annotation"] = "Other" 
-cell[grep("CDS", cell$cds),"annotation"] = "CDS"
-cell[which(is.na(cell$annotation) & cell$UTR5 == "UTR5"),"annotation"] = "UTR5"
-cell[which(is.na(cell$annotation) & cell$UTR3 == "UTR3"),"annotation"] = "UTR3"
-cell[which(is.na(cell$annotation) & cell$intron == "Intron"),"annotation"] = "Intron"
-cell[which(is.na(cell$annotation) & cell$promoter == "Promoter"),"annotation"] = "Promoter"
-
-# Mapping cell sites to nearest gene
-geneMapGR = makeGRangesFromDataFrame(geneMap, start.field="Start",end.field="End",strand.field="Strand",keep=TRUE)
-dA = distanceToNearest(grcell, geneMapGR)
-cell$nearestSymbol = geneMapGR$Symbol[subjectHits(dA)]
-cell$nearestID = names(geneMapGR)[subjectHits(dA)]
-cell$distToGene = mcols(dA)$distance
-cell$EntrezID = geneMapGR$EntrezID[subjectHits(dA)]
-cell$regionID = paste0(cell$seqnames,":",cell$start,"-", cell$end)
-cell$sig = ifelse(cell$fwer<=0.05, "FWER < 0.05", "FWER > 0.05")
-cell$Dir = ifelse(cell$value<0, "neg", "pos")
-dtcell = data.table(cell)
-
-
-### Explore annotation of regions
 
 ## how many fall within CpG islands?
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CellType/figures/DMR_overap_with_CpG_Islands_byCellType.pdf")
-x = dtcell[,length(unique(regionID)), by = "islands"]
-x$perc = round(x$V1/sum(x$V1)*100,2)
-ggplot(x, aes(x = islands, y = V1)) + geom_bar(stat = "identity") +
-  geom_text(aes( label = paste0(perc,"%")), vjust = -.5) +
-  labs(fill="") +
-  ylab("Count") + 
-  xlab("") +
-  ggtitle("DMRs Overlapping CpG Islands: All DMRs") +
-  theme(title = element_text(size = 20)) +
-  theme(text = element_text(size = 20))
-
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CellType/figures/DMR_overap_with_CpG-Islands_byCellType.pdf")
 x = dtcell[sig=="FWER < 0.05",length(unique(regionID)), by = "islands"]
 x$perc = round(x$V1/sum(x$V1)*100,2)
 ggplot(x, aes(x = islands, y = V1)) + geom_bar(stat = "identity") +
   geom_text(aes( label = paste0(perc,"%")), vjust = -.5) +
-  labs(fill="") +
+  labs(fill="") + theme_classic() +
   ylab("Count") + 
   xlab("") +
   ggtitle("DMRs Overlapping CpG Islands: FWER < 0.05") +
@@ -96,7 +68,7 @@ x$perc = unlist(c(round(x[1:2,"V1"]/sum(x[1:2,"V1"])*100,2),
            round(x[3:4,"V1"]/sum(x[3:4,"V1"])*100,2)))
 ggplot(x, aes(x = islands, y = V1)) + geom_bar(stat = "identity") +
   geom_text(aes( label = paste0(perc,"%")), vjust = -.5) +
-  facet_grid(. ~ sig) +
+  facet_grid(. ~ sig) + theme_classic() +
   labs(fill="") +
   ylab("Count") + 
   xlab("") +
@@ -108,39 +80,61 @@ dev.off()
 
 # Is there a relationship between being significantly DM and overlapping a CpG island?
 
-fisher.test(data.frame(c(nrow(cell[which(cell$sig=="FWER < 0.05" & cell$islands=="CpG_Island"),]),
-                         nrow(cell[which(cell$sig=="FWER > 0.05" & cell$islands=="CpG_Island"),])),
-                       c(nrow(cell[which(cell$sig=="FWER < 0.05" & cell$islands=="non-Island"),]),
-                         nrow(cell[which(cell$sig=="FWER > 0.05" & cell$islands=="non-Island"),]))))
+fisher.test(data.frame(YesIsland = c(nrow(df.clusters[df.clusters$Islands=="island" & df.clusters$CellType=="CellType",]),
+                                  nrow(df.clusters[df.clusters$Islands=="island" & df.clusters$CellType=="no",])),
+                       NoIsland = c(nrow(df.clusters[df.clusters$Islands=="no" & df.clusters$CellType=="CellType",]),
+                                  nrow(df.clusters[df.clusters$Islands=="no" & df.clusters$CellType=="no",])), row.names = c("YesCT","NoCT")))
 # CpG islands are overrepresented in DMRs
 #p-value < 2.2e-16
 #alternative hypothesis: true odds ratio is not equal to 1
 #95 percent confidence interval:
-#  5.070749 5.818562
+#  30.78423 33.99262
 #sample estimates:
 #  odds ratio 
-#5.432825
+#32.34714 
+
+# How about Repetitive Elements?
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CellType/figures/DMR_repetitiveElements_byCellType.pdf", width = 12)
+x = dtcell[sig=="FWER < 0.05",length(unique(regionID)), by = "repeats"]
+x$perc = round(x$V1/sum(x$V1)*100,2)
+x$repeats = factor(x$repeats, levels = c("SINE","LINE","Simple_repeat","DNA","LTR","Low_complexity","No repeats","Unknown","snRNA",
+                                         "Other","DNA?","Satellite","RC","scRNA","tRNA","SINE?","srpRNA","RNA","rRNA","LINE?","LTR?","Unknown?"))
+ggplot(x, aes(x = repeats, y = V1)) + geom_bar(stat = "identity") +
+  geom_text(aes( label = paste0(perc,"%")), vjust = -.5) +
+  theme(axis.text.x=element_text(angle=45, hjust=1)) +
+  labs(fill="") + theme_classic() +
+  ylab("Count") + 
+  xlab("") +
+  ggtitle("DMRs in repretitive elements: FWER < 0.05") +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20))
+dev.off()
+
+
+# Is there a relationship between being significantly DM and overlapping a promoter?
+
+fisher.test(data.frame(Yesrepeats = c(nrow(df.clusters[df.clusters$repeats=="repeat" & df.clusters$CellType=="CellType",]),
+                                     nrow(df.clusters[df.clusters$repeats=="repeat" & df.clusters$CellType=="no",])),
+                       Norepeats = c(nrow(df.clusters[df.clusters$repeats=="no" & df.clusters$CellType=="CellType",]),
+                                    nrow(df.clusters[df.clusters$repeats=="no" & df.clusters$CellType=="no",])), row.names = c("YesCT","NoCT")))
+#p-value < 2.2e-16
+#alternative hypothesis: true odds ratio is not equal to 1
+#95 percent confidence interval:
+#  1.903427 2.311114
+#sample estimates:
+#  odds ratio 
+#2.095256 
 
 
 # assign genomic features
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CellType/figures/DMR_annotation_byCellType.pdf")
-x = dtcell[,length(unique(regionID)), by = "annotation"]
-x$perc = round(x$V1/sum(x$V1)*100,2)
-ggplot(x, aes(x = annotation, y = V1)) + geom_bar(stat = "identity") +
-  geom_text(aes( label = paste0(perc,"%")), vjust = -.5) +
-  labs(fill="") +
-  ylab("Count") + 
-  xlab("") +
-  ggtitle("DMR annotation: All DMRs") +
-  theme(title = element_text(size = 20)) +
-  theme(text = element_text(size = 20))
-
 x = dtcell[sig=="FWER < 0.05",length(unique(regionID)), by = "annotation"]
 x$perc = round(x$V1/sum(x$V1)*100,2)
 ggplot(x, aes(x = annotation, y = V1)) + geom_bar(stat = "identity") +
   geom_text(aes( label = paste0(perc,"%")), vjust = -.5) +
-  labs(fill="") +
+  labs(fill="") + theme_classic() +
   ylab("Count") + 
   xlab("") +
   ggtitle("DMR annotation: FWER < 0.05") +
@@ -152,7 +146,7 @@ x$perc = unlist(c(round(x[1:6,"V1"]/sum(x[1:6,"V1"])*100,2),
                   round(x[7:12,"V1"]/sum(x[7:12,"V1"])*100,2)))
 ggplot(x, aes(x = annotation, y = V1)) + geom_bar(stat = "identity") +
   geom_text(aes( label = paste0(perc,"%")), vjust = -.5) +
-  facet_grid(. ~ sig) +
+  facet_grid(. ~ sig) + theme_classic() +
   labs(fill="") +
   ylab("Count") + 
   theme(axis.text.x=element_text(angle=45,hjust=1)) +
@@ -164,61 +158,46 @@ dev.off()
 
 # Is there a relationship between being significantly DM and overlapping a gene?
 
-fisher.test(data.frame(c(nrow(cell[which(cell$sig=="FWER < 0.05" & cell$distToGene==0),]),
-                         nrow(cell[which(cell$sig=="FWER > 0.05" & cell$distToGene==0),])),
-                       c(nrow(cell[which(cell$sig=="FWER < 0.05" & cell$distToGene>0),]),
-                         nrow(cell[which(cell$sig=="FWER > 0.05" & cell$distToGene>0),]))))
+fisher.test(data.frame(Yesgenes = c(nrow(df.clusters[df.clusters$genes=="gene" & df.clusters$CellType=="CellType",]),
+                                      nrow(df.clusters[df.clusters$genes=="gene" & df.clusters$CellType=="no",])),
+                       Nogenes = c(nrow(df.clusters[df.clusters$genes=="no" & df.clusters$CellType=="CellType",]),
+                                     nrow(df.clusters[df.clusters$genes=="no" & df.clusters$CellType=="no",])), row.names = c("YesCT","NoCT")))
 # Genes are overrepresented in DMRs
 #p-value < 2.2e-16
 #alternative hypothesis: true odds ratio is not equal to 1
 #95 percent confidence interval:
-#  2.268516 2.480824
+#  4.900227 5.590851
 #sample estimates:
 #  odds ratio 
-#2.371966 
+#5.23127 
 
 # Is there a relationship between being significantly DM and overlapping a promoter?
 
-fisher.test(data.frame(c(nrow(cell[which(cell$sig=="FWER < 0.05" & cell$annotation=="Promoter"),]),
-                         nrow(cell[which(cell$sig=="FWER > 0.05" & cell$annotation=="Promoter"),])),
-                       c(nrow(cell[which(cell$sig=="FWER < 0.05" & cell$annotation!="Promoter"),]),
-                         nrow(cell[which(cell$sig=="FWER > 0.05" & cell$annotation!="Promoter"),]))))
+fisher.test(data.frame(Yespromoters = c(nrow(df.clusters[df.clusters$promoters=="promoter" & df.clusters$CellType=="CellType",]),
+                                    nrow(df.clusters[df.clusters$promoters=="promoter" & df.clusters$CellType=="no",])),
+                       Nopromoters = c(nrow(df.clusters[df.clusters$promoters=="no" & df.clusters$CellType=="CellType",]),
+                                   nrow(df.clusters[df.clusters$promoters=="no" & df.clusters$CellType=="no",])), row.names = c("YesCT","NoCT")))
 # promoters by themselves aren't overrepresented in DMRs
-#p-value = 0.5655
-#alternative hypothesis: true odds ratio is not equal to 1
-#95 percent confidence interval:
-#  0.931030 1.132771
-#sample estimates:
-#  odds ratio 
-#1.028018 
-
-# Is there a relationship between being significantly DM and overlapping a gene and/or promoter?
-
-fisher.test(data.frame(c(nrow(cell[which(cell$sig=="FWER < 0.05" & cell$annotation!="Other"),]),
-                         nrow(cell[which(cell$sig=="FWER > 0.05" & cell$annotation!="Other"),])),
-                       c(nrow(cell[which(cell$sig=="FWER < 0.05" & cell$annotation=="Other"),]),
-                         nrow(cell[which(cell$sig=="FWER > 0.05" & cell$annotation=="Other"),]))))
-# genes and promoters together are overrepresented in DMRs
 #p-value < 2.2e-16
 #alternative hypothesis: true odds ratio is not equal to 1
 #95 percent confidence interval:
-#  0.3801622 0.4175264
+#  12.42343 13.64845
 #sample estimates:
 #  odds ratio 
-#0.3984746
+#13.02401 
 
 
 ### Gene Ontology
 entrez = list(All = dtcell[sig=="FWER < 0.05",list(na.omit(EntrezID)),], 
-              GenesPlusPromoters = dtcell[annotation != "Other" & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
+              GenesPlusPromoters = dtcell[annotation != "Intergenic" & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
               Genes = dtcell[distToGene==0 & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
               Promoters = dtcell[annotation == "Promoter" & sig=="FWER < 0.05",list(na.omit(EntrezID)),])
 entrez.dir = list(All.pos = dtcell[value>0 & sig=="FWER < 0.05",list(na.omit(EntrezID)),], 
-                  GenesPlusPromoters.pos = dtcell[value>0 & annotation != "Other" & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
+                  GenesPlusPromoters.pos = dtcell[value>0 & annotation != "Intergenic" & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
                   Genes.pos = dtcell[value>0 & distToGene==0 & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
                   Promoters.pos = dtcell[value>0 & annotation == "Promoter" & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
                   All.neg = dtcell[value<0 & sig=="FWER < 0.05",list(na.omit(EntrezID)),], 
-                  GenesPlusPromoters.neg = dtcell[value<0 & annotation != "Other" & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
+                  GenesPlusPromoters.neg = dtcell[value<0 & annotation != "Intergenic" & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
                   Genes.neg = dtcell[value<0 & distToGene==0 & sig=="FWER < 0.05",list(na.omit(EntrezID)),],
                   Promoters.neg = dtcell[value<0 & annotation == "Promoter" & sig=="FWER < 0.05",list(na.omit(EntrezID)),])
 entrez = lapply(entrez, function(x) as.character(unique(x$V1)))              
@@ -298,15 +277,67 @@ save(compareKegg, compareKegg.dir, compareBP, compareBP.dir, compareMF, compareM
      file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/CellType/DMR_KEGG_GO_DO_objects_byCellType.rda")
 
 # plot compared results
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CellType/figures/DMR_KEGG_GO_DO_plots_byCellType.pdf", height = 20, width = 20)
-plot(compareKegg, colorBy="p.adjust", showCategory = 45, title= "KEGG Pathway Enrichment")
-plot(compareBP, colorBy="p.adjust", showCategory = 45, title= "Biological Process GO Enrichment")
-plot(compareMF, colorBy="p.adjust", showCategory = 45, title= "Molecular Function GO Enrichment")
-plot(compareCC, colorBy="p.adjust", showCategory = 45, title= "Cellular Compartment GO Enrichment")
-plot(compareDO, colorBy="p.adjust", showCategory = 30, title= "Disease Ontology Enrichment")
-plot(compareKegg.dir, colorBy="p.adjust", showCategory = 45, title= "KEGG Pathway Enrichment")
-plot(compareBP.dir, colorBy="p.adjust", showCategory = 45, title= "Biological Process GO Enrichment")
-plot(compareMF.dir, colorBy="p.adjust", showCategory = 45, title= "Molecular Function GO Enrichment")
-plot(compareCC.dir, colorBy="p.adjust", showCategory = 45, title= "Cellular Compartment GO Enrichment")
-plot(compareDO.dir, colorBy="p.adjust", showCategory = 30, title= "Disease Ontology Enrichment")
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CellType/figures/DMR_KEGG_GO_DO_plots_byCellType.pdf", height = 120, width = 20)
+plot(compareKegg, colorBy="p.adjust", showCategory = 800, title= "KEGG Pathway Enrichment")
+plot(compareBP, colorBy="p.adjust", showCategory = 900, title= "Biological Process GO Enrichment")
+plot(compareMF, colorBy="p.adjust", showCategory = 800, title= "Molecular Function GO Enrichment")
+plot(compareCC, colorBy="p.adjust", showCategory = 800, title= "Cellular Compartment GO Enrichment")
+plot(compareDO, colorBy="p.adjust", showCategory = 800, title= "Disease Ontology Enrichment")
+plot(compareKegg.dir, colorBy="p.adjust", showCategory = 800, title= "KEGG Pathway Enrichment")
+plot(compareBP.dir, colorBy="p.adjust", showCategory = 800, title= "Biological Process GO Enrichment")
+plot(compareMF.dir, colorBy="p.adjust", showCategory = 800, title= "Molecular Function GO Enrichment")
+plot(compareCC.dir, colorBy="p.adjust", showCategory = 800, title= "Cellular Compartment GO Enrichment")
+plot(compareDO.dir, colorBy="p.adjust", showCategory = 800, title= "Disease Ontology Enrichment")
 dev.off()
+
+
+## Width of DMRs
+
+cellgr = makeGRangesFromDataFrame(DMR$CellType, keep.extra.columns = T)
+mean(width(cellgr)) # 2775.331
+median(width(cellgr)) # 2029
+sd(width(cellgr)) # 3304.216
+min(width(cellgr)) # 1
+max(width(cellgr)) # 72913
+
+geneMapgr = makeGRangesFromDataFrame(geneMap)
+geneMapgr$geneID = names(geneMapgr)
+mean(width(geneMapgr)) # 29389.18
+median(width(geneMapgr)) # 2602.5
+min(width(geneMapgr)) # 8
+
+tiles = tile(geneMapgr[width(geneMapgr)>=20], n = 20)
+names(tiles) = names(geneMapgr[width(geneMapgr)>=20])
+
+regions = cellgr[cellgr$distToGene==0 & cellgr$sig=="FWER < 0.05"]
+
+tiles = tiles[names(tiles) %in% regions$nearestID]
+tiles = as.list(tiles)
+pos = lapply(tiles, function(x) findOverlaps(x, reduce(regions[which(regions$Dir=="pos")])))
+neg = lapply(tiles, function(x) findOverlaps(x, reduce(regions[which(regions$Dir=="neg")])))
+
+overlaps1 = overlaps2 = list()
+for (i in 1:length(pos)) {
+  if (length(queryHits(pos[[i]]))>0) {
+    overlaps1[[i]] = data.frame(region = queryHits(pos[[i]]), strand = as.character(strand(tiles[[i]])[1])) } else {
+      overlaps1[[i]] = data.frame(region = 0, strand = as.character(strand(tiles[[i]])[1])) }
+  if (length(queryHits(neg[[i]]))>0) {
+    overlaps2[[i]] = data.frame(region = queryHits(neg[[i]]), strand = as.character(strand(tiles[[i]])[1])) } else {
+      overlaps2[[i]] = data.frame(region = 0, strand = as.character(strand(tiles[[i]])[1])) }
+}
+overlaps = rbind(do.call(rbind, Map(cbind, overlaps1, geneID = as.list(names(tiles)), Direction = "Hypermethylated\nin Neurons")),
+                 do.call(rbind, Map(cbind, overlaps2, geneID = as.list(names(tiles)), Direction = "Hypomethylated\nin Neurons")))
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CellType/figures/CellType_DMR_position_in_gene.pdf")
+ggplot(overlaps, aes(region, colour = Direction)) + scale_colour_brewer(8, palette="Dark2") +
+  geom_freqpoly(bins = 20, size=2) + theme_classic() +
+  labs(fill="") +
+  ylab("Count") + xlab("") +
+  ggtitle("Cell Type DMR Position in Gene") +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.position="bottom", legend.title=element_blank())
+dev.off()
+
+
+
+
