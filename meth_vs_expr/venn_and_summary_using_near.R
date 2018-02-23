@@ -1001,7 +1001,9 @@ saved_files <- c(paste0('rda/meqtl_mres_', opt$feature,
     paste0('rda/meqtl_venn_go_', opt$feature, '_using_near.Rdata'),
     paste0('rda/meqtl_age_coef_', opt$feature, '_using_near.Rdata'),
     paste0('rda/meqtl_data_by_venn_', opt$feature, '_using_near.Rdata'),
-    paste0('rda/meqtl_data_venn_summ_', opt$feature, '_using_near.Rdata')
+    paste0('rda/meqtl_data_venn_summ_', opt$feature, '_using_near.Rdata'),
+    load('rda/gene_section.Rdata', verbose = TRUE),
+    paste0('rda/meqtl_c_by_gene_', opt$feature, '_using_near.Rdata')
 )
 for(i in saved_files) load(i, verbose = TRUE)
 rm(i)
