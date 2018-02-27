@@ -305,7 +305,7 @@ print('C strand vs feature strand')
 if(opt$feature == 'psi') {
     print(addmargins(table('C strand' = as.vector(strand(me_annotated$meth)), 'feature strand' = as.vector(strand(unlist(range(rowRanges(me_annotated$expr))))))))
     print(chisq.test(table('C strand' = as.vector(strand(me_annotated$meth)), 'feature strand' = as.vector(strand(unlist(range(rowRanges(me_annotated$expr))))))))
-} else {
+} else if (opt$feature %in% c('gene', 'exon')) {
     print(addmargins(table('C strand' = as.vector(strand(me_annotated$meth)), 'feature strand' = as.vector(strand(me_annotated$expr)))))
     print(chisq.test(table('C strand' = as.vector(strand(me_annotated$meth)), 'feature strand' = as.vector(strand(me_annotated$expr)))))
 }   
