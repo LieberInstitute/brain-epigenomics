@@ -77,10 +77,10 @@ load_expr <- function(type) {
         assays(rse_jx)$norm <- recount::getRPKM(rse_jx, 'Length')
         expr <- rse_jx
     }
-    
+
     ## Subset to postnatal and PolyA only
     expr <- expr[, colData(expr)$Age > 0 & colData(expr)$Experiment == 'PolyA']
-    
+
     ## Drop low expressed features
     if(type != 'psi') {
         if(!file.exists(paste0('rda/expr_', opt$feature, '_unfiltered.Rdata'))) {
@@ -91,7 +91,7 @@ load_expr <- function(type) {
             message(paste(cuts, collapse = ' '))
             cut <- max(cuts)
             dev.off()
-    
+
             meanExpr <- rowMeans(assays(expr)$norm)
             rowRanges(expr)$meanExprs <- meanExpr
             rowRanges(expr)$passExprsCut <- meanExpr > cut
@@ -99,7 +99,7 @@ load_expr <- function(type) {
             save(expr, file = paste0('rda/expr_', opt$feature, '_unfiltered.Rdata'))
         }
     }
-        
+
     return(expr)
 }
 expr <- load_expr(opt$feature)
@@ -116,32 +116,32 @@ load_meqtl <- function() {
     return(me_annotated)
 }
 if(opt$feature == 'jx') {
-    
+
     ## To deal with memory issues
     #meqtl <- load_meqtl()
     #expr_row <- rowRanges(meqtl$expr)
     #save(expr_row, file = 'rda/me_annotated_FDR5_nonCpG_jx_only_rowExpr.Rdata')
-    
+
     load('rda/me_annotated_FDR5_nonCpG_jx_only_rowExpr.Rdata', verbose = TRUE)
-    
+
     ## Subset data to only only 1 side for the junctions
     expr_row <- resize(expr_row, width = 1,
         fix = ifelse(opt$jxside == 'left', 'start', 'end'),
         ignore.strand = TRUE)
     rowRanges(expr) <- resize(rowRanges(expr), width = 1,
         fix = ifelse(opt$jxside == 'left', 'start', 'end'),
-        ignore.strand = TRUE)    
-    
+        ignore.strand = TRUE)
+
     ## Take a window around the end of the jx, then reduce to reduce
     ## mem needed for this step
     expr_row <- reduce(resize(expr_row, width(expr_row) + 1000, fix = 'center'))
-    
+
     me_ov <- findOverlaps(expr_row, expr)
 
     message(paste(Sys.time(), 'keeping the following percent of', opt$feature, opt$jxside, 'side'))
     print(round(length(unique(subjectHits(me_ov))) / nrow(expr) * 100, 2))
     expr <- expr[sort(unique(subjectHits(me_ov))), ]
-    rm(me_ov, expr_row)    
+    rm(me_ov, expr_row)
 }  else {
     meqtl <- load_meqtl()
     me_ov <- findOverlaps(resize(rowRanges(meqtl$expr), width(rowRanges(meqtl$expr)) + 2000, fix = 'center'), expr)
@@ -176,10 +176,10 @@ if(FALSE) {
     ## For debugging
     BSobj_raw <- BSobj
     expr_raw <- expr
-    
+
     BSobj <- BSobj_raw
     expr <- expr_raw
-        
+
     BSobj <- BSobj[seqnames(rowRanges(BSobj)) %in% c('chr1', 'chr6', 'chr10', 'chr21'), ]
     expr <- expr[seqnames(rowRanges(expr)) %in% c('chr1', 'chr6', 'chr10', 'chr21'), ]
 }
@@ -233,15 +233,15 @@ get_exprpos <- function(type) {
 exprpos <- get_exprpos(opt$feature)
 
 message(paste(Sys.time(), 'running MatrixEQTL'))
-me <- Matrix_eQTL_main(snps = meth, gene = exprinfo, 
+me <- Matrix_eQTL_main(snps = meth, gene = exprinfo,
     output_file_name.cis = paste0('.', cpg, '_', opt$feature,
         '_near_nonCpG_meQTLs.txt'), # invis file, temporary
-    pvOutputThreshold = 0, pvOutputThreshold.cis = 0.01, 
+    pvOutputThreshold = 0, pvOutputThreshold.cis = 0.01,
 	useModel = modelLINEAR,
 	snpspos = methpos, genepos = exprpos, cisDist = 1000)
 ## Check warnings if any are present
 warnings()
-    
+
 message(paste(Sys.time(), 'saving MatrixEQTL results'))
 dir.create('rda', showWarnings = FALSE)
 save(me, file = paste0('rda/me_', cpg, '_', opt$feature,
@@ -286,7 +286,7 @@ if(opt$feature == 'psi') {
 save(me_annotated,
     file = paste0('rda/me_annotated_FDR5_', cpg, '_', opt$feature,
     ifelse(opt$feature == 'jx', opt$jxside, ''), '_near_nonCpG_meQTLs.Rdata'))
-    
+
 ## Explore annotated mEQTLs with FDR < 5%
 print('Trinucleotide vs C context')
 addmargins(table('trinucleotide_context' = as.vector(rowRanges(me_annotated$meth)$trinucleotide_context), 'c_context' = as.vector(rowRanges(me_annotated$meth)$c_context)))
@@ -308,7 +308,7 @@ if(opt$feature == 'psi') {
 } else if (opt$feature %in% c('gene', 'exon')) {
     print(addmargins(table('C strand' = as.vector(strand(me_annotated$meth)), 'feature strand' = as.vector(strand(me_annotated$expr)))))
     print(chisq.test(table('C strand' = as.vector(strand(me_annotated$meth)), 'feature strand' = as.vector(strand(me_annotated$expr)))))
-}   
+}
 
 
 if(opt$feature %in% c('gene', 'exon')) {
@@ -335,7 +335,7 @@ plotting_code <- function(i) {
     } else {
         main <- paste(opt$feature, me_annotated$eqtls$gene[i], 'FDR', signif(me_annotated$eqtls$FDR[i], 3))
     }
-    
+
     plot(x = jitter(getMeth(me_annotated$meth[i, ], type = 'raw'), 0.05), y = jitter(y[i, ], 0.05), xlab = 'Methylation', ylab = ylab, main = main, sub = paste(as.vector(seqnames(rowRanges(me_annotated$meth)[i])), start(rowRanges(me_annotated$meth)[i]), as.vector(strand(rowRanges(me_annotated$meth)[i])), as.vector(rowRanges(me_annotated$meth)$c_context[i])))
 }
 
