@@ -77,12 +77,12 @@ intergenic_split$Age.neg = motifEnrichment(seq$intergenic$Age.neg, PWMLogn.hg19.
 intergenic_split$Interaction.pos = motifEnrichment(seq$intergenic$Interaction.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
 intergenic_split$Interaction.neg = motifEnrichment(seq$intergenic$Interaction.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
 
-introns_split$CellType.pos = motifEnrichment(seq$intergenic$CellType.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
-introns_split$CellType.neg = motifEnrichment(seq$intergenic$CellType.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
-introns_split$Age.pos = motifEnrichment(seq$intergenic$Age.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
-introns_split$Age.neg = motifEnrichment(seq$intergenic$Age.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
-introns_split$Interaction.pos = motifEnrichment(seq$intergenic$Interaction.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
-introns_split$Interaction.neg = motifEnrichment(seq$intergenic$Interaction.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+introns_split$CellType.pos = motifEnrichment(seq$introns$CellType.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+introns_split$CellType.neg = motifEnrichment(seq$introns$CellType.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+introns_split$Age.pos = motifEnrichment(seq$introns$Age.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+introns_split$Age.neg = motifEnrichment(seq$introns$Age.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+introns_split$Interaction.pos = motifEnrichment(seq$introns$Interaction.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+introns_split$Interaction.neg = motifEnrichment(seq$introns$Interaction.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
 
 
 save(promoters_split, intergenic_split, introns_split, all_split, promoters_int, intergenic_int, introns_int, all_int,
@@ -96,16 +96,31 @@ pos = c(all_split[grep("pos", names(all_split))], promoters_split[grep("pos", na
 neg = c(all_split[grep("neg", names(all_split))], promoters_split[grep("neg", names(promoters_split))],
         introns_split[grep("neg", names(introns_split))], intergenic_split[grep("neg", names(intergenic_split))])
 names(pos) = c("allAge","allInt","allCT","promCT","promAge","promInt","intronsCT","intronsAge","intronsInt","interCT","interAge","interInt")
-pos = pos[!names(pos) %in% c("intronsAge","interAge")]
-names(neg) = names(pos)
-seqpos = c(allAge = seq$all$Age.pos, allInt = seq$all$Interaction.pos, allCT = seq$all$CellType.pos,
-           promCT = seq$promoters$CellType.pos, promAge = seq$promoters$Age.pos, promInt = seq$promoters$Interaction.pos,
-           intronsCT = seq$introns$CellType.pos, intronsAge = seq$introns$Age.pos, intronsInt = seq$introns$Interaction.pos,
-           interCT = seq$intergenic$CellType.pos, interAge = seq$intergenic$Age.pos, interInt = seq$intergenic$Interaction.pos)
-seqneg = c(allAge = seq$all$Age.neg, allInt = seq$all$Interaction.neg, allCT = seq$all$CellType.neg,
-           promCT = seq$promoters$CellType.neg, promAge = seq$promoters$Age.neg, promInt = seq$promoters$Interaction.neg,
-           intronsCT = seq$introns$CellType.neg, intronsInt = seq$introns$Interaction.neg,
-           interCT = seq$intergenic$CellType.neg, interInt = seq$intergenic$Interaction.neg)
+names(neg) = c("allAge","allInt","allCT","promCT","promAge","promInt","intronsCT","intronsInt","intronsAge","interCT","interInt")
+pos = pos[names(pos)!="interAge"]
+
+seqpos = c(allAge = seq$all$Age.pos, 
+           allInt = seq$all$Interaction.pos, 
+           allCT = seq$all$CellType.pos,
+           promCT = seq$promoters$CellType.pos, 
+           promAge = seq$promoters$Age.pos, 
+           promInt = seq$promoters$Interaction.pos,
+           intronsCT = seq$introns$CellType.pos, 
+           intronsAge = seq$introns$Age.pos, 
+           intronsInt = seq$introns$Interaction.pos,
+           interCT = seq$intergenic$CellType.pos, 
+           interInt = seq$intergenic$Interaction.pos)
+seqneg = c(allAge = seq$all$Age.neg, 
+           allInt = seq$all$Interaction.neg, 
+           allCT = seq$all$CellType.neg,
+           promCT = seq$promoters$CellType.neg, 
+           promAge = seq$promoters$Age.neg, 
+           promInt = seq$promoters$Interaction.neg,
+           intronsCT = seq$introns$CellType.neg, 
+           intronsInt = seq$introns$Interaction.neg,
+           intronsAge = seq$introns$Age.neg,
+           interCT = seq$intergenic$CellType.neg, 
+           interInt = seq$intergenic$Interaction.neg)
 
 TFdiff = list()
 for (i in 1:length(pos)) {
@@ -113,6 +128,13 @@ for (i in 1:length(pos)) {
                                     res1 = pos[[i]], res2 = neg[[i]], PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE)
 }
 names(TFdiff) = names(pos)
+pos = c(all_split[grep("pos", names(all_split))], promoters_split[grep("pos", names(promoters_split))],
+        introns_split[grep("pos", names(introns_split))], intergenic_split[grep("pos", names(intergenic_split))])
+names(pos) = c("allAge","allInt","allCT","promCT","promAge","promInt","intronsCT","intronsAge","intronsInt","interCT","interAge","interInt")
+seqpos = c(allAge = seq$all$Age.pos, allInt = seq$all$Interaction.pos, allCT = seq$all$CellType.pos, promCT = seq$promoters$CellType.pos, 
+           promAge = seq$promoters$Age.pos, promInt = seq$promoters$Interaction.pos, intronsCT = seq$introns$CellType.pos, 
+           intronsAge = seq$introns$Age.pos, intronsInt = seq$introns$Interaction.pos, interCT = seq$intergenic$CellType.pos,
+           interAge = seq$intergenic$Age.pos, interInt = seq$intergenic$Interaction.pos)
 
 TFdiff = c(TFdiff, 
            list(prom.intergenic.pos.CT = motifDiffEnrichment(sequences1 = seqpos$promCT, sequences2 = seqpos$interCT,res1 = pos$promCT, 
@@ -133,12 +155,8 @@ TFdiff = c(TFdiff,
                                                           res2 = pos$intronsAge, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
                 intron.intergenic.pos.Age = motifDiffEnrichment(sequences1 = seqpos$intronsAge, sequences2 = seqpos$interAge, res1 = pos$intronsAge, 
                                                                 res2 = pos$interAge, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
-                prom.intergenic.neg.Age = motifDiffEnrichment(sequences1 = seqneg$promAge, sequences2 = seqneg$interAge, res1 = neg$promAge, 
-                                                              res2 = neg$interAge, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
                 prom.intron.neg.Age = motifDiffEnrichment(sequences1 = seqneg$promAge, sequences2 = seqneg$intronsAge, res1 = neg$promAge, 
                                                           res2 = neg$intronsAge, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
-                intron.intergenic.neg.Age = motifDiffEnrichment(sequences1 = seqneg$intronsAge, sequences2 = seqneg$interAge, res1 = neg$intronsAge, 
-                                                                res2 = neg$interAge, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
                 prom.intergenic.pos.Int = motifDiffEnrichment(sequences1 = seqpos$promInt, sequences2 = seqpos$interInt, res1 = pos$promInt, 
                                                               res2 = pos$interInt, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
                 prom.intron.pos.Int = motifDiffEnrichment(sequences1 = seqpos$promInt, sequences2 = seqpos$intronsInt, res1 = pos$promInt, 
