@@ -183,13 +183,14 @@ x$dir = ifelse(x$regionID %in% cell[which(cell$Dir=="pos"),"regionID"], "More Me
 
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/ATAC/ATAC_at_CpGs/figures/DMR_CpG_ATAC_coverage_vs_outDMR_byCellType_fwer.0.05_redo.pdf",w=12)
-ggplot(x[which(x$sig=="FWER < 0.05"),], aes(x=Difference)) + geom_density(aes(group=CellType, colour=CellType)) + 
+ggplot(x[which(x$sig=="FWER < 0.05"),], aes(x=Difference)) + geom_density(aes(group=CellType, colour=CellType), size = 2) + 
     facet_grid(. ~ dir) + scale_color_brewer(palette = "Dark2") +
+    theme_classic() +
     ylab("Density") + ylim(0,30) + 
     xlab("(Inside Region) - (Outside Region)") + xlim(-0.5,0.5) +
     ggtitle("Mean ATAC-seq Coverage Difference at CpGs\nBetween DMR and Flanking Regions: Cell Type Regions") + 
     theme(title = element_text(size = 20)) +
-    theme(text = element_text(size = 20))
+    theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
 dev.off()
   
   

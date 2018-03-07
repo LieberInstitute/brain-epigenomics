@@ -4,17 +4,70 @@ library(org.Hs.eg.db)
 library(BSgenome.Hsapiens.UCSC.hg19)
 library(PWMEnrich.Hsapiens.background)
 
-
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMRs_LMRs_annotated.rda")
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda")
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_PWMEnrich_objects.rda")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/UMR_LMR_PWMEnrich_object.rda")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/filtered_TF_list_expressionInfo.rda")
+
+## Objects for analysis:
+  # all_int: PWMEnrich result for all interaction DMRs
+  # intergenic_int: PWMEnrich result for interaction DMRs that overlap intergenic regions
+  # introns_int: PWMEnrich result for interaction DMRs that overlap introns
+  # promoters_int: PWMEnrich result for interaction DMRs that overlap promoters
+  # LMR_UMR_pwmenrich: PWMEnrich result for shared and not shared LMR and UMR sequence for All, Prenatal, Postnatal, Neurons, and Glia 
+  # all_split: PWMEnrich result for all regions in three models split by direction
+  # intergenic_split: PWMEnrich result for intergenic regions in three models split by direction
+  # introns_split: PWMEnrich result for introns in three models split by direction
+  # promoters_split: PWMEnrich result for promoters in three models split by direction
+  # DMR, uDMR, lDMR: lists of annotated methylated regions 
+  # geneMap
+  # hompd, pd: phenotype tables
+  # targettogeneID: map of target ID to gencodeID
+  # TFhomRPKM, TFnucres: RNA-seq results for TFs in homogenate (hom) and nuclear RNA (nuc)
+  # TFdiff: difference in test statistic between positive and negative beta values of DMRs (all, intergenic, introns, and promoters)
+  # 
 
 
-## First check TF enrichment by cell type
+## collate TF group report results
 
 TF = list(allTF = lapply(all_split, groupReport), promTF = lapply(promoters_split, groupReport),
           intronTF = lapply(introns_split, groupReport), intergenicTF = lapply(intergenic_split, groupReport))
 TF = lapply(TF, function(x) lapply(x, as.data.frame))
 TF = lapply(TF, function(t) Map(cbind, t, padj = lapply(t, function(x) p.adjust(x$p.value, method = "fdr"))))
+TF = lapply(TF, function(t) lapply(t, function(x) x[which(x$target %in% names(targettogeneID)),]))
+
+
+### Are different genomic features enriched for different TFs?
+
+## Correlate TF enrichment between features
+
+## Are motifs for the same target similarly enriched?
+
+
+
+
+# excitatory neurons (Mo et al): Egr, Ap-1, Neurod2, Rfx1/3/5, and TBR1
+# PV neurons: Mafb/g, Mef2a/c/d
+# VIP neurons: developmental role TFs such as Dlx, Pou, Sox family, Arx and Vax2, which are also enriched in fetal and glial hypo-DMRs
+
+# Figures 5D (construction of TF-TF regulatory networks) TF A was predicted to regulate TF B when: 
+  # (1) TF A was expressed in a cell type (≥30 TPM), (2) TF A had a predicted footprint (FP A) in a cell type-specific ATAC-seq peak, 
+  # (3) the ATAC-seq peak was within 10 kb of the TSS for TF B, and (4) TF B was expressed in that cell type (≥30 TPM). 
+  # The resulting set of predicted regulatory interactions was visualized as a network (igraph package in R), 
+  # omitting TFs with more than 20 connections to ease visualization. To define a pan-neuronal regulatory network, 
+  # we identified footprints common to all three cell types that occurred in shared ATAC-seq peaks and did not overlap ubiquitous DNaseI peaks 
+  # (peaks occurring in at least 40 out of 53 processed DNaseI-seq samples). The full networks are listed in Table S4.
+
+
+
+
+
+
+
+
+
+
 
 
 ## annotate all the TFs to their entrez IDS
@@ -219,3 +272,23 @@ d = plot(TFdiffDO[[i]],colorBy="p.adjust",  showCategory = 400,title= paste0("Bi
 print(d)
 }
 dev.off()
+
+
+
+
+# other tools
+# GeneNetworkBuilder: Appliation for discovering direct or indirect targets of transcription factors using ChIP-chip or ChIP-seq, and microarray or RNA-seq gene expression data. Inputting a list of genes of potential targets of one TF from ChIP-chip or ChIP-seq, and the gene expression results, GeneNetworkBuilder generates a regulatory network of the TF.
+# http://bioconductor.org/packages/release/bioc/html/GeneNetworkBuilder.html
+
+# RTN: reconstruction of transcriptional networks and analysis of master regulators.
+# Circos plots
+# HiveR and Gephi plots, http://www.vesnam.com/Rblog/viznets3/
+# mfinder: Network motifs detection tool
+
+
+
+
+
+
+
+

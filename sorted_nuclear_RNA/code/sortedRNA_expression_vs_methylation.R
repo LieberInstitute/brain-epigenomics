@@ -55,8 +55,10 @@ length(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/sorted_nuclear_RNA/figures/LFC_gene_expression_vs_meanBetadiff_byCellType.pdf", width = 9, height = 9)
 ggplot(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR5") & cell$value!="NA" & cell$Coeff.CellTypeNeuron!="NA"),], 
        aes(x = value, y = Coeff.CellTypeNeuron)) + geom_point(alpha=1/10) +
-  geom_smooth(method=lm) +
+  geom_smooth(method=lm) + theme_classic() +
   labs(fill="") +
+  geom_hline(yintercept=0, linetype="dashed", color = "gray") +
+  geom_vline(xintercept=0, linetype="dashed", color = "gray") +
   ylab("Log2(Fold Change)\nGene Expression") + 
   xlab("Mean Difference in Methylation") +
   ggtitle("Cell Type DMRs (FWER<0.05) in Promoters or 5'UTR\nvs. Cell Type Gene Expression\nr=-0.47") +
@@ -64,8 +66,10 @@ ggplot(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR
   theme(text = element_text(size = 20))
 ggplot(cell[which(cell$fwer<=0.05 & cell$cds=="CDS" & cell$value!="NA" & cell$Coeff.CellTypeNeuron!="NA"),], 
        aes(x = value, y = Coeff.CellTypeNeuron)) + geom_point(alpha=1/10) +
-  geom_smooth(method=lm) +
+  geom_smooth(method=lm) + theme_classic() +
   labs(fill="") +
+  geom_hline(yintercept=0, linetype="dashed", color = "gray") +
+  geom_vline(xintercept=0, linetype="dashed", color = "gray") +
   ylab("Log2(Fold Change)\nGene Expression") + 
   xlab("Mean Difference in Methylation") +
   ggtitle("Cell Type DMRs (FWER<0.05) in CDS\nvs. Cell Type Gene Expression\nr=-0.46") +
@@ -73,8 +77,10 @@ ggplot(cell[which(cell$fwer<=0.05 & cell$cds=="CDS" & cell$value!="NA" & cell$Co
   theme(text = element_text(size = 20))
 ggplot(cell[which(cell$fwer<=0.05 & (cell$cds=="CDS" | cell$intron=="Intron") & cell$value!="NA" & cell$Coeff.CellTypeNeuron!="NA"),], 
        aes(x = value, y = Coeff.CellTypeNeuron)) + geom_point(alpha=1/10) +
-  geom_smooth(method=lm) +
+  geom_smooth(method=lm) + theme_classic() +
   labs(fill="") +
+  geom_hline(yintercept=0, linetype="dashed", color = "gray") +
+  geom_vline(xintercept=0, linetype="dashed", color = "gray") +
   ylab("Log2(Fold Change)\nGene Expression") + 
   xlab("Mean Difference in Methylation") +
   ggtitle("Cell Type DMRs (FWER<0.05) in CDS or Introns\nvs. Cell Type Gene Expression\nr=-0.45") +
@@ -82,8 +88,10 @@ ggplot(cell[which(cell$fwer<=0.05 & (cell$cds=="CDS" | cell$intron=="Intron") & 
   theme(text = element_text(size = 20))
 ggplot(cell[which(cell$fwer<=0.05 & cell$annotation=="Other" & cell$value!="NA" & cell$Coeff.CellTypeNeuron!="NA"),], 
        aes(x = value, y = Coeff.CellTypeNeuron)) + geom_point(alpha=1/10) +
-  geom_smooth(method=lm) +
+  geom_smooth(method=lm) + theme_classic() +
   labs(fill="") +
+  geom_hline(yintercept=0, linetype="dashed", color = "gray") +
+  geom_vline(xintercept=0, linetype="dashed", color = "gray") +
   ylab("Log2(Fold Change)\nGene Expression") + 
   xlab("Mean Difference in Methylation") +
   ggtitle("Intergenic Cell Type DMRs (FWER<0.05)\nvs. Nearest Gene Expression\nr=-0.18") +
@@ -91,8 +99,10 @@ ggplot(cell[which(cell$fwer<=0.05 & cell$annotation=="Other" & cell$value!="NA" 
   theme(text = element_text(size = 20))
 ggplot(cell[which(cell$fwer<=0.05 & (cell$annotation=="Promoter" | cell$annotation=="UTR5") & cell$value!="NA" & cell$Coeff.CellTypeNeuron!="NA"),], 
        aes(x = value, y = Coeff.CellTypeNeuron)) + geom_point(alpha=1/10) +
-  geom_smooth(method=lm) +
+  geom_smooth(method=lm) + theme_classic() +
   labs(fill="") +
+  geom_hline(yintercept=0, linetype="dashed", color = "gray") +
+  geom_vline(xintercept=0, linetype="dashed", color = "gray") +
   ylab("Log2(Fold Change)\nGene Expression") + 
   xlab("Mean Difference in Methylation") +
   ggtitle(paste0("Cell Type DMRs (FWER<0.05) in Promoters or 5'UTR\nvs. Cell Type Gene Expression\nr=",round(
@@ -102,8 +112,10 @@ ggplot(cell[which(cell$fwer<=0.05 & (cell$annotation=="Promoter" | cell$annotati
   theme(text = element_text(size = 20))
 ggplot(cell[which(cell$fwer<=0.05 & cell$annotation=="CDS" & cell$value!="NA" & cell$Coeff.CellTypeNeuron!="NA"),], 
        aes(x = value, y = Coeff.CellTypeNeuron)) + geom_point(alpha=1/10) +
-  geom_smooth(method=lm) +
+  geom_smooth(method=lm) + theme_classic() +
   labs(fill="") +
+  geom_hline(yintercept=0, linetype="dashed", color = "gray") +
+  geom_vline(xintercept=0, linetype="dashed", color = "gray") +
   ylab("Log2(Fold Change)\nGene Expression") + 
   xlab("Mean Difference in Methylation") +
   ggtitle(paste0("Cell Type DMRs (FWER<0.05) in CDS\nvs. Cell Type Gene Expression\nr=",round(
@@ -113,8 +125,10 @@ ggplot(cell[which(cell$fwer<=0.05 & cell$annotation=="CDS" & cell$value!="NA" & 
   theme(text = element_text(size = 20))
 ggplot(cell[which(cell$fwer<=0.05 & (cell$annotation=="CDS" | cell$annotation=="Intron") & cell$value!="NA" & cell$Coeff.CellTypeNeuron!="NA"),], 
        aes(x = value, y = Coeff.CellTypeNeuron)) + geom_point(alpha=1/10) +
-  geom_smooth(method=lm) +
+  geom_smooth(method=lm) + theme_classic() +
   labs(fill="") +
+  geom_hline(yintercept=0, linetype="dashed", color = "gray") +
+  geom_vline(xintercept=0, linetype="dashed", color = "gray") +
   ylab("Log2(Fold Change)\nGene Expression") + 
   xlab("Mean Difference in Methylation") +
   ggtitle(paste0("Cell Type DMRs (FWER<0.05) in CDS or Introns\nvs. Cell Type Gene Expression\nr=",round(
