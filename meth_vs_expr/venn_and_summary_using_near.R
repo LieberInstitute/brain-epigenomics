@@ -720,17 +720,105 @@ ggplot(beta_common, aes(x = beta, y = agebeta, colour = gtype)) + geom_point() +
 ggplot(beta_common, aes(x = t, y = aget, colour = gtype)) + geom_point() + ylab('Age by methylation statistic') + theme_grey(base_size = 18) + xlab('Expr by methylation statistic') + scale_colour_discrete(name = 'Feature\ntype') + facet_grid(. ~ gtype) + ggtitle('nonCpGs common with CpGs: best meQTL by FDR per gene')
 dev.off()
 
+## Check if methylation still explains the expression
+## even after adjusting by age
+agemeth_coef <- lapply(names(mres), function(type) {
+    message(paste(Sys.time(), 'processing', type))
+    age <- get_age(type)
 
+    res <- as.data.frame(t(sapply(seq_len(nrow(mres[[type]]$meth)), function(i) {
+        fit <- lm(as.vector(get_y(type, i)) ~ get_meth(type, i) + age)
+        summary(fit)$coef[2, ]
+    })))
+    res$ageFDR <- p.adjust(res[, 'Pr(>|t|)'], 'fdr')
+    return(res)
+})
+names(agemeth_coef) <- names(mres)
+save(agemeth_coef, file = paste0('rda/meqtl_agemeth_coef_', opt$feature, '_using_near.Rdata'))
+
+lapply(agemeth_coef, function(x) {
+    addmargins(table('FDR < 0.05 after adjusting for age' = x$ageFDR < 0.05, useNA = 'ifany'))
+})
+lapply(agemeth_coef, function(x) {
+    round(addmargins(table('FDR < 0.05 after adjusting for age' = x$ageFDR < 0.05, useNA = 'ifany')) / nrow(x) * 100, 2)
+})
+
+
+if(opt$feature == 'gene') {
+    ## Adapted from /dcl01/lieber/ajaffe/lab/brain-epigenomics/sorted_nuclear_RNA/code/check_splicing.R
+    expr <- load_expr(opt$feature)
+
+    geneMap = rowRanges(expr)
+    genePromoters = GRanges(seqnames(geneMap),
+    IRanges(start = ifelse(strand(geneMap) == "+",
+    start(geneMap)-2000, end(geneMap)-200),
+    end = ifelse(strand(geneMap) == "+",
+    start(geneMap)+200, end(geneMap)+2000)),
+    strand = strand(geneMap))
+    mcols(genePromoters) = mcols(geneMap)
+    names(genePromoters) <- names(geneMap)
+
+    geneBody = geneMap
+    longIndex = which(width(geneBody) > 250)
+    start(geneBody)[longIndex] = ifelse(strand(geneBody) == "+",
+    start(geneBody)+200, start(geneBody))[longIndex]
+    end(geneBody)[longIndex] = ifelse(strand(geneBody) == "+",
+    end(geneBody), end(geneBody)-200)[longIndex]
+
+    geneBodyLeft = geneBodyRight = geneBody
+    start(geneBodyLeft) = start(geneBody)-100000
+    end(geneBodyLeft) = start(geneBody)
+    start(geneBodyRight) = end(geneBody)
+    end(geneBodyRight) = end(geneBody) + 100000
+
+
+    gene_section <- list(promoter = genePromoters, body = geneBody, flanking = c(geneBodyLeft, geneBodyRight))
+    save(gene_section, file = 'rda/gene_section.Rdata')
+}
+load('rda/gene_section.Rdata', verbose = TRUE)
+
+c_by_gene <- lapply(names(mres), function(type) {
+    message(paste(Sys.time(), 'processing', type))
+    gr_c <- rowRanges(mres[[type]]$meth)
+
+    typegen <- do.call(cbind, lapply(names(gene_section), function(gsec) {
+        message(paste(Sys.time(), 'processing', gsec))
+        gr_g <- gene_section[[gsec]]
+        ov <- findOverlaps(gr_c, gr_g)
+        ov_s <- IntegerList(split(subjectHits(ov), queryHits(ov)))
+        gcon <- IntegerList(vector('list', length(gr_c)))
+        gcon[as.integer(names(ov_s))] <- ov_s
+
+        ov_gen <- CharacterList(lapply(ov_s, function(x) { gr_g$gencodeID[x] }))
+        gencode <- CharacterList(vector('list', length(gr_c)))
+        gencode[as.integer(names(ov_s))] <- ov_gen
+
+        res <- DataFrame(geneid = gcon, present = elementNROWS(gcon) > 0, gencodeID = gencode)
+        colnames(res) <- paste0(gsec, '_', colnames(res))
+        return(res)
+    }))
+    return(typegen)
+
+})
+names(c_by_gene) <- names(mres)
+save(c_by_gene, file = paste0('rda/meqtl_c_by_gene_', opt$feature, '_using_near.Rdata'))
 
 ## Extract beta and age coef info for the venn groups
 data_by_venn <- do.call(rbind, lapply(c('nonCpG', 'CpGmarg'), function(typeref) {
+    message(paste(Sys.time(), 'processing reference', typeref))
     which_v <- grep(typeref, names(attr(vennres, 'intersections')))
     res_ref <- mapply(function(vset, vname) {
+        message(paste(Sys.time(), 'processing venn set', vname))
         iset <- which(mres[[typeref]]$eqtls$gene %in% vset)
         ## Put together eQTL info and age coef data
-        res <- cbind(DataFrame(mres[[typeref]]$eqtls[iset, ]), age_coef[[typeref]][iset, ])
+        res <- cbind(DataFrame(mres[[typeref]]$eqtls[iset, ]),
+            age_coef[[typeref]][iset, ],
+            DataFrame('agemethFDR' = agemeth_coef[[typeref]]$ageFDR[iset],
+            'noage' = agemeth_coef[[typeref]]$ageFDR[iset] < 0.05),
+            c_by_gene[[typeref]][iset, ]
+        )
         ## Fix column names
-        colnames(res)[(ncol(mres[[typeref]]$eqtls) + 1):ncol(res)] <- colnames(age_coef[[typeref]])
+        colnames(res)[(ncol(mres[[typeref]]$eqtls) + 1):(ncol(mres[[typeref]]$eqtls) + ncol(age_coef[[typeref]]))] <- colnames(age_coef[[typeref]])
         res$vset <- vname
         return(res)
     }, attr(vennres, 'intersections')[which_v], names(attr(vennres, 'intersections')[which_v]))
@@ -740,6 +828,14 @@ data_by_venn <- do.call(rbind, lapply(c('nonCpG', 'CpGmarg'), function(typeref) 
 }))
 save(data_by_venn, file = paste0('rda/meqtl_data_by_venn_', opt$feature, '_using_near.Rdata'))
 
+
+with(data_by_venn, addmargins(table(noage, promoter_present, useNA = 'ifany')))
+with(data_by_venn, addmargins(table(noage, body_present, useNA = 'ifany')))
+with(data_by_venn, addmargins(table(noage, flanking_present, useNA = 'ifany')))
+
+with(data_by_venn, round(addmargins(table(noage, promoter_present, useNA = 'ifany')) / length(noage) * 100, 2))
+with(data_by_venn, round(addmargins(table(noage, body_present, useNA = 'ifany')) / length(noage) * 100, 2))
+with(data_by_venn, round(addmargins(table(noage, flanking_present, useNA = 'ifany')) / length(noage) * 100, 2))
 
 ## Compare beta, then by venn groups
 
@@ -778,42 +874,47 @@ dev.off()
 
 
 ## Summarize at the gene level, kind of like m_summary
-grp <- with(data_by_venn, paste0(typeref, '_', vset, '_', gene))
 get_summary <- function(var, fun) {
     fun(NumericList(split(var, grp)))
 }
 
-data_venn_summ <- DataFrame(
-    beta_mean = get_summary(data_by_venn$beta, mean),
-    beta_median = get_summary(data_by_venn$beta, median),
-    beta_prop_pos = get_summary(sign(data_by_venn$beta) == 1, mean),
-    beta_sign_mean = get_summary(sign(data_by_venn$beta), mean),
-    agebeta_mean = get_summary(data_by_venn$Estimate, mean),
-    agebeta_median = get_summary(data_by_venn$Estimate, median),
-    agebeta_prop_pos = get_summary(sign(data_by_venn$Estimate) == 1, mean),
-    agebeta_sign_mean = get_summary(sign(data_by_venn$Estimate), mean),
-    beta_neglog10FDR_mean = get_summary(-log10(data_by_venn$FDR), mean),
-    beta_neglog10FDR_median = get_summary(-log10(data_by_venn$FDR), median),
-    beta_neglog10pval_mean = get_summary(-log10(data_by_venn$FDR), mean),
-    beta_neglog10pval_median = get_summary(-log10(data_by_venn$FDR), median),
-    agebeta_neglog10FDR_mean = get_summary(-log10(data_by_venn$ageFDR), mean),
-    agebeta_neglog10FDR_median = get_summary(-log10(data_by_venn$ageFDR), median),
-    agebeta_neglog10pval_mean = get_summary(-log10(data_by_venn[, 'Pr(>|t|)']), mean),
-    agebeta_neglog10pval_median = get_summary(-log10(data_by_venn[, 'Pr(>|t|)']), median),
-    meth_n_mean = get_summary(data_by_venn$meth_n, mean),
-    meth_n_median = get_summary(data_by_venn$meth_n, median),
-    beta_t_mean = get_summary(data_by_venn$statistic, mean),
-    beta_t_median = get_summary(data_by_venn$statistic, median),
-    agebeta_t_mean = get_summary(data_by_venn[, 't value'], mean),
-    agebeta_t_median = get_summary(data_by_venn[, 't value'], median),
-    n_meqtls = get_summary(data_by_venn$beta, elementNROWS),
-    typeref = sapply(strsplit(unique(grp), '_'), '[[', 1),
-    vset = sapply(strsplit(unique(grp), '_'), '[[', 2),
-    gene = sapply(strsplit(unique(grp), '_'), function(x) { paste(x[3:length(x)], collapse = '_') })
-)
-data_venn_summ$gtype <- ifelse(data_venn_summ$gene %in% rownames(top5k), 'neuron', ifelse(data_venn_summ$gene %in% rownames(top5kglia), 'glia', 'none'))
-## https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
-data_venn_summ$distance_diag <- with(data_venn_summ, abs( abs(beta_sign_mean) - abs(agebeta_sign_mean)) / sqrt(2))
+summarize_venn <- function(dbv) {
+    grp <<- with(dbv, paste0(typeref, '_', vset, '_', gene))
+    d_summ <- DataFrame(
+        beta_mean = get_summary(dbv$beta, mean),
+        beta_median = get_summary(dbv$beta, median),
+        beta_prop_pos = get_summary(sign(dbv$beta) == 1, mean),
+        beta_sign_mean = get_summary(sign(dbv$beta), mean),
+        agebeta_mean = get_summary(dbv$Estimate, mean),
+        agebeta_median = get_summary(dbv$Estimate, median),
+        agebeta_prop_pos = get_summary(sign(dbv$Estimate) == 1, mean),
+        agebeta_sign_mean = get_summary(sign(dbv$Estimate), mean),
+        beta_neglog10FDR_mean = get_summary(-log10(dbv$FDR), mean),
+        beta_neglog10FDR_median = get_summary(-log10(dbv$FDR), median),
+        beta_neglog10pval_mean = get_summary(-log10(dbv$FDR), mean),
+        beta_neglog10pval_median = get_summary(-log10(dbv$FDR), median),
+        agebeta_neglog10FDR_mean = get_summary(-log10(dbv$ageFDR), mean),
+        agebeta_neglog10FDR_median = get_summary(-log10(dbv$ageFDR), median),
+        agebeta_neglog10pval_mean = get_summary(-log10(dbv[, 'Pr(>|t|)']), mean),
+        agebeta_neglog10pval_median = get_summary(-log10(dbv[, 'Pr(>|t|)']), median),
+        meth_n_mean = get_summary(dbv$meth_n, mean),
+        meth_n_median = get_summary(dbv$meth_n, median),
+        beta_t_mean = get_summary(dbv$statistic, mean),
+        beta_t_median = get_summary(dbv$statistic, median),
+        agebeta_t_mean = get_summary(dbv[, 't value'], mean),
+        agebeta_t_median = get_summary(dbv[, 't value'], median),
+        n_meqtls = get_summary(dbv$beta, elementNROWS),
+        typeref = sapply(strsplit(unique(grp), '_'), '[[', 1),
+        vset = sapply(strsplit(unique(grp), '_'), '[[', 2),
+        gene = sapply(strsplit(unique(grp), '_'), function(x) { paste(x[3:length(x)], collapse = '_') })
+    )
+    d_summ$gtype <- ifelse(d_summ$gene %in% rownames(top5k), 'neuron', ifelse(d_summ$gene %in% rownames(top5kglia), 'glia', 'none'))
+    ## https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
+    d_summ$distance_diag <- with(d_summ, abs( abs(beta_sign_mean) - abs(agebeta_sign_mean)) / sqrt(2))
+    return(d_summ)
+}
+
+data_venn_summ <- summarize_venn(data_by_venn)
 save(data_venn_summ, file = paste0('rda/meqtl_data_venn_summ_', opt$feature, '_using_near.Rdata'))
 
 ## Explore briefly
@@ -822,36 +923,64 @@ head(data_venn_summ)
 summary(as.data.frame(data_venn_summ))
 table(data_venn_summ$gtype)
 
-d <- as.data.frame(data_venn_summ)
+
+plot_feature_level <- function(dvsumm) {
+    d <- as.data.frame(dvsumm)
+    print(ggplot(d, aes(y = agebeta_mean, x = beta_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation mean beta') + theme_grey(base_size = 18) + ylab('Age by methylation mean beta') + scale_colour_discrete(name = 'Feature\ntype'))
+    print(ggplot(d, aes(y = agebeta_median, x = beta_median, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation median beta') + theme_grey(base_size = 18) + ylab('Age by methylation median beta') + scale_colour_discrete(name = 'Feature\ntype'))
+
+    print(ggplot(d, aes(y = agebeta_neglog10FDR_mean, x = beta_neglog10FDR_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation mean neg log 10 FDR') + theme_grey(base_size = 18) + ylab('Age by methylation mean neg log 10 FDR') + scale_colour_discrete(name = 'Feature\ntype'))
+    print(ggplot(d, aes(y = agebeta_neglog10FDR_median, x = beta_neglog10FDR_median, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation median neg log 10 FDR') + theme_grey(base_size = 18) + ylab('Age by methylation median neg log 10 FDR') + scale_colour_discrete(name = 'Feature\ntype'))
+    print(ggplot(d, aes(y = agebeta_neglog10pval_mean, x = beta_neglog10pval_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation mean neg log 10 pval') + theme_grey(base_size = 18) + ylab('Age by methylation mean neg log 10 pval') + scale_colour_discrete(name = 'Feature\ntype'))
+    print(ggplot(d, aes(y = agebeta_t_mean, x = beta_t_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation mean t') + theme_grey(base_size = 18) + ylab('Age by methylation mean t') + scale_colour_discrete(name = 'Feature\ntype'))
+    print(ggplot(d, aes(y = agebeta_t_median, x = beta_t_median, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation median t') + theme_grey(base_size = 18) + ylab('Age by methylation median t') + scale_colour_discrete(name = 'Feature\ntype'))
+
+    print(ggplot(d, aes(y = agebeta_prop_pos, x = beta_prop_pos, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation proportion positive') + theme_grey(base_size = 18) + ylab('Age by methylation proportion positive') + scale_colour_discrete(name = 'Feature\ntype'))
+    print(ggplot(d, aes(y = agebeta_sign_mean, x = beta_sign_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation sign mean') + theme_grey(base_size = 18) + ylab('Age by methylation sign mean') + scale_colour_discrete(name = 'Feature\ntype'))
+    ## Lots of points on the diagonals in the previous 2 plots (at least at the gene level)
+    ## Take absolute on both axes
+    print(ggplot(d, aes(y = abs(agebeta_sign_mean), x = abs(beta_sign_mean), colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation sign mean (abs)') + theme_grey(base_size = 18) + ylab('Age by methylation sign mean (abs)') + scale_colour_discrete(name = 'Feature\ntype'))
+    print(ggplot(d, aes(y = distance_diag, x = n_meqtls, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + ylab('Expr and age by methylation sign distance to diagonal') + theme_grey(base_size = 18) + xlab('Number of meQTLs') + scale_colour_discrete(name = 'Feature\ntype'))
+    print(ggplot(d, aes(y = distance_diag, x = beta_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + ylab('Expr and age by methylation sign distance to diagonal') + theme_grey(base_size = 18) + xlab('Expr by methylation mean beta') + scale_colour_discrete(name = 'Feature\ntype'))
+    print(ggplot(d, aes(y = distance_diag, x = beta_median, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + ylab('Expr and age by methylation sign distance to diagonal') + theme_grey(base_size = 18) + xlab('Expr by methylation median beta') + scale_colour_discrete(name = 'Feature\ntype'))
+    print(ggplot(d, aes(y = distance_diag, x = agebeta_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + ylab('Expr and age by methylation sign distance to diagonal') + theme_grey(base_size = 18) + xlab('Age by methylation mean beta') + scale_colour_discrete(name = 'Feature\ntype'))
+    print(ggplot(d, aes(y = distance_diag, x = gtype, colour = gtype)) + geom_boxplot() + facet_grid(typeref ~ vset) + ylab('Expr and age by methylation sign distance to diagonal') + theme_grey(base_size = 18) + xlab('Feature type') + scale_colour_discrete(name = 'Feature\ntype'))
+
+    print(ggplot(d, aes(x = distance_diag < 0.1, y = n_meqtls, colour = gtype)) + geom_boxplot() + facet_grid(typeref ~ vset) + xlab('Expr and age by methylation sign distance to diagonal < 0.1') + theme_grey(base_size = 18) + ylab('Number of meQTLs') + scale_colour_discrete(name = 'Feature\ntype') + stat_summary(fun.data = give.n, geom = "text", position = position_nudge(y = max(d$n_meqtls) * c(0.95, 1, 1.05), x = c(-0.2, 0, 0.2))))
+    print(ggplot(d, aes(x = distance_diag < 0.1, y = n_meqtls, colour = gtype)) + geom_boxplot() + facet_grid(typeref ~ vset) + xlab('Expr and age by methylation sign distance to diagonal < 0.1') + theme_grey(base_size = 18) + ylab('Number of meQTLs') + scale_colour_discrete(name = 'Feature\ntype') + stat_summary(fun.data = give.n, geom = "text", position = position_nudge(y = log10(max(d$n_meqtls)) * c(0.65, 0.675, 0.7), x = c(-0.2, 0, 0.2))) + scale_y_log10())
+
+    d$close <- d$distance_diag < 0.1
+    print(ggplot(d, aes(y = agebeta_sign_mean, x = beta_sign_mean, colour = gtype)) + geom_point() + facet_grid(typeref + close ~ vset) + xlab('Expr by methylation sign mean') + theme_grey(base_size = 18) + ylab('Age by methylation sign mean') + scale_colour_discrete(name = 'Feature\ntype'))
+    return(NULL)
+}
+
+
 
 
 ## Explore at the feature level
 pdf(paste0('pdf/meth_vs_expr_venn_byfeature_', opt$feature, '.pdf'), width = 14, height = 10)
-ggplot(d, aes(y = agebeta_mean, x = beta_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation mean beta') + theme_grey(base_size = 18) + ylab('Age by methylation mean beta') + scale_colour_discrete(name = 'Feature\ntype')
-ggplot(d, aes(y = agebeta_median, x = beta_median, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation median beta') + theme_grey(base_size = 18) + ylab('Age by methylation median beta') + scale_colour_discrete(name = 'Feature\ntype')
+plot_feature_level(data_venn_summ)
+dev.off()
 
-ggplot(d, aes(y = agebeta_neglog10FDR_mean, x = beta_neglog10FDR_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation mean neg log 10 FDR') + theme_grey(base_size = 18) + ylab('Age by methylation mean neg log 10 FDR') + scale_colour_discrete(name = 'Feature\ntype')
-ggplot(d, aes(y = agebeta_neglog10FDR_median, x = beta_neglog10FDR_median, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation median neg log 10 FDR') + theme_grey(base_size = 18) + ylab('Age by methylation median neg log 10 FDR') + scale_colour_discrete(name = 'Feature\ntype')
-ggplot(d, aes(y = agebeta_neglog10pval_mean, x = beta_neglog10pval_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation mean neg log 10 pval') + theme_grey(base_size = 18) + ylab('Age by methylation mean neg log 10 pval') + scale_colour_discrete(name = 'Feature\ntype')
-ggplot(d, aes(y = agebeta_t_mean, x = beta_t_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation mean t') + theme_grey(base_size = 18) + ylab('Age by methylation mean t') + scale_colour_discrete(name = 'Feature\ntype')
-ggplot(d, aes(y = agebeta_t_median, x = beta_t_median, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation median t') + theme_grey(base_size = 18) + ylab('Age by methylation median t') + scale_colour_discrete(name = 'Feature\ntype')
 
-ggplot(d, aes(y = agebeta_prop_pos, x = beta_prop_pos, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation proportion positive') + theme_grey(base_size = 18) + ylab('Age by methylation proportion positive') + scale_colour_discrete(name = 'Feature\ntype')
-ggplot(d, aes(y = agebeta_sign_mean, x = beta_sign_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation sign mean') + theme_grey(base_size = 18) + ylab('Age by methylation sign mean') + scale_colour_discrete(name = 'Feature\ntype')
-## Lots of points on the diagonals in the previous 2 plots (at least at the gene level)
-## Take absolute on both axes
-ggplot(d, aes(y = abs(agebeta_sign_mean), x = abs(beta_sign_mean), colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + xlab('Expr by methylation sign mean (abs)') + theme_grey(base_size = 18) + ylab('Age by methylation sign mean (abs)') + scale_colour_discrete(name = 'Feature\ntype')
-ggplot(d, aes(y = distance_diag, x = n_meqtls, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + ylab('Expr and age by methylation sign distance to diagonal') + theme_grey(base_size = 18) + xlab('Number of meQTLs') + scale_colour_discrete(name = 'Feature\ntype')
-ggplot(d, aes(y = distance_diag, x = beta_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + ylab('Expr and age by methylation sign distance to diagonal') + theme_grey(base_size = 18) + xlab('Expr by methylation mean beta') + scale_colour_discrete(name = 'Feature\ntype')
-ggplot(d, aes(y = distance_diag, x = beta_median, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + ylab('Expr and age by methylation sign distance to diagonal') + theme_grey(base_size = 18) + xlab('Expr by methylation median beta') + scale_colour_discrete(name = 'Feature\ntype')
-ggplot(d, aes(y = distance_diag, x = agebeta_mean, colour = gtype)) + geom_point() + facet_grid(typeref ~ vset) + ylab('Expr and age by methylation sign distance to diagonal') + theme_grey(base_size = 18) + xlab('Age by methylation mean beta') + scale_colour_discrete(name = 'Feature\ntype')
-ggplot(d, aes(y = distance_diag, x = gtype, colour = gtype)) + geom_boxplot() + facet_grid(typeref ~ vset) + ylab('Expr and age by methylation sign distance to diagonal') + theme_grey(base_size = 18) + xlab('Feature type') + scale_colour_discrete(name = 'Feature\ntype')
-
-ggplot(d, aes(x = distance_diag < 0.1, y = n_meqtls, colour = gtype)) + geom_boxplot() + facet_grid(typeref ~ vset) + xlab('Expr and age by methylation sign distance to diagonal < 0.1') + theme_grey(base_size = 18) + ylab('Number of meQTLs') + scale_colour_discrete(name = 'Feature\ntype') + stat_summary(fun.data = give.n, geom = "text", position = position_nudge(y = max(d$n_meqtls) * c(0.95, 1, 1.05), x = c(-0.2, 0, 0.2)))
-ggplot(d, aes(x = distance_diag < 0.1, y = n_meqtls, colour = gtype)) + geom_boxplot() + facet_grid(typeref ~ vset) + xlab('Expr and age by methylation sign distance to diagonal < 0.1') + theme_grey(base_size = 18) + ylab('Number of meQTLs') + scale_colour_discrete(name = 'Feature\ntype') + stat_summary(fun.data = give.n, geom = "text", position = position_nudge(y = log10(max(d$n_meqtls)) * c(0.65, 0.675, 0.7), x = c(-0.2, 0, 0.2))) + scale_y_log10()
-
-d$close <- d$distance_diag < 0.1
-ggplot(d, aes(y = agebeta_sign_mean, x = beta_sign_mean, colour = gtype)) + geom_point() + facet_grid(typeref + close ~ vset) + xlab('Expr by methylation sign mean') + theme_grey(base_size = 18) + ylab('Age by methylation sign mean') + scale_colour_discrete(name = 'Feature\ntype')
+## By gene region and whether age affects it or not
+pdf(paste0('pdf/meth_vs_expr_venn_byfeature_genebody_hasage_', opt$feature, '.pdf'), width = 14, height = 10)
+plot_feature_level(summarize_venn(data_by_venn[intersect(which(data_by_venn$body_present), which(!data_by_venn$noage)), ]))
+dev.off()
+pdf(paste0('pdf/meth_vs_expr_venn_byfeature_genebody_noage_', opt$feature, '.pdf'), width = 14, height = 10)
+plot_feature_level(summarize_venn(data_by_venn[intersect(which(data_by_venn$body_present), which(data_by_venn$noage)), ]))
+dev.off()
+pdf(paste0('pdf/meth_vs_expr_venn_byfeature_geneflanking_hasage_', opt$feature, '.pdf'), width = 14, height = 10)
+plot_feature_level(summarize_venn(data_by_venn[intersect(which(data_by_venn$flanking_present), which(!data_by_venn$noage)), ]))
+dev.off()
+pdf(paste0('pdf/meth_vs_expr_venn_byfeature_geneflanking_noage_', opt$feature, '.pdf'), width = 14, height = 10)
+plot_feature_level(summarize_venn(data_by_venn[intersect(which(data_by_venn$flanking_present), which(data_by_venn$noage)), ]))
+dev.off()
+pdf(paste0('pdf/meth_vs_expr_venn_byfeature_genepromoter_hasage_', opt$feature, '.pdf'), width = 14, height = 10)
+plot_feature_level(summarize_venn(data_by_venn[intersect(which(data_by_venn$promoter_present), which(!data_by_venn$noage)), ]))
+dev.off()
+pdf(paste0('pdf/meth_vs_expr_venn_byfeature_genepromoter_noage_', opt$feature, '.pdf'), width = 14, height = 10)
+plot_feature_level(summarize_venn(data_by_venn[intersect(which(data_by_venn$promoter_present), which(data_by_venn$noage)), ]))
 dev.off()
 
 
@@ -872,7 +1001,9 @@ saved_files <- c(paste0('rda/meqtl_mres_', opt$feature,
     paste0('rda/meqtl_venn_go_', opt$feature, '_using_near.Rdata'),
     paste0('rda/meqtl_age_coef_', opt$feature, '_using_near.Rdata'),
     paste0('rda/meqtl_data_by_venn_', opt$feature, '_using_near.Rdata'),
-    paste0('rda/meqtl_data_venn_summ_', opt$feature, '_using_near.Rdata')
+    paste0('rda/meqtl_data_venn_summ_', opt$feature, '_using_near.Rdata'),
+    'rda/gene_section.Rdata',
+    paste0('rda/meqtl_c_by_gene_', opt$feature, '_using_near.Rdata')
 )
 for(i in saved_files) load(i, verbose = TRUE)
 rm(i)
