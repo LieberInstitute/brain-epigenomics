@@ -83,6 +83,11 @@ round(table(gliaHmean>0.8)/length(gliaHmean)*100,1)
 
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/BSobj_bsseqSmooth_Neuron_minCov_3_prenatal.Rdata")
 
+pd = pData(BSobj)
+pd$Race[pd$Race== "CAUC "] <- 'CAUC'
+pd$Sex[pd$Sex == " M"] <- 'M'
+write.csv(pd, quote=F, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/prenatal.WGBS.pheno.info.csv")
+
 fGmeth <- getMeth(BSobj, type = 'raw')
 dim(fGmeth) # 
 mean1 = rowMeans(fGmeth[1:9332446,], na.rm = T)
@@ -106,6 +111,11 @@ round(table(Mean>0.8)/length(Mean)*100,1)
 # load methylation matrix for homogenate postnatal CpGs
 
 load("/dcl01/lieber/WGBS/LIBD_Data/bsseqObj/bsseqObj_postNatal_cleaned_CpGonly.rda")
+
+pd = pData(BSobj)
+pd$Race[pd$Race== "CAUC "] <- 'CAUC'
+pd$Sex[pd$Sex == " M"] <- 'M'
+write.csv(pd, quote=F, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/postnatal.homogenate.WGBS.pheno.info.csv")
 
 hGmeth <- getMeth(BSobj, type = 'raw')
 dim(hGmeth) #  28217448 CpGs measured
