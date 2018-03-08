@@ -20,9 +20,10 @@ data = list(promoters = lapply(DMR, function(x) x[which(x$promoter=="Promoter" &
             introns = lapply(DMR, function(x) x[which(x$annotation=="Intron" & x$sig=="FWER < 0.05" & x$width>29),]), #all DMRs that overlap exclusively introns
             all = lapply(DMR, function(x) x[which(x$sig=="FWER < 0.05" & x$width>29),]))
 gr = lapply(data, function(x) lapply(x, makeGRangesFromDataFrame))
+gr = lapply(gr, function(x) lapply(x, reduce))
 for (i in 1:length(gr)) { 
   for (j in 1:length(gr[[i]])) { 
-    names(gr[[i]][[j]]) = data[[i]][[j]][,"regionID"] 
+    names(gr[[i]][[j]]) = paste0(as.character(seqnames(gr[[i]][[j]])), ":",as.character(start(gr[[i]][[j]])), "-",as.character(end(gr[[i]][[j]])))
   } 
 }
 seq = lapply(gr, function(y) lapply(y, function(x) getSeq(Hsapiens, x)))
@@ -49,9 +50,10 @@ save(promoters_int, intergenic_int, introns_int, all_int, file="/dcl01/lieber/aj
 promoters_split = intergenic_split = introns_split = all_split = list()
 split = lapply(data, function(y) unlist(lapply(y, function(x) split(x, x$Dir)), recursive = F))
 gr = lapply(split, function(x) lapply(x, makeGRangesFromDataFrame))
+gr = lapply(gr, function(x) lapply(x, reduce))
 for (i in 1:length(gr)) { 
   for (j in 1:length(gr[[i]])) { 
-    names(gr[[i]][[j]]) = split[[i]][[j]][,"regionID"] 
+    names(gr[[i]][[j]]) = paste0(as.character(seqnames(gr[[i]][[j]])), ":",as.character(start(gr[[i]][[j]])), "-",as.character(end(gr[[i]][[j]]))) 
   } 
 }
 seq = lapply(gr, function(y) lapply(y, function(x) getSeq(Hsapiens, x)))
