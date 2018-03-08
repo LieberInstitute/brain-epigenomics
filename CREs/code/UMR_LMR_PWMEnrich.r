@@ -121,51 +121,25 @@ for (i in 1:length(umrs)) {
   names(lmrs[[i]]) = paste0(seqnames(lmrs[[i]]), ":", data.frame(ranges(lmrs[[i]]))$start,"-", data.frame(ranges(lmrs[[i]]))$end)
 }
 
-seq = lapply(c(lapply(umrs, function(x) x[which(width(x)>=30)]),
-               lapply(lmrs, function(x) x[which(width(x)>=30)])), function(x) getSeq(Hsapiens, x))
-names(seq) = c(paste0("UMR.", names(seq)[1:52]), paste0("LMR.", names(seq)[53:104]))
-UMR.seq = seq[grep("UMR.", names(seq))]
-LMR.seq = seq[grep("LMR.", names(seq))]
+UMR.seq = lapply(lapply(umrs, function(x) x[which(width(x)>=30)]), function(x) getSeq(Hsapiens, x))
+names(UMR.seq) = paste0("UMR.", names(UMR.seq))
+LMR.seq = lapply(lapply(lmrs, function(x) x[which(width(x)>=30)]), function(x) getSeq(Hsapiens, x))
+names(LMR.seq) = paste0("LMR.", names(LMR.seq))
 
-
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/filtered_TF_list_expressionInfo.rda")
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_PWMEnrich_objects.rda")
-gp = groupReport(promoters_split$CellType.pos)
-gp = as.data.frame(gp)
-id = gp[which(gp$target %in% names(targettogeneID)),"id"]
-x = PWMLognBackground(bg.source = PWMLogn.hg19.MotifDb.Hsap$bg.source, 
-                  bg.len = PWMLogn.hg19.MotifDb.Hsap$bg.len[,which(colnames(PWMLogn.hg19.MotifDb.Hsap$bg.mean) %in% id)],
-                  bg.mean = PWMLogn.hg19.MotifDb.Hsap$bg.mean[,which(colnames(PWMLogn.hg19.MotifDb.Hsap$bg.mean) %in% id)],
-                  bg.sd = PWMLogn.hg19.MotifDb.Hsap$bg.sd[,which(colnames(PWMLogn.hg19.MotifDb.Hsap$bg.mean) %in% id)],
-                  pwms = PWMLogn.hg19.MotifDb.Hsap$pwms[,which(colnames(PWMLogn.hg19.MotifDb.Hsap$bg.mean) %in% id)])
-PWMLogn.hg19.MotifDb.Hsap$bg.mean = PWMLogn.hg19.MotifDb.Hsap$bg.mean[,which(colnames(PWMLogn.hg19.MotifDb.Hsap$bg.mean) %in% id)]
-PWMLogn.hg19.MotifDb.Hsap$bg.sd
-names(PWMLogn.hg19.MotifDb.Hsap$pwms)[which(names(PWMLogn.hg19.MotifDb.Hsap$pwms) %in% id)]
+rm(list=ls()[-which(ls() %in% c("LMR.seq","PWMLogn.hg19.MotifDb.Hsap", "geneMap", "pd"))])
 
 for (i in 1:length(LMR.seq)) { 
   umrlmr_pwmenrich = motifEnrichment(LMR.seq[[i]], PWMLogn.hg19.MotifDb.Hsap, verbose=F)
   save(umrlmr_pwmenrich, 
        file = paste0("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/umrlmr/",names(LMR.seq)[i],"_TSS_TFs_bysample.rda"))
 }
+
 TSS_TFs_bysample = list()
-for (i in 1:length(seq)) { 
-  load(paste0("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/umrlmr/",names(seq)[i],"TSS_TFs_bysample.rda"))
+for (i in 1:length(LMR.seq)) { 
+  load(paste0("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/umrlmr/",names(LMR.seq)[i],"_TSS_TFs_bysample.rda"))
   TSS_TFs_bysample[[i]] = umrlmr_pwmenrich
   rm(umrlmr_pwmenrich)
 }
-names(TSS_TFs_bysample) = names(seq)
+names(TSS_TFs_bysample) = names(LMR.seq)
 
 save(TSS_TFs_bysample, geneMap,pd, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/TSS_TFs_bysample.rda")
-
-
-
-
-
-
-
-
-
-
-
-
-
