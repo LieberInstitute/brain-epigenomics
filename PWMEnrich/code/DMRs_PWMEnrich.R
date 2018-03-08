@@ -20,9 +20,10 @@ data = list(promoters = lapply(DMR, function(x) x[which(x$promoter=="Promoter" &
             introns = lapply(DMR, function(x) x[which(x$annotation=="Intron" & x$sig=="FWER < 0.05" & x$width>29),]), #all DMRs that overlap exclusively introns
             all = lapply(DMR, function(x) x[which(x$sig=="FWER < 0.05" & x$width>29),]))
 gr = lapply(data, function(x) lapply(x, makeGRangesFromDataFrame))
+gr = lapply(gr, function(x) lapply(x, reduce))
 for (i in 1:length(gr)) { 
   for (j in 1:length(gr[[i]])) { 
-    names(gr[[i]][[j]]) = data[[i]][[j]][,"regionID"] 
+    names(gr[[i]][[j]]) = paste0(as.character(seqnames(gr[[i]][[j]])), ":",as.character(start(gr[[i]][[j]])), "-",as.character(end(gr[[i]][[j]])))
   } 
 }
 seq = lapply(gr, function(y) lapply(y, function(x) getSeq(Hsapiens, x)))
@@ -49,9 +50,10 @@ save(promoters_int, intergenic_int, introns_int, all_int, file="/dcl01/lieber/aj
 promoters_split = intergenic_split = introns_split = all_split = list()
 split = lapply(data, function(y) unlist(lapply(y, function(x) split(x, x$Dir)), recursive = F))
 gr = lapply(split, function(x) lapply(x, makeGRangesFromDataFrame))
+gr = lapply(gr, function(x) lapply(x, reduce))
 for (i in 1:length(gr)) { 
   for (j in 1:length(gr[[i]])) { 
-    names(gr[[i]][[j]]) = split[[i]][[j]][,"regionID"] 
+    names(gr[[i]][[j]]) = paste0(as.character(seqnames(gr[[i]][[j]])), ":",as.character(start(gr[[i]][[j]])), "-",as.character(end(gr[[i]][[j]]))) 
   } 
 }
 seq = lapply(gr, function(y) lapply(y, function(x) getSeq(Hsapiens, x)))
@@ -77,80 +79,16 @@ intergenic_split$Age.neg = motifEnrichment(seq$intergenic$Age.neg, PWMLogn.hg19.
 intergenic_split$Interaction.pos = motifEnrichment(seq$intergenic$Interaction.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
 intergenic_split$Interaction.neg = motifEnrichment(seq$intergenic$Interaction.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
 
-introns_split$CellType.pos = motifEnrichment(seq$intergenic$CellType.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
-introns_split$CellType.neg = motifEnrichment(seq$intergenic$CellType.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
-introns_split$Age.pos = motifEnrichment(seq$intergenic$Age.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
-introns_split$Age.neg = motifEnrichment(seq$intergenic$Age.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
-introns_split$Interaction.pos = motifEnrichment(seq$intergenic$Interaction.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
-introns_split$Interaction.neg = motifEnrichment(seq$intergenic$Interaction.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+introns_split$CellType.pos = motifEnrichment(seq$introns$CellType.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+introns_split$CellType.neg = motifEnrichment(seq$introns$CellType.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+introns_split$Age.pos = motifEnrichment(seq$introns$Age.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+introns_split$Age.neg = motifEnrichment(seq$introns$Age.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+introns_split$Interaction.pos = motifEnrichment(seq$introns$Interaction.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+introns_split$Interaction.neg = motifEnrichment(seq$introns$Interaction.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
 
 
 save(promoters_split, intergenic_split, introns_split, all_split, promoters_int, intergenic_int, introns_int, all_int,
      file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_PWMEnrich_objects.rda")
-
-
-## Cluster Interaction DMRs by TF enrichment to see how the groups materialize
-
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_PWMEnrich_objects.rda")
-
-all_int_seqRep = list()
-for (i in 1:length(all_int$sequences)) {
-	all_int_seqRep[[i]] = sequenceReport(all_int, seq.id=i)
-}
-targ = all_int_seqRep[[1]]$target    
-pvalMat = do.call(cbind, lapply(all_int_seqRep, function(x) x$p.value[match(targ, x$target)]))
-rownames(pvalMat) = targ
-colnames(pvalMat) = names(all_int$sequences)
-
-lMat = -log10(pvalMat)
-
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich/figures/Interaction_DMR_TFenrichment_heatmap.pdf",h=16,w=8)
-sampleDists <- dist(t(lMat))
-sampleDistMatrix <- as.matrix(sampleDists)
-colors <- colorRampPalette(rev(brewer.pal(9, "Blues")) )(255)
-pheatmap(sampleDistMatrix,clustering_distance_rows=sampleDists, clustering_distance_cols=sampleDists,
-         col=colors, main="Euclidean Distance Between\nInteraction DMRs by TF Enrichment")
-sampleDists <- dist(lMat)
-sampleDistMatrix <- as.matrix(sampleDists)
-pheatmap(sampleDistMatrix,clustering_distance_rows=sampleDists, clustering_distance_cols=sampleDists,
-         col=colors, main="Euclidean Distance Between\nTFs by Enrichment in Interaction DMRs")
-dev.off()
-# too large to be informative
-
-
-
-
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich/figures/Interaction_DMR_TFenrichment_cluster.pdf", h = 5, w = 14)
-##  cluster by TF
-hc = hclust(dist(t(lMat)))
-hc_cut = cutree(hc, h= 40)
-palette(brewer.pal(12,"Paired"))
-myplclust(hc, lab.col=hc_cut,xlab="",hang=0.05,cex=1.1)
-# cluster by DMR
-hc2 = hclust(dist(lMat))
-hc2_cut = cutree(hc2, k= 20)
-myplclust(hc2, lab.col=hc2_cut,xlab="",hang=0)
-dev.off()
-
-### go by cluster
-sIndexes = splitit(hc2_cut)
-nullgenes =  read.delim("/users/ajaffe/Lieber/Projects/450k/grant/ref_gene_hg19.txt", header=T,as.is=T)
-genes = sig$annotation
-goListByTF = lapply(sIndexes, function(x) dogo(genes[x],nullgenes[,2])[,-8])
-
-
-
-pca = prcomp(lMat)
-pcat = prcomp(t(lMat))
-ggplot(data = d, aes_string(x = "PC2", y = "PC3", color = "group")) + 
-  geom_point(size = 3) + 
-  ylab(paste0("PC3: ", round(percentVar[3] * 100), "% variance")) + 
-  xlab(paste0("PC2: ", round(percentVar[2] * 100), "% variance")) +
-  theme(title = element_text(size = 20)) +
-  theme(text = element_text(size = 20))
-
-pca= prcomp(t(zMat))
-km = kmeans(t(zMat), 5)
 
 
 ## Test for Differential TF binding
@@ -160,16 +98,31 @@ pos = c(all_split[grep("pos", names(all_split))], promoters_split[grep("pos", na
 neg = c(all_split[grep("neg", names(all_split))], promoters_split[grep("neg", names(promoters_split))],
         introns_split[grep("neg", names(introns_split))], intergenic_split[grep("neg", names(intergenic_split))])
 names(pos) = c("allAge","allInt","allCT","promCT","promAge","promInt","intronsCT","intronsAge","intronsInt","interCT","interAge","interInt")
-pos = pos[!names(pos) %in% c("intronsAge","interAge")]
-names(neg) = names(pos)
-seqpos = c(allAge = seq$all$Age.pos, allInt = seq$all$Interaction.pos, allCT = seq$all$CellType.pos,
-           promCT = seq$promoters$CellType.pos, promAge = seq$promoters$Age.pos, promInt = seq$promoters$Interaction.pos,
-           intronsCT = seq$introns$CellType.pos, intronsAge = seq$introns$Age.pos, intronsInt = seq$introns$Interaction.pos,
-           interCT = seq$intergenic$CellType.pos, interAge = seq$intergenic$Age.pos, interInt = seq$intergenic$Interaction.pos)
-seqneg = c(allAge = seq$all$Age.neg, allInt = seq$all$Interaction.neg, allCT = seq$all$CellType.neg,
-           promCT = seq$promoters$CellType.neg, promAge = seq$promoters$Age.neg, promInt = seq$promoters$Interaction.neg,
-           intronsCT = seq$introns$CellType.neg, intronsInt = seq$introns$Interaction.neg,
-           interCT = seq$intergenic$CellType.neg, interInt = seq$intergenic$Interaction.neg)
+names(neg) = c("allAge","allInt","allCT","promCT","promAge","promInt","intronsCT","intronsInt","intronsAge","interCT","interInt")
+pos = pos[names(pos)!="interAge"]
+
+seqpos = c(allAge = seq$all$Age.pos, 
+           allInt = seq$all$Interaction.pos, 
+           allCT = seq$all$CellType.pos,
+           promCT = seq$promoters$CellType.pos, 
+           promAge = seq$promoters$Age.pos, 
+           promInt = seq$promoters$Interaction.pos,
+           intronsCT = seq$introns$CellType.pos, 
+           intronsAge = seq$introns$Age.pos, 
+           intronsInt = seq$introns$Interaction.pos,
+           interCT = seq$intergenic$CellType.pos, 
+           interInt = seq$intergenic$Interaction.pos)
+seqneg = c(allAge = seq$all$Age.neg, 
+           allInt = seq$all$Interaction.neg, 
+           allCT = seq$all$CellType.neg,
+           promCT = seq$promoters$CellType.neg, 
+           promAge = seq$promoters$Age.neg, 
+           promInt = seq$promoters$Interaction.neg,
+           intronsCT = seq$introns$CellType.neg, 
+           intronsInt = seq$introns$Interaction.neg,
+           intronsAge = seq$introns$Age.neg,
+           interCT = seq$intergenic$CellType.neg, 
+           interInt = seq$intergenic$Interaction.neg)
 
 TFdiff = list()
 for (i in 1:length(pos)) {
@@ -177,10 +130,49 @@ for (i in 1:length(pos)) {
                                     res1 = pos[[i]], res2 = neg[[i]], PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE)
 }
 names(TFdiff) = names(pos)
+pos = c(all_split[grep("pos", names(all_split))], promoters_split[grep("pos", names(promoters_split))],
+        introns_split[grep("pos", names(introns_split))], intergenic_split[grep("pos", names(intergenic_split))])
+names(pos) = c("allAge","allInt","allCT","promCT","promAge","promInt","intronsCT","intronsAge","intronsInt","interCT","interAge","interInt")
+seqpos = c(allAge = seq$all$Age.pos, allInt = seq$all$Interaction.pos, allCT = seq$all$CellType.pos, promCT = seq$promoters$CellType.pos, 
+           promAge = seq$promoters$Age.pos, promInt = seq$promoters$Interaction.pos, intronsCT = seq$introns$CellType.pos, 
+           intronsAge = seq$introns$Age.pos, intronsInt = seq$introns$Interaction.pos, interCT = seq$intergenic$CellType.pos,
+           interAge = seq$intergenic$Age.pos, interInt = seq$intergenic$Interaction.pos)
+
+TFdiff = c(TFdiff, 
+           list(prom.intergenic.pos.CT = motifDiffEnrichment(sequences1 = seqpos$promCT, sequences2 = seqpos$interCT,res1 = pos$promCT, 
+                                                             res2 = pos$interCT, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                prom.intron.pos.CT = motifDiffEnrichment(sequences1 = seqpos$promCT, sequences2 = seqpos$intronsCT,res1 = pos$promCT, 
+                                                         res2 = pos$intronsCT, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                intron.intergenic.pos.CT = motifDiffEnrichment(sequences1 = seqpos$intronsCT, sequences2 = seqpos$interCT, res1 = pos$intronsCT, 
+                                                               res2 = pos$interCT, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                prom.intergenic.neg.CT = motifDiffEnrichment(sequences1 = seqneg$promCT, sequences2 = seqneg$interCT, res1 = neg$promCT, 
+                                                             res2 = neg$interCT, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                prom.intron.neg.CT = motifDiffEnrichment(sequences1 = seqneg$promCT, sequences2 = seqneg$intronsCT, res1 = neg$promCT, 
+                                                         res2 = neg$intronsCT, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                intron.intergenic.neg.CT = motifDiffEnrichment(sequences1 = seqneg$intronsCT, sequences2 = seqneg$interCT, res1 = neg$intronsCT, 
+                                                               res2 = neg$interCT, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                prom.intergenic.pos.Age = motifDiffEnrichment(sequences1 = seqpos$promAge, sequences2 = seqpos$interAge, res1 = pos$promAge, 
+                                                              res2 = pos$interAge, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                prom.intron.pos.Age = motifDiffEnrichment(sequences1 = seqpos$promAge, sequences2 = seqpos$intronsAge, res1 = pos$promAge, 
+                                                          res2 = pos$intronsAge, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                intron.intergenic.pos.Age = motifDiffEnrichment(sequences1 = seqpos$intronsAge, sequences2 = seqpos$interAge, res1 = pos$intronsAge, 
+                                                                res2 = pos$interAge, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                prom.intron.neg.Age = motifDiffEnrichment(sequences1 = seqneg$promAge, sequences2 = seqneg$intronsAge, res1 = neg$promAge, 
+                                                          res2 = neg$intronsAge, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                prom.intergenic.pos.Int = motifDiffEnrichment(sequences1 = seqpos$promInt, sequences2 = seqpos$interInt, res1 = pos$promInt, 
+                                                              res2 = pos$interInt, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                prom.intron.pos.Int = motifDiffEnrichment(sequences1 = seqpos$promInt, sequences2 = seqpos$intronsInt, res1 = pos$promInt, 
+                                                          res2 = pos$intronsInt, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                intron.intergenic.pos.Int = motifDiffEnrichment(sequences1 = seqpos$intronsInt, sequences2 = seqpos$interInt, res1 = pos$intronsInt, 
+                                                                res2 = pos$interInt, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                prom.intergenic.neg.Int = motifDiffEnrichment(sequences1 = seqneg$promInt, sequences2 = seqneg$interInt, res1 = neg$promInt, 
+                                                              res2 = neg$interInt, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                prom.intron.neg.Int = motifDiffEnrichment(sequences1 = seqneg$promInt, sequences2 = seqneg$intronsInt, res1 = neg$promInt, 
+                                                          res2 = neg$intronsInt, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                intron.intergenic.neg.Int = motifDiffEnrichment(sequences1 = seqneg$intronsInt, sequences2 = seqneg$interInt, res1 = neg$intronsInt, 
+                                                                res2 = neg$interInt, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE)))
 
 save(TFdiff, promoters_split, intergenic_split, introns_split, all_split, promoters_int, intergenic_int, introns_int, all_int,
      file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_PWMEnrich_objects.rda")
-
-
 
 

@@ -16,7 +16,7 @@ load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/bumps_bsseqSmooth_N
 cell = bumps[[1]]
 dim(cell) # 241924     14
 dim(cell[which(cell$fwer<=0.05),]) # 11179    14
-cell$regionID = paste0(cell$seqnames,":",cell$start,"-", cell$end)
+cell$regionID = paste0(cell$chr,":",cell$start,"-", cell$end)
 
 # Mapping cell sites to nearest gene
 grcell = makeGRangesFromDataFrame(cell, keep.extra.columns = T)
@@ -87,7 +87,7 @@ load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/bumps_bsseqSmooth_N
 age = bumps[[1]]
 dim(age) # 52790     14
 dim(age[which(age$fwer<=0.05),]) # 129    14
-age$regionID = paste0(age$seqnames,":",age$start,"-", age$end)
+age$regionID = paste0(age$chr,":",age$start,"-", age$end)
 
 
 # Mapping age sites to nearest gene
@@ -143,7 +143,7 @@ load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/bumps_bsseqSmooth_N
 interaction = bumps[[1]]
 dim(interaction) # 26282     14
 dim(interaction[which(interaction$fwer<=0.05),]) # 2178    14
-interaction$regionID = paste0(interaction$seqnames,":",interaction$start,"-", interaction$end)
+interaction$regionID = paste0(interaction$chr,":",interaction$start,"-", interaction$end)
 
 # Mapping interaction sites to nearest gene
 grinteraction = makeGRangesFromDataFrame(interaction, keep.extra.columns = T)

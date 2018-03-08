@@ -120,6 +120,7 @@ nucRNAexonres$padj.AgeToddler = p.adjust(nucRNAexonres$pval.AgeToddler, method =
 nucRNAexonres$padj.CellTypeNeuron = p.adjust(nucRNAexonres$pval.CellTypeNeuron, method = "fdr")
 nucRNAexonres$gencodeID = rownames(nucRNAexonres)
 
+write.csv(metrics, quote=F, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/sorted.RNAseq.pheno.info.csv")
 
 save(fit_gene_polya,fit_gene_ribo,fit_exon_polya,fit_exon_ribo, geneMap, metrics,
      fit_gene_combined, fit_exon_combined, nucRNAres, nucRNAexonres, 

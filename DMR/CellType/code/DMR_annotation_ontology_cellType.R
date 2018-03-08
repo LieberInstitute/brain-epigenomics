@@ -291,6 +291,40 @@ plot(compareDO.dir, colorBy="p.adjust", showCategory = 800, title= "Disease Onto
 dev.off()
 
 
+# Make more specific enrichment figure
+
+x = as.data.frame(compareBP.dir)
+x = split(x, x$Cluster)
+
+pos = x$GenesPlusPromoters.pos[-which(x$GenesPlusPromoters.pos$Description %in% x$GenesPlusPromoters.neg$Description),]
+neg = x$GenesPlusPromoters.neg[-which(x$GenesPlusPromoters.neg$Description %in% x$GenesPlusPromoters.pos$Description),]
+
+toplot = rbind(pos[1:5,], neg[1:5,])
+toplot$log10 = -log10(toplot$p.adjust)
+toplot = toplot[,colnames(toplot) !="geneID"]
+toplot$Description = factor(c(toplot$Description[1:8], "presynaptic process involved\nin chemical synaptic transmission", toplot$Description[10]),
+                              levels = c("gliogenesis","glial cell differentiation","ensheathment of neurons","axon ensheathment","myelination",
+                                         "neurotransmitter secretion","signal release from synapse",
+                                         "neurotransmitter transport","presynaptic process involved\nin chemical synaptic transmission",
+                                         "vesicle localization"))
+toplot$Cluster = gsub("GenesPlusPromoters.neg", "Hypomethylated\nIn Neurons", toplot$Cluster)
+toplot$Cluster = gsub("GenesPlusPromoters.pos", "Hypomethylated\nIn Glia", toplot$Cluster)
+toplot$Cluster = factor(toplot$Cluster, levels = c("Hypomethylated\nIn Glia", "Hypomethylated\nIn Neurons"))
+
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CellType/figures/DMR_byCellType_BP_top12.pdf", width=8,height=8)
+ggplot(toplot, aes(x=Description, y =log10)) + scale_fill_brewer(8, palette="Dark2") + 
+  geom_bar(stat = 'identity', aes(fill = Cluster), position = 'dodge', col = 'transparent') +
+  geom_text(aes(label=GeneRatio), hjust=1.1, color="black", position = position_dodge(1), size=5) +
+  coord_flip() + theme_classic() +
+  ylab("-log10(FDR)") + 
+  xlab("") +
+  ggtitle("Biological Process\nEnrichment: Cell Type DMRs") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+dev.off()
+
+
 ## Width of DMRs
 
 cellgr = makeGRangesFromDataFrame(DMR$CellType, keep.extra.columns = T)

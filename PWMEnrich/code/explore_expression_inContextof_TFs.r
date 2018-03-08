@@ -5,7 +5,7 @@ library(PWMEnrich)
 
 
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_PWMEnrich_objects.rda")
-
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/sorted_nuclear_RNA/DE_limma_results_objects.rda")
 
 ## Get homogenate gene level data 
 
@@ -49,21 +49,61 @@ quantile(homRPKM)
 
 cutoff = data.frame(geneID = rownames(TFhomRPKM), Threshold = NA)
 for (i in 1:nrow(TFhomRPKM)) {
-  cutoff[i,"Threshold"] = ifelse(max(TFhomRPKM[i,])>5, "TRUE","FALSE")
+  cutoff[i,"Threshold"] = ifelse(max(TFhomRPKM[i,])>1, "TRUE","FALSE")
 }
 table(cutoff$Threshold=="TRUE")
+#FALSE  TRUE 
+#188   650 
 
-no = geneMap[which(geneMap$gencodeID %in% cutoff$geneID[cutoff$Threshold=="FALSE"]),"Symbol"]
+# Excluded TFs
+geneMap[which(geneMap$gencodeID %in% cutoff$geneID[cutoff$Threshold=="FALSE"]),"Symbol"]
+#[1] "TP73"      "RUNX3"     "DMBX1"     "FOXD2"     "GLIS1"     "FOXD3"    
+#[7] "BARHL2"    "ALX3"      "TBX15"     "HIST2H2AB" "LMX1A"     "TBX19"    
+#[13] "ELF3"      "MYOG"      "IL24"      "IRF6"      "MIXL1"     "REL"      
+#[19] "FIGLA"     "VAX2"      "NOTO"      "LBX2"      "EN1"       "EVX2"     
+#[25] "HOXD13"    "HOXD12"    "HOXD11"    "HOXD8"     "HOXD3"     "BOLL"     
+#[31] "FEV"       "PAX3"      "GBX2"      "HESX1"     "POU1F1"    "SOX14"    
+#[37] "SHOX2"     "TP63"      "HMX1"      "NKX3-2"    "PHOX2B"    "NKX6-1"   
+#[43] "FOSL1P1"   "POU4F2"    "IRX2"      "DDX4"      "FOXD1"     "PITX1"    
+#[49] "POU4F3"    "CDX1"      "HAND1"     "FOXI1"     "PROP1"     "IRF4"     
+#[55] "RREB1"     "TFAP2A"    "GCM2"      "HIST1H2BN" "TULP1"     "RUNX2"    
+#[61] "TFAP2B"    "GCM1"      "DDX43"     "OLIG3"     "ESR1"      "PLG"      
+#[67] "T"         "UNCX"      "MEOX2"     "HOXA1"     "HOXA2"     "HOXA10"   
+#[73] "HOXA13"    "EVX1"      "TBX20"     "PGAM2"     "TFEC"      "PAX4"     
+#[79] "KLF14"     "GBX1"      "EN2"       "MNX1"      "GATA4"     "SLC18A1"  
+#[85] "NKX3-1"    "HNF4G"     "ESRP1"     "POU5F1B"   "MAFA"      "FOXH1"    
+#[91] "PAX5"      "BARX1"     "LMX1B"     "GATA3"     "PTF1A"     "DRGX"     
+#[97] "A1CF"      "NKX2-3"    "PAX2"      "TLX1"      "PITX3"     "HMX3"     
+#[103] "HMX2"      "VENTX"     "MYOD1"     "ELF5"      "EHF"       "FGF19"    
+#[109] "PHOX2A"    "POU2F3"    "BSX"       "PDE6H"     "VDR"       "HOXC13"   
+#[115] "HOXC12"    "HOXC11"    "HOXC10"    "NFE2"      "MYF6"      "ALX1"     
+#[121] "SPIC"      "TBX5"      "HNF1A"     "ZNF26"     "PDX1"      "CDX2"     
+#[127] "POU4F1"    "CEBPE"     "NKX2-8"    "PAX9"      "FOXA1"     "ESR2"     
+#[133] "ZNF410"    "VSX2"      "BATF"      "ESRRB"     "GSC"       "ONECUT1"  
+#[139] "FOXB1"     "CELF6"     "ISL2"      "MCTP2"     "IRX5"      "ESRP2"    
+#[145] "FOXL1"     "HNF1B"     "MEOX1"     "HOXB2"     "HOXB3"     "HOXB5"    
+#[151] "HOXB9"     "HOXB13"    "DLX4"      "TBX4"      "RAX"       "NFATC1"   
+#[157] "ONECUT3"   "RAX2"      "MEF2B"     "CEBPA"     "SPIB"      "DPRX"     
+#[163] "DUXA"      "ZSCAN4"    "PAX1"      "VSX1"      "HNF4A"     "WISP2"    
+#[169] "GATA5"     "U2AF1"     "GSC2"      "TBX1"      "ISX"       "SOX10"    
+#[175] "SHOX"      "XG"        "YY2"       "DDX53"     "SSX3"      "FOXP3"    
+#[181] "SSX2"      "AR"        "TGIF2LX"   "ESX1"      "ELF4"      "MAGEA8"   
+#[187] "SRY"       "HSFY2"    
 
-df = t(TFhomRPKM)
-
-theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-                   panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
-
-geneIDs = c(geneMap$gencodeID[which(geneMap$Symbol %in% un)], geneMap$gencodeID[which(geneMap$ensemblID %in% ensIDs)]
-
-load("/dcl01/lieber/ajaffe/Brain/DLPFC_PolyA/Consortium/rse_gene_BrainSeq_Phase1_hg19_TopHat2_EnsemblV75.rda")
-load("/dcl01/lieber/ajaffe/CellSorting/RNAseq_pipeline/rawCounts_CellSorting_July5_n12.rda")
+no = geneMap[which(geneMap$gencodeID %in% cutoff$geneID[cutoff$Threshold=="FALSE"]),"gencodeID"]
 
 
+targettogeneID = c(geneMap[match(noW[which(noW %in% geneMap$Symbol)], geneMap$Symbol), "gencodeID"], 
+            geneMap[match(ensIDs, geneMap$ensemblID), "gencodeID"])
+names(targettogeneID) = c(geneMap[match(noW[which(noW %in% geneMap$Symbol)], geneMap$Symbol), "Symbol"], names(ensIDs))
 
+targettogeneID = targettogeneID[!targettogeneID %in% no]
+TFhomRPKM = TFhomRPKM[-which(rownames(TFhomRPKM) %in% no),]
+
+
+## Get sorted nuclear RNA TF results
+
+TFnucres = nucRNAres[which(rownames(nucRNAres) %in% targettogeneID),]
+
+save(targettogeneID, TFhomRPKM, hompd, geneMap, TFnucres,
+     file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/filtered_TF_list_expressionInfo.rda")
