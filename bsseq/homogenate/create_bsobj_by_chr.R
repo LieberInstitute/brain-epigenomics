@@ -55,6 +55,9 @@ pd <- pd[pd$Cell.Type == 'Homogenate', ]
 print('after filtering')
 with(pd, table('postnatal' = Age > 0, Cell.Type, useNA = 'ifany'))
 
+## Rename to match previous code
+colnames(pd)[colnames(pd) == 'WGC.ID'] <- 'Data.ID'
+
 ## all report files
 pd$reportFiles <- file.path(
     '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports',
