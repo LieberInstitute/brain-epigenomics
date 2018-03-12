@@ -102,17 +102,17 @@ x$repeats = factor(x$repeats, levels = c("SINE","LINE","Simple_repeat","DNA","LT
                                          "Other","DNA?","Satellite","RC","scRNA","tRNA","SINE?","srpRNA","RNA","rRNA","LINE?","LTR?","Unknown?"))
 ggplot(x, aes(x = repeats, y = V1)) + geom_bar(stat = "identity") +
   geom_text(aes( label = paste0(perc,"%")), vjust = -.5) +
-  theme(axis.text.x=element_text(angle=45, hjust=1)) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
   labs(fill="") + theme_classic() +
   ylab("Count") + 
   xlab("") +
-  ggtitle("DMRs in repretitive elements: FWER < 0.05") +
+  ggtitle("DMRs in repetitive elements: FWER < 0.05") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 dev.off()
 
 
-# Is there a relationship between being significantly DM and overlapping a promoter?
+# Is there a relationship between being significantly DM and overlapping a repeat?
 
 fisher.test(data.frame(Yesrepeats = c(nrow(df.clusters[df.clusters$repeats=="repeat" & df.clusters$CellType=="CellType",]),
                                      nrow(df.clusters[df.clusters$repeats=="repeat" & df.clusters$CellType=="no",])),
@@ -327,10 +327,10 @@ dev.off()
 
 ## Width of DMRs
 
-cellgr = makeGRangesFromDataFrame(DMR$CellType, keep.extra.columns = T)
-mean(width(cellgr)) # 2775.331
-median(width(cellgr)) # 2029
-sd(width(cellgr)) # 3304.216
+cellgr = reduce(makeGRangesFromDataFrame(DMR$CellType[which(DMR$CellType$sig=="FWER < 0.05"),], keep.extra.columns = T))
+mean(width(cellgr)) # 2783.261
+median(width(cellgr)) # 2049
+sd(width(cellgr)) # 2885.05
 min(width(cellgr)) # 1
 max(width(cellgr)) # 72913
 
@@ -343,7 +343,7 @@ min(width(geneMapgr)) # 8
 tiles = tile(geneMapgr[width(geneMapgr)>=20], n = 20)
 names(tiles) = names(geneMapgr[width(geneMapgr)>=20])
 
-regions = cellgr[cellgr$distToGene==0 & cellgr$sig=="FWER < 0.05"]
+regions = makeGRangesFromDataFrame(DMR$CellType[which(DMR$CellType$sig=="FWER < 0.05" & DMR$CellType$distToGene==0),], keep.extra.columns = T)
 
 tiles = tiles[names(tiles) %in% regions$nearestID]
 tiles = as.list(tiles)
@@ -363,10 +363,10 @@ overlaps = rbind(do.call(rbind, Map(cbind, overlaps1, geneID = as.list(names(til
                  do.call(rbind, Map(cbind, overlaps2, geneID = as.list(names(tiles)), Direction = "Hypomethylated\nin Neurons")))
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CellType/figures/CellType_DMR_position_in_gene.pdf")
-ggplot(overlaps, aes(region, colour = Direction)) + scale_colour_brewer(8, palette="Dark2") +
-  geom_freqpoly(bins = 20, size=2) + theme_classic() +
+ggplot(overlaps, aes(region, fill = Direction)) + scale_fill_brewer(8, palette="Dark2") +
+  geom_density(alpha = 1/2) + theme_classic() +
   labs(fill="") +
-  ylab("Count") + xlab("") +
+  ylab("Density") + xlab("") +
   ggtitle("Cell Type DMR Position in Gene") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.position="bottom", legend.title=element_blank())

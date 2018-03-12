@@ -94,6 +94,8 @@ fisher.test(data.frame(YesIsland = c(nrow(df.clusters[df.clusters$Islands=="isla
 #60.82746 
 
 
+## Repetitive elements
+
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/figures/DMR_repetitiveElements_byInteraction.pdf", width = 12)
 x = dtinteraction[sig=="FWER < 0.05",length(unique(regionID)), by = "repeats"]
 x$perc = round(x$V1/sum(x$V1)*100,2)
@@ -105,10 +107,25 @@ ggplot(x, aes(x = repeats, y = V1)) + geom_bar(stat = "identity") +
   labs(fill="") + theme_classic() +
   ylab("Count") + 
   xlab("") +
-  ggtitle("DMRs in repretitive elements: FWER < 0.05") +
+  ggtitle("DMRs in repetitive elements: FWER < 0.05") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 dev.off()
+
+
+# Is there a relationship between being significantly DM and overlapping a repeat?
+
+fisher.test(data.frame(Yesrepeats = c(nrow(df.clusters[df.clusters$repeats=="repeat" & df.clusters$Interaction=="Interaction",]),
+                                      nrow(df.clusters[df.clusters$repeats=="repeat" & df.clusters$Interaction=="no",])),
+                       Norepeats = c(nrow(df.clusters[df.clusters$repeats=="no" & df.clusters$Interaction=="Interaction",]),
+                                     nrow(df.clusters[df.clusters$repeats=="no" & df.clusters$Interaction=="no",])), row.names = c("YesInt","NoInt")))
+#p-value < 2.2e-16
+#alternative hypothesis: true odds ratio is not equal to 1
+#95 percent confidence interval:
+#  3.249362 5.790269
+#sample estimates:
+#  odds ratio 
+#4.292918 
 
 
 # assign genomic features
@@ -329,10 +346,10 @@ dev.off()
 
 ## Width of DMRs
 
-Interactiongr = makeGRangesFromDataFrame(DMR$Interaction, keep.extra.columns = T)
-mean(width(Interactiongr)) # 1118.387
-median(width(Interactiongr)) # 749
-sd(width(Interactiongr)) # 1358.947
+Interactiongr = reduce(makeGRangesFromDataFrame(DMR$Interaction[which(DMR$Interaction$sig=="FWER < 0.05"),], keep.extra.columns = T))
+mean(width(Interactiongr)) # 1375.545
+median(width(Interactiongr)) # 1031
+sd(width(Interactiongr)) # 1294.805
 min(width(Interactiongr)) # 1
 max(width(Interactiongr)) # 16714
 
@@ -345,29 +362,26 @@ min(width(geneMapgr)) # 8
 tiles = tile(geneMapgr[width(geneMapgr)>=20], n = 20)
 names(tiles) = names(geneMapgr[width(geneMapgr)>=20])
 
-regions = Interactiongr[Interactiongr$distToGene==0 & Interactiongr$sig=="FWER < 0.05"]
+regions = makeGRangesFromDataFrame(DMR$Interaction[which(DMR$Interaction$sig=="FWER < 0.05" & DMR$Interaction$distToGene==0),],
+                                          keep.extra.columns = T)
 
 tiles = tiles[names(tiles) %in% regions$nearestID]
 tiles = as.list(tiles)
-pos = lapply(tiles, function(x) findOverlaps(x, reduce(regions[which(regions$Dir=="pos")])))
-neg = lapply(tiles, function(x) findOverlaps(x, reduce(regions[which(regions$Dir=="neg")])))
+reg = lapply(tiles, function(x) findOverlaps(x, reduce(regions)))
 
-overlaps1 = overlaps2 = list()
-for (i in 1:length(pos)) {
-  if (length(queryHits(pos[[i]]))>0) {
-    overlaps1[[i]] = data.frame(region = queryHits(pos[[i]]), strand = as.character(strand(tiles[[i]])[1])) } else {
-      overlaps1[[i]] = data.frame(region = 0, strand = as.character(strand(tiles[[i]])[1])) }
-  if (length(queryHits(neg[[i]]))>0) {
-    overlaps2[[i]] = data.frame(region = queryHits(neg[[i]]), strand = as.character(strand(tiles[[i]])[1])) } else {
-      overlaps2[[i]] = data.frame(region = 0, strand = as.character(strand(tiles[[i]])[1])) }
+overlaps = list()
+for (i in 1:length(reg)) {
+  if (length(queryHits(reg[[i]]))>0) {
+    overlaps[[i]] = data.frame(region = queryHits(reg[[i]]), strand = as.character(strand(tiles[[i]])[1])) } 
+  else {
+    overlaps[[i]] = data.frame(region = 0, strand = as.character(strand(tiles[[i]])[1])) }
 }
-overlaps = rbind(do.call(rbind, Map(cbind, overlaps1, geneID = as.list(names(tiles)))),
-                 do.call(rbind, Map(cbind, overlaps2, geneID = as.list(names(tiles)))))
+overlaps = do.call(rbind, Map(cbind, overlaps, geneID = as.list(names(tiles))))
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/figures/Interaction_DMR_position_in_gene.pdf")
-ggplot(overlaps, aes(region)) + geom_freqpoly(bins = 20, size=2) + theme_classic() +
+ggplot(overlaps, aes(region)) + geom_density(size = 2) + theme_classic() +
   labs(fill="") +
-  ylab("Count") + xlab("") +
+  ylab("Density") + xlab("") +
   ggtitle("Interaction DMR Position in Gene") +
   theme(title = element_text(size = 20)) +
   theme_classic() +

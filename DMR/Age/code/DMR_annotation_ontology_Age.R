@@ -114,6 +114,21 @@ ggplot(x, aes(x = repeats, y = V1)) + geom_bar(stat = "identity") +
 dev.off()
 
 
+# Is there a relationship between being significantly DM and overlapping a repeat?
+
+fisher.test(data.frame(Yesrepeats = c(nrow(df.clusters[df.clusters$repeats=="repeat" & df.clusters$Age=="Age",]),
+                                      nrow(df.clusters[df.clusters$repeats=="repeat" & df.clusters$Age=="no",])),
+                       Norepeats = c(nrow(df.clusters[df.clusters$repeats=="no" & df.clusters$Age=="Age",]),
+                                     nrow(df.clusters[df.clusters$repeats=="no" & df.clusters$Age=="no",])), row.names = c("YesAge","NoAge")))
+#p-value = 0.009244
+#alternative hypothesis: true odds ratio is not equal to 1
+#95 percent confidence interval:
+#  1.242697 9.359717
+#sample estimates:
+#  odds ratio 
+#2.983668 
+
+
 # assign genomic features
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/Age/figures/DMR_annotation_byAge.pdf",width = 9)
@@ -160,18 +175,18 @@ fisher.test(data.frame(Yesgenes = c(nrow(df.clusters[df.clusters$genes=="gene" &
 
 # Is there a relationship between being significantly DM and overlapping a promoter?
 
-fisher.test(data.frame(Yesrepeats = c(nrow(df.clusters[df.clusters$repeats=="repeat" & df.clusters$Age=="Age",]),
-                                      nrow(df.clusters[df.clusters$repeats=="repeat" & df.clusters$Age=="no",])),
-                       Norepeats = c(nrow(df.clusters[df.clusters$repeats=="no" & df.clusters$Age=="Age",]),
-                                     nrow(df.clusters[df.clusters$repeats=="no" & df.clusters$Age=="no",])), row.names = c("YesAge","NoAge")))
-# promoters by themselves aren't overrepresented in DMRs
-#p-value = 0.009244
+fisher.test(data.frame(Yesrepeats = c(nrow(df.clusters[df.clusters$promoters=="promoter" & df.clusters$Age=="Age",]),
+                                      nrow(df.clusters[df.clusters$promoters=="promoter" & df.clusters$Age=="no",])),
+                       Norepeats = c(nrow(df.clusters[df.clusters$promoters=="no" & df.clusters$Age=="Age",]),
+                                     nrow(df.clusters[df.clusters$promoters=="no" & df.clusters$Age=="no",])), row.names = c("YesAge","NoAge")))
+# promoters are overrepresented
+#p-value < 2.2e-16
 #alternative hypothesis: true odds ratio is not equal to 1
 #95 percent confidence interval:
-#  1.242697 9.359717
+#  36.55685 132.95789
 #sample estimates:
 #  odds ratio 
-#2.983668 
+#66.42392 
 
 
 ### Gene Ontology
@@ -251,7 +266,7 @@ compareCC.dir = compareCluster(entrez.dir, fun="enrichGO",  ont = "CC", OrgDb = 
 compareDO = compareCluster(entrez, fun="enrichDO",  ont = "DO", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
 compareDO.dir = compareCluster(entrez.dir, fun="enrichDO",  ont = "DO", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
 
-# save, write to csv
+# save
 save(compareKegg, compareKegg.dir, compareBP, compareBP.dir, compareMF, compareCC, compareCC.dir, compareDO, compareDO.dir,
      keggList, keggList.dir, goList_BP, goList_BP.dir, goList_MF, goList_MF.dir, goList_CC, goList_CC.dir, goList_DO, goList_DO.dir,
      keggListdf, keggList.dir.df, goListdf_BP, goListdf_BP.dir, goListdf_MF, goListdf_MF.dir, goListdf_CC, goListdf_CC.dir, goListdf_DO, goListdf_DO.dir,
@@ -272,14 +287,49 @@ plot(compareDO.dir, colorBy="p.adjust", showCategory = 450, title= "Disease Onto
 dev.off()
 
 
+# Make more specific enrichment figure
+
+x = as.data.frame(compareKegg.dir)
+x = split(x, x$Cluster)
+x$Promoters.pos
+goListdf_MF.dir$Genes.neg
+pos = x$GenesPlusPromoters.pos[-which(x$GenesPlusPromoters.pos$Description %in% x$GenesPlusPromoters.neg$Description),]
+neg = x$GenesPlusPromoters.neg[-which(x$GenesPlusPromoters.neg$Description %in% x$GenesPlusPromoters.pos$Description),]
+
+toplot = rbind(data.frame(Direction = "Increasingly\nMethylated", 
+                          Description = paste0(x$Promoters.pos$Description,"\n(",x$Promoters.pos$ID,")"),
+                          GeneRatio = x$Promoters.pos$GeneRatio, log10 = -log10(x$Promoters.pos$p.adjust), GO = "KEGG Pathway"),
+               data.frame(Direction = "Decreasingly\nMethylated", 
+                          Description = paste0(goListdf_MF.dir$Genes.neg$Description,"\n(",goListdf_MF.dir$Genes.neg$ID,")"),
+                          GeneRatio = goListdf_MF.dir$Genes.neg$GeneRatio, log10 = -log10(goListdf_MF.dir$Genes.neg$p.adjust),
+                          GO = "Molecular Function\nGene Ontology"))
+toplot$Description = gsub(" - multiple species", "", toplot$Description)
+toplot$Description = gsub("MAP-kinase scaffold activity", "MAP-kinase\nscaffold activity", toplot$Description)
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/Age/figures/DMR_byAge_Kegg_MF_topOnes.pdf", width=12,height=6)
+ggplot(toplot, aes(x=Description, y =log10)) + scale_fill_brewer(palette = "Set1") + 
+  geom_bar(stat = 'identity', aes(fill = Direction), position = 'dodge', col = 'transparent') +
+  geom_text(aes(label=GeneRatio), vjust = 1.5, color="black", size=5) +
+  theme_classic() + facet_grid(. ~ GO, scales = "free") +
+  ylab("-log10(FDR)") + 
+  xlab("") +
+  ggtitle("Developmental DMRs (Both Cell Types)") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+dev.off()
+
+#c("22883","23162","9479","8642","57216")
+#"CLSTN1"   "VANGL2"   "DCHS1"    "MAPK8IP1" "MAPK8IP3"
+
+
 ## Width of DMRs
 
-agegr = makeGRangesFromDataFrame(DMR$Age, keep.extra.columns = T)
-mean(width(agegr)) # 1465.505
-median(width(agegr)) # 1017
-sd(width(agegr)) # 1762.197
+agegr = reduce(makeGRangesFromDataFrame(DMR$Age[which(DMR$Age$sig=="FWER < 0.05"),], keep.extra.columns = T))
+mean(width(agegr)) # 3158.295
+median(width(agegr)) # 1974
+sd(width(agegr)) # 3587.513
 min(width(agegr)) # 1
-max(width(agegr)) # 23094
+max(width(agegr)) # 20339
 
 geneMapgr = makeGRangesFromDataFrame(geneMap)
 geneMapgr$geneID = names(geneMapgr)
@@ -290,7 +340,7 @@ min(width(geneMapgr)) # 8
 tiles = tile(geneMapgr[width(geneMapgr)>=20], n = 20)
 names(tiles) = names(geneMapgr[width(geneMapgr)>=20])
 
-regions = agegr[agegr$distToGene==0 & agegr$sig=="FWER < 0.05"]
+regions = makeGRangesFromDataFrame(DMR$Age[which(DMR$Age$sig=="FWER < 0.05" & DMR$Age$distToGene==0),], keep.extra.columns = T)
 
 tiles = tiles[names(tiles) %in% regions$nearestID]
 tiles = as.list(tiles)
@@ -310,10 +360,10 @@ overlaps = rbind(do.call(rbind, Map(cbind, overlaps1, geneID = as.list(names(til
                  do.call(rbind, Map(cbind, overlaps2, geneID = as.list(names(tiles)), Direction = "Decreasingly\nMethylated")))
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/Age/figures/Age_DMR_position_in_gene.pdf")
-ggplot(overlaps, aes(region, colour = Direction)) + scale_colour_brewer(palette = "Set1") +
-  geom_freqpoly(bins = 20, size=2) + theme_classic() +
+ggplot(overlaps, aes(region, fill = Direction)) + scale_fill_brewer(palette = "Set1") +
+  geom_density(alpha = 1/2) + theme_classic() +
   labs(fill="") +
-  ylab("Count") + xlab("") +
+  ylab("Density") + xlab("") +
   ggtitle("Age DMR Position in Gene") +
   theme(title = element_text(size = 20)) +
   theme_classic() +
