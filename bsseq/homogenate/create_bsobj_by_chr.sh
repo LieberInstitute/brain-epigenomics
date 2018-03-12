@@ -6,7 +6,8 @@
 mkdir -p logs
 
 #for chrnum in {1..22} X Y M
-for chrnum in {1..7}
+#for chrnum in {1..7}
+for chrnum in X
 do 
 
 chr="chr${chrnum}"
