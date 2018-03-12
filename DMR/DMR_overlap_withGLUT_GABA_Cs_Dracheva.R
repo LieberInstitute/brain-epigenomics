@@ -143,7 +143,7 @@ df = data.frame(group = rep.int(rownames(x),3), count = c(unlist(lapply(ooCT, fu
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/figures/DMR_Kozlenkov_Dracheva_NucAcidsRes_2016_GABA-GLU_dmC_Overlap.pdf",width=10,height=12)
 ggplot(df[df$dir=="Both",], aes(x = model, y = percent)) + geom_bar(stat = "identity") +
   geom_text(aes( label = count), vjust = -.5) +
-  facet_grid(. ~ list) +
+  facet_grid(. ~ list) + theme_classic() +
   labs(fill="") +
   ylab("Percent") + ylim(0,100) +
   xlab("") +
@@ -153,7 +153,7 @@ ggplot(df[df$dir=="Both",], aes(x = model, y = percent)) + geom_bar(stat = "iden
   theme(text = element_text(size = 20))
 ggplot(df[df$dir!="Both",], aes(x = dir, y = percent)) + geom_bar(stat = "identity") +
   geom_text(aes( label = count), vjust = -.5) +
-  facet_grid(list ~ model, scales = "free") +
+  facet_grid(list ~ model, scales = "free") + theme_classic() +
   labs(fill="") +
   ylab("Percent") + ylim(0,100) +
   xlab("") +
