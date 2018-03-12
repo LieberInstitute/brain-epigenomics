@@ -7,7 +7,8 @@ mkdir -p logs
 
 #for chrnum in {1..22} X Y M
 #for chrnum in {1..7}
-for chrnum in X
+#for chrnum in X
+for chrnum in 1
 do 
 
 chr="chr${chrnum}"
@@ -18,7 +19,7 @@ echo "Creating script for chromosome ${chr}"
 cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l bluejay,mem_free=60G,h_vmem=60G,h_fsize=200G
+#$ -l bluejay,mem_free=75G,h_vmem=75G,h_fsize=200G
 #$ -N ${SHORT}
 #$ -pe local 4
 #$ -o ./logs/${SHORT}.txt
