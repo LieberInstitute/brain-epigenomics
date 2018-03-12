@@ -193,7 +193,7 @@ for (i in 1:length(venn)) {
     names(venn[[i]][[j]]) = c(paste0(comps[[i]][1]," (+Beta)"),paste0(comps[[i]][1]," (-Beta)"),
                               paste0(comps[[i]][2]," (+Beta)"),paste0(comps[[i]][2]," (-Beta)"))
     venn.diagram(venn[[i]][[j]], paste0("/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich/figures/",
-                                        names(comps)[i],"_",names(venn[[i]])[j], "_UMR_LMR_TFoverlap.jpeg"), 
+                                        names(comps)[i],"_",names(venn[[i]])[j], "Beta_dir_TFoverlap.jpeg"), 
              main=paste0("TF Overlap: ",names(comps)[i], ": ", names(venn[[i]])[j]),
              col = "transparent",
              fill = c("lightpink2","cornflowerblue", "olivedrab2", "khaki1"),
@@ -255,8 +255,8 @@ dev.off()
 venn = list()
 comps = list(All_vs_Neurons = c("AllLMR","AllUMR","NeuronsLMR","NeuronsUMR"), 
              All_vs_Glia = c("AllLMR","AllUMR","GliaLMR","GliaUMR"), 
-             All_vs_Postnatal = c("AllLMR","AllUMR","PostnatalLMR","PostnatalUMR"),
-             All_vs_Postnatal = c("AllLMR","AllUMR","PrenatalLMR","PrenatalUMR"), 
+             All_vs_Postnatal = c("AllLMR","AllUMR","PostnatalLMR","PostnatalUMR"), ## missing this (accidentally overwrote)
+             All_vs_Prenatal = c("AllLMR","AllUMR","PrenatalLMR","PrenatalUMR"), 
              All_groups = c("All","Neurons","Glia","Postnatal","Prenatal"),
              All_groups_UMR = c("AllUMR","NeuronsUMR","GliaUMR","PostnatalUMR","PrenatalUMR"), 
              All_groups_LMR = c("AllLMR","NeuronsLMR","GliaLMR","PostnatalLMR","PrenatalLMR"))
