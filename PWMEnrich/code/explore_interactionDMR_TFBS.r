@@ -85,6 +85,7 @@ km = kmeans(t(zMat), 5)
 
 ## Cluster Interaction DMRs by TF enrichment to see how the groups materialize
 
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/rda/limma_Neuron_CpGs_minCov_3_ageInfo_dmrs.Rdata")
 
 int = list()
 for (i in 1:length(all_int$sequences)) {
