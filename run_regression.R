@@ -90,6 +90,19 @@ plot(dm_type_cell ~ dm_age_hom,data=statsSig,
 abline(h=0,v=0,lty=3)
 dev.off()
 
+fisher.test(data.frame(c(nrow(statsSig[which(statsSig$dm_type_cell>0 & statsSig$dm_age_hom<0 & statsSig$pval_age_hom < 1e-4),]),
+                         nrow(statsSig[which(statsSig$dm_type_cell<0 & statsSig$dm_age_hom<0 & statsSig$pval_age_hom < 1e-4),])),
+                       c(nrow(statsSig[which(statsSig$dm_type_cell>0 & statsSig$dm_age_hom>0 & statsSig$pval_age_hom < 1e-4),]),
+                         nrow(statsSig[which(statsSig$dm_type_cell<0 & statsSig$dm_age_hom>0 & statsSig$pval_age_hom < 1e-4),]))))
+#p-value < 2.2e-16
+#alternative hypothesis: true odds ratio is not equal to 1
+#95 percent confidence interval:
+#  7.005771 8.074886
+#sample estimates:
+#  odds ratio 
+#7.518533 
+
+
 # combined
 pdf("plots/dm_totalAge_vs_homAge.pdf")
 par(mar=c(5,6,2,2),cex.axis=2,cex.lab=2)
@@ -101,6 +114,29 @@ plot(b ~ dm_age_hom,data=statsSig,
 abline(h=0,v=0,lty=3)
 dev.off()
 
+fisher.test(data.frame(c(nrow(statsSig[which((statsSig$dm_age_cell+statsSig$dm_int_cell)>0 & statsSig$dm_age_hom<0 & statsSig$pval_age_hom < 1e-4),]),
+                         nrow(statsSig[which((statsSig$dm_age_cell+statsSig$dm_int_cell)<0 & statsSig$dm_age_hom<0 & statsSig$pval_age_hom < 1e-4),])),
+                       c(nrow(statsSig[which((statsSig$dm_age_cell+statsSig$dm_int_cell)>0 & statsSig$dm_age_hom>0 & statsSig$pval_age_hom < 1e-4),]),
+                         nrow(statsSig[which((statsSig$dm_age_cell+statsSig$dm_int_cell)<0 & statsSig$dm_age_hom>0 & statsSig$pval_age_hom < 1e-4),]))))
+#p-value < 2.2e-16
+#alternative hypothesis: true odds ratio is not equal to 1
+#95 percent confidence interval:
+#  0.04760138 0.05518475
+#sample estimates:
+#  odds ratio 
+#0.05126661 
+
+cor.test(x = (statsSig[which(statsSig$pval_age_hom < 1e-4),"dm_age_cell"]+statsSig[which(statsSig$pval_age_hom < 1e-4),"dm_int_cell"]),
+         y = statsSig[which(statsSig$pval_age_hom < 1e-4),"dm_age_hom"])
+#t = 140.95, df = 22592, p-value < 2.2e-16
+#alternative hypothesis: true correlation is not equal to 0
+#95 percent confidence interval:
+#  0.6770269 0.6909047
+#sample estimates:
+#  cor 
+#0.6840277 
+
+
 ## separate
 pdf("plots/dm_separateAge_vs_homAge.pdf")
 par(mar=c(5,6,2,2),cex.axis=2,cex.lab=2)
@@ -110,6 +146,30 @@ plot(dm_age_cell ~ dm_age_hom,data=statsSig,
 	xlab = "Age (Homogenate)",ylab="Overall Age (Cell)")
 abline(h=0,v=0,lty=3)
 
+fisher.test(data.frame(c(nrow(statsSig[which((statsSig$dm_age_cell)>0 & statsSig$dm_age_hom<0 & statsSig$pval_age_hom < 1e-4),]),
+                         nrow(statsSig[which((statsSig$dm_age_cell)<0 & statsSig$dm_age_hom<0 & statsSig$pval_age_hom < 1e-4),])),
+                       c(nrow(statsSig[which((statsSig$dm_age_cell)>0 & statsSig$dm_age_hom>0 & statsSig$pval_age_hom < 1e-4),]),
+                         nrow(statsSig[which((statsSig$dm_age_cell)<0 & statsSig$dm_age_hom>0 & statsSig$pval_age_hom < 1e-4),]))))
+#p-value < 2.2e-16
+#alternative hypothesis: true odds ratio is not equal to 1
+#95 percent confidence interval:
+#  0.01691573 0.02054119
+#sample estimates:
+#  odds ratio 
+#0.01865829 
+
+cor.test(x = statsSig[which(statsSig$pval_age_hom < 1e-4),"dm_age_cell"],
+         y = statsSig[which(statsSig$pval_age_hom < 1e-4),"dm_age_hom"])
+#t = 193.73, df = 22592, p-value < 2.2e-16
+#alternative hypothesis: true correlation is not equal to 0
+#95 percent confidence interval:
+#  0.7851328 0.7949333
+#sample estimates:
+#  cor 
+#0.7900835 
+
+
+
 # interaction
 plot(dm_int_cell ~ dm_age_hom,data=statsSig,
 	subset = pval_age_hom < 1e-4,pch=21,bg="grey",
@@ -117,6 +177,29 @@ plot(dm_int_cell ~ dm_age_hom,data=statsSig,
 	xlab = "Age (Homogenate)",ylab="Specific Age (Cell)")
 abline(h=0,v=0,lty=3)
 dev.off()
+
+fisher.test(data.frame(c(nrow(statsSig[which(statsSig$dm_int_cell>0 & statsSig$dm_age_hom<0 & statsSig$pval_age_hom < 1e-4),]),
+                         nrow(statsSig[which(statsSig$dm_int_cell<0 & statsSig$dm_age_hom<0 & statsSig$pval_age_hom < 1e-4),])),
+                       c(nrow(statsSig[which(statsSig$dm_int_cell>0 & statsSig$dm_age_hom>0 & statsSig$pval_age_hom < 1e-4),]),
+                         nrow(statsSig[which(statsSig$dm_int_cell<0 & statsSig$dm_age_hom>0 & statsSig$pval_age_hom < 1e-4),]))))
+#p-value < 2.2e-16
+#alternative hypothesis: true odds ratio is not equal to 1
+#95 percent confidence interval:
+#  2.215964 2.517668
+#sample estimates:
+#  odds ratio 
+#2.361638 
+
+cor.test(x = statsSig[which(statsSig$pval_age_hom < 1e-4),"dm_int_cell"],
+         y = statsSig[which(statsSig$pval_age_hom < 1e-4),"dm_age_hom"])
+#t = -41.302, df = 22592, p-value < 2.2e-16
+#alternative hypothesis: true correlation is not equal to 0
+#95 percent confidence interval:
+#  -0.2770483 -0.2528002
+#sample estimates:
+#  cor 
+#-0.2649661 
+
 
 ### just neuronal
 neunIndex = which(pd$Cell.Type == "Neuron")

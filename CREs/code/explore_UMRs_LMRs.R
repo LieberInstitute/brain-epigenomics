@@ -362,9 +362,9 @@ round((unlist(lapply(uall, function(x) (sum(width(x))/sum(as.numeric(sLengths)))
 # 0.07         0.08         0.09         0.10         0.11 
 # 7-11% of total bases in UMR state shared by all or most
 
-ushared = mapply(function(all,ind) lapply( ind, function(x) round(all / x *100,2)), unlist(lapply(uall, function(x) (sum(width(x))/sum(as.numeric(sLengths))*100))), 
+ushared = mapply(function(all,ind) lapply( ind, function(x) round(all / x *100,2)), unlist(lapply(uall, function(x) (sum(width(reduce(x)))/sum(as.numeric(sLengths))*100))), 
                   lapply(list(c(umrs$postnatal, umrs$prenatal), umrs$prenatal, umrs$postnatal, umrs$postnatal[which(names(umrs$postnatal) %in% pd[pd$Cell.Type=="Neuron","Data.ID"])],
-                   umrs$postnatal[which(names(umrs$postnatal) %in% pd[pd$Cell.Type=="Glia","Data.ID"])]), function(y) lapply(y, function(x) sum(width(x))/sum(as.numeric(sLengths))*100)))
+                   umrs$postnatal[which(names(umrs$postnatal) %in% pd[pd$Cell.Type=="Glia","Data.ID"])]), function(y) lapply(y, function(x) sum(width(reduce(x)))/sum(as.numeric(sLengths))*100)))
 ushared = data.frame(perc = unlist(ushared))
 ushared$Group = gsub("\\..*","", rownames(ushared))
 
@@ -383,9 +383,9 @@ round((unlist(lapply(lall, function(x) (sum(width(x))/sum(as.numeric(sLengths)))
 # 0.00         0.00         0.01         0.02         0.05  
 # Very little of total bases in LMR state shared by all or most
 
-lshared = mapply(function(all,ind) lapply( ind, function(x) round(all / x *100,2)), unlist(lapply(uall, function(x) (sum(width(x))/sum(as.numeric(sLengths))*100))), 
+lshared = mapply(function(all,ind) lapply( ind, function(x) round(all / x *100,2)), unlist(lapply(lall, function(x) (sum(width(reduce(x)))/sum(as.numeric(sLengths))*100))), 
                  lapply(list(c(lmrs$postnatal, lmrs$prenatal), lmrs$prenatal, lmrs$postnatal, lmrs$postnatal[which(names(lmrs$postnatal) %in% pd[pd$Cell.Type=="Neuron","Data.ID"])],
-                             lmrs$postnatal[which(names(lmrs$postnatal) %in% pd[pd$Cell.Type=="Glia","Data.ID"])]), function(y) lapply(y, function(x) sum(width(x))/sum(as.numeric(sLengths))*100)))
+                             lmrs$postnatal[which(names(lmrs$postnatal) %in% pd[pd$Cell.Type=="Glia","Data.ID"])]), function(y) lapply(y, function(x) sum(width(reduce(x)))/sum(as.numeric(sLengths))*100)))
 lshared = data.frame(perc = unlist(lshared))
 lshared$Group = gsub("\\..*","", rownames(lshared))
 
@@ -393,12 +393,12 @@ pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/percent_shared_UMRs
 ggplot(ushared, aes(x = Group, y = perc)) + geom_boxplot() +
   labs(fill="") + theme_classic() +
   ylim(0,100) +
-  ylab("Count") + xlab("") +
+  ylab("Percent") + xlab("") +
   ggtitle("Percent Bases Shared Per Sample: UMR") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 ggplot(lshared, aes(x = Group, y = perc)) + geom_boxplot() +
-  labs(fill="") + ylab("Count") + xlab("") +
+  labs(fill="") + ylab("Percent") + xlab("") +
   ylim(0,100) + theme_classic() +
   ggtitle("Percent Bases Shared Per Sample: LMR") +
   theme(title = element_text(size = 20)) +

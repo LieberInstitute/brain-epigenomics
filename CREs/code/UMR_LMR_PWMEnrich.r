@@ -79,7 +79,7 @@ save(LMR_UMR_pwmenrich, geneMap,pd, file="/dcl01/lieber/ajaffe/lab/brain-epigeno
 
 ulTFdiff = mapply(function(u,l) motifDiffEnrichment(sequences1 = seq[[l]], sequences2 = seq[[u]], res1 = LMR_UMR_pwmenrich[[l]], 
                                                     res2 = LMR_UMR_pwmenrich[[u]], PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE), c(1:5),c(6:10), SIMPLIFY = F)
-names(ulTFdiff) = names(all)
+names(ulTFdiff) = c("All","Prenatal","Postnatal","Neurons","Glia")
 
 ulTFdiff = c(ulTFdiff, 
            list(pre.post.UMR = motifDiffEnrichment(sequences1 = seq$PrenatalUMR, sequences2 = seq$PostnatalUMR,
@@ -97,7 +97,25 @@ ulTFdiff = c(ulTFdiff,
                 pre.glia.LMR = motifDiffEnrichment(sequences1 = seq$PrenatalLMR, sequences2 = seq$GliaLMR,
                                                    res1 = LMR_UMR_pwmenrich$PrenatalLMR, res2 = LMR_UMR_pwmenrich$GliaLMR, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
                 neuron.glia.LMR = motifDiffEnrichment(sequences1 = seq$NeuronsLMR, sequences2 = seq$GliaLMR,
-                                                      res1 = LMR_UMR_pwmenrich$NeuronsLMR, res2 = LMR_UMR_pwmenrich$GliaLMR, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE)))
+                                                      res1 = LMR_UMR_pwmenrich$NeuronsLMR, res2 = LMR_UMR_pwmenrich$GliaLMR, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                all.pre.UMR = motifDiffEnrichment(sequences1 = seq$AllUMR, sequences2 = seq$PrenatalUMR,
+                                               res1 = LMR_UMR_pwmenrich$AllUMR, res2 = LMR_UMR_pwmenrich$PrenatalUMR, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                all.post.UMR = motifDiffEnrichment(sequences1 = seq$AllUMR, sequences2 = seq$PostnatalUMR,
+                                                   res1 = LMR_UMR_pwmenrich$AllUMR, res2 = LMR_UMR_pwmenrich$PostnatalUMR, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                all.neuron.UMR = motifDiffEnrichment(sequences1 = seq$AllUMR, sequences2 = seq$NeuronsUMR,
+                                                     res1 = LMR_UMR_pwmenrich$AllUMR, res2 = LMR_UMR_pwmenrich$NeuronsUMR, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                all.glia.UMR = motifDiffEnrichment(sequences1 = seq$AllUMR, sequences2 = seq$GliaUMR,
+                                                   res1 = LMR_UMR_pwmenrich$AllUMR, res2 = LMR_UMR_pwmenrich$GliaUMR, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                all.pre.LMR = motifDiffEnrichment(sequences1 = seq$AllLMR, sequences2 = seq$PrenatalLMR,
+                                                  res1 = LMR_UMR_pwmenrich$AllLMR, res2 = LMR_UMR_pwmenrich$PrenatalLMR, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                all.post.LMR = motifDiffEnrichment(sequences1 = seq$AllLMR, sequences2 = seq$PostnatalLMR,
+                                                   res1 = LMR_UMR_pwmenrich$AllLMR, res2 = LMR_UMR_pwmenrich$PostnatalLMR, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                all.neuron.LMR = motifDiffEnrichment(sequences1 = seq$AllLMR, sequences2 = seq$NeuronsLMR,
+                                                     res1 = LMR_UMR_pwmenrich$AllLMR, res2 = LMR_UMR_pwmenrich$NeuronsLMR, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE),
+                all.glia.LMR = motifDiffEnrichment(sequences1 = seq$AllLMR, sequences2 = seq$GliaLMR,
+                                                   res1 = LMR_UMR_pwmenrich$AllLMR, res2 = LMR_UMR_pwmenrich$GliaLMR, PWMLogn.hg19.MotifDb.Hsap, verbose=FALSE)))
+                
+            
 
 save(ulTFdiff, LMR_UMR_pwmenrich, geneMap,pd, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/UMR_LMR_PWMEnrich_object.rda")
 
