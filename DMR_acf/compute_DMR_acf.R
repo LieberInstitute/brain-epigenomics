@@ -25,9 +25,10 @@ if (!is.null(opt$help)) {
 ## For testing
 if(FALSE) {
     opt <- list(cores = 1, context = 'CHG', model = 'age')
+    opt <- list(cores = 1, context = 'all', model = 'age')
 }
 
-stopifnot(opt$context %in% c('nonCG', 'CG', 'CHG', 'CHH'))
+stopifnot(opt$context %in% c('nonCG', 'CG', 'CHG', 'CHH', 'all'))
 stopifnot(opt$model %in% c('age', 'cell', 'interaction'))
 
 ## Load the subset BSobj
@@ -47,7 +48,25 @@ load_DMR <- function(model) {
     print(nrow(DMR))
     return(DMR)
 }
-DMR <- load_DMR(opt$model)
+if(opt$context != 'all') {
+    DMR <- load_DMR(opt$model)
+} else {
+    opt$context <- 'CG'
+    cg <- load_DMR(opt$model)
+    rowRanges(cg)$trinucleotide_context <- Rle(NA)
+    opt$context <- 'nonCG'
+    ncg <- load_DMR(opt$model)
+    colData(cg)$reportFiles <- colData(ncg)$reportFiles
+    DMR <- BSseq(
+        M = rbind(assays(cg)$M, assays(ncg)$M),
+        Cov = rbind(assays(cg)$Cov, assays(ncg)$Cov),
+        gr = c(rowRanges(cg), rowRanges(ncg)),
+        pData = colData(ncg),
+        chr = seqlevels(rowRanges(cg))
+    )
+    opt$context <- 'all'
+}
+
 
 
 
