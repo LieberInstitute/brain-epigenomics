@@ -81,7 +81,7 @@ colSums(statsSig[,grep("qval", colnames(statsSig))] < 0.05)
 load("rdas/signif_stats_1e4.rda")
 
 # cell type?
-pdf("plots/dm_cellType_vs_homAge.pdf")
+pdf("plots/dm_cellType_vs_homAge.pdf") # pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/single_CpGs/figures/dm_cellType_vs_homAge.pdf")
 par(mar=c(5,6,2,2),cex.axis=2,cex.lab=2)
 plot(dm_type_cell ~ dm_age_hom,data=statsSig,
 	subset = pval_age_hom < 1e-4,pch=21,bg="grey",
@@ -104,7 +104,7 @@ fisher.test(data.frame(c(nrow(statsSig[which(statsSig$dm_type_cell>0 & statsSig$
 
 
 # combined
-pdf("plots/dm_totalAge_vs_homAge.pdf")
+pdf("plots/dm_totalAge_vs_homAge.pdf") # pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/single_CpGs/figures/dm_totalAge_vs_homAge.pdf")
 par(mar=c(5,6,2,2),cex.axis=2,cex.lab=2)
 b =(statsSig$dm_age_cell + statsSig$dm_int_cell)
 plot(b ~ dm_age_hom,data=statsSig,
