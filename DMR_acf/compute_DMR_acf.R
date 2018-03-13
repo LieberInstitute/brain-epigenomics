@@ -65,6 +65,19 @@ if(opt$context != 'all') {
         chr = seqlevels(rowRanges(cg))
     )
     opt$context <- 'all'
+    
+    ## Andd context info to GR
+    gr <- c(rowRanges(cg), rowRanges(ncg))
+    ov <- findOverlaps(DMR, gr, type = 'equal')
+    
+    rowRanges(DMR)$c_context <- gr$c_context[subjectHits(ov)]
+    rowRanges(DMR)$trinucleotide_context <- gr$trinucleotide_context[subjectHits(ov)]
+    
+    
+    
+    print('Final number of bases of interest -- after merging')
+    print(nrow(DMR))
+    rm(cg, ncg, gr, ov)
 }
 
 
@@ -109,7 +122,7 @@ neurons <- colData(DMR)$Cell.Type == 'Neuron'
 
 auto <- bplapply(meth_list, function(x) {
     ## Drop first row because it's always 1
-    auto_res <- apply(x, 2, function(y) { acf(y, plot = FALSE, lag.max = 4)$acf })[-1, ]
+    auto_res <- apply(as.matrix(x), 2, function(y) { acf(y, plot = FALSE, lag.max = 4)$acf })[-1, ]
     c('neuron' = rowMeans(auto_res[, neurons], na.rm = TRUE),
         'glia' = rowMeans(auto_res[, !neurons], na.rm = TRUE))
 }, BPPARAM = bpparam)
