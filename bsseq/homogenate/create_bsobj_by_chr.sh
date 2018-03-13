@@ -19,7 +19,7 @@ echo "Creating script for chromosome ${chr}"
 cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l bluejay,mem_free=75G,h_vmem=75G,h_fsize=200G
+#$ -l bluejay,mem_free=70G,h_vmem=70G,h_fsize=200G
 #$ -N ${SHORT}
 #$ -pe local 4
 #$ -o ./logs/${SHORT}.txt
