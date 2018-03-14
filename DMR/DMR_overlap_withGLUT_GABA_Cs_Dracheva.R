@@ -124,11 +124,11 @@ write.csv(t(df),file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_Ko
 
 ## Count the number of DMRs that contain sites differentially methylated by neuronal subtype
 
-ooCT = lapply(gabglu, function(x) findOverlaps(makeGRangesFromDataFrame(DMR$CellType[which(DMR$CellType$fwer<=0.05),]),x))
-ooAge = lapply(gabglu, function(x) findOverlaps(makeGRangesFromDataFrame(DMR$Age[which(DMR$Age$fwer<=0.05),]),x))
-ooInt = lapply(gabglu, function(x) findOverlaps(makeGRangesFromDataFrame(DMR$Interaction[which(DMR$Interaction$fwer<=0.05),]),x))
+ooCT = lapply(gabglu, function(x) findOverlaps(reduce(makeGRangesFromDataFrame(DMR$CellType[which(DMR$CellType$fwer<=0.05),])),x))
+ooAge = lapply(gabglu, function(x) findOverlaps(reduce(makeGRangesFromDataFrame(DMR$Age[which(DMR$Age$fwer<=0.05),])),x))
+ooInt = lapply(gabglu, function(x) findOverlaps(reduce(makeGRangesFromDataFrame(DMR$Interaction[which(DMR$Interaction$fwer<=0.05),])),x))
 
-df = data.frame(group = rep.int(rownames(x),3), count = c(unlist(lapply(ooCT, function(x) length(unique(queryHits(x))))),
+df = data.frame(Group = names(ooCT), count = c(unlist(lapply(ooCT, function(x) length(unique(queryHits(x))))),
 											           unlist(lapply(ooAge, function(x) length(unique(queryHits(x))))),
 											           unlist(lapply(ooInt, function(x) length(unique(queryHits(x)))))), 
 			   percent = c(round(unlist(lapply(ooCT, function(x) length(unique(queryHits(x)))))/11179*100,2),

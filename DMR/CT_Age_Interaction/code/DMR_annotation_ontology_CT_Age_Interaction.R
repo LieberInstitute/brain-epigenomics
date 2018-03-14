@@ -141,20 +141,6 @@ ggplot(x, aes(x = annotation, y = V1)) + geom_bar(stat = "identity") +
   ggtitle("DMR annotation: FWER < 0.05") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
-
-x = dtinteraction[,length(unique(regionID)), by = c("annotation", "sig")]
-x$perc = unlist(c(round(x[1:6,"V1"]/sum(x[1:6,"V1"])*100,2),
-                  round(x[7:12,"V1"]/sum(x[7:12,"V1"])*100,2)))
-ggplot(x, aes(x = annotation, y = V1)) + geom_bar(stat = "identity") +
-  geom_text(aes( label = paste0(perc,"%")), vjust = -.5) +
-  facet_grid(. ~ sig) + theme_classic() +
-  labs(fill="") +
-  ylab("Count") + 
-  theme(axis.text.x=element_text(angle=45,hjust=1)) +
-  xlab("") +
-  ggtitle("DMR annotation") +
-  theme(title = element_text(size = 20)) +
-  theme(text = element_text(size = 20))
 dev.off()
 
 # Is there a relationship between being significantly DM and overlapping a gene?
@@ -173,18 +159,18 @@ fisher.test(data.frame(Yesgenes = c(nrow(df.clusters[df.clusters$genes=="gene" &
 
 # Is there a relationship between being significantly DM and overlapping a promoter?
 
-fisher.test(data.frame(Yesrepeats = c(nrow(df.clusters[df.clusters$repeats=="repeat" & df.clusters$Interaction=="Interaction",]),
-                                      nrow(df.clusters[df.clusters$repeats=="repeat" & df.clusters$Interaction=="no",])),
-                       Norepeats = c(nrow(df.clusters[df.clusters$repeats=="no" & df.clusters$Interaction=="Interaction",]),
-                                     nrow(df.clusters[df.clusters$repeats=="no" & df.clusters$Interaction=="no",])), row.names = c("YesInteraction","NoInteraction")))
-# promoters by themselves aren't overrepresented in DMRs
+fisher.test(data.frame(Yesrepeats = c(nrow(df.clusters[df.clusters$promoters=="promoter" & df.clusters$Interaction=="Interaction",]),
+                                      nrow(df.clusters[df.clusters$promoters=="promoter" & df.clusters$Interaction=="no",])),
+                       Norepeats = c(nrow(df.clusters[df.clusters$promoters=="no" & df.clusters$Interaction=="Interaction",]),
+                                     nrow(df.clusters[df.clusters$promoters=="no" & df.clusters$Interaction=="no",])), row.names = c("YesInteraction","NoInteraction")))
 #p-value < 2.2e-16
 #alternative hypothesis: true odds ratio is not equal to 1
 #95 percent confidence interval:
-#  3.249362 5.790269
+#  19.1240 23.7653
 #sample estimates:
 #  odds ratio 
-#4.292918 
+#21.30865 
+
 
 
 ### Gene Ontology
