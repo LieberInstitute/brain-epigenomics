@@ -425,16 +425,23 @@ m_summary <- do.call(rbind, lapply(1:length(mres), function(i) {
     message(paste(Sys.time(), 'processing', names(mres)[i]))
     gdata <- split(mres[[i]]$eqtls, mres[[i]]$eqtls$gene)
     gdata <- gdata[elementNROWS(gdata) > 0]
-    typeres <- do.call(rbind, lapply(gdata, function(g) {
-        if(nrow(g) == 1) {
-            g$n_meqtls <- 1
-            return(g)
-        }
+    
+    erow <- elementNROWS(gdata)
+    print(table(erow > 1))
+    message(paste(Sys.time(), 'creating typeres1'))
+    typeres1 <- do.call(rbind, gdata[erow == 1])
+    typeres1$n_meqtls <- 1
+    
+    message(paste(Sys.time(), 'creating typeres2'))
+    typeres2 <- do.call(rbind, lapply(gdata[erow > 1], function(g) {
         best <- which.min(g$FDR)
         res <- g[best, , drop = FALSE]
         res$n_meqtls <- nrow(g)
         return(res)
     }))
+        
+    message(paste(Sys.time(), 'creating typeres'))
+    typeres <- rbind(typeres1, typeres2)
     typeres$type <- names(mres)[i]
     return(typeres)
 }))
