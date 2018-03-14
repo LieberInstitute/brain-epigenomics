@@ -17,7 +17,7 @@ echo "Creating scriptfeature type ${type} side"
 cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l bluejay,mem_free=210G,h_vmem=210G,h_fsize=200G
+#$ -l mem_free=250G,h_vmem=250G,h_fsize=200G
 #$ -N ${SHORT}
 #$ -o ./logs/${SHORT}.txt
 #$ -e ./logs/${SHORT}.txt
