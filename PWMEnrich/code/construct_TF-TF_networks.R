@@ -17,20 +17,101 @@ names(assays(rse_gene))
 
 ## construct matrix of TF-TF regulatory networks for each sample
 
-pmat = vector("list",length(TSS_TFs_bysample))
-for (i in 1:length(TSS_TFs_bysample)) {
-  pmat[[i]] = list(vector("list", length(TSS_TFs_bysample[[i]]$sequences)))
+### WILL NEED TO CHANGE targettogeneID to prepostTargettoGeneID
+
+group = groupReport(TSS_TFs_bysample[[1]])
+group = as.data.frame(group)[order(group$id),]
+group = group[which(group$target %in% names(targettogeneID)),]
+
+pmat1.10 = pmat11.20 = pmat21.30 =pmat31.40 = pmat41.52 = list()
+# 1-10
+for (i in 1:10) {
+  pmat1.10[[i]] = list(vector("list", length(TSS_TFs_bysample[[i]]$sequences)))
   for (j in 1:length(TSS_TFs_bysample[[i]]$sequences)) {
-    pmat[[i]][[j]] = sequenceReport(TSS_TFs_bysample[[i]], seq.id=j)
+    pmat1.10[[i]][[j]] = sequenceReport(TSS_TFs_bysample[[i]], seq.id=j)
   }
 }
-pmat = lapply(pmat, function(x) lapply(x, function(y) as.data.frame(y)[order(y$id),]))
-pmat = lapply(pmat, function(t) lapply(t, function(x) x[which(x$target %in% names(targettogeneID)),]))
+pmat1.10 = pmat1.10[which(elementNROWS(pmat1.10)>0)]
+names(pmat1.10) = names(TSS_TFs_bysample)[1:10]
+pmat1.10 = lapply(pmat1.10, function(x) lapply(x, function(y) as.data.frame(y)[order(y$id),]))
+pmat1.10 = lapply(pmat1.10, function(y) do.call(cbind, lapply(y, function(z) p.adjust(z$p.value, method = "fdr"))))
+for (i in 1:length(pmat1.10)) { rownames(pmat1.10[[i]]) = group$target }
+pmat1.10 = lapply(pmat1.10, function(x) x[which(rownames(x) %in% names(targettogeneID)),])
+cols = list()
+for (i in 1:10) { cols[[i]] = names(TSS_TFs_bysample[[i]]$sequences) }
+cols = cols[which(elementNROWS(cols)>0)]
+for (i in 1:length(pmat1.10)) { colnames(pmat1.10[[i]]) = cols[[i]] }
+save(pmat1.10, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/pmat1.10.rda")
 
-pvalMat = lapply(pmat, function(y) lapply(y, do.call(cbind, lapply(y, p.adjust(y$p.value, method = "fdr")))))
-rownames(pvalMat) = pmat[[1]][[1]]$target
+# 11-20
+for (i in 11:20) {
+  pmat11.20[[i]] = list(vector("list", length(TSS_TFs_bysample[[i]]$sequences)))
+  for (j in 1:length(TSS_TFs_bysample[[i]]$sequences)) {
+    pmat11.20[[i]][[j]] = sequenceReport(TSS_TFs_bysample[[i]], seq.id=j)
+  }
+}
+names(pmat11.20) = names(TSS_TFs_bysample)[11:20]
+pmat11.20 = lapply(pmat11.20, function(x) lapply(x, function(y) as.data.frame(y)[order(y$id),]))
+pmat11.20 = lapply(pmat11.20, function(y) do.call(cbind, lapply(y, function(z) p.adjust(z$p.value, method = "fdr"))))
+for (i in 1:length(pmat11.20)) { rownames(pmat11.20[[i]]) = group$target }
+pmat11.20 = lapply(pmat11.20, function(x) x[which(rownames(x) %in% names(targettogeneID)),])
+for (i in 11:20) { cols[[i]] = names(TSS_TFs_bysample[[i]]$sequences) }
+cols = cols[which(elementNROWS(cols)>0)]
+for (i in 1:length(pmat11.20)) { colnames(pmat11.20[[i]]) = cols[[i]] }
+save(pmat11.20, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/pmat11.20.rda")
 
-for (i in 1:length(TSS_TFs_bysample)) { colnames(pvalMat[[i]]) = names(TSS_TFs_bysample[[i]]$sequences) }
+# 21-30
+for (i in 21:30) {
+  pmat21.30[[i]] = list(vector("list", length(TSS_TFs_bysample[[i]]$sequences)))
+  for (j in 1:length(TSS_TFs_bysample[[i]]$sequences)) {
+    pmat21.30[[i]][[j]] = sequenceReport(TSS_TFs_bysample[[i]], seq.id=j)
+  }
+}
+names(pmat21.30) = names(TSS_TFs_bysample)[21:30]
+pmat21.30 = lapply(pmat21.30, function(x) lapply(x, function(y) as.data.frame(y)[order(y$id),]))
+pmat21.30 = lapply(pmat21.30, function(t) lapply(t, function(x) x[which(x$target %in% names(targettogeneID)),]))
+pmat21.30 = lapply(pmat21.30, function(y) do.call(cbind, lapply(y, function(z) p.adjust(z$p.value, method = "fdr"))))
+for (i in 1:length(pmat21.30)) { rownames(pmat21.30[[i]]) = group$target }
+for (i in 21:30) { cols[[i]] = names(TSS_TFs_bysample[[i]]$sequences) }
+cols = cols[which(elementNROWS(cols)>0)]
+for (i in 1:length(pmat21.30)) { colnames(pmat21.30[[i]]) = cols[[i]] }
+save(pmat21.30, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/pmat21.30.rda")
+
+# 31-40
+for (i in 31:40) {
+  pmat31.40[[i]] = list(vector("list", length(TSS_TFs_bysample[[i]]$sequences)))
+  for (j in 1:length(TSS_TFs_bysample[[i]]$sequences)) {
+    pmat31.40[[i]][[j]] = sequenceReport(TSS_TFs_bysample[[i]], seq.id=j)
+  }
+}
+names(pmat31.40) = names(TSS_TFs_bysample)[31:40]
+pmat31.40 = lapply(pmat31.40, function(x) lapply(x, function(y) as.data.frame(y)[order(y$id),]))
+pmat31.40 = lapply(pmat31.40, function(t) lapply(t, function(x) x[which(x$target %in% names(targettogeneID)),]))
+pmat31.40 = lapply(pmat31.40, function(y) do.call(cbind, lapply(y, function(z) p.adjust(z$p.value, method = "fdr"))))
+for (i in 1:length(pmat31.40)) { rownames(pmat31.40[[i]]) = group$target }
+for (i in 31:40) { cols[[i]] = names(TSS_TFs_bysample[[i]]$sequences) }
+cols = cols[which(elementNROWS(cols)>0)]
+for (i in 1:length(pmat31.40)) { colnames(pmat31.40[[i]]) = cols[[i]] }
+save(pmat31.40, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/pmat31.40.rda")
+
+# 41-52
+for (i in 41:52) {
+  pmat41.52[[i]] = list(vector("list", length(TSS_TFs_bysample[[i]]$sequences)))
+  for (j in 1:length(TSS_TFs_bysample[[i]]$sequences)) {
+    pmat41.52[[i]][[j]] = sequenceReport(TSS_TFs_bysample[[i]], seq.id=j)
+  }
+}
+names(pmat41.52) = names(TSS_TFs_bysample)[41:52]
+pmat41.52 = lapply(pmat41.52, function(x) lapply(x, function(y) as.data.frame(y)[order(y$id),]))
+pmat41.52 = lapply(pmat41.52, function(t) lapply(t, function(x) x[which(x$target %in% names(targettogeneID)),]))
+pmat41.52 = lapply(pmat41.52, function(y) do.call(cbind, lapply(y, function(z) p.adjust(z$p.value, method = "fdr"))))
+for (i in 1:length(pmat41.52)) { rownames(pmat41.52[[i]]) = pmat41.52[[1]][[1]]$target }
+for (i in 1:length(pmat41.52)) { colnames(pmat41.52[[i]]) = names(TSS_TFs_bysample[[i]]$sequences) }
+save(pmat41.52, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/pmat41.52.rda")
+
+
+
+
 gr = lapply(TSS_TFs_bysample, function(x) GRanges(names(x$sequences)))
 elementNROWS(gr)
 
