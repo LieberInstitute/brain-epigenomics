@@ -287,7 +287,7 @@ save(mres, file = paste0('rda/meqtl_mres_', opt$feature,
     load(paste0('rda/meqtl_mres_', opt$feature, '_using_near_meth11_proteincoding.Rdata'), verbose = TRUE)
 }
 
-
+if(!file.exists(paste0('rda/meqtl_venn_', opt$feature, '_using_near.Rdata'))) {
 load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/sorted_nuclear_RNA/DE_limma_results_objects.rda', verbose = TRUE)
 
 ## Use the combined results to determine the neuronal genes
@@ -415,15 +415,21 @@ dev.off()
 
 save(vennres, vennres5k, vennres5kglia, top, top5k, top5kglia, v, v5k, v5kglia,
     file = paste0('rda/meqtl_venn_', opt$feature, '_using_near.Rdata'))
+} else {
+    load(paste0('rda/meqtl_venn_', opt$feature, '_using_near.Rdata'), verbose = TRUE)
+}
 
-
+if(!file.exists(paste0('rda/meqtl_summary_', opt$feature, '_using_near.Rdata'))) {
 message(paste(Sys.time(), 'summarizing the meQTL data by', opt$feature))
 m_summary <- do.call(rbind, lapply(1:length(mres), function(i) {
     message(paste(Sys.time(), 'processing', names(mres)[i]))
-    me <- mres[[i]]
-    gdata <- split(me$eqtls, me$eqtls$gene)
+    gdata <- split(mres[[i]]$eqtls, mres[[i]]$eqtls$gene)
     gdata <- gdata[elementNROWS(gdata) > 0]
     typeres <- do.call(rbind, lapply(gdata, function(g) {
+        if(nrow(g) == 1) {
+            g$n_meqtls <- 1
+            return(g)
+        }
         best <- which.min(g$FDR)
         res <- g[best, , drop = FALSE]
         res$n_meqtls <- nrow(g)
@@ -439,6 +445,9 @@ m_summary$snps <- as.character(m_summary$snps)
 message(paste(Sys.time(), 'saving summary of the meQTL data by', opt$feature))
 save(m_summary, file = paste0('rda/meqtl_summary_', opt$feature,
     '_using_near.Rdata'))
+} else {
+    load(paste0('rda/meqtl_summary_', opt$feature, '_using_near.Rdata'), verbose = TRUE)
+}
 
 
 common <- names(table(m_summary$gene)[table(m_summary$gene) == 3])
@@ -515,6 +524,7 @@ dev.off()
 
 
 ## Make some scatter plots of the methylation vs expr
+if(!file.exists(paste0('rda/meqtl_delta_pval_', opt$feature, '_using_near.Rdata'))) {
 delta_pval <- data.frame(delta = find_pval('nonCpG') - find_pval('CpG'), gene = names(find_pval('CpG')), nonCpG = find_pval('nonCpG'), CpG = find_pval('CpG'), stringsAsFactors = FALSE)
 delta_pval$top5k <- delta_pval$gene %in% vinfo5k[['nonCpG']]
 delta_pval$top5kglia <- delta_pval$gene %in% vinfo5kglia[['nonCpG']]
@@ -533,6 +543,9 @@ delta_pval$i_nonCpG <- mapply(function(g, s) {
 
 save(delta_pval, common, file = paste0('rda/meqtl_delta_pval_', opt$feature,
     '_using_near.Rdata'))
+} else {
+    load(paste0('rda/meqtl_delta_pval_', opt$feature, '_using_near.Rdata'), verbose = TRUE)
+}
 head(delta_pval)
 
 ## Check the meth_n data (note that it's already been filtered to >= 4)
@@ -688,6 +701,7 @@ dev.off()
 
 
 
+if(!file.exists(paste0('rda/meqtl_venn_go_', opt$feature, '_using_near.Rdata'))) {
 ## Gene ontology for each of the sets of the main venn diagram
 if(opt$feature == 'psi') {
     expr <- load_expr('gene')
@@ -750,6 +764,9 @@ dev.off()
 
 
 save(go_venn_res, go_cluster_comp, uni, v_symb, file = paste0('rda/meqtl_venn_go_', opt$feature, '_using_near.Rdata'))
+} else {
+    load(paste0('rda/meqtl_venn_go_', opt$feature, '_using_near.Rdata'), verbose = TRUE)
+}
 
 
 
@@ -761,6 +778,7 @@ get_meth <- function(type, i) {
     as.vector(getMeth(mres[[type]]$meth[i, ], type = 'raw'))
 }
 
+if(!file.exists(paste0('rda/meqtl_age_coef_', opt$feature, '_using_near.Rdata'))) {
 age_coef <- lapply(names(mres), function(type) {
     message(paste(Sys.time(), 'processing', type))
     age <- get_age(type)
@@ -773,6 +791,9 @@ age_coef <- lapply(names(mres), function(type) {
 })
 names(age_coef) <- names(mres)
 save(age_coef, file = paste0('rda/meqtl_age_coef_', opt$feature, '_using_near.Rdata'))
+} else {
+    load(paste0('rda/meqtl_age_coef_', opt$feature, '_using_near.Rdata'), verbose = TRUE)
+}
 
 
 beta_common <- do.call(rbind, lapply(seq_len(nrow(delta_pval)), function(i) {
@@ -794,6 +815,7 @@ dev.off()
 
 ## Check if methylation still explains the expression
 ## even after adjusting by age
+if(!file.exists(paste0('rda/meqtl_agemeth_coef_', opt$feature, '_using_near.Rdata'))) {
 agemeth_coef <- lapply(names(mres), function(type) {
     message(paste(Sys.time(), 'processing', type))
     age <- get_age(type)
@@ -807,6 +829,9 @@ agemeth_coef <- lapply(names(mres), function(type) {
 })
 names(agemeth_coef) <- names(mres)
 save(agemeth_coef, file = paste0('rda/meqtl_agemeth_coef_', opt$feature, '_using_near.Rdata'))
+} else {
+    load(paste0('rda/meqtl_agemeth_coef_', opt$feature, '_using_near.Rdata'), verbose = TRUE)
+}
 
 lapply(agemeth_coef, function(x) {
     addmargins(table('FDR < 0.05 after adjusting for age' = x$ageFDR < 0.05, useNA = 'ifany'))
@@ -849,6 +874,7 @@ if(opt$feature == 'gene') {
 }
 load('rda/gene_section.Rdata', verbose = TRUE)
 
+if(!file.exists(paste0('rda/meqtl_c_by_gene_', opt$feature, '_using_near.Rdata'))) {
 c_by_gene <- lapply(names(mres), function(type) {
     message(paste(Sys.time(), 'processing', type))
     gr_c <- rowRanges(mres[[type]]$meth)
@@ -873,9 +899,13 @@ c_by_gene <- lapply(names(mres), function(type) {
 
 })
 names(c_by_gene) <- names(mres)
-save(c_by_gene, file = paste0('rda/meqtl_c_by_gene_', opt$feature, '_using_near.Rdata'))
+save(c_by_gene, file = paste0('rda/meqtl_c_by_gene_', opt$feature, '_using_near.Rdata')) 
+} else {
+    load(paste0('rda/meqtl_c_by_gene_', opt$feature, '_using_near.Rdata'), verbose = TRUE)
+}
 
 ## Extract beta and age coef info for the venn groups
+if(!file.exists(paste0('rda/meqtl_data_by_venn_', opt$feature, '_using_near.Rdata'))) {
 data_by_venn <- do.call(rbind, lapply(c('nonCpG', 'CpGmarg'), function(typeref) {
     message(paste(Sys.time(), 'processing reference', typeref))
     which_v <- grep(typeref, names(attr(vennres, 'intersections')))
@@ -899,6 +929,9 @@ data_by_venn <- do.call(rbind, lapply(c('nonCpG', 'CpGmarg'), function(typeref) 
     return(res_ref)
 }))
 save(data_by_venn, file = paste0('rda/meqtl_data_by_venn_', opt$feature, '_using_near.Rdata'))
+} else {
+    load(paste0('rda/meqtl_data_by_venn_', opt$feature, '_using_near.Rdata'), verbose = TRUE)
+}
 
 
 with(data_by_venn, addmargins(table(noage, promoter_present, useNA = 'ifany')))
@@ -986,8 +1019,12 @@ summarize_venn <- function(dbv) {
     return(d_summ)
 }
 
+if(!file.exists(paste0('rda/meqtl_data_venn_summ_', opt$feature, '_using_near.Rdata'))) {
 data_venn_summ <- summarize_venn(data_by_venn)
 save(data_venn_summ, file = paste0('rda/meqtl_data_venn_summ_', opt$feature, '_using_near.Rdata'))
+} else {
+    load(paste0('rda/meqtl_data_venn_summ_', opt$feature, '_using_near.Rdata'), verbose = TRUE)
+}
 
 ## Explore briefly
 dim(data_venn_summ)
