@@ -25,9 +25,10 @@ if (!is.null(opt$help)) {
 ## For testing
 if(FALSE) {
     opt <- list(cores = 1, context = 'CHG', model = 'age')
+    opt <- list(cores = 1, context = 'all', model = 'age')
 }
 
-stopifnot(opt$context %in% c('nonCG', 'CG', 'CHG', 'CHH'))
+stopifnot(opt$context %in% c('nonCG', 'CG', 'CHG', 'CHH', 'all'))
 stopifnot(opt$model %in% c('age', 'cell', 'interaction'))
 
 ## Load the subset BSobj
@@ -47,7 +48,38 @@ load_DMR <- function(model) {
     print(nrow(DMR))
     return(DMR)
 }
-DMR <- load_DMR(opt$model)
+if(opt$context != 'all') {
+    DMR <- load_DMR(opt$model)
+} else {
+    opt$context <- 'CG'
+    cg <- load_DMR(opt$model)
+    rowRanges(cg)$trinucleotide_context <- Rle(NA)
+    opt$context <- 'nonCG'
+    ncg <- load_DMR(opt$model)
+    colData(cg)$reportFiles <- colData(ncg)$reportFiles
+    DMR <- BSseq(
+        M = rbind(assays(cg)$M, assays(ncg)$M),
+        Cov = rbind(assays(cg)$Cov, assays(ncg)$Cov),
+        gr = c(rowRanges(cg), rowRanges(ncg)),
+        pData = colData(ncg),
+        chr = seqlevels(rowRanges(cg))
+    )
+    opt$context <- 'all'
+    
+    ## Andd context info to GR
+    gr <- c(rowRanges(cg), rowRanges(ncg))
+    ov <- findOverlaps(DMR, gr, type = 'equal')
+    
+    rowRanges(DMR)$c_context <- gr$c_context[subjectHits(ov)]
+    rowRanges(DMR)$trinucleotide_context <- gr$trinucleotide_context[subjectHits(ov)]
+    
+    
+    
+    print('Final number of bases of interest -- after merging')
+    print(nrow(DMR))
+    rm(cg, ncg, gr, ov)
+}
+
 
 
 
@@ -90,7 +122,7 @@ neurons <- colData(DMR)$Cell.Type == 'Neuron'
 
 auto <- bplapply(meth_list, function(x) {
     ## Drop first row because it's always 1
-    auto_res <- apply(x, 2, function(y) { acf(y, plot = FALSE, lag.max = 4)$acf })[-1, ]
+    auto_res <- apply(as.matrix(x), 2, function(y) { acf(y, plot = FALSE, lag.max = 4)$acf })[-1, ]
     c('neuron' = rowMeans(auto_res[, neurons], na.rm = TRUE),
         'glia' = rowMeans(auto_res[, !neurons], na.rm = TRUE))
 }, BPPARAM = bpparam)

@@ -60,39 +60,46 @@ session_info()
 #  ui       X11
 #  language (EN)
 #  collate  en_US.UTF-8
-#  tz       America/New_York
-#  date     2018-01-25
+#  tz       US/Eastern
+#  date     2018-03-13
 #
 # Packages --------------------------------------------------------------------------------------------------------------
-#  package    * version date       source
-#  base       * 3.4.3   2018-01-20 local
-#  colorout   * 1.1-2   2017-08-10 Github (jalvesaq/colorout@020a14d)
-#  colorspace   1.3-2   2016-12-14 CRAN (R 3.4.1)
-#  compiler     3.4.3   2018-01-20 local
-#  datasets   * 3.4.3   2018-01-20 local
-#  devtools   * 1.13.4  2017-11-09 CRAN (R 3.4.2)
-#  digest       0.6.14  2018-01-14 CRAN (R 3.4.2)
-#  ggplot2    * 2.2.1   2016-12-30 CRAN (R 3.4.1)
-#  graphics   * 3.4.3   2018-01-20 local
-#  grDevices  * 3.4.3   2018-01-20 local
-#  grid         3.4.3   2018-01-20 local
-#  gtable       0.2.0   2016-02-26 CRAN (R 3.4.1)
-#  labeling     0.3     2014-08-23 CRAN (R 3.4.1)
-#  lazyeval     0.2.1   2017-10-29 CRAN (R 3.4.2)
-#  magrittr     1.5     2014-11-22 CRAN (R 3.4.1)
-#  memoise      1.1.0   2017-04-21 CRAN (R 3.4.1)
-#  methods    * 3.4.3   2018-01-20 local
-#  munsell      0.4.3   2016-02-13 CRAN (R 3.4.1)
-#  pillar       1.1.0   2018-01-14 CRAN (R 3.4.2)
-#  plyr         1.8.4   2016-06-08 CRAN (R 3.4.1)
-#  Rcpp         0.12.14 2017-11-23 CRAN (R 3.4.2)
-#  reshape2     1.4.3   2017-12-11 CRAN (R 3.4.2)
-#  rlang        0.1.6   2017-12-21 CRAN (R 3.4.2)
-#  scales       0.5.0   2017-08-24 CRAN (R 3.4.1)
-#  stats      * 3.4.3   2018-01-20 local
-#  stringi      1.1.6   2017-11-17 CRAN (R 3.4.2)
-#  stringr      1.2.0   2017-02-18 CRAN (R 3.4.1)
-#  tibble       1.4.1   2017-12-25 CRAN (R 3.4.2)
-#  tools        3.4.3   2018-01-20 local
-#  utils      * 3.4.3   2018-01-20 local
-#  withr        2.1.1   2017-12-19 CRAN (R 3.4.2)
+#  package     * version date       source
+#  base        * 3.4.3   2018-01-20 local
+#  colorout    * 1.2-0   2018-02-19 Github (jalvesaq/colorout@2f01173)
+#  colorspace    1.3-2   2016-12-14 CRAN (R 3.4.1)
+#  compiler      3.4.3   2018-01-20 local
+#  datasets    * 3.4.3   2018-01-20 local
+#  devtools    * 1.13.4  2017-11-09 CRAN (R 3.4.2)
+#  digest        0.6.15  2018-01-28 cran (@0.6.15)
+#  ggplot2     * 2.2.1   2016-12-30 CRAN (R 3.4.1)
+#  graphics    * 3.4.3   2018-01-20 local
+#  grDevices   * 3.4.3   2018-01-20 local
+#  grid          3.4.3   2018-01-20 local
+#  gtable        0.2.0   2016-02-26 CRAN (R 3.4.1)
+#  htmltools     0.3.6   2017-04-28 CRAN (R 3.4.1)
+#  htmlwidgets   0.9     2017-07-10 CRAN (R 3.4.1)
+#  httpuv        1.3.6.2 2018-03-02 CRAN (R 3.4.3)
+#  labeling      0.3     2014-08-23 CRAN (R 3.4.1)
+#  lattice       0.20-35 2017-03-25 CRAN (R 3.4.3)
+#  lazyeval      0.2.1   2017-10-29 CRAN (R 3.4.2)
+#  magrittr      1.5     2014-11-22 CRAN (R 3.4.1)
+#  memoise       1.1.0   2017-04-21 CRAN (R 3.4.1)
+#  methods     * 3.4.3   2018-01-20 local
+#  munsell       0.4.3   2016-02-13 CRAN (R 3.4.1)
+#  pillar        1.1.0   2018-01-14 CRAN (R 3.4.2)
+#  plyr          1.8.4   2016-06-08 CRAN (R 3.4.1)
+#  png           0.1-7   2013-12-03 CRAN (R 3.4.1)
+#  Rcpp          0.12.14 2017-11-23 CRAN (R 3.4.2)
+#  reshape2      1.4.3   2017-12-11 CRAN (R 3.4.2)
+#  rlang         0.1.6   2017-12-21 CRAN (R 3.4.2)
+#  rmote       * 0.3.4   2018-02-16 deltarho (R 3.4.3)
+#  scales        0.5.0   2017-08-24 CRAN (R 3.4.1)
+#  servr         0.8     2017-11-06 CRAN (R 3.4.3)
+#  stats       * 3.4.3   2018-01-20 local
+#  stringi       1.1.6   2017-11-17 CRAN (R 3.4.2)
+#  stringr       1.2.0   2017-02-18 CRAN (R 3.4.1)
+#  tibble        1.4.1   2017-12-25 CRAN (R 3.4.2)
+#  tools         3.4.3   2018-01-20 local
+#  utils       * 3.4.3   2018-01-20 local
+#  withr         2.1.1   2017-12-19 CRAN (R 3.4.2)

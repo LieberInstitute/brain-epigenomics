@@ -142,7 +142,7 @@ mean_geneRpkm_cpg_genePromoter = mean_geneRpkm[
 signif(diag(cor(mean_meth_cpg_genePromoter,
 	log2(mean_geneRpkm_cpg_genePromoter+1))),3)
 smoothScatter(	mean_meth_cpg_genePromoter[,6],
-	log2(mean_geneRpkm_cpg_genePromoter[,6]+1))
+	log2(mean_geneRpkm_cpg_genePromoter[,6]+1),ylim = c(0,5))
 	
 ## binned
 mean_meth_cpg_genePromoter_cut = apply(mean_meth_cpg_genePromoter, 2, 
@@ -152,6 +152,7 @@ mean_exprs_cut_cpg_genePromoter	= apply(log2(mean_geneRpkm_cpg_genePromoter+1),2
 signif(diag(cor(mean_meth_cpg_genePromoter_cut,
 	mean_exprs_cut_cpg_genePromoter+1)),2)
 table(mean_meth_cpg_genePromoter_cut[,1] , mean_exprs_cut_cpg_genePromoter[,1])
+prop.table(table(mean_meth_cpg_genePromoter_cut[,1] , mean_exprs_cut_cpg_genePromoter[,1]),2)
 	
 ## non-cpg
 ooGene_promoter_non = findOverlaps(genePromoters, gr_non)
@@ -169,7 +170,7 @@ smoothScatter(	mean_meth_non_genePromoter[,6],
 
 ########################
 ## check CpH context ###
-cIndexes = splitit(gr_non$trinucleotide_context)
+cIndexes = splitit(gr_non$c_context)
 	
 corByContext_promoters = t(sapply(cIndexes, function(ii) {
 	gr_non_sub = gr_non[ii]
@@ -316,6 +317,66 @@ corByContext_exon = t(sapply(cIndexes, function(ii) {
 		log2(mean_exonRpkm_non+1))),3)
 }))
 corByContext_exon
+
+###################
+## constituative ##
+exonMap$numTx_gene = geneMap$NumTx[match(exonMap$gencodeID, names(geneMap))]
+exonMap$constit = exonMap$numTx_gene == exonMap$NumTx
+
+exonMapMain = exonMap[exonMap$constit,]
+exonMapAlt = exonMap[!exonMap$constit,]
+
+ooExon_cpg_main = findOverlaps(exonMapMain, gr_cpg, maxgap=500)
+mean_meth_cpg_exon_main = t(sapply(split(subjectHits(ooExon_cpg_main),
+	queryHits(ooExon_cpg_main)), function(ii) {
+		if(length(ii) > 1) colMeans(mean_meth_cpg[ii,]) else mean_meth_cpg[ii,]
+}))
+mean_exonRpkm_cpg_main = mean_exonRpkm[
+	as.numeric(rownames(mean_meth_cpg_exon_main)),]
+## check correlation
+signif(diag(cor(mean_meth_cpg_exon_main,
+	log2(mean_exonRpkm_cpg_main+1))),3)
+
+## non: main
+ooExon_non_main = findOverlaps(exonMapMain, gr_non, maxgap=500)
+mean_meth_non_exon_main = t(sapply(split(subjectHits(ooExon_non_main),
+	queryHits(ooExon_non_main)), function(ii) {
+		if(length(ii) > 1) colMeans(mean_meth_non[ii,]) else mean_meth_non[ii,]
+}))
+mean_exonRpkm_non_main = mean_exonRpkm[
+	as.numeric(rownames(mean_meth_non_exon_main)),]
+## check correlation
+signif(diag(cor(mean_meth_non_exon_main,
+	log2(mean_exonRpkm_non_main+1))),3)
+
+## alt	
+	
+ooExon_cpg_alt = findOverlaps(exonMapAlt, gr_cpg, maxgap=500)
+mean_meth_cpg_exon_alt = t(sapply(split(subjectHits(ooExon_cpg_alt),
+	queryHits(ooExon_cpg_alt)), function(ii) {
+		if(length(ii) > 1) colMeans(mean_meth_cpg[ii,]) else mean_meth_cpg[ii,]
+}))
+mean_exonRpkm_cpg_alt = mean_exonRpkm[
+	as.numeric(rownames(mean_meth_cpg_exon_alt)),]
+## check correlation
+signif(diag(cor(mean_meth_cpg_exon_alt,
+	log2(mean_exonRpkm_cpg_alt+1))),3)
+
+## non: alt
+ooExon_non_alt = findOverlaps(exonMapAlt, gr_non, maxgap=500)
+mean_meth_non_exon_alt = t(sapply(split(subjectHits(ooExon_non_alt),
+	queryHits(ooExon_non_alt)), function(ii) {
+		if(length(ii) > 1) colMeans(mean_meth_non[ii,]) else mean_meth_non[ii,]
+}))
+mean_exonRpkm_non_alt = mean_exonRpkm[
+	as.numeric(rownames(mean_meth_non_exon_alt)),]
+## check correlation
+signif(diag(cor(mean_meth_non_exon_alt,
+	log2(mean_exonRpkm_non_alt+1))),3)
+
+	
+	
+
 ####################
 ### Junction Level #
 ####################	
