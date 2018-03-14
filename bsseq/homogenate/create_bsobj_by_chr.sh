@@ -19,9 +19,9 @@ echo "Creating script for chromosome ${chr}"
 cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l bluejay,mem_free=70G,h_vmem=70G,h_fsize=200G
+#$ -l bluejay,mem_free=1350G,h_vmem=135G,h_fsize=200G
 #$ -N ${SHORT}
-#$ -pe local 4
+#$ -pe local 2
 #$ -o ./logs/${SHORT}.txt
 #$ -e ./logs/${SHORT}.txt
 #$ -m e
@@ -36,7 +36,7 @@ echo "Job name: \${JOB_NAME}"
 echo "Hostname: \${HOSTNAME}"
 echo "Task id: \${TASK_ID}"
 
-Rscript create_bsobj_by_chr.R -c ${chr} -t 4
+Rscript create_bsobj_by_chr.R -c ${chr} -t 2
 
 echo "**** Job ends ****"
 date
