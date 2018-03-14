@@ -38,8 +38,8 @@ ensIDs = c("HINFP1" = "ENSG00000172273", "MZF1_1-4" = "ENSG00000099326", "Myf" =
 geneIDs = c(geneMap[match(noW[which(noW %in% geneMap$Symbol)], geneMap$Symbol), "gencodeID"], 
             geneMap[match(ensIDs, geneMap$ensemblID), "gencodeID"])
 length(unique(geneIDs)) # 839
-TFhomRPKM = data.frame(homRPKM[which(rownames(homRPKM) %in% geneIDs),])
-TFhomRPKM = as.matrix(TFhomRPKM)
+prepostTFhomRPKM = data.frame(homRPKM[which(rownames(homRPKM) %in% geneIDs),])
+prepostTFhomRPKM = as.matrix(prepostTFhomRPKM)
 
 ## Test cutoffs of expression
 
@@ -47,9 +47,9 @@ quantile(homRPKM)
 #0%          25%          50%          75%         100% 
 #0.000000e+00 0.000000e+00 4.469787e-02 9.757915e-01 7.486556e+04 
 
-cutoff = data.frame(geneID = rownames(TFhomRPKM), Threshold = NA)
-for (i in 1:nrow(TFhomRPKM)) {
-  cutoff[i,"Threshold"] = ifelse(max(TFhomRPKM[i,])>1, "TRUE","FALSE")
+cutoff = data.frame(geneID = rownames(prepostTFhomRPKM), Threshold = NA)
+for (i in 1:nrow(prepostTFhomRPKM)) {
+  cutoff[i,"Threshold"] = ifelse(max(prepostTFhomRPKM[i,])>1, "TRUE","FALSE")
 }
 table(cutoff$Threshold=="TRUE")
 #FALSE  TRUE 
@@ -93,17 +93,53 @@ geneMap[which(geneMap$gencodeID %in% cutoff$geneID[cutoff$Threshold=="FALSE"]),"
 no = geneMap[which(geneMap$gencodeID %in% cutoff$geneID[cutoff$Threshold=="FALSE"]),"gencodeID"]
 
 
-targettogeneID = c(geneMap[match(noW[which(noW %in% geneMap$Symbol)], geneMap$Symbol), "gencodeID"], 
+prepostTargettoGeneID = c(geneMap[match(noW[which(noW %in% geneMap$Symbol)], geneMap$Symbol), "gencodeID"], 
             geneMap[match(ensIDs, geneMap$ensemblID), "gencodeID"])
-names(targettogeneID) = c(geneMap[match(noW[which(noW %in% geneMap$Symbol)], geneMap$Symbol), "Symbol"], names(ensIDs))
+names(prepostTargettoGeneID) = c(geneMap[match(noW[which(noW %in% geneMap$Symbol)], geneMap$Symbol), "Symbol"], names(ensIDs))
 
-targettogeneID = targettogeneID[!targettogeneID %in% no]
-TFhomRPKM = TFhomRPKM[-which(rownames(TFhomRPKM) %in% no),]
+prepostTargettoGeneID = prepostTargettoGeneID[!prepostTargettoGeneID %in% no]
+prepostTFhomRPKM = prepostTFhomRPKM[-which(rownames(prepostTFhomRPKM) %in% no),]
 
 
 ## Get sorted nuclear RNA TF results
 
-TFnucres = nucRNAres[which(rownames(nucRNAres) %in% targettogeneID),]
+prepostTFnucres = nucRNAres[which(rownames(nucRNAres) %in% prepostTargettoGeneID),]
 
-save(targettogeneID, TFhomRPKM, hompd, geneMap, TFnucres,
+
+
+### Test cutoffs of expression in postnatal only
+
+postRPKM = prepostTFhomRPKM[,which(colnames(prepostTFhomRPKM) %in% rownames(hompd[which(hompd$Age>0),]))]
+
+cutoff = data.frame(geneID = rownames(postRPKM), Threshold = NA)
+for (i in 1:nrow(postRPKM)) {
+  cutoff[i,"Threshold"] = ifelse(max(postRPKM[i,])>1, "TRUE","FALSE")
+}
+table(cutoff$Threshold=="TRUE")
+#FALSE  TRUE 
+#   32   618 
+
+# Additional excluded TFs
+geneMap[which(geneMap$gencodeID %in% cutoff$geneID[cutoff$Threshold=="FALSE"]),"Symbol"]
+# [1] "MORN1"   "E2F2"    "LHX4"    "LHX9"    "DTL"     "ZNF695"  "GLI2"   
+# [8] "EOMES"   "GLYCTK"  "GSX2"    "TFAP2D"  "PTCD1"   "PLAG1"   "VAX1"   
+# [15] "E2F8"    "ALX4"    "HMGA2"   "E2F7"    "GSX1"    "NRL"     "OTX2"   
+# [22] "SCAND2P" "FOXC2"   "BRCA1"   "TBX21"   "ONECUT2" "FAAP24"  "ETV2"   
+# [29] "MYBL2"   "UBE2V1"  "TFAP2C"  "BHLHE23"
+
+no = geneMap[which(geneMap$gencodeID %in% cutoff$geneID[cutoff$Threshold=="FALSE"]),"gencodeID"]
+
+PostnataltargettogeneID = prepostTargettoGeneID[-which(prepostTargettoGeneID %in% no)]
+
+postRPKM = postRPKM[-which(rownames(postRPKM) %in% no),]
+
+
+## Get sorted nuclear RNA TF results
+
+TFnucresPostnatal = nucRNAres[which(rownames(nucRNAres) %in% PostnataltargettogeneID),]
+
+save(PostnataltargettogeneID, postRPKM, TFnucresPostnatal,prepostTargettoGeneID, prepostTFhomRPKM, prepostTFnucres, hompd, geneMap,  
      file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/filtered_TF_list_expressionInfo.rda")
+
+
+
