@@ -691,7 +691,7 @@ dev.off()
 ## Gene ontology for each of the sets of the main venn diagram
 if(opt$feature == 'psi') {
     expr <- load_expr('gene')
-} else if () {
+} else if (grepl('jx', opt$feature)) {
     expr <- load_expr('gene')
     uni <- unique(rowRanges(expr)$ensemblID[rowRanges(expr)$gene_type == 'protein_coding'])
     expr <- load_expr(opt$feature)
