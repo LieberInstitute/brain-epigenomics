@@ -429,7 +429,8 @@ m_summary <- do.call(rbind, lapply(1:length(mres), function(i) {
     erow <- elementNROWS(gdata)
     print(table(erow > 1))
     message(paste(Sys.time(), 'creating typeres1'))
-    typeres1 <- do.call(rbind, gdata[erow == 1])
+    g1 <- sapply(gdata[erow == 1], function(x) { x$gene })
+    typeres1 <- mres[[i]]$eqtls[mres[[i]]$eqtls$gene %in% g1, ]
     typeres1$n_meqtls <- 1
     
     message(paste(Sys.time(), 'creating typeres2'))
