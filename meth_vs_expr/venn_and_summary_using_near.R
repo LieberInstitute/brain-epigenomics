@@ -29,12 +29,14 @@ if(FALSE) {
     opt <- list('feature' = 'gene')
     opt <- list('feature' = 'exon')
     opt <- list('feature' = 'psi')
+    opt <- list('feature' = 'jxleft')
+    opt <- list('feature' = 'jxright')
     ## Not yet adapted/designed for the other two
     #opt <- list('feature' = 'jx', 'jxside' = 'left')
     #opt <- list('feature' = 'jx', 'jxside' = 'right')
 }
 
-stopifnot(opt$feature %in% c('psi', 'gene', 'exon', 'jx'))
+stopifnot(opt$feature %in% c('psi', 'gene', 'exon', 'jxleft', 'jxright'))
 cpgs <- c('CpG', 'nonCpG', 'CpGmarg')
 
 ## For the CpGmarg
@@ -53,6 +55,8 @@ load_dmp <- function(is_cpg) {
 
 ## Load data
 load_expr <- function(type) {
+    ## For jxright and jxleft
+    type <- gsub('left|right', '', type)
     if(type == 'psi') {
         load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/psi/rda/sgvc10_postnatal_polyA.Rdata', verbose = TRUE)
         expr <- sgvc10
@@ -79,9 +83,9 @@ load_expr <- function(type) {
 
     ## Drop low expressed features
     if(type != 'psi') {
-        if(!file.exists(paste0('rda/expr_', opt$feature, '_unfiltered.Rdata'))) {
+        if(!file.exists(paste0('rda/expr_', type, '_unfiltered.Rdata'))) {
             dir.create('pdf', showWarnings = FALSE)
-            pdf(paste0('pdf/suggested_expr_cutoffs_', tolower(opt$feature),
+            pdf(paste0('pdf/suggested_expr_cutoffs_', tolower(type),
                 '.pdf'), width = 12)
             cuts <- expression_cutoff(assays(expr)$norm, seed = 20180119)
             message(paste(cuts, collapse = ' '))
@@ -92,7 +96,7 @@ load_expr <- function(type) {
             rowRanges(expr)$meanExprs <- meanExpr
             rowRanges(expr)$passExprsCut <- meanExpr > cut
             dir.create('rda', showWarnings = FALSE)
-            save(expr, file = paste0('rda/expr_', opt$feature, '_unfiltered.Rdata'))
+            save(expr, file = paste0('rda/expr_', type, '_unfiltered.Rdata'))
         }
     }
 
@@ -108,11 +112,12 @@ getid <- function(x) {
 
 ## Subset to around a 1kb window from the nonCpG meQTl results
 load_meqtl <- function() {
-    load(paste0('rda/me_annotated_FDR5_nonCpG_', opt$feature,
-        '.Rdata'), verbose = TRUE)
+    load(paste0('rda/me_annotated_FDR5_nonCpG_', gsub('left|right', '',
+        opt$feature), '.Rdata'), verbose = TRUE)
     return(me_annotated)
 }
 
+if(!file.exists(paste0('rda/meqtl_mres_', opt$feature, '_using_near_meth11_proteincoding.Rdata'))) {
 ## Load annotated meQTL results at FDR 5%
 ## for the CpG data, I'm using the results near the nonCpG meQTLs
 ## For the marginal CpG data I'm using the results from 'near'
@@ -123,7 +128,8 @@ mres <- lapply(cpgs, function(cpg) {
         f <- paste0('rda/me_annotated_FDR5_', cpg, '_', opt$feature,
             '_near_nonCpG_meQTLs.Rdata')
     } else if (cpg == 'nonCpG') {
-        f <- paste0('rda/me_annotated_FDR5_', cpg, '_', opt$feature, '.Rdata')
+        f <- paste0('rda/me_annotated_FDR5_', cpg, '_', gsub('left|right', '',
+            opt$feature), '.Rdata')
     } else if (cpg == 'CpGmarg') {
         f <- paste0('rda/me_CpG_', opt$feature, '_near_nonCpG_meQTLs.Rdata')
     }
@@ -140,10 +146,30 @@ mres <- lapply(cpgs, function(cpg) {
         ## For getting the meth_n part
         message(paste(Sys.time(), 'computing the parts for meth_n'))
         expr <- load_expr(opt$feature)
-        meqtl <- load_meqtl()
-        me_ov <- findOverlaps(resize(rowRanges(meqtl$expr), width(rowRanges(meqtl$expr)) + 2000, fix = 'center'), expr)
-        expr <- expr[sort(unique(subjectHits(me_ov))), ]
-        rm(me_ov, meqtl)
+        
+        if(grepl('jx', opt$feature)) {
+            load('rda/me_annotated_FDR5_nonCpG_jx_only_rowExpr.Rdata', verbose = TRUE)
+            ## Subset data to only only 1 side for the junctions
+            expr_row <- resize(expr_row, width = 1,
+                fix = ifelse(opt$feature == 'jxleft', 'start', 'end'),
+                ignore.strand = TRUE)
+            rowRanges(expr) <- resize(rowRanges(expr), width = 1,
+                fix = ifelse(opt$feature == 'jxleft', 'start', 'end'),
+                ignore.strand = TRUE)
+
+            ## Take a window around the end of the jx, then reduce to reduce
+            ## mem needed for this step
+            expr_row <- reduce(resize(expr_row, width(expr_row) + 1000, fix = 'center'))
+            me_ov <- findOverlaps(expr_row, expr)
+            expr <- expr[sort(unique(subjectHits(me_ov))), ]
+            rm(me_ov, expr_row)
+        } else {
+            meqtl <- load_meqtl()
+            me_ov <- findOverlaps(resize(rowRanges(meqtl$expr), width(rowRanges(meqtl$expr)) + 2000, fix = 'center'), expr)
+            expr <- expr[sort(unique(subjectHits(me_ov))), ]
+            rm(me_ov, meqtl)
+        }      
+        
         BSobj <- load_dmp(TRUE)
         m  <- match(getid(colData(expr)$BrNum), getid(colData(BSobj)$Brain.ID))
         expr <- expr[, which(!is.na(m))]
@@ -198,11 +224,7 @@ save(mres, file = paste0('rda/meqtl_mres_', opt$feature,
 ## Simplify rowRanges() for the psi info just to make the rest of the
 ## code work
 if(opt$feature == 'psi') {
-    ## Otherwise load_expr fails
-    opt$feature <- 'gene'
     gene <- load_expr('gene')
-    ## Change back to normal
-    opt$feature <- 'psi'
 
     ## Use the gene-level info to simplify things
     for(cp in names(mres)) {
@@ -219,6 +241,28 @@ if(opt$feature == 'psi') {
         rm(newgr, mgr)
     }
     rm(cp, gene)
+} else if (grepl('jx', opt$feature)) {
+    gene <- load_expr('gene')
+    
+    ## add some gene-level info
+    for(cp in names(mres)) {
+        m <- match(rowRanges(mres[[cp]]$expr)$newGeneID,
+            rowRanges(gene)$gencodeID)
+        rowRanges(mres[[cp]]$expr)$gene_type <- rowRanges(gene)$gene_type[m]
+        
+        ## Special case for fusions
+        fusion <- grep('-', rowRanges(mres[[cp]]$expr)$newGeneID)
+        rowRanges(mres[[cp]]$expr)$gene_type[fusion] <- sapply(
+            rowRanges(mres[[cp]]$expr)$newGeneID[fusion], function(x) { 
+                ifelse('protein_coding' %in%
+                    rowRanges(gene)$gene_type[grep(gsub('-', '|', x),
+                    rowRanges(gene)$gencodeID)],
+                    'protein_coding', 'fusion')
+        })
+        rm(m, fusion)
+    }
+    rm(cp, gene)
+    
 }
 
 ## Filter further to keep only those with meth_n >= 11
@@ -227,18 +271,21 @@ for(cp in names(mres)) {
     pc <- rowRanges(mres[[cp]]$expr)$gene_type == 'protein_coding'
     meth11 <- mres[[cp]]$eqtls$meth_n >= 11
     message(paste(Sys.time(), 'Filtering by meth_n >= 11 and protein_coding genes for set', cp))
-    pc_meth_tab <- addmargins(table('protein coding' = pc, 'meth_n >= 11' = meth11))
+    pc_meth_tab <- addmargins(table('protein coding' = pc, 'meth_n >= 11' = meth11, useNA = 'ifany'))
     print(pc_meth_tab)
     print(round(pc_meth_tab / max(pc_meth_tab) * 100, 2))
-    mres[[cp]]$eqtls <- mres[[cp]]$eqtls[pc & meth11, ]
-    mres[[cp]]$expr <- mres[[cp]]$expr[pc & meth11, ]
-    mres[[cp]]$meth <- mres[[cp]]$meth[pc & meth11, ]
+    mres[[cp]]$eqtls <- mres[[cp]]$eqtls[which(pc & meth11), ]
+    mres[[cp]]$expr <- mres[[cp]]$expr[which(pc & meth11), ]
+    mres[[cp]]$meth <- mres[[cp]]$meth[which(pc & meth11), ]
     rm(pc, meth11, pc_meth_tab)
 }
 rm(cp)
 
 save(mres, file = paste0('rda/meqtl_mres_', opt$feature,
     '_using_near_meth11_proteincoding.Rdata'))
+} else {
+    load(paste0('rda/meqtl_mres_', opt$feature, '_using_near_meth11_proteincoding.Rdata'), verbose = TRUE)
+}
 
 
 load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/sorted_nuclear_RNA/DE_limma_results_objects.rda', verbose = TRUE)
@@ -280,7 +327,7 @@ if(opt$feature == 'gene') {
     ## Clean up
     rm(check_gr, rse_exon, ov, m1, exonCounts, exonMap, geneCounts, geneMap, jCounts, jMap, metrics, txMap, txNumReads, getRPKM)
 
-} else if (opt$feature == 'psi') {
+} else if (opt$feature %in% c('psi', 'jxleft', 'jxright')) {
     ## Use the gene info here
     load(paste0('rda/meqtl_venn_gene_using_near.Rdata'), verbose = TRUE)
     rm(vennres, vennres5k, vennres5kglia, v, v5k, v5kglia)
@@ -306,14 +353,27 @@ top5kglia <- top5kglia[order(top5kglia$adj.P.Val, decreasing = FALSE), ]
 top5kglia <- head(top5kglia, 5000)
 
 vinfo <- lapply(mres, function(me) { unique(as.character(me$eqtls$gene)) })
-vinfo5k <- lapply(vinfo, function(me) { me[me %in% rownames(top5k)] })
-vinfo5kglia <- lapply(vinfo, function(me) { me[me %in% rownames(top5kglia)] })
+if(grepl('jx', opt$feature)) {
+    vinfo5k <- lapply(names(vinfo), function(i) {
+        me <- vinfo[[i]]
+        me[rowRanges(mres[[i]]$expr)[me]$newGeneID %in% rownames(top5k)]
+    })
+    vinfo5kglia <- lapply(names(vinfo), function(i) {
+        me <- vinfo[[i]]
+        me[rowRanges(mres[[i]]$expr)[me]$newGeneID %in% rownames(top5kglia)]
+    })
+    names(vinfo5k) <- names(vinfo5kglia) <- names(vinfo)
+} else {
+    vinfo5k <- lapply(vinfo, function(me) { me[me %in% rownames(top5k)] })
+    vinfo5kglia <- lapply(vinfo, function(me) { me[me %in% rownames(top5kglia)] })
+}
+
 
 dir.create('pdf', showWarnings = FALSE)
 pdf(paste0('pdf/meqtl_venn_', opt$feature, '_using_near.pdf'))
 vennres <- venn(vinfo) + title('meQTLs at FDR 5%, CpGs only in proximity to nonCpG')
-vennres5k <- venn(vinfo5k) + title(paste0('meQTLs at FDR 5%, CpGs only in proximity to nonCpG\nBased on top ', nrow(top5k), ' ', ifelse(opt$feature == 'psi', 'gene', opt$feature), 's expressed in Neurons'))
-vennres5kglia <- venn(vinfo5kglia) + title(paste0('meQTLs at FDR 5%, CpGs only in proximity to nonCpG\nBased on top ', nrow(top5kglia), ' ', ifelse(opt$feature == 'psi', 'gene', opt$feature), 's expressed in Glia'))
+vennres5k <- venn(vinfo5k) + title(paste0('meQTLs at FDR 5%, CpGs only in proximity to nonCpG\nBased on top ', nrow(top5k), ' ', ifelse(opt$feature %in% c('psi', 'jxleft', 'jxright'), 'gene', opt$feature), 's expressed in Neurons'))
+vennres5kglia <- venn(vinfo5kglia) + title(paste0('meQTLs at FDR 5%, CpGs only in proximity to nonCpG\nBased on top ', nrow(top5kglia), ' ', ifelse(opt$feature %in% c('psi', 'jxleft', 'jxright'), 'gene', opt$feature), 's expressed in Glia'))
 dev.off()
 
 vennres <- venn(vinfo, show.plot = FALSE)
@@ -332,7 +392,7 @@ grid.newpage()
 grid.draw(v)
 
 v5k <- venn.diagram(vinfo5k, filename = NULL,
-    main = paste0('meQTLs at FDR 5%, CpGs only in proximity to nonCpG\nBased on top ', nrow(top5k), ' ', ifelse(opt$feature == 'psi', 'gene', opt$feature), 's expressed in Neurons'),
+    main = paste0('meQTLs at FDR 5%, CpGs only in proximity to nonCpG\nBased on top ', nrow(top5k), ' ', ifelse(opt$feature %in% c('psi', 'jxleft', 'jxright'), 'gene', opt$feature), 's expressed in Neurons'),
     col = "transparent", fill = c("lightpink2","cornflowerblue", "olivedrab2"),
     alpha = 0.50, fontface = "bold",
     cat.col = c("palevioletred4", "darkblue", "olivedrab4"),
@@ -342,7 +402,7 @@ grid.draw(v5k)
 
 
 v5kglia <- venn.diagram(vinfo5kglia, filename = NULL,
-    main = paste0('meQTLs at FDR 5%, CpGs only in proximity to nonCpG\nBased on top ', nrow(top5kglia), ' ', ifelse(opt$feature == 'psi', 'gene', opt$feature), 's expressed in Glia'),
+    main = paste0('meQTLs at FDR 5%, CpGs only in proximity to nonCpG\nBased on top ', nrow(top5kglia), ' ', ifelse(opt$feature %in% c('psi', 'jxleft', 'jxright'), 'gene', opt$feature), 's expressed in Glia'),
     col = "transparent", fill = c("lightpink2","cornflowerblue", "olivedrab2"),
     alpha = 0.50, fontface = "bold",
     cat.col = c("palevioletred4", "darkblue", "olivedrab4"),
@@ -389,9 +449,9 @@ find_pval <- function(type, t5k = FALSE, t5kg = FALSE) {
     ## Match the order
     res <- res[match(common, names(res))]
     if(t5k) {
-        res <- res[names(res) %in% rownames(top5k)]
+        res <- res[names(res) %in% vinfo5k[[type]]]
     } else if (t5kg) {
-        res <- res[names(res) %in% rownames(top5kglia)]
+        res <- res[names(res) %in% vinfo5kglia[[type]]]
     }
     return(res)
 }
@@ -401,14 +461,14 @@ stopifnot(identical(names(find_pval('CpG')), names(find_pval('nonCpG'))))
 ## Scatter plot of -log 10 p-values for the CpG and nonCpG data (FDR adjusted p-values)
 pdf(paste0('pdf/scatter_FDR_', opt$feature, '_using_near.pdf'))
 plot(x = find_pval('CpG'), y = find_pval('nonCpG'), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste(length(common), 'common', opt$feature, 'meQTLs'))
-plot(x = find_pval('CpG', TRUE), y = find_pval('nonCpG', TRUE), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste0(sum(common %in% rownames(top5k)), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5k), ' ', ifelse(opt$feature == 'psi', 'gene', opt$feature), 's expressed in Neurons'))
-plot(x = find_pval('CpG', t5kg = TRUE), y = find_pval('nonCpG', t5kg = TRUE), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste0(sum(common %in% rownames(top5kglia)), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5kglia), ' ', ifelse(opt$feature == 'psi', 'gene', opt$feature), 's expressed in Glia'))
+plot(x = find_pval('CpG', TRUE), y = find_pval('nonCpG', TRUE), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste0(sum(common %in% vinfo5k[['nonCpG']]), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5k), ' ', ifelse(opt$feature %in% c('psi', 'jxleft', 'jxright'), 'gene', opt$feature), 's expressed in Neurons'))
+plot(x = find_pval('CpG', t5kg = TRUE), y = find_pval('nonCpG', t5kg = TRUE), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste0(sum(common %in% vinfo5kglia[['nonCpG']]), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5kglia), ' ', ifelse(opt$feature %in% c('psi', 'jxleft', 'jxright'), 'gene', opt$feature), 's expressed in Glia'))
 
 ## Limiting the x and y axes
 xylim <- c(0, round(max(find_pval('nonCpG')) + 0.5, 0))
 plot(x = find_pval('CpG'), y = find_pval('nonCpG'), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste(length(common), 'common', opt$feature, 'meQTLs'), xlim = xylim, ylim = xylim)
-plot(x = find_pval('CpG', TRUE), y = find_pval('nonCpG', TRUE), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste0(sum(common %in% rownames(top5k)), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5k), ' ', ifelse(opt$feature == 'psi', 'gene', opt$feature), 's expressed in Neurons'), xlim = xylim, ylim = xylim)
-plot(x = find_pval('CpG', t5kg = TRUE), y = find_pval('nonCpG', t5kg = TRUE), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste0(sum(common %in% rownames(top5kglia)), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5kglia), ' ', ifelse(opt$feature == 'psi', 'gene', opt$feature), 's expressed in Glia'), xlim = xylim, ylim = xylim)
+plot(x = find_pval('CpG', TRUE), y = find_pval('nonCpG', TRUE), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste0(sum(common %in% vinfo5k[['nonCpG']]), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5k), ' ', ifelse(opt$feature %in% c('psi', 'jxleft', 'jxright'), 'gene', opt$feature), 's expressed in Neurons'), xlim = xylim, ylim = xylim)
+plot(x = find_pval('CpG', t5kg = TRUE), y = find_pval('nonCpG', t5kg = TRUE), pch = 20, xlab = 'Best -log10 FDR p-value with CpGs', ylab = 'Best -log10 FDR p-value with non CpGs', main = paste0(sum(common %in% vinfo5kglia[['nonCpG']]), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5kglia), ' ', ifelse(opt$feature %in% c('psi', 'jxleft', 'jxright'), 'gene', opt$feature), 's expressed in Glia'), xlim = xylim, ylim = xylim)
 dev.off()
 
 
@@ -421,9 +481,9 @@ find_beta <- function(type, t5k = FALSE, t5kg = FALSE) {
     ## Match the order
     res <- res[match(common, names(res))]
     if(t5k) {
-        res <- res[names(res) %in% rownames(top5k)]
+        res <- res[names(res) %in% vinfo5k[[type]]]
     } else if (t5kg) {
-        res <- res[names(res) %in% rownames(top5kglia)]
+        res <- res[names(res) %in% vinfo5kglia[[type]]]
     }
     return(res)
 }
@@ -432,10 +492,10 @@ pdf(paste0('pdf/scatter_beta_', opt$feature, '_using_near.pdf'))
 plot(x = find_beta('CpG'), y = find_beta('nonCpG'), pch = 20, xlab = 'Beta from best FDR p-value with CpGs', ylab = 'Beta from best FDR p-value with non CpGs', main = paste(length(common), 'common', opt$feature, 'meQTLs'))
 abline(v = 0, col = 'grey80')
 abline(h = 0, col = 'grey80')
-plot(x = find_beta('CpG', TRUE), y = find_beta('nonCpG', TRUE), pch = 20, xlab = 'Beta from best FDR p-value with CpGs', ylab = 'Beta from best FDR p-value with non CpGs', main = paste0(sum(common %in% rownames(top5k)), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5k), ' ', ifelse(opt$feature == 'psi', 'gene', opt$feature), 's expressed in Neurons'))
+plot(x = find_beta('CpG', TRUE), y = find_beta('nonCpG', TRUE), pch = 20, xlab = 'Beta from best FDR p-value with CpGs', ylab = 'Beta from best FDR p-value with non CpGs', main = paste0(sum(common %in% vinfo5k[['nonCpG']]), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5k), ' ', ifelse(opt$feature %in% c('psi', 'jxleft', 'jxright'), 'gene', opt$feature), 's expressed in Neurons'))
 abline(v = 0, col = 'grey80')
 abline(h = 0, col = 'grey80')
-plot(x = find_beta('CpG', t5kg = TRUE), y = find_beta('nonCpG', t5kg = TRUE), pch = 20, xlab = 'Beta from best FDR p-value with CpGs', ylab = 'Beta from best FDR p-value with non CpGs', main = paste0(sum(common %in% rownames(top5kglia)), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5kglia), ' ', ifelse(opt$feature == 'psi', 'gene', opt$feature), 's expressed in Glia'))
+plot(x = find_beta('CpG', t5kg = TRUE), y = find_beta('nonCpG', t5kg = TRUE), pch = 20, xlab = 'Beta from best FDR p-value with CpGs', ylab = 'Beta from best FDR p-value with non CpGs', main = paste0(sum(common %in% vinfo5kglia[['nonCpG']]), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5kglia), ' ', ifelse(opt$feature %in% c('psi', 'jxleft', 'jxright'), 'gene', opt$feature), 's expressed in Glia'))
 abline(v = 0, col = 'grey80')
 abline(h = 0, col = 'grey80')
 
@@ -444,10 +504,10 @@ xylim <- range(c(find_beta('CpG'), find_beta('nonCpG')))
 plot(x = find_beta('CpG'), y = find_beta('nonCpG'), pch = 20, xlab = 'Beta from best FDR p-value with CpGs', ylab = 'Beta from best FDR p-value with non CpGs', main = paste(length(common), 'common', opt$feature, 'meQTLs'), xlim = xylim, ylim = xylim)
 abline(v = 0, col = 'grey80')
 abline(h = 0, col = 'grey80')
-plot(x = find_beta('CpG', TRUE), y = find_beta('nonCpG', TRUE), pch = 20, xlab = 'Beta from best FDR p-value with CpGs', ylab = 'Beta from best FDR p-value with non CpGs', main = paste0(sum(common %in% rownames(top5k)), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5k), ' ', ifelse(opt$feature == 'psi', 'gene', opt$feature), 's expressed in Neurons'), xlim = xylim, ylim = xylim)
+plot(x = find_beta('CpG', TRUE), y = find_beta('nonCpG', TRUE), pch = 20, xlab = 'Beta from best FDR p-value with CpGs', ylab = 'Beta from best FDR p-value with non CpGs', main = paste0(sum(common %in% vinfo5k[['nonCpG']]), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5k), ' ', ifelse(opt$feature %in% c('psi', 'jxleft', 'jxright'), 'gene', opt$feature), 's expressed in Neurons'), xlim = xylim, ylim = xylim)
 abline(v = 0, col = 'grey80')
 abline(h = 0, col = 'grey80')
-plot(x = find_beta('CpG', t5kg = TRUE), y = find_beta('nonCpG', t5kg = TRUE), pch = 20, xlab = 'Beta from best FDR p-value with CpGs', ylab = 'Beta from best FDR p-value with non CpGs', main = paste0(sum(common %in% rownames(top5kglia)), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5kglia), ' ', ifelse(opt$feature == 'psi', 'gene', opt$feature), 's expressed in Glia'), xlim = xylim, ylim = xylim)
+plot(x = find_beta('CpG', t5kg = TRUE), y = find_beta('nonCpG', t5kg = TRUE), pch = 20, xlab = 'Beta from best FDR p-value with CpGs', ylab = 'Beta from best FDR p-value with non CpGs', main = paste0(sum(common %in% vinfo5kglia[['nonCpG']]), ' common ', opt$feature, ' meQTLs\nBased on top ', nrow(top5kglia), ' ', ifelse(opt$feature %in% c('psi', 'jxleft', 'jxright'), 'gene', opt$feature), 's expressed in Glia'), xlim = xylim, ylim = xylim)
 abline(v = 0, col = 'grey80')
 abline(h = 0, col = 'grey80')
 dev.off()
@@ -456,8 +516,8 @@ dev.off()
 
 ## Make some scatter plots of the methylation vs expr
 delta_pval <- data.frame(delta = find_pval('nonCpG') - find_pval('CpG'), gene = names(find_pval('CpG')), nonCpG = find_pval('nonCpG'), CpG = find_pval('CpG'), stringsAsFactors = FALSE)
-delta_pval$top5k <- delta_pval$gene %in% rownames(top5k)
-delta_pval$top5kglia <- delta_pval$gene %in% rownames(top5kglia)
+delta_pval$top5k <- delta_pval$gene %in% vinfo5k[['nonCpG']]
+delta_pval$top5kglia <- delta_pval$gene %in% vinfo5kglia[['nonCpG']]
 delta_pval$snps <- with(subset(m_summary, type == 'nonCpG'), snps[match(delta_pval$gene, gene)])
 delta_pval <- delta_pval[order(delta_pval$delta, decreasing = TRUE), ]
 
@@ -521,7 +581,7 @@ find_i_venn <- function(mtype = 'nonCpG', vennset = 'nonCpG', t5k = FALSE, n = 1
 }
 
 
-ylab <- ifelse(opt$feature == 'psi', 'PSI', ifelse(opt$feature == 'jx', 'log2 (RP80M + 1)', 'log2 (RPKM + 1)'))
+ylab <- ifelse(opt$feature == 'psi', 'PSI', ifelse(grepl('jx', opt$feature), 'log2 (RP80M + 1)', 'log2 (RPKM + 1)'))
 
 get_y <- function(type, i) {
     if(opt$feature == 'psi') {
@@ -565,7 +625,7 @@ plotting_code <- function(i, type = 'nonCpG') {
         sapply(i, plotting_code, type = type)
         return(NULL)
     }
-    main <- paste(opt$feature, ifelse(opt$feature %in% c('gene', 'psi'), mres[[type]]$eqtls$gene[i], rowRanges(mres[[type]]$expr[i])$exon_gencodeID), 'FDR', signif(mres[[type]]$eqtls$FDR[i], 3), '\n',  rowRanges(mres[[type]]$expr[i])$Symbol)
+    main <- paste(opt$feature, ifelse(opt$feature %in% c('gene', 'psi', 'jxleft', 'jxright'), mres[[type]]$eqtls$gene[i], rowRanges(mres[[type]]$expr[i])$exon_gencodeID), 'FDR', signif(mres[[type]]$eqtls$FDR[i], 3), '\n',  rowRanges(mres[[type]]$expr[i])$Symbol)
 
     plot(x = jitter(getMeth(mres[[type]]$meth[i, ], type = 'raw'), 0.05), y = jitter(get_y(type, i), 0.05), xlab = 'Methylation', ylab = ylab, main = main, sub = paste(as.vector(seqnames(rowRanges(mres[[type]]$meth)[i])), start(rowRanges(mres[[type]]$meth)[i]), as.vector(strand(rowRanges(mres[[type]]$meth)[i])), as.vector(rowRanges(mres[[type]]$meth)$c_context[i])), col = get_col(type))
 }
@@ -630,18 +690,30 @@ dev.off()
 
 ## Gene ontology for each of the sets of the main venn diagram
 if(opt$feature == 'psi') {
-    opt$feature <- 'gene'
+    expr <- load_expr('gene')
+} else if () {
+    expr <- load_expr('gene')
+    uni <- unique(rowRanges(expr)$ensemblID[rowRanges(expr)$gene_type == 'protein_coding'])
     expr <- load_expr(opt$feature)
-    opt$feature <- 'psi'
 } else {
     expr <- load_expr(opt$feature)
 }
 
-uni <- unique(rowRanges(expr)$ensemblID[rowRanges(expr)$gene_type == 'protein_coding'])
+if(!grepl('jx', opt$feature)) {
+    uni <- unique(rowRanges(expr)$ensemblID[rowRanges(expr)$gene_type == 'protein_coding'])
+}
+
 length(uni)
 
 v_symb <- lapply( attr(vennres, 'intersections'), function(vset) {
-    unique(rowRanges(expr)$ensemblID[ names(rowRanges(expr)) %in% vset ])
+    if(grepl('jx', opt$feature)) {
+        res <- unique(rowRanges(expr)$newGeneID[ names(rowRanges(expr)) %in% vset ])
+        ## Make into Ensembl IDs, also deal with fusions
+        res <- gsub('\\..*', '', unlist(strsplit(res, '-')))
+    } else {
+        res <- unique(rowRanges(expr)$ensemblID[ names(rowRanges(expr)) %in% vset ])
+    }
+    return(res)
 })
 sapply(v_symb, length)
 
@@ -864,11 +936,11 @@ dev.off()
 
 ## For top in neurons, then in glia
 pdf(paste0('pdf/meth_vs_expr_venn_beta_', opt$feature, '_top5k.pdf'), width = 14, height = 10)
-venn_5k(as.data.frame(subset(data_by_venn, gene %in% rownames(top5k))))
+venn_5k(as.data.frame(subset(data_by_venn, gene %in% unlist(vinfo5k))))
 dev.off()
 
 pdf(paste0('pdf/meth_vs_expr_venn_beta_', opt$feature, '_top5kglia.pdf'), width = 14, height = 10)
-venn_5k(as.data.frame(subset(data_by_venn, gene %in% rownames(top5kglia))))
+venn_5k(as.data.frame(subset(data_by_venn, gene %in% unlist(vinfo5kglia))))
 dev.off()
 
 
@@ -908,7 +980,7 @@ summarize_venn <- function(dbv) {
         vset = sapply(strsplit(unique(grp), '_'), '[[', 2),
         gene = sapply(strsplit(unique(grp), '_'), function(x) { paste(x[3:length(x)], collapse = '_') })
     )
-    d_summ$gtype <- ifelse(d_summ$gene %in% rownames(top5k), 'neuron', ifelse(d_summ$gene %in% rownames(top5kglia), 'glia', 'none'))
+    d_summ$gtype <- ifelse(d_summ$gene %in% unlist(vinfo5k), 'neuron', ifelse(d_summ$gene %in% unlist(vinfo5kglia), 'glia', 'none'))
     ## https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
     d_summ$distance_diag <- with(d_summ, abs( abs(beta_sign_mean) - abs(agebeta_sign_mean)) / sqrt(2))
     return(d_summ)
