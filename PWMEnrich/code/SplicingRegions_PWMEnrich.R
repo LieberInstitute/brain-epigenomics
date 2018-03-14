@@ -31,10 +31,27 @@ class(data_by_venn)
 dim(data_by_venn)
 head(data_by_venn)
 
-## Get sequences from different annotations in the correct format
+
+## How many of the mC's fall within the exon with which they associate?
 
 gr = list(CpG.pos = rowRanges(mres$CpG$expr)[which(mres$CpG$eqtls$statistic>0),], nonCpG.pos = rowRanges(mres$nonCpG$expr)[which(mres$nonCpG$eqtls$statistic>0),],
           CpG.neg = rowRanges(mres$CpG$expr)[which(mres$CpG$eqtls$statistic<0),], nonCpG.neg = rowRanges(mres$nonCpG$expr)[which(mres$nonCpG$eqtls$statistic<0),])
+Cgr = list(CpG.pos = granges(mres$CpG$meth)[which(mres$CpG$eqtls$statistic>0),], nonCpG.pos = granges(mres$nonCpG$meth)[which(mres$nonCpG$eqtls$statistic>0),],
+           CpG.neg = granges(mres$CpG$meth)[which(mres$CpG$eqtls$statistic<0),], nonCpG.neg = granges(mres$nonCpG$meth)[which(mres$nonCpG$eqtls$statistic<0),])
+
+oo = mapply(function(exon, mC) findOverlaps(exon,mC), gr, Cgr, SIMPLIFY = F)
+oo = lapply(oo, as.data.frame)
+do.call(rbind, mapply(function(dat, len) data.frame(total = len, SameExon = length(which(dat$queryHits==dat$subjectHits)), 
+                                                    Percent = round(length(which(dat$queryHits==dat$subjectHits))/len*100,1)),oo,elementNROWS(Cgr), SIMPLIFY = F))
+#           total SameExon Percent
+#CpG.pos     1349      454    33.7
+#nonCpG.pos  1288       78     6.1
+#CpG.neg     9674     2346    24.3
+#nonCpG.neg  7874      605     7.7
+
+
+## Get sequences from different annotations in the correct format
+
 seq = lapply(gr, function(x) getSeq(Hsapiens, x))
 seq = lapply(seq, function(x) x[which(width(x)>30)])
 
