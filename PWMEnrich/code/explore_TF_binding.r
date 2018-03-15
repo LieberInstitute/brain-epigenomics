@@ -16,33 +16,13 @@ write.csv(pd, quote=F, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/pos
 write.csv(hompd, quote=F, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/homogenate.RNAseq.pheno.info.csv")
 
 
-## Objects for analysis:
-  # all_int: PWMEnrich result for all interaction DMRs
-  # intergenic_int: PWMEnrich result for interaction DMRs that overlap intergenic regions
-  # introns_int: PWMEnrich result for interaction DMRs that overlap introns
-  # promoters_int: PWMEnrich result for interaction DMRs that overlap promoters
-  # LMR_UMR_pwmenrich: PWMEnrich result for shared and not shared LMR and UMR sequence for All, Prenatal, Postnatal, Neurons, and Glia 
-  # all_split: PWMEnrich result for all regions in three models split by direction
-  # intergenic_split: PWMEnrich result for intergenic regions in three models split by direction
-  # introns_split: PWMEnrich result for introns in three models split by direction
-  # promoters_split: PWMEnrich result for promoters in three models split by direction
-  # DMR, uDMR, lDMR: lists of annotated methylated regions 
-  # geneMap
-  # hompd, pd: phenotype tables
-  # targettogeneID: map of target ID to gencodeID
-  # TFhomRPKM, TFnucres: RNA-seq results for TFs in homogenate (hom) and nuclear RNA (nuc)
-  # TFdiff: difference in test statistic between positive and negative beta values of DMRs (all, intergenic, introns, and promoters)
-  # TFnucres: DE results by cell type for TF genes in nuclear RNA
-  # ulTFdiff: difference in test statistic between UMRs and LMRs, and between cell types/ages in UMRs and LMRs
-
-
 ## collate TF group report results
 
 TF = list(allTF = lapply(all_split, groupReport), promTF = lapply(promoters_split, groupReport),
           intronTF = lapply(introns_split, groupReport), intergenicTF = lapply(intergenic_split, groupReport))
 TF = lapply(TF, function(x) lapply(x, as.data.frame))
 TF = lapply(TF, function(t) Map(cbind, t, padj = lapply(t, function(x) p.adjust(x$p.value, method = "fdr"))))
-TF = lapply(TF, function(t) lapply(t, function(x) x[which(x$target %in% names(targettogeneID)),]))
+TF = lapply(TF, function(t) lapply(t, function(x) x[which(x$target %in% names(PostnataltargettogeneID)),]))
 TF = lapply(TF, function(t) lapply(t, function(x) x[order(x$id),]))
 TF = lapply(TF, function(t) Map(cbind, t, transf = lapply(t, function(x) -log10(x$padj))))
 TF = lapply(TF, function(t) t[order(names(t))])
@@ -50,7 +30,7 @@ TF = lapply(TF, function(t) t[order(names(t))])
 ulTF = lapply(LMR_UMR_pwmenrich, groupReport)
 ulTF = lapply(ulTF, as.data.frame)
 ulTF = Map(cbind, ulTF, padj = lapply(ulTF, function(x) p.adjust(x$p.value, method = "fdr")))
-ulTF = lapply(ulTF, function(x) x[which(x$target %in% names(targettogeneID)),])
+ulTF = lapply(ulTF, function(x) x[which(x$target %in% names(PostnataltargettogeneID)),])
 ulTF = Map(cbind, ulTF, transf = lapply(ulTF, function(x) -log10(x$padj)))
 ulTF = lapply(ulTF, function(x) x[order(x$id),])
 ulTF = ulTF[order(names(ulTF))]
@@ -298,6 +278,7 @@ lapply(splTF$allTF$Age.pos, function(x) x$padj)
 ### Identify TFs that are differentially enriched between UMRs and LMRs
 
 ## Explore distribution
+
 ulTFdiff = lapply(ulTFdiff, function(x) x$group.bg[which(names(x$group.bg) %in% ulTF$All$id)])
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich/figures/ulTFdiff_distribution.pdf")
@@ -313,19 +294,54 @@ write.csv(do.call(rbind, Map(cbind, lapply(ulTF, function(x) data.frame(max = ma
 
 
 ## Isolate motifs that are in the top and bottom quartile that are at least enriched to +/-2
-ulQ = do.call(rbind, lapply(ulTFdiff, function(x) quantile(x, na.rm = T)))
+
+do.call(rbind, lapply(ulTFdiff, function(x) quantile(x, na.rm = T)))
 
 ulDiffQ25 = mapply(function(ul, q) ul[which(ul<=q[2] & abs(ul)>=2)], ulTFdiff, lapply(ulTFdiff, function(x) quantile(x, na.rm = T)))
 ulDiffQ75 = mapply(function(ul, q) ul[which(ul>=q[4] & abs(ul)>=2)], ulTFdiff, lapply(ulTFdiff, function(x) quantile(x, na.rm = T)))
 
+comps = list(All = c("AllLMR", "AllUMR"), Prenatal = c("PrenatalLMR","PrenatalUMR"), Postnatal = c("PostnatalLMR","PostnatalUMR"),
+             Neurons = c("NeuronsLMR","NeuronsUMR"), Glia = c("GliaLMR","GliaUMR"),
+             pre.post.UMR = c("PrenatalUMR","PostnatalUMR"),
+             pre.neuron.UMR = c("PrenatalUMR","NeuronsUMR"),
+             pre.glia.UMR = c("PrenatalUMR","GliaUMR"),
+             neuron.glia.UMR = c("NeuronsUMR", "GliaUMR"),
+             pre.post.LMR = c("PrenatalLMR","PostnatalLMR"),
+             pre.neuron.LMR = c("PrenatalLMR","NeuronsLMR"),
+             pre.glia.LMR = c("PrenatalLMR","GliaLMR"),
+             neuron.glia.LMR = c("NeuronsLMR","GliaLMR"),
+             all.pre.UMR = c("AllUMR","PrenatalUMR"),
+             all.post.UMR = c("AllUMR","PostnatalUMR"),
+             all.neuron.UMR = c("AllUMR","NeuronsUMR"),
+             all.glia.UMR = c("AllUMR","GliaUMR"),
+             all.pre.LMR = c("AllLMR","PrenatalLMR"),
+             all.post.LMR = c("AllLMR","PostnatalLMR"),
+             all.neuron.LMR = c("AllLMR","NeuronsLMR"),
+             all.glia.LMR = c("AllLMR","GliaLMR"))
+
+x = list()
+for (i in 1:length(comps)) {
+  x[[i]] = cbind(ulTF[[comps[[i]][1]]], ulTF[[comps[[i]][2]]][match(ulTF[[comps[[i]][1]]][,"id"], ulTF[[comps[[i]][2]]][,"id"]),])
+  x[[i]] = x[[i]][,-c(grep("transf", colnames(x[[i]])),grep("rank", colnames(x[[i]])))]
+  colnames(x[[i]]) = gsub("padj", "FDR", colnames(x[[i]]))
+}
+
+ulDiffQ25 = mapply(function(d,x) data.frame(Quantile = "Q25","Difference Statistic" = d, x[match(names(d), x[,2]),]), ulDiffQ25, x, SIMPLIFY = F) 
+ulDiffQ75 = mapply(function(d,x) data.frame(Quantile = "Q75","Difference Statistic" = d, x[match(names(d), x[,2]),]), ulDiffQ75, x, SIMPLIFY = F) 
+
+ulDiffQ25 = lapply(ulDiffQ25, function(x) x[which(x[,14]<=0.01),])
+ulDiffQ75 = lapply(ulDiffQ75, function(x) x[which(x[,8]<=0.01),])
+
+for (i in 1:length(ulDiffQ25)) { 
+  write.csv(rbind(ulDiffQ25[[i]], ulDiffQ75[[i]]), quote = F, row.names = F,
+            file = paste0("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/differentially_enriched_TFs_", names(ulDiffQ75)[i], ".csv"))  }
+
 
 ## annotate TFs to their entrez IDS
 
-length(unique(TF$allTF$Age.pos$target)) # 673 unique targets
-ulDiffQ25 = lapply(ulDiffQ25, function(x) unique(TF$allTF$Age.pos[which(TF$allTF$Age.pos$id %in% names(x)),"target"]))
-ulDiffQ75 = lapply(ulDiffQ75, function(x) unique(TF$allTF$Age.pos[which(TF$allTF$Age.pos$id %in% names(x)),"target"]))
-ulDiffQ25 = lapply(ulDiffQ25, function(x) targettogeneID[match(x,names(targettogeneID))])
-ulDiffQ75 = lapply(ulDiffQ75, function(x) targettogeneID[match(x,names(targettogeneID))])
+length(unique(ulTF$AllLMR$target)) # 641 unique targets
+ulDiffQ25 = lapply(ulDiffQ25, function(x) PostnataltargettogeneID[match(x[,3],names(PostnataltargettogeneID))])
+ulDiffQ75 = lapply(ulDiffQ75, function(x) PostnataltargettogeneID[match(x[,3],names(PostnataltargettogeneID))])
 ulDiffQ25 = lapply(ulDiffQ25, function(x) geneMap[which(geneMap$gencodeID %in% x),])
 ulDiffQ75 = lapply(ulDiffQ75, function(x) geneMap[which(geneMap$gencodeID %in% x),])
 
@@ -335,8 +351,8 @@ entrez = mapply(function(x,y) list(Q25 = unique(na.omit(as.character(x$EntrezID)
 
 ## Assess enriched terms limiting the gene universe to the terms associated with the master list of TFs
 
-GeneUniverse = unique(na.omit(as.character(geneMap[which(geneMap$gencodeID %in% targettogeneID), "EntrezID"])))
-length(GeneUniverse) # 648
+GeneUniverse = unique(na.omit(as.character(geneMap[which(geneMap$gencodeID %in% PostnataltargettogeneID), "EntrezID"])))
+length(GeneUniverse) # 616
 
 # Find enriched pathways and processes
 
@@ -351,7 +367,6 @@ goList_CC = lapply(unlist(entrez, recursive=F), function(x) enrichGO(x, ont = "C
 goList_DO = lapply(unlist(entrez, recursive=F), function(x) enrichDO(x, ont = "DO", universe= GeneUniverse, minGSSize=5, 
                                                                      pAdjustMethod="BH", qvalueCutoff=1, readable=TRUE))
 
-
 # Compare the enriched terms
 
 compareKegg = lapply(entrez, function(x) compareCluster(x, fun="enrichKEGG", qvalueCutoff = 0.05, pvalueCutoff = 0.05))
@@ -360,70 +375,10 @@ compareMF = lapply(entrez, function(x) compareCluster(x, fun="enrichGO",  ont = 
 compareCC = lapply(entrez, function(x) compareCluster(x, fun="enrichGO",  ont = "CC", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05))
 compareDO = lapply(entrez, function(x) compareCluster(x, fun="enrichDO",  ont = "DO", qvalueCutoff = 0.05, pvalueCutoff = 0.05))
 
-# Save
 
 save(keggList, goList_MF, goList_BP, goList_CC, goList_DO, compareBP, compareMF, compareCC, compareKegg,
      file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/UMR_LMR_GO.objects.PWMEnrich.rda")
 
-ulDiffQ25 = mapply(function(ul, q) ul[which(ul<=q[2] & abs(ul)>=2)], ulTFdiff, lapply(ulTFdiff, function(x) quantile(x, na.rm = T)))
-ulDiffQ75 = mapply(function(ul, q) ul[which(ul>=q[4] & abs(ul)>=2)], ulTFdiff, lapply(ulTFdiff, function(x) quantile(x, na.rm = T)))
-
-x = list("All" = cbind(ulTF$AllUMR, ulTF$AllLMR[match(ulTF$AllUMR$id, ulTF$AllLMR$id),]), 
-         "Prenatal" = cbind(ulTF$PrenatalUMR, ulTF$PrenatalLMR[match(ulTF$PrenatalUMR$id, ulTF$PrenatalLMR$id),]),        
-         "Postnatal" = cbind(ulTF$PostnatalUMR, ulTF$PostnatalLMR[match(ulTF$PostnatalUMR$id, ulTF$PostnatalLMR$id),]),
-         "Neurons" = cbind(ulTF$NeuronsUMR, ulTF$NeuronsLMR[match(ulTF$NeuronsUMR$id, ulTF$NeuronsLMR$id),]),        
-         "Glia" = cbind(ulTF$GliaUMR, ulTF$GliaLMR[match(ulTF$GliaUMR$id, ulTF$GliaLMR$id),]), 
-         "pre.post.UMR" = cbind(ulTF$PrenatalUMR, ulTF$PostnatalUMR[match(ulTF$PrenatalUMR$id, ulTF$PostnatalUMR$id),]),
-         "pre.neuron.UMR" = cbind(ulTF$PrenatalUMR, ulTF$NeuronsUMR[match(ulTF$PrenatalUMR$id, ulTF$NeuronsUMR$id),]),
-         "pre.glia.UMR" = cbind(ulTF$PrenatalUMR, ulTF$GliaUMR[match(ulTF$PrenatalUMR$id, ulTF$GliaUMR$id),]),
-         "neuron.glia.UMR" = cbind(ulTF$NeuronsUMR, ulTF$GliaUMR[match(ulTF$NeuronsUMR$id, ulTF$GliaUMR$id),]),
-         "pre.post.LMR" = cbind(ulTF$PrenatalLMR, ulTF$PostnatalLMR[match(ulTF$PrenatalLMR$id, ulTF$PostnatalLMR$id),]),
-         "pre.neuron.LMR" = cbind(ulTF$PrenatalLMR, ulTF$NeuronsLMR[match(ulTF$PrenatalLMR$id, ulTF$NeuronsLMR$id),]),
-         "pre.glia.LMR" = cbind(ulTF$PrenatalLMR, ulTF$GliaLMR[match(ulTF$PrenatalLMR$id, ulTF$GliaLMR$id),]),
-         "neuron.glia.LMR" = cbind(ulTF$NeuronsLMR, ulTF$GliaLMR[match(ulTF$NeuronsLMR$id, ulTF$GliaLMR$id),]),
-         "all.pre.UMR" = cbind(ulTF$AllUMR, ulTF$PrenatalUMR[match(ulTF$AllUMR$id, ulTF$PrenatalUMR$id),]),
-         "all.post.UMR" = cbind(ulTF$AllUMR, ulTF$PostnatalUMR[match(ulTF$AllUMR$id, ulTF$PostnatalUMR$id),]),
-         "all.neuron.UMR" = cbind(ulTF$AllUMR, ulTF$NeuronsUMR[match(ulTF$AllUMR$id, ulTF$NeuronsUMR$id),]),
-         "all.glia.UMR" = cbind(ulTF$AllUMR, ulTF$GliaUMR[match(ulTF$AllUMR$id, ulTF$GliaUMR$id),]),
-         "all.pre.LMR" = cbind(ulTF$AllLMR, ulTF$PrenatalLMR[match(ulTF$AllLMR$id, ulTF$PrenatalLMR$id),]),
-         "all.post.LMR" = cbind(ulTF$AllLMR, ulTF$PostnatalLMR[match(ulTF$AllLMR$id, ulTF$PostnatalLMR$id),]),
-         "all.neuron.LMR" = cbind(ulTF$AllLMR, ulTF$NeuronsLMR[match(ulTF$AllLMR$id, ulTF$NeuronsLMR$id),]),
-         "all.glia.LMR" = cbind(ulTF$AllLMR, ulTF$GliaLMR[match(ulTF$AllLMR$id, ulTF$GliaLMR$id),]))
-for (i in 1:length(x)) { 
-  x[[i]] = x[[i]][,-c(grep("transf", colnames(x[[i]])),grep("rank", colnames(x[[i]])))]
-  colnames(x[[i]]) = list(c(paste0("UMR.",colnames(x[[i]])[1:6]), paste0("LMR.",colnames(x[[i]])[1:6])),
-                          c(paste0("UMR.",colnames(x[[i]])[1:6]), paste0("LMR.",colnames(x[[i]])[1:6])),
-                          c(paste0("UMR.",colnames(x[[i]])[1:6]), paste0("LMR.",colnames(x[[i]])[1:6])),
-                          c(paste0("UMR.",colnames(x[[i]])[1:6]), paste0("LMR.",colnames(x[[i]])[1:6])),
-                          c(paste0("UMR.",colnames(x[[i]])[1:6]), paste0("LMR.",colnames(x[[i]])[1:6])),
-                          c(paste0("prenatal.UMR.",colnames(x[[i]])[1:6]), paste0("postnatal.UMR.",colnames(x[[i]])[1:6])),
-                          c(paste0("prenatal.UMR",colnames(x[[i]])[1:6]), paste0("neuron.UMR.",colnames(x[[i]])[1:6])),
-                          c(paste0("prenatal.UMR",colnames(x[[i]])[1:6]), paste0("glia.UMR.",colnames(x[[i]])[1:6])),
-                          c(paste0("neuron.UMR",colnames(x[[i]])[1:6]), paste0("glia.UMR.",colnames(x[[i]])[1:6])),
-                          c(paste0("prenatal.LMR.",colnames(x[[i]])[1:6]), paste0("postnatal.LMR.",colnames(x[[i]])[1:6])),
-                          c(paste0("prenatal.LMR",colnames(x[[i]])[1:6]), paste0("neuron.LMR.",colnames(x[[i]])[1:6])),
-                          c(paste0("prenatal.LMR",colnames(x[[i]])[1:6]), paste0("glia.LMR.",colnames(x[[i]])[1:6])),
-                          c(paste0("neuron.LMR",colnames(x[[i]])[1:6]), paste0("glia.LMR.",colnames(x[[i]])[1:6])),
-                          c(paste0("all.UMR.",colnames(x[[i]])[1:6]), paste0("prenatal.UMR.",colnames(x[[i]])[1:6])),
-                          c(paste0("all.UMR.",colnames(x[[i]])[1:6]), paste0("postnatal.UMR.",colnames(x[[i]])[1:6])),
-                          c(paste0("all.UMR.",colnames(x[[i]])[1:6]), paste0("neuron.UMR.",colnames(x[[i]])[1:6])),
-                          c(paste0("all.UMR.",colnames(x[[i]])[1:6]), paste0("glia.UMR.",colnames(x[[i]])[1:6])),
-                          c(paste0("all.LMR.",colnames(x[[i]])[1:6]), paste0("prenatal.LMR.",colnames(x[[i]])[1:6])),
-                          c(paste0("all.LMR.",colnames(x[[i]])[1:6]), paste0("postnatal.LMR.",colnames(x[[i]])[1:6])),
-                          c(paste0("all.LMR.",colnames(x[[i]])[1:6]), paste0("neuron.LMR.",colnames(x[[i]])[1:6])),
-                          c(paste0("all.LMR.",colnames(x[[i]])[1:6]), paste0("glia.LMR.",colnames(x[[i]])[1:6])))[[i]]
-  colnames(x[[i]]) = gsub("padj", "FDR", colnames(x[[i]]))
-}
-                            
-ulDiffQ25 = mapply(function(d,x) data.frame(Quantile = "Q25","Difference Statistic" = d, x[match(names(d), x[,2]),]), ulDiffQ25, x, SIMPLIFY = F) 
-ulDiffQ75 = mapply(function(d,x) data.frame(Quantile = "Q75","Difference Statistic" = d, x[match(names(d), x[,2]),]), ulDiffQ75, x, SIMPLIFY = F) 
-
-for (i in 1:length(ulDiffQ25)) { 
-  write.csv(rbind(ulDiffQ25[[i]], ulDiffQ75[[i]]), quote = F, row.names = F,
-            file = paste0("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/differentially_enriched_TFs_", names(ulDiffQ75)[i], ".csv"))  }
-
-
-## plot Gene ontology enrichment
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich/figures/KEGG_MF_CC_DO_umr_lmr_TFs.pdf", width=12,height=20)
 for (i in 1:length(compareKegg)) {
@@ -460,19 +415,44 @@ write.csv(do.call(rbind, Map(cbind, lapply(TF, function(y)  do.call(rbind, Map(c
 
 ## Isolate motifs that are in the top and bottom quartile that are at least enriched to +/-2
 
-tfQ = do.call(rbind, lapply(TFdiff, function(x) quantile(x, na.rm = T)))
+do.call(rbind, lapply(TFdiff, function(x) quantile(x, na.rm = T)))
 
 tfDiffQ25 = mapply(function(tf, q) tf[which(tf<=q[2] & abs(tf)>=2)], TFdiff, lapply(TFdiff, function(x) quantile(x, na.rm = T)))
 tfDiffQ75 = mapply(function(tf, q) tf[which(tf>=q[4] & abs(tf)>=2)], TFdiff, lapply(TFdiff, function(x) quantile(x, na.rm = T)))
+
+comps = data.frame(a=c(rep("allTF",3),rep("intergenicTF",2),rep("intronTF",3),rep("promTF",3),
+                       rep(c("promTF","promTF","intronTF"),3),"promTF", rep(c("promTF","promTF","intronTF"),2)),
+                   b=c("Age",rep(c("CellType","Interaction"),2),rep(c("Age","CellType","Interaction"),2),rep("CellType",6),rep("Age",4),rep("Interaction",6)),
+                   c=c(rep("pos",11),rep("pos",3),rep("neg",3),rep("pos",3),"neg",rep("pos",3),rep("neg",3)),
+                   d=c(rep("allTF",3),rep("intergenicTF",2),rep("intronTF",3),rep("promTF",3),
+                       rep(c("intergenicTF","intronTF","intergenicTF"),3),"intronTF", rep(c("intergenicTF","intronTF","intergenicTF"),2)),
+                   e=c("Age",rep(c("CellType","Interaction"),2),rep(c("Age","CellType","Interaction"),2),rep("CellType",6),rep("Age",4),rep("Interaction",6)),
+                   f=c(rep("neg",11),rep("pos",3),rep("neg",3),rep("pos",3),"neg",rep("pos",3),rep("neg",3)))
+comps = list(paste(comps$a, comps$b, comps$c, sep = "."), paste(comps$d, comps$e, comps$f, sep = "."))
+x = list()
+for (i in 1:length(comps[[1]])) {
+  x[[i]] = cbind(unlist(TF, recursive=F)[[comps[[1]][i]]], 
+                 unlist(TF, recursive=F)[[comps[[2]][i]]][match(unlist(TF, recursive=F)[[comps[[1]][i]]][,"id"], unlist(TF, recursive=F)[[comps[[2]][i]]][,"id"]),])
+  x[[i]] = x[[i]][,-c(grep("transf", colnames(x[[i]])),grep("rank", colnames(x[[i]])))]
+  colnames(x[[i]]) = gsub("padj", "FDR", colnames(x[[i]]))
+}
+
+tfDiffQ25 = mapply(function(d,x) data.frame(Quantile = "Q25","Difference Statistic" = d, x[match(names(d), x[,2]),]), tfDiffQ25, x, SIMPLIFY = F) 
+tfDiffQ75 = mapply(function(d,x) data.frame(Quantile = "Q75","Difference Statistic" = d, x[match(names(d), x[,2]),]), tfDiffQ75, x, SIMPLIFY = F) 
+
+tfDiffQ25 = lapply(tfDiffQ25, function(x) x[which(x[,14]<=0.01),])
+tfDiffQ75 = lapply(tfDiffQ75, function(x) x[which(x[,8]<=0.01),])
+
+for (i in 1:length(tfDiffQ25)) { 
+  write.csv(rbind(tfDiffQ25[[i]], tfDiffQ75[[i]]), quote = F, row.names = F,
+            file = paste0("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/differentially_enriched_TFs_", names(tfDiffQ75)[i], ".csv"))  }
 
 
 ## annotate TFs to their entrez IDS
 
 length(unique(TF$allTF$Age.pos$target)) # 673 unique targets
-tfDiffQ25 = lapply(tfDiffQ25, function(x) unique(TF$allTF$Age.pos[which(TF$allTF$Age.pos$id %in% names(x)),"target"]))
-tfDiffQ75 = lapply(tfDiffQ75, function(x) unique(TF$allTF$Age.pos[which(TF$allTF$Age.pos$id %in% names(x)),"target"]))
-tfDiffQ25 = lapply(tfDiffQ25, function(x) targettogeneID[match(x,names(targettogeneID))])
-tfDiffQ75 = lapply(tfDiffQ75, function(x) targettogeneID[match(x,names(targettogeneID))])
+tfDiffQ25 = lapply(tfDiffQ25, function(x) PostnataltargettogeneID[match(x[,3],names(PostnataltargettogeneID))])
+tfDiffQ75 = lapply(tfDiffQ75, function(x) PostnataltargettogeneID[match(x[,3],names(PostnataltargettogeneID))])
 tfDiffQ25 = lapply(tfDiffQ25, function(x) geneMap[which(geneMap$gencodeID %in% x),])
 tfDiffQ75 = lapply(tfDiffQ75, function(x) geneMap[which(geneMap$gencodeID %in% x),])
 
@@ -482,8 +462,8 @@ entrez = mapply(function(x,y) list(Q25 = unique(na.omit(as.character(x$EntrezID)
 
 ## Assess enriched terms limiting the gene universe to the terms associated with the master list of TFs
 
-GeneUniverse = unique(na.omit(as.character(geneMap[which(geneMap$gencodeID %in% targettogeneID), "EntrezID"])))
-length(GeneUniverse) # 648
+GeneUniverse = unique(na.omit(as.character(geneMap[which(geneMap$gencodeID %in% PostnataltargettogeneID), "EntrezID"])))
+length(GeneUniverse) # 616
 
 # Find enriched pathways and processes
 
@@ -508,94 +488,18 @@ compareDO = lapply(entrez, function(x) compareCluster(x, fun="enrichDO",  ont = 
 
 # Save
 
-save(keggList, goList_MF, goList_BP, goList_CC, goList_DO, compareBP, compareMF, compareCC, compareKegg,
-     file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_GO.objects.PWMEnrich.rda")
+save(keggList, goList_MF, goList_BP, goList_CC, goList_DO, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_GO.objects.PWMEnrich.rda")
 
-tfDiffQ25 = mapply(function(tf, q) tf[which(tf<=q[2] & abs(tf)>=2)], TFdiff, lapply(TFdiff, function(x) quantile(x, na.rm = T)))
-tfDiffQ75 = mapply(function(tf, q) tf[which(tf>=q[4] & abs(tf)>=2)], TFdiff, lapply(TFdiff, function(x) quantile(x, na.rm = T)))
 
-x = list("allAge" = cbind(TF$allTF$Age.pos, TF$allTF$Age.neg[match(TF$allTF$Age.pos$id, TF$allTF$Age.neg$id),]),
-         "allInt" = cbind(TF$allTF$Interaction.pos, TF$allTF$Interaction.neg[match(TF$allTF$Interaction.pos$id, TF$allTF$Interaction.neg$id),]),                   
-         "allCT" = cbind(TF$allTF$CellType.pos, TF$allTF$CellType.neg[match(TF$allTF$CellType.pos$id, TF$allTF$CellType.neg$id),]),
-         "promCT" = cbind(TF$promTF$CellType.pos, TF$promTF$CellType.neg[match(TF$promTF$CellType.pos$id, TF$promTF$CellType.neg$id),]),
-         "promAge" = cbind(TF$promTF$Age.pos, TF$promTF$Age.neg[match(TF$promTF$Age.pos$id, TF$promTF$Age.neg$id),]),
-         "promInt" = cbind(TF$promTF$Interaction.pos, TF$promTF$Interaction.neg[match(TF$promTF$Interaction.pos$id, TF$promTF$Interaction.neg$id),]),
-         "intronsCT" = cbind(TF$intronTF$CellType.pos, TF$intronTF$CellType.neg[match(TF$intronTF$CellType.pos$id, TF$intronTF$CellType.neg$id),]),
-         "intronsAge" = cbind(TF$intronTF$Age.pos, TF$intronTF$Age.neg[match(TF$intronTF$Age.pos$id, TF$intronTF$Age.neg$id),]),
-         "intronsInt" = cbind(TF$intronTF$Interaction.pos, TF$intronTF$Interaction.neg[match(TF$intronTF$Interaction.pos$id, TF$intronTF$Interaction.neg$id),]),
-         "interCT" = cbind(TF$intergenicTF$CellType.pos, TF$intergenicTF$CellType.neg[match(TF$intergenicTF$CellType.pos$id, TF$intergenicTF$CellType.neg$id),]),
-         "interInt" = cbind(TF$intergenicTF$Interaction.pos, TF$intergenicTF$Interaction.neg[match(TF$intergenicTF$Interaction.pos$id, TF$intergenicTF$Interaction.neg$id),]),
-         "prom.intergenic.pos.CT" = cbind(TF$promTF$CellType.pos, TF$intergenicTF$CellType.pos[match(TF$promTF$CellType.pos$id, TF$intergenicTF$CellType.pos$id),]),
-         "prom.intron.pos.CT" = cbind(TF$promTF$CellType.pos, TF$intronTF$CellType.pos[match(TF$promTF$CellType.pos$id, TF$intronTF$CellType.pos$id),]),
-         "intron.intergenic.pos.CT" = cbind(TF$intronTF$CellType.pos, TF$intergenicTF$CellType.pos[match(TF$intronTF$CellType.pos$id, TF$intergenicTF$CellType.pos$id),]), 
-         "prom.intergenic.neg.CT" = cbind(TF$promTF$CellType.neg, TF$intergenicTF$CellType.neg[match(TF$promTF$CellType.neg$id, TF$intergenicTF$CellType.neg$id),]),    
-         "prom.intron.neg.CT" = cbind(TF$promTF$CellType.neg, TF$intronTF$CellType.neg[match(TF$promTF$CellType.neg$id, TF$intronTF$CellType.neg$id),]),       
-         "intron.intergenic.neg.CT" = cbind(TF$intronTF$CellType.neg, TF$intergenicTF$CellType.neg[match(TF$intronTF$CellType.neg$id, TF$intergenicTF$CellType.neg$id),]),
-         "prom.intergenic.pos.Age" = cbind(TF$promTF$Age.pos, TF$intergenicTF$Age.pos[match(TF$promTF$Age.pos$id, TF$intergenicTF$Age.pos$id),]),  
-         "prom.intron.pos.Age" = cbind(TF$promTF$Age.pos, TF$intronTF$Age.pos[match(TF$promTF$Age.pos$id, TF$intronTF$Age.pos$id),]),
-         "intron.intergenic.pos.Age" = cbind(TF$intronTF$Age.pos, TF$intergenicTF$Age.pos[match(TF$intronTF$Age.pos$id, TF$intergenicTF$Age.pos$id),]),
-         "prom.intron.neg.Age" = cbind(TF$promTF$Age.neg, TF$intronTF$Age.neg[match(TF$promTF$Age.neg$id, TF$intronTF$Age.neg$id),]),
-         "prom.intergenic.pos.Int" = cbind(TF$promTF$Interaction.pos, TF$intergenicTF$Interaction.pos[match(TF$promTF$Interaction.pos$id, TF$intergenicTF$Interaction.pos$id),]),  
-         "prom.intron.pos.Int" = cbind(TF$promTF$Interaction.pos, TF$intronTF$Interaction.pos[match(TF$promTF$Interaction.pos$id, TF$intronTF$Interaction.pos$id),]),
-         "intron.intergenic.pos.Int" = cbind(TF$intronTF$Interaction.pos, TF$intergenicTF$Interaction.pos[match(TF$intronTF$Interaction.pos$id, TF$intergenicTF$Interaction.pos$id),]),
-         "prom.intergenic.neg.Int" = cbind(TF$promTF$Interaction.neg, TF$intergenicTF$Interaction.neg[match(TF$promTF$Interaction.neg$id, TF$intergenicTF$Interaction.neg$id),]),    
-         "prom.intron.neg.Int" = cbind(TF$promTF$Interaction.neg, TF$intronTF$Interaction.neg[match(TF$promTF$Interaction.neg$id, TF$intronTF$Interaction.neg$id),]),      
-         "intron.intergenic.neg.Int" = cbind(TF$intronTF$Interaction.neg, TF$intergenicTF$Interaction.neg[match(TF$intronTF$Interaction.neg$id, TF$intergenicTF$Interaction.neg$id),]))
+## Explore results
 
-for (i in 1:length(x)) { 
-  x[[i]] = x[[i]][,-c(grep("transf", colnames(x[[i]])),grep("rank", colnames(x[[i]])))]
-  colnames(x[[i]]) = list(c(paste0("+Beta",colnames(x[[i]])[1:6]), paste0("-Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("+Beta",colnames(x[[i]])[1:6]), paste0("-Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("+Beta",colnames(x[[i]])[1:6]), paste0("-Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("+Beta",colnames(x[[i]])[1:6]), paste0("-Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("+Beta",colnames(x[[i]])[1:6]), paste0("-Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("+Beta",colnames(x[[i]])[1:6]), paste0("-Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("+Beta",colnames(x[[i]])[1:6]), paste0("-Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("+Beta",colnames(x[[i]])[1:6]), paste0("-Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("+Beta",colnames(x[[i]])[1:6]), paste0("-Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("+Beta",colnames(x[[i]])[1:6]), paste0("-Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("+Beta",colnames(x[[i]])[1:6]), paste0("-Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("Promoter.CellType.+Beta",colnames(x[[i]])[1:6]), paste0("Intergenic.CellType.+Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("Promoter.CellType.+Beta",colnames(x[[i]])[1:6]), paste0("Intron.CellType.+Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("Intron.CellType.+Beta",colnames(x[[i]])[1:6]), paste0("Intergenic.CellType.+Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("Promoter.CellType.-Beta",colnames(x[[i]])[1:6]), paste0("Intergenic.CellType.-Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("Promoter.CellType.-Beta",colnames(x[[i]])[1:6]), paste0("Intron.CellType.-Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("Intron.CellType.-Beta",colnames(x[[i]])[1:6]), paste0("Intergenic.CellType.-Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("Promoter.Age.+Beta",colnames(x[[i]])[1:6]), paste0("Intergenic.Age.+Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("Promoter.Age.+Beta",colnames(x[[i]])[1:6]), paste0("Intron.Age.+Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("Intron.Age.+Beta",colnames(x[[i]])[1:6]), paste0("Intergenic.Age.+Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("Promoter.Age.-Beta",colnames(x[[i]])[1:6]), paste0("Intron.Age.-Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("Promoter.Interaction.+Beta",colnames(x[[i]])[1:6]), paste0("Intergenic.Interaction.+Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("Promoter.Interaction.+Beta",colnames(x[[i]])[1:6]), paste0("Intron.Interaction.+Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("Intron.Interaction.+Beta",colnames(x[[i]])[1:6]), paste0("Intergenic.Interaction.+Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("Promoter.Interaction.-Beta",colnames(x[[i]])[1:6]), paste0("Intergenic.Interaction.-Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("Promoter.Interaction.-Beta",colnames(x[[i]])[1:6]), paste0("Intron.Interaction.-Beta",colnames(x[[i]])[1:6])),
-                          c(paste0("Intron.Interaction.-Beta",colnames(x[[i]])[1:6]), paste0("Intergenic.Interaction.-Beta",colnames(x[[i]])[1:6])))[[i]]
-  colnames(x[[i]]) = gsub("padj", "FDR", colnames(x[[i]]))
+names = c("allAge", "promAge", "intronsAge", "allCT", "promCT", "intronsCT", "interCT")
+tfs = list()
+for (i in 1:length(names)) {
+  tfs[[i]] = read.csv(paste0("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/differentially_enriched_TFs_",
+                             names[i], ".csv"))
 }
-
-tfDiffQ25 = mapply(function(d,x) data.frame(Quantile = "Q25","Difference Statistic" = d, x[match(names(d), x[,2]),]), tfDiffQ25, x, SIMPLIFY = F) 
-tfDiffQ75 = mapply(function(d,x) data.frame(Quantile = "Q75","Difference Statistic" = d, x[match(names(d), x[,2]),]), tfDiffQ75, x, SIMPLIFY = F) 
-
-for (i in 1:length(tfDiffQ25)) { 
-  write.csv(rbind(tfDiffQ25[[i]], tfDiffQ75[[i]]), quote = F, row.names = F,
-            file = paste0("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/differentially_enriched_TFs_", names(tfDiffQ75)[i], ".csv"))  }
-
-
-## plot Gene ontology enrichment
-
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich/figures/KEGG_MF_CC_DO_DMR_TFs.pdf", width=12,height=20)
-for (i in 1:length(compareKegg)) {
-  print(plot(compareKegg[[i]], colorBy= "p.adjust",  showCategory = 1500, title= paste0("KEGG Pathway Enrichment: ", names(compareKegg)[i])))
-  print(plot(compareMF[[i]], colorBy= "p.adjust",  showCategory = 1500, title= paste0("MF Pathway Enrichment: ", names(compareMF)[i])))
-  print(plot(compareCC[[i]], colorBy= "p.adjust",  showCategory = 1500, title= paste0("CC Pathway Enrichment: ", names(compareCC)[i])))
-}
-dev.off()
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich/figures/BP_DMR_TFs.pdf", width=12,height=110)
-for (i in 1:length(compareBP)) {
-  print(plot(compareBP[[i]], colorBy= "p.adjust",  showCategory = 1500, title= paste0("Biological Process GO:\n", names(compareBP)[i])))
-}
-dev.off()
+names(tfs) = names
 
 
 

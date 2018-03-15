@@ -260,3 +260,159 @@ do.call(rbind,lapply(group, function(x) x[which(x$target=="CBX7"),]))
 unlist(lapply(exonDiff, function(x) x[names(x)=="CBX7"]))
 #   CpG.CBX7         nonCpG.CBX7 CpG.nonCpG.pos.CBX7 CpG.nonCpG.neg.CBX7 
 #-11918.4571       -3713625.2774            -28.2978       -3701735.1181 
+
+
+
+### Explore binding motif score distribution
+
+## Get PWMs
+
+data(MotifDb.Hsap)
+pwms = c(MotifDb.Hsap[which(names(MotifDb.Hsap)=="CTCF")], MotifDb.Hsap[grep("MECP2", names(MotifDb.Hsap))],
+         MotifDb.Hsap[grep("CBX7", names(MotifDb.Hsap))])
+# Can't find HP1 family PWMS (CBX1,CBX5,CBX3). Shame...
+
+pwms = MotifDb.Hsap[which(names(MotifDb.Hsap) %in% group$CpG.pos$id)] # all the motifs included in my other analyses
+
+
+## Get coordinates of expressed exons
+
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/brainseq_pipeline/polyA_unstranded/rse_exon_polyA_dlpfc_n41.Rdata", verbose = T)
+
+exonMap = rowRanges(rse_exon)
+exonCounts = assays(rse_exon)$counts
+hompd = colData(rse_exon)
+exonCounts = exonCounts[,which(colnames(exonCounts) %in% rownames(hompd[which(hompd$Age>0),]))]
+exonCounts = exonCounts[which(rowSums(exonCounts)>0),]
+exonMap = exonMap[names(exonMap) %in% rownames(exonCounts)]
+exonMap = exonMap[which(width(x)>30)]
+exonMap = exonMap[which(as.character(seqnames(exonMap)) %in% paste0("chr",c(1:22,"X","Y")))]
+
+sampleset = sample(exonMap, 25000, replace = FALSE)
+
+
+## Make new log-normal background on exons
+
+sampleseq = getSeq(Hsapiens, sampleset)
+lognBcgnd = makePWMLognBackground(sampleseq, pwms, algorithm = "human", bg.len = 100, verbose=F)
+
+
+## Run motifEnrichment on associated exons
+
+splice.exonBack = list()
+splice.exonBack$CpG.pos = motifEnrichment(seq$CpG.pos, lognBcgnd, verbose=F)
+splice.exonBack$nonCpG.pos = motifEnrichment(seq$nonCpG.pos, lognBcgnd, verbose=F)
+splice.exonBack$CpG.neg = motifEnrichment(seq$CpG.neg, lognBcgnd, verbose=F)
+splice.exonBack$nonCpG.neg = motifEnrichment(seq$nonCpG.neg, lognBcgnd, verbose=F)
+
+
+# Make table of raw scores for distribution analysis
+
+score = list()
+for (i in 1:length(splice.exonBack)) {
+  score[[i]] = list(vector("list", length(splice.exonBack[[i]]$sequences)))
+  for (j in 1:length(splice.exonBack[[i]]$sequences)) {
+    score[[i]][[j]] = sequenceReport(splice.exonBack[[i]], seq.id=j)
+  }
+}
+names(score) = names(splice.exonBack)
+score = lapply(score, function(x) lapply(x, function(y) as.data.frame(y)[order(y$id),]))
+score = lapply(score, function(y) do.call(cbind, lapply(y, function(z) z$raw.score)))
+for (i in 1:length(score)) { rownames(score[[i]]) = group$CpG.pos$id }
+for (i in 1:length(score)) { colnames(score[[i]]) = names(splice.exonBack[[i]]$sequences) }
+score = lapply(score, as.data.frame)
+
+score = Map(cbind, score, Context = lapply(as.list(names(score)), function(x) gsub('\\..*', '', x)),
+            Direction = lapply(as.list(names(score)), function(x) gsub('.*\\.', '', x)),
+            id = lapply(score, rownames))
+cols = lapply(score, colnames)
+cols = lapply(cols, function(x) data.frame(exonID = x[1:(length(x)-3)], col = paste0("col",1:length(x[1:(length(x)-3)]))))
+for (i in 1:length(score)) { colnames(score[[i]]) = c(as.character(cols[[i]][,"col"]),"Context","Direction","motifID") }
+score = lapply(score, reshape2::melt)
+
+# does it overlap?
+gr = list(CpG.pos = rowRanges(mres$CpG$expr)[which(mres$CpG$eqtls$statistic>0),], nonCpG.pos = rowRanges(mres$nonCpG$expr)[which(mres$nonCpG$eqtls$statistic>0),],
+          CpG.neg = rowRanges(mres$CpG$expr)[which(mres$CpG$eqtls$statistic<0),], nonCpG.neg = rowRanges(mres$nonCpG$expr)[which(mres$nonCpG$eqtls$statistic<0),])
+Cgr = list(CpG.pos = granges(mres$CpG$meth)[which(mres$CpG$eqtls$statistic>0),], nonCpG.pos = granges(mres$nonCpG$meth)[which(mres$nonCpG$eqtls$statistic>0),],
+           CpG.neg = granges(mres$CpG$meth)[which(mres$CpG$eqtls$statistic<0),], nonCpG.neg = granges(mres$nonCpG$meth)[which(mres$nonCpG$eqtls$statistic<0),])
+
+oo = mapply(function(exon, mC) findOverlaps(exon,mC), lapply(gr, function(x) x[width(x)>30]),
+            mapply(function(c,g) c[width(g)>30], Cgr, gr, SIMPLIFY = F), SIMPLIFY = F)
+overlapping = lapply(oo, function(x) x[which(queryHits(x)==subjectHits(x))])
+
+colOverlaps = mapply(function(dat, ov) as.character(dat[queryHits(ov),"col"]), cols, overlapping, SIMPLIFY = F)
+
+x = Map(cbind, score, C_in_exon = mapply(function(dat, ov) ifelse(dat$variable %in% ov, "Yes", "No"),
+                                             score, colOverlaps, SIMPLIFY = F),
+            Target = lapply(score, function(x) group$CpG.pos[match(x$motifID, group$CpG.pos$id), "target"]),
+            exonID = mapply(function(x, co) co[match(x$variable, co$col), "exonID"], score, cols, SIMPLIFY = F))
+score = do.call(rbind, x)
+
+save(score, splice.exonBack, lognBcgnd,
+     file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/spliceRegions_PWMEnrich_objects_exonAdjustedBackgrounds.rda")
+
+
+## Make a log-normal background for the canonical splice sequences
+
+# PFMs from https://www.ncbi.nlm.nih.gov/pubmed/9536098?dopt=Abstract
+splsitesPFM = list(highGC.3SS = rbind("A" = c(10,8,7,8,6,6,4,8,8,7,6,19,2,100,0,21,19),
+                                      "C" = c(41,42,41,40,38,43,42,46,49,54,45,38,82,0,0,13,21),
+                                      "G" = c(15,14,14,13,13,12,13,14,10,8,8,26,0,0,100,58,29),
+                                      "T" = c(34,36,38,39,43,39,41,32,33,31,41,17,16,0,0,8,31)),
+                   lowGC.3SS = rbind("A" = c(15,14,13,11,10,10,11,12,13,11,10,26,7,100,0,26,24),
+                                     "C" = c(24,21,20,22,21,22,25,28,28,25,22,25,55,0,0,11,15),
+                                     "G" = c(10,12,10,9,10,9,10,10,8,5,5,15,1,0,100,50,20),
+                                     "T" = c(51,53,57,58,59,59,54,50,51,59,63,33,37,0,0,13,41)),
+                   highGC.5SS = rbind("A" = c(32,56,8,0,0,38,70,5,13),
+                                      "C" = c(38,15,4,0,0,4,9,5,21),
+                                      "G" = c(19,15,80,100,0,56,14,86,25),
+                                      "T" = c(11,14,8,0,100,2,7,4,41)),
+                   lowGC.5SS = rbind("A" = c(38,62,12,0,0,71,73,11,21),
+                                     "C" = c(31,10,4,0,0,2,6,6,10),
+                                     "G" = c(18,12,77,100,0,24,8,75,14),
+                                     "T" = c(13,16,7,0,100,3,13,8,55)))
+genomic.acgt = getBackgroundFrequencies("hg19")
+splsitesPWM = toPWM(splsitesPFM, prior=genomic.acgt)
+
+
+exonMap = rowRanges(rse_exon)
+exonMap = split(exonMap, exonMap$gencodeID)
+ranges = lapply(exonMap, range)
+intronMap = mapply(function(exon, r) setdiff(exon, r), exonMap, ranges, SIMPLIFY = F)
+
+exonMap = unlist(exonMap)
+exonCounts = assays(rse_exon)$counts
+exonMap = exonMap[which(width(exonMap)>30)]
+exonMap = exonMap[which(as.character(seqnames(exonMap)) %in% paste0("chr",c(1:22,"X","Y")))]
+intronMap = unlist(intronMap)
+intronMap = intronMap[which(as.character(seqnames(intronMap)) %in% paste0("chr",c(1:22,"X","Y")))]
+intronMap = intronMap[which(width(intronMap)>30)]
+
+sampleset = c(sample(exonMap, 12500, replace = FALSE),sample(intronMap, 12500, replace = FALSE))
+sampleset = sortSeqlevels(sampleset)
+sampleset = sort(sampleset)
+
+## Make new log-normal background on mix of exons and introns for canonical splice donor and acceptor sequence
+
+sampleseq = getSeq(Hsapiens, sampleset)
+lognSpliceSeq = makePWMLognBackground(sampleseq, pwms, algorithm = "human", bg.len = 100, verbose=F)
+
+
+## Run motifEnrichment on regions around associated Cs
+
+Cgr = list(CpG.pos = granges(mres$CpG$meth)[which(mres$CpG$eqtls$statistic>0),], nonCpG.pos = granges(mres$nonCpG$meth)[which(mres$nonCpG$eqtls$statistic>0),],
+           CpG.neg = granges(mres$CpG$meth)[which(mres$CpG$eqtls$statistic<0),], nonCpG.neg = granges(mres$nonCpG$meth)[which(mres$nonCpG$eqtls$statistic<0),])
+for (i in 1:length(Cgr)) {
+  start(Cgr[[i]]) = start(Cgr[[i]]) - 15
+  end(Cgr[[i]]) = end(Cgr[[i]]) + 15
+}
+Cgr # names?
+
+Cseq = lapply(Cgr, function(x) getSeq(Hsapiens, x))
+
+C.allMotifsBack = lapply(Cseq, function(x) motifEnrichment(x, lognBcgnd, verbose=F))
+C.canonicalspliceBack = lapply(Cseq, function(x) motifEnrichment(x, lognSpliceSeq, verbose=F))
+
+
+
+
