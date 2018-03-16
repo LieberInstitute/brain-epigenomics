@@ -378,24 +378,23 @@ splsitesPWM = toPWM(splsitesPFM, prior=genomic.acgt)
 exonMap = rowRanges(rse_exon)
 exonMap = split(exonMap, exonMap$gencodeID)
 ranges = lapply(exonMap, range)
-intronMap = mapply(function(exon, r) setdiff(exon, r), exonMap, ranges, SIMPLIFY = F)
+intronMap = mapply(function(exon, r) setdiff(r,exon), exonMap, ranges, SIMPLIFY = F)
 
-exonMap = unlist(exonMap)
-exonCounts = assays(rse_exon)$counts
+exonMap = do.call(getMethod(c, "GenomicRanges"), GRangesList(exonMap))
 exonMap = exonMap[which(width(exonMap)>30)]
 exonMap = exonMap[which(as.character(seqnames(exonMap)) %in% paste0("chr",c(1:22,"X","Y")))]
-intronMap = unlist(intronMap)
+intronMap = do.call(getMethod(c, "GenomicRanges"), GRangesList(intronMap))
 intronMap = intronMap[which(as.character(seqnames(intronMap)) %in% paste0("chr",c(1:22,"X","Y")))]
 intronMap = intronMap[which(width(intronMap)>30)]
 
-sampleset = c(sample(exonMap, 12500, replace = FALSE),sample(intronMap, 12500, replace = FALSE))
+sampleset = c(sample(granges(exonMap), 12500, replace = FALSE),sample(intronMap, 12500, replace = FALSE))
 sampleset = sortSeqlevels(sampleset)
 sampleset = sort(sampleset)
 
 ## Make new log-normal background on mix of exons and introns for canonical splice donor and acceptor sequence
 
 sampleseq = getSeq(Hsapiens, sampleset)
-lognSpliceSeq = makePWMLognBackground(sampleseq, pwms, algorithm = "human", bg.len = 100, verbose=F)
+lognSpliceSeq = makePWMLognBackground(sampleseq, splsitesPWM, algorithm = "human", bg.len = 50, verbose=F)
 
 
 ## Run motifEnrichment on regions around associated Cs
@@ -403,15 +402,217 @@ lognSpliceSeq = makePWMLognBackground(sampleseq, pwms, algorithm = "human", bg.l
 Cgr = list(CpG.pos = granges(mres$CpG$meth)[which(mres$CpG$eqtls$statistic>0),], nonCpG.pos = granges(mres$nonCpG$meth)[which(mres$nonCpG$eqtls$statistic>0),],
            CpG.neg = granges(mres$CpG$meth)[which(mres$CpG$eqtls$statistic<0),], nonCpG.neg = granges(mres$nonCpG$meth)[which(mres$nonCpG$eqtls$statistic<0),])
 for (i in 1:length(Cgr)) {
+  names(Cgr[[i]]) = paste0(as.character(seqnames(Cgr[[i]])), ":",as.character(start(Cgr[[i]])), "-",as.character(end(Cgr[[i]])))
   start(Cgr[[i]]) = start(Cgr[[i]]) - 15
   end(Cgr[[i]]) = end(Cgr[[i]]) + 15
 }
-Cgr # names?
 
 Cseq = lapply(Cgr, function(x) getSeq(Hsapiens, x))
 
 C.allMotifsBack = lapply(Cseq, function(x) motifEnrichment(x, lognBcgnd, verbose=F))
 C.canonicalspliceBack = lapply(Cseq, function(x) motifEnrichment(x, lognSpliceSeq, verbose=F))
+
+save(score, splice.exonBack, lognBcgnd, lognSpliceSeq, C.allMotifsBack, C.canonicalspliceBack,
+     file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/spliceRegions_PWMEnrich_objects_exonAdjustedBackgrounds.rda")
+
+
+## make a score object for the C's
+
+spliceMotif.group = lapply(C.canonicalspliceBack, groupReport)
+spliceMotif.group = lapply(spliceMotif.group, as.data.frame)
+spliceMotif.group = Map(cbind, spliceMotif.group, padj = lapply(spliceMotif.group, function(x) p.adjust(x$p.value, method = "fdr")))
+spliceMotif.group = lapply(spliceMotif.group, function(x) x[order(x$id),])
+spliceMotif.group = do.call(rbind, Map(cbind, spliceMotif.group, Context = lapply(as.list(names(spliceMotif.group)), function(x) gsub('\\..*', '', x)),
+                                       Direction = lapply(as.list(names(spliceMotif.group)), function(x) gsub('.*\\.', '', x))))
+
+scoreC = pvalC = list()
+for (i in 1:length(C.allMotifsBack)) {
+  scoreC[[i]] = pcalC[[i]] = list(vector("list", length(C.allMotifsBack[[i]]$sequences)))
+  for (j in 1:length(C.allMotifsBack[[i]]$sequences)) {
+    scoreC[[i]][[j]] = list(sequenceReport(C.allMotifsBack[[i]], seq.id=j),
+                            sequenceReport(C.canonicalspliceBack[[i]], seq.id=j))
+    pvalC[[i]][[j]] = list(sequenceReport(C.allMotifsBack[[i]], seq.id=j),
+                           sequenceReport(C.canonicalspliceBack[[i]], seq.id=j))
+  }
+}
+names(scoreC) = names(pvalC) = names(C.allMotifsBack)
+
+scoreC = lapply(scoreC, function(x) lapply(x, function(z) lapply(z, function(y) as.data.frame(y)[order(y$id),])))
+scoreC = list(lapply(scoreC, function(y) do.call(cbind, lapply(y, function(z) z[[1]]$raw.score))),
+              lapply(scoreC, function(y) do.call(cbind, lapply(y, function(z) z[[2]]$raw.score))))
+for (i in 1:length(scoreC[[1]])) { rownames(scoreC[[1]][[i]]) = group$CpG.pos$id }
+for (i in 1:length(scoreC[[2]])) { rownames(scoreC[[2]][[i]]) = c("highGC.3SS","highGC.5SS","lowGC.3SS","lowGC.5SS") }
+scoreC = mapply(function(all, spl) rbind(all, spl), scoreC[[1]], scoreC[[2]], SIMPLIFY = F)
+for (i in 1:length(scoreC)) { colnames(scoreC[[i]]) = names(C.canonicalspliceBack[[i]]$sequences) }
+scoreC = lapply(scoreC, as.data.frame)
+scoreC = Map(cbind, scoreC, Context = lapply(as.list(names(scoreC)), function(x) gsub('\\..*', '', x)),
+            Direction = lapply(as.list(names(scoreC)), function(x) gsub('.*\\.', '', x)), id = lapply(scoreC, rownames))
+cols = lapply(scoreC, colnames)
+cols = lapply(cols, function(x) data.frame(exonID = x[1:(length(x)-3)], col = paste0("col",1:length(x[1:(length(x)-3)]))))
+for (i in 1:length(scoreC)) { colnames(scoreC[[i]]) = c(as.character(cols[[i]][,"col"]),"Context","Direction","motifID") }
+scoreC = lapply(scoreC, reshape2::melt)
+
+pvalC = lapply(pvalC, function(x) lapply(x, function(z) lapply(z, function(y) as.data.frame(y)[order(y$id),])))
+pvalC = list(lapply(pvalC, function(y) do.call(cbind, lapply(y, function(z) p.adjust(z[[1]]$p.value, method = "fdr")))),
+             lapply(pvalC, function(y) do.call(cbind, lapply(y, function(z) p.adjust(z[[2]]$p.value, method = "fdr")))))
+for (i in 1:length(pvalC[[1]])) { rownames(pvalC[[1]][[i]]) = as.character(group$CpG.pos$id) }
+for (i in 1:length(pvalC[[2]])) { rownames(pvalC[[2]][[i]]) = c("highGC.3SS","highGC.5SS","lowGC.3SS","lowGC.5SS") }
+pvalC = mapply(function(all, spl) rbind(all, spl), pvalC[[1]], pvalC[[2]], SIMPLIFY = F)
+for (i in 1:length(pvalC)) { colnames(pvalC[[i]]) = names(C.canonicalspliceBack[[i]]$sequences) }
+pvalC = lapply(pvalC, as.data.frame)
+pvalC = Map(cbind, pvalC, Context = lapply(as.list(names(pvalC)), function(x) gsub('\\..*', '', x)),
+            Direction = lapply(as.list(names(pvalC)), function(x) gsub('.*\\.', '', x)), id = lapply(pvalC, rownames))
+cols = lapply(pvalC, colnames)
+cols = lapply(cols, function(x) data.frame(exonID = x[1:(length(x)-3)], col = paste0("col",1:length(x[1:(length(x)-3)]))))
+for (i in 1:length(pvalC)) { colnames(pvalC[[i]]) = c(as.character(cols[[i]][,"col"]),"Context","Direction","motifID") }
+pvalC = lapply(pvalC, reshape2::melt)
+
+
+
+# does it overlap?
+gr = list(CpG.pos = rowRanges(mres$CpG$expr)[which(mres$CpG$eqtls$statistic>0),], nonCpG.pos = rowRanges(mres$nonCpG$expr)[which(mres$nonCpG$eqtls$statistic>0),],
+          CpG.neg = rowRanges(mres$CpG$expr)[which(mres$CpG$eqtls$statistic<0),], nonCpG.neg = rowRanges(mres$nonCpG$expr)[which(mres$nonCpG$eqtls$statistic<0),])
+Cgr = list(CpG.pos = granges(mres$CpG$meth)[which(mres$CpG$eqtls$statistic>0),], nonCpG.pos = granges(mres$nonCpG$meth)[which(mres$nonCpG$eqtls$statistic>0),],
+           CpG.neg = granges(mres$CpG$meth)[which(mres$CpG$eqtls$statistic<0),], nonCpG.neg = granges(mres$nonCpG$meth)[which(mres$nonCpG$eqtls$statistic<0),])
+
+oo = mapply(function(exon, mC) findOverlaps(exon,mC), lapply(gr, function(x) x[width(x)>30]),
+            mapply(function(c,g) c[width(g)>30], Cgr, gr, SIMPLIFY = F), SIMPLIFY = F)
+overlapping = lapply(oo, function(x) x[which(queryHits(x)==subjectHits(x))])
+
+colOverlaps = mapply(function(dat, ov) as.character(dat[queryHits(ov),"col"]), cols, overlapping, SIMPLIFY = F)
+
+x = Map(cbind, scoreC, C_in_exon = mapply(function(dat, ov) ifelse(dat$variable %in% ov, "Yes", "No"),
+                                         scoreC, colOverlaps, SIMPLIFY = F),
+        Target = lapply(scoreC, function(x) group$CpG.pos[match(x$motifID, group$CpG.pos$id), "target"]),
+        C_ID = mapply(function(x, co) co[match(x$variable, co$col), "exonID"], scoreC, cols, SIMPLIFY = F))
+scoreC = do.call(rbind, x)
+
+x = Map(cbind, pvalC, C_in_exon = mapply(function(dat, ov) ifelse(dat$variable %in% ov, "Yes", "No"),
+                                         pvalC, colOverlaps, SIMPLIFY = F),
+        Target = lapply(pvalC, function(x) group$CpG.pos[match(x$motifID, group$CpG.pos$id), "target"]),
+        C_ID = mapply(function(x, co) co[match(x$variable, co$col), "exonID"], pvalC, cols, SIMPLIFY = F))
+pvalC = do.call(rbind, x)
+
+scoreC$Direction = ifelse(scoreC$Direction=="pos", "Positive Association", "Negative Association")
+score$Direction = ifelse(score$Direction=="pos", "Positive Association", "Negative Association")
+scoreC$C_in_exon = ifelse(scoreC$C_in_exon=="Yes", "C in Exon", "C not in Exon")
+score$C_in_exon = ifelse(score$C_in_exon=="Yes", "C in Exon", "C not in Exon")
+pvalC$Direction = ifelse(pvalC$Direction=="pos", "Positive Association", "Negative Association")
+pvalC$C_in_exon = ifelse(pvalC$C_in_exon=="Yes", "C in Exon", "C not in Exon")
+colnames(pvalC)[colnames(pvalC)=="value"] = "FDR"
+
+save(score, splice.exonBack, lognBcgnd, lognSpliceSeq, C.allMotifsBack, C.canonicalspliceBack, spliceMotif.group, scoreC, pvalC,
+     file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/spliceRegions_PWMEnrich_objects_exonAdjustedBackgrounds.rda")
+
+
+## Compare distribution of the raw score for CTCF
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich/figures/CTCF_rawscore_distribution.pdf", width =10)
+ggplot(scoreC[which(scoreC$motifID=="CTCF" & scoreC$Context=="CpG"),], aes(value, fill = C_in_exon)) + scale_fill_brewer(palette = "Set1") +
+  geom_density(alpha = 1/2) + theme_classic() + 
+  facet_grid(. ~ Direction) +
+  ylab("Density") + 
+  xlab("") + xlim(0,10) +
+  ggtitle("CTCF Enrichent around C: CpG context") + 
+  theme(title = element_text(size = 20)) + theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(scoreC[which(scoreC$motifID=="CTCF" & scoreC$Context=="nonCpG"),], aes(value, fill = C_in_exon)) + scale_fill_brewer(palette = "Set1") +
+  geom_density(alpha = 1/2) + theme_classic() + 
+  facet_grid(. ~ Direction) +
+  ylab("Density") + 
+  xlab("") + xlim(0,10) +
+  ggtitle("CTCF Enrichent around C: CpH context") + 
+  theme(title = element_text(size = 20)) + theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(score[which(score$motifID=="CTCF" & score$Context=="CpG"),], aes(value, fill = C_in_exon)) + scale_fill_brewer(palette = "Set1") +
+  geom_density(alpha = 1/2) + theme_classic() + 
+  facet_grid(. ~ Direction) +
+  ylab("Density") + 
+  xlab("") + xlim(0,10) +
+  ggtitle("CTCF Enrichent around Exon: CpG context") + 
+  theme(title = element_text(size = 20)) + theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(score[which(score$motifID=="CTCF" & score$Context=="nonCpG"),], aes(value, fill = C_in_exon)) + scale_fill_brewer(palette = "Set1") +
+  geom_density(alpha = 1/2) + theme_classic() + 
+  facet_grid(. ~ Direction) +
+  ylab("Density") + 
+  xlab("") + xlim(0,10) +
+  ggtitle("CTCF Enrichent around Exon: CpH context") + 
+  theme(title = element_text(size = 20)) + theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+dev.off()
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich/figures/MECP2_rawscore_distribution.pdf", width =10)
+ggplot(scoreC[which(scoreC$motifID=="MECP2" & scoreC$Context=="CpG"),], aes(value, fill = C_in_exon)) + scale_fill_brewer(palette = "Set1") +
+  geom_density(alpha = 1/2) + theme_classic() + 
+  facet_grid(. ~ Direction) +
+  ylab("Density") + 
+  xlab("") + xlim(0,10) +
+  ggtitle("MECP2 Enrichent around C: CpG context") + 
+  theme(title = element_text(size = 20)) + theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(scoreC[which(scoreC$motifID=="MECP2" & scoreC$Context=="nonCpG"),], aes(value, fill = C_in_exon)) + scale_fill_brewer(palette = "Set1") +
+  geom_density(alpha = 1/2) + theme_classic() + 
+  facet_grid(. ~ Direction) +
+  ylab("Density") + 
+  xlab("") + xlim(0,10) +
+  ggtitle("MECP2 Enrichent around C: CpH context") + 
+  theme(title = element_text(size = 20)) + theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(score[which(score$motifID=="MECP2" & score$Context=="CpG"),], aes(value, fill = C_in_exon)) + scale_fill_brewer(palette = "Set1") +
+  geom_density(alpha = 1/2) + theme_classic() + 
+  facet_grid(. ~ Direction) +
+  ylab("Density") + 
+  xlab("") + xlim(0,10) +
+  ggtitle("MECP2 Enrichent around Exon: CpG context") + 
+  theme(title = element_text(size = 20)) + theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(score[which(score$motifID=="MECP2" & score$Context=="nonCpG"),], aes(value, fill = C_in_exon)) + scale_fill_brewer(palette = "Set1") +
+  geom_density(alpha = 1/2) + theme_classic() + 
+  facet_grid(. ~ Direction) +
+  ylab("Density") + 
+  xlab("") + xlim(0,10) +
+  ggtitle("MECP2 Enrichent around Exon: CpH context") + 
+  theme(title = element_text(size = 20)) + theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+dev.off()
+
+
+## CTCF and MECP2 enrichment in the C regions
+
+splPvalC = split(pvalC, pvalC$Context)
+df = lapply(splPvalC, function(x) list(CTCF.Sig.by.Dir = data.frame(Pos = c(nrow(x[which(x$motifID=="CTCF" & x$FDR<=0.05 & x$Direction=="Positive Association"),]),
+                                                          nrow(x[which(x$motifID=="CTCF" & x$FDR>0.05 & x$Direction=="Positive Association"),])),
+                                                  Neg = c(nrow(x[which(x$motifID=="CTCF" & x$FDR<=0.05 & x$Direction=="Negative Association"),]),
+                                                          nrow(x[which(x$motifID=="CTCF" & x$FDR>0.05 & x$Direction=="Negative Association"),])), row.names = c("sigY","sigN")),
+                                       CTCF.Sig.by.inExon.PosDir = data.frame(inExon = c(nrow(x[which(x$motifID=="CTCF" & x$FDR<=0.05 & x$Direction=="Positive Association" & x$C_in_exon=="C in Exon"),]),
+                                                          nrow(x[which(x$motifID=="CTCF" & x$FDR>0.05 & x$Direction=="Positive Association" & x$C_in_exon=="C in Exon"),])),
+                                                  not = c(nrow(x[which(x$motifID=="CTCF" & x$FDR<=0.05 & x$Direction=="Positive Association" & x$C_in_exon=="C not in Exon"),]),
+                                                         nrow(x[which(x$motifID=="CTCF" & x$FDR>0.05 & x$Direction=="Positive Association" & x$C_in_exon=="C not in Exon"),])), row.names = c("sigY","sigN")),
+                                       CTCF.Sig.by.inExon.NegDir = data.frame(inExon = c(nrow(x[which(x$motifID=="CTCF" & x$FDR<=0.05 & x$Direction=="Negative Association" & x$C_in_exon=="C in Exon"),]),
+                                                          nrow(x[which(x$motifID=="CTCF" & x$FDR>0.05 & x$Direction=="Negative Association" & x$C_in_exon=="C in Exon"),])),
+                                                  not = c(nrow(x[which(x$motifID=="CTCF" & x$FDR<=0.05 & x$Direction=="Negative Association" & x$C_in_exon=="C not in Exon"),]),
+                                                         nrow(x[which(x$motifID=="CTCF" & x$FDR>0.05 & x$Direction=="Negative Association" & x$C_in_exon=="C not in Exon"),])), row.names = c("sigY","sigN")),
+                                       MECP2.Sig.by.Dir = data.frame(Pos = c(nrow(x[which(x$motifID=="MECP2" & x$FDR<=0.05 & x$Direction=="Positive Association"),]),
+                                                          nrow(x[which(x$motifID=="MECP2" & x$FDR>0.05 & x$Direction=="Positive Association"),])),
+                                                  Neg = c(nrow(x[which(x$motifID=="MECP2" & x$FDR<=0.05 & x$Direction=="Negative Association"),]),
+                                                          nrow(x[which(x$motifID=="MECP2" & x$FDR>0.05 & x$Direction=="Negative Association"),])), row.names = c("sigY","sigN")),
+                                       MECP2.Sig.by.inExon.PosDir = data.frame(inExon = c(nrow(x[which(x$motifID=="MECP2" & x$FDR<=0.05 & x$Direction=="Positive Association" & x$C_in_exon=="C in Exon"),]),
+                                                          nrow(x[which(x$motifID=="MECP2" & x$FDR>0.05 & x$Direction=="Positive Association" & x$C_in_exon=="C in Exon"),])),
+                                                  not = c(nrow(x[which(x$motifID=="MECP2" & x$FDR<=0.05 & x$Direction=="Positive Association" & x$C_in_exon=="C not in Exon"),]),
+                                                         nrow(x[which(x$motifID=="MECP2" & x$FDR>0.05 & x$Direction=="Positive Association" & x$C_in_exon=="C not in Exon"),])), row.names = c("sigY","sigN")),
+                                       MECP2.Sig.by.inExon.NegDir = data.frame(inExon = c(nrow(x[which(x$motifID=="MECP2" & x$FDR<=0.05 & x$Direction=="Negative Association" & x$C_in_exon=="C in Exon"),]),
+                                                          nrow(x[which(x$motifID=="MECP2" & x$FDR>0.05 & x$Direction=="Negative Association" & x$C_in_exon=="C in Exon"),])),
+                                                  not = c(nrow(x[which(x$motifID=="MECP2" & x$FDR<=0.05 & x$Direction=="Negative Association" & x$C_in_exon=="C not in Exon"),]),
+                                                         nrow(x[which(x$motifID=="MECP2" & x$FDR>0.05 & x$Direction=="Negative Association" & x$C_in_exon=="C not in Exon"),])), row.names = c("sigY","sigN"))))
+fish = lapply(df, function(x) lapply(x, fisher.test))
+unlist(lapply(df, function(x) lapply(x, function(y) y$p.value)))
+
+pvalC[which(pvalC$motifID=="CTCF" & pvalC$FDR<=0.05),]
+#                   Context            Direction motifID variable        FDR
+#CpG.neg.7172707        CpG Negative Association    CTCF  col6179 0.02023266
+#nonCpG.neg.8816683  nonCpG Negative Association    CTCF  col7595 0.04258352
+#                       C_in_exon Target                     C_ID
+#CpG.neg.7172707    C not in Exon   CTCF     chr4:8307741-8307741
+#nonCpG.neg.8816683 C not in Exon   CTCF chr2:233346659-233346659
+pvalC[which(pvalC$motifID=="MECP2" & pvalC$FDR<=0.05),]
+#none
+
+
+
+
 
 
 
