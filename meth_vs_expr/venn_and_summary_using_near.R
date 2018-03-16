@@ -199,6 +199,7 @@ mres <- lapply(cpgs, function(cpg) {
         me_annotated$eqtls$meth_all_n <- meth_all_n[meth_n >= 4 & meth_all_n >= 4]
     } else {
         meth_n <- rowSums(getMeth(me_annotated$meth, type = 'raw') > 0)
+        meth_all_n <- rowSums(getMeth(me_annotated$meth, type = 'raw') < 1)
         me_annotated$eqtls <- me_annotated$eqtls[meth_n >= 4 & meth_all_n >= 4, ]
         me_annotated$meth <- me_annotated$meth[meth_n >= 4 & meth_all_n >= 4, ]
         me_annotated$expr <- me_annotated$expr[meth_n >= 4 & meth_all_n >= 4, ]
