@@ -146,7 +146,7 @@ mres <- lapply(cpgs, function(cpg) {
         ## For getting the meth_n part
         message(paste(Sys.time(), 'computing the parts for meth_n'))
         expr <- load_expr(opt$feature)
-        
+
         if(grepl('jx', opt$feature)) {
             load('rda/me_annotated_FDR5_nonCpG_jx_only_rowExpr.Rdata', verbose = TRUE)
             ## Subset data to only only 1 side for the junctions
@@ -168,8 +168,8 @@ mres <- lapply(cpgs, function(cpg) {
             me_ov <- findOverlaps(resize(rowRanges(meqtl$expr), width(rowRanges(meqtl$expr)) + 2000, fix = 'center'), expr)
             expr <- expr[sort(unique(subjectHits(me_ov))), ]
             rm(me_ov, meqtl)
-        }      
-        
+        }
+
         BSobj <- load_dmp(TRUE)
         m  <- match(getid(colData(expr)$BrNum), getid(colData(BSobj)$Brain.ID))
         expr <- expr[, which(!is.na(m))]
@@ -185,8 +185,9 @@ mres <- lapply(cpgs, function(cpg) {
         BSobj <- BSobj[snp_id(me_annotated$eqtls$snps), ]
 
         meth_n <- rowSums(getMeth(BSobj, type = 'raw') > 0)
-        me_annotated$eqtls <- me_annotated$eqtls[meth_n >= 4, ]
-        me_annotated$meth <- BSobj[meth_n >= 4, ]
+        meth_all_n <- rowSums(getMeth(BSobj, type = 'raw') < 1)
+        me_annotated$eqtls <- me_annotated$eqtls[meth_n >= 4 & meth_all_n >= 4, ]
+        me_annotated$meth <- BSobj[meth_n >= 4 & meth_all_n >= 4, ]
         if(opt$feature == 'psi') {
             names(expr) <- paste0('row', seq_len(nrow(expr)))
             me_annotated$expr <- expr[snp_id(me_annotated$eqtls$gene), ]
@@ -194,13 +195,15 @@ mres <- lapply(cpgs, function(cpg) {
             me_annotated$expr <- expr[match(me_annotated$eqtls$gene, names(rowRanges(expr))), ]
         }
 
-        me_annotated$eqtls$meth_n <- meth_n[meth_n >= 4]
+        me_annotated$eqtls$meth_n <- meth_n[meth_n >= 4 & meth_all_n >= 4]
+        me_annotated$eqtls$meth_all_n <- meth_all_n[meth_n >= 4 & meth_all_n >= 4]
     } else {
         meth_n <- rowSums(getMeth(me_annotated$meth, type = 'raw') > 0)
-        me_annotated$eqtls <- me_annotated$eqtls[meth_n >= 4, ]
-        me_annotated$meth <- me_annotated$meth[meth_n >= 4, ]
-        me_annotated$expr <- me_annotated$expr[meth_n >= 4, ]
-        me_annotated$eqtls$meth_n <- meth_n[meth_n >= 4]
+        me_annotated$eqtls <- me_annotated$eqtls[meth_n >= 4 & meth_all_n >= 4, ]
+        me_annotated$meth <- me_annotated$meth[meth_n >= 4 & meth_all_n >= 4, ]
+        me_annotated$expr <- me_annotated$expr[meth_n >= 4 & meth_all_n >= 4, ]
+        me_annotated$eqtls$meth_n <- meth_n[meth_n >= 4 & meth_all_n >= 4]
+        me_annotated$eqtls$meth_all_n <- meth_n[meth_n >= 4 & meth_all_n >= 4]
     }
 
     message(paste(Sys.time(), 'computing the expression delta'))
@@ -243,17 +246,17 @@ if(opt$feature == 'psi') {
     rm(cp, gene)
 } else if (grepl('jx', opt$feature)) {
     gene <- load_expr('gene')
-    
+
     ## add some gene-level info
     for(cp in names(mres)) {
         m <- match(rowRanges(mres[[cp]]$expr)$newGeneID,
             rowRanges(gene)$gencodeID)
         rowRanges(mres[[cp]]$expr)$gene_type <- rowRanges(gene)$gene_type[m]
-        
+
         ## Special case for fusions
         fusion <- grep('-', rowRanges(mres[[cp]]$expr)$newGeneID)
         rowRanges(mres[[cp]]$expr)$gene_type[fusion] <- sapply(
-            rowRanges(mres[[cp]]$expr)$newGeneID[fusion], function(x) { 
+            rowRanges(mres[[cp]]$expr)$newGeneID[fusion], function(x) {
                 ifelse('protein_coding' %in%
                     rowRanges(gene)$gene_type[grep(gsub('-', '|', x),
                     rowRanges(gene)$gencodeID)],
@@ -262,22 +265,23 @@ if(opt$feature == 'psi') {
         rm(m, fusion)
     }
     rm(cp, gene)
-    
+
 }
 
-## Filter further to keep only those with meth_n >= 11
+## Filter further to keep only those with meth_n >= 11 & meth_all_n >= 11
 ## and protein coding
 for(cp in names(mres)) {
     pc <- rowRanges(mres[[cp]]$expr)$gene_type == 'protein_coding'
     meth11 <- mres[[cp]]$eqtls$meth_n >= 11
-    message(paste(Sys.time(), 'Filtering by meth_n >= 11 and protein_coding genes for set', cp))
-    pc_meth_tab <- addmargins(table('protein coding' = pc, 'meth_n >= 11' = meth11, useNA = 'ifany'))
+    meth11_all <- mres[[cp]]$eqtls$meth_all_n >= 11
+    message(paste(Sys.time(), 'Filtering by meth_n >= 11 and meth_all_n >= 11 and protein_coding genes for set', cp))
+    pc_meth_tab <- addmargins(table('protein coding' = pc, 'meth_n >= 11 & meth_all_n >= 11' = meth11 & meth11_all, useNA = 'ifany'))
     print(pc_meth_tab)
     print(round(pc_meth_tab / max(pc_meth_tab) * 100, 2))
-    mres[[cp]]$eqtls <- mres[[cp]]$eqtls[which(pc & meth11), ]
-    mres[[cp]]$expr <- mres[[cp]]$expr[which(pc & meth11), ]
-    mres[[cp]]$meth <- mres[[cp]]$meth[which(pc & meth11), ]
-    rm(pc, meth11, pc_meth_tab)
+    mres[[cp]]$eqtls <- mres[[cp]]$eqtls[which(pc & meth11 & meth11_all), ]
+    mres[[cp]]$expr <- mres[[cp]]$expr[which(pc & meth11 & meth11_all), ]
+    mres[[cp]]$meth <- mres[[cp]]$meth[which(pc & meth11 & meth11_all), ]
+    rm(pc, meth11, meth11_all, pc_meth_tab)
 }
 rm(cp)
 
@@ -425,14 +429,14 @@ m_summary <- do.call(rbind, lapply(1:length(mres), function(i) {
     message(paste(Sys.time(), 'processing', names(mres)[i]))
     gdata <- split(mres[[i]]$eqtls, mres[[i]]$eqtls$gene)
     gdata <- gdata[elementNROWS(gdata) > 0]
-    
+
     erow <- elementNROWS(gdata)
     print(table(erow > 1))
     message(paste(Sys.time(), 'creating typeres1'))
     g1 <- sapply(gdata[erow == 1], function(x) { x$gene })
     typeres1 <- mres[[i]]$eqtls[mres[[i]]$eqtls$gene %in% g1, ]
     typeres1$n_meqtls <- 1
-    
+
     message(paste(Sys.time(), 'creating typeres2'))
     typeres2 <- do.call(rbind, lapply(gdata[erow > 1], function(g) {
         best <- which.min(g$FDR)
@@ -440,7 +444,7 @@ m_summary <- do.call(rbind, lapply(1:length(mres), function(i) {
         res$n_meqtls <- nrow(g)
         return(res)
     }))
-        
+
     message(paste(Sys.time(), 'creating typeres'))
     typeres <- rbind(typeres1, typeres2)
     typeres$type <- names(mres)[i]
@@ -562,6 +566,14 @@ tapply(m_summary$meth_n, m_summary$type, function(x) {
     round(table(x) / length(x) * 100, 2)
 })
 tapply(m_summary$meth_n, m_summary$type, function(x) {
+    cumsum(round(table(x) / length(x) * 100, 2))
+})
+
+tapply(m_summary$meth_all_n, m_summary$type, table)
+tapply(m_summary$meth_all_n, m_summary$type, function(x) {
+    round(table(x) / length(x) * 100, 2)
+})
+tapply(m_summary$meth_all_n, m_summary$type, function(x) {
     cumsum(round(table(x) / length(x) * 100, 2))
 })
 
@@ -907,7 +919,7 @@ c_by_gene <- lapply(names(mres), function(type) {
 
 })
 names(c_by_gene) <- names(mres)
-save(c_by_gene, file = paste0('rda/meqtl_c_by_gene_', opt$feature, '_using_near.Rdata')) 
+save(c_by_gene, file = paste0('rda/meqtl_c_by_gene_', opt$feature, '_using_near.Rdata'))
 } else {
     load(paste0('rda/meqtl_c_by_gene_', opt$feature, '_using_near.Rdata'), verbose = TRUE)
 }
@@ -1012,6 +1024,8 @@ summarize_venn <- function(dbv) {
         agebeta_neglog10pval_median = get_summary(-log10(dbv[, 'Pr(>|t|)']), median),
         meth_n_mean = get_summary(dbv$meth_n, mean),
         meth_n_median = get_summary(dbv$meth_n, median),
+        meth_all_n_mean = get_summary(dbv$meth_all_n, mean),
+        meth_all_n_median = get_summary(dbv$meth_all_n, median),
         beta_t_mean = get_summary(dbv$statistic, mean),
         beta_t_median = get_summary(dbv$statistic, median),
         agebeta_t_mean = get_summary(dbv[, 't value'], mean),

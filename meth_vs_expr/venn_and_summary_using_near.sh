@@ -6,7 +6,7 @@
 
 mkdir -p logs
 
-for type in jxleft jxright
+for type in gene exon psi #jxleft jxright
     do
 
 SHORT="venn_and_summary_using_near_${type}"
@@ -17,7 +17,7 @@ echo "Creating scriptfeature type ${type} side"
 cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l mem_free=270G,h_vmem=270G,h_fsize=200G
+#$ -l bluejay,mem_free=150G,h_vmem=150G,h_fsize=200G
 #$ -N ${SHORT}
 #$ -o ./logs/${SHORT}.txt
 #$ -e ./logs/${SHORT}.txt
