@@ -2,6 +2,8 @@ library(PWMEnrich)
 library(GenomicRanges)
 library(PWMEnrich.Hsapiens.background)
 library(BSgenome.Hsapiens.UCSC.hg19)
+library(clusterProfiler)
+library(org.Hs.eg.db)
 library('bsseq')
 library('SGSeq')
 
@@ -44,32 +46,25 @@ oo = lapply(oo, as.data.frame)
 do.call(rbind, mapply(function(dat, len) data.frame(total = len, SameExon = length(which(dat$queryHits==dat$subjectHits)), 
                                                     Percent = round(length(which(dat$queryHits==dat$subjectHits))/len*100,1)),oo,elementNROWS(Cgr), SIMPLIFY = F))
 #           total SameExon Percent
-#CpG.pos     1349      454    33.7
+#CpG.pos     1328      447    33.7
 #nonCpG.pos  1288       78     6.1
-#CpG.neg     9674     2346    24.3
+#CpG.neg     9505     2311    24.3
 #nonCpG.neg  7874      605     7.7
 
 
 ## Get sequences from different annotations in the correct format
 
-seq = lapply(gr, function(x) getSeq(Hsapiens, x))
-seq = lapply(seq, function(x) x[which(width(x)>30)])
-
+seq = lapply(gr, function(x) getSeq(Hsapiens, x[which(width(x)>30)]))
 
 ### Run PWMEnrich
 
 useBigMemoryPWMEnrich(TRUE)
-registerCoresPWMEnrich(5)
+registerCoresPWMEnrich(6)
 
 # load the pre-compiled lognormal background computed using promoters
+
 data(PWMLogn.hg19.MotifDb.Hsap)
-
-splice.exon = list()
-splice.exon$CpG.pos = motifEnrichment(seq$CpG.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
-splice.exon$nonCpG.pos = motifEnrichment(seq$nonCpG.pos, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
-splice.exon$CpG.neg = motifEnrichment(seq$CpG.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
-splice.exon$nonCpG.neg = motifEnrichment(seq$nonCpG.neg, PWMLogn.hg19.MotifDb.Hsap, verbose=F)
-
+splice.exon = lapply(seq, function(x) motifEnrichment(x, PWMLogn.hg19.MotifDb.Hsap, verbose=F))
 
 ## Test for Differential TF binding
 
@@ -99,8 +94,8 @@ load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/filtered_TF_list
 
 group = lapply(splice.exon, groupReport)
 group = lapply(group, as.data.frame)
-group = Map(cbind, group, padj = lapply(group, function(x) p.adjust(x$p.value, method = "fdr")))
 group = lapply(group, function(x) x[which(x$target %in% names(PostnataltargettogeneID)),])
+group = Map(cbind, group, padj = lapply(group, function(x) p.adjust(x$p.value, method = "fdr")))
 group = lapply(group, function(x) x[order(x$id),])
 
 exonDiff = lapply(exonDiff, function(x) x$group.bg[which(names(x$group.bg) %in% group$CpG.pos$id)])
@@ -189,9 +184,9 @@ dev.off()
 
 do.call(rbind, lapply(group, function(x) x[which(x$target=="MECP2"),]))
 #             rank target    id raw.score p.value top.motif.prop padj
-#CpG.pos    1732.5  MECP2 MECP2 0.7565686       1     0.01595745    1
+#CpG.pos    1732.5  MECP2 MECP2 0.7442695       1     0.01466049    1
 #nonCpG.pos 1493.0  MECP2 MECP2 0.9724046       1     0.02680747    1
-#CpG.neg    1679.5  MECP2 MECP2 0.7646823       1     0.01571010    1
+#CpG.neg    1678.0  MECP2 MECP2 0.7607640       1     0.01512892    1
 #nonCpG.neg 1721.5  MECP2 MECP2 0.8783678       1     0.02998462    1
 
 exonDiff$CpG["MECP2"] # 0
@@ -200,66 +195,66 @@ exonDiff$CpG.nonCpG.pos["MECP2"] # -0.002241363
 exonDiff$CpG.nonCpG.neg["MECP2"] # 0
 
 do.call(rbind, lapply(exonDiffQ25, function(x) x[which(x[,3]=="CTCF"),]))
-#        Quantile Difference.Statistic pos.target                  pos.id
-#CpG.254      Q25        -9.463450e+12       CTCF                    CTCF
-#CpG.307      Q25        -1.035549e+08       CTCF Hsapiens-jolma2013-CTCF
-#nonCpG       Q25        -3.643336e+11       CTCF                    CTCF
-#        pos.raw.score  pos.p.value pos.top.motif.prop      pos.FDR neg.target
-#CpG.254      23.04849 1.032534e-41         0.06155015 9.296870e-41       CTCF
-#CpG.307       4.14569 1.085640e-32         0.10030395 8.087486e-32       CTCF
-#nonCpG       69.75449 3.093087e-26         0.08610885 4.812170e-25       CTCF
-#                         neg.id neg.raw.score   neg.p.value neg.top.motif.prop
-#CpG.254                    CTCF      4.183613 1.874522e-196         0.07184751
-#CpG.307 Hsapiens-jolma2013-CTCF      3.464304  2.291995e-76         0.06598240
-#nonCpG                     CTCF      5.761351 1.922173e-156         0.07816504
-#              neg.FDR
-#CpG.254 1.283542e-195
-#CpG.307  9.890176e-76
-#nonCpG  1.441314e-155
+#        Quantile Difference.Statistic target                      id raw.score
+#CpG.255      Q25        -9.897927e+12   CTCF                    CTCF 23.492773
+#CpG.301      Q25        -1.265043e+08   CTCF Hsapiens-jolma2013-CTCF  4.226071
+#nonCpG       Q25        -3.643336e+11   CTCF                    CTCF 69.754491
+#             p.value top.motif.prop          FDR target.1
+#CpG.255 2.110034e-42     0.06018519 1.479581e-41     CTCF
+#CpG.301 3.192906e-34     0.10185185 1.884792e-33     CTCF
+#nonCpG  3.093087e-26     0.08610885 5.186524e-25     CTCF
+#                           id.1 raw.score.1     p.value.1 top.motif.prop.1
+#CpG.255                    CTCF    4.222023 4.890218e-197       0.07234179
+#CpG.301 Hsapiens-jolma2013-CTCF    3.514215  5.511270e-78       0.06658854
+#nonCpG                     CTCF    5.761351 1.922173e-156       0.07816504
+#                FDR.1
+#CpG.255 3.160884e-196
+#CpG.301  2.214076e-77
+#nonCpG  1.555212e-155
 
 # Greater enriched in CpG than non-CpG in both expression direction effects, but does not pass the filtering steps
-exonDiff$CpG.nonCpG.pos["CTCF"] # 677137.7
-exonDiff$CpG.nonCpG.neg["CTCF"] # 9.099117e+12
+exonDiff$CpG.nonCpG.pos["CTCF"] # 765565
+exonDiff$CpG.nonCpG.neg["CTCF"] # 9.533595e+12
 
 
 do.call(rbind,lapply(group, function(x) x[which(x$target=="HP1BP3"),]))
 #             rank target     id raw.score     p.value top.motif.prop
-#CpG.pos    1732.5 HP1BP3 HP1BP3  1.314786 1.000000000     0.02963526
+#CpG.pos    1732.5 HP1BP3 HP1BP3  1.308901 1.000000000     0.03009259
 #nonCpG.pos  717.0 HP1BP3 HP1BP3  2.093420 0.001504384     0.09017059
-#CpG.neg    1679.5 HP1BP3 HP1BP3  1.504900 1.000000000     0.03917051
+#CpG.neg    1678.0 HP1BP3 HP1BP3  1.499761 1.000000000     0.03878116
 #nonCpG.neg 1721.5 HP1BP3 HP1BP3  1.671395 1.000000000     0.03908252
 #                  padj
 #CpG.pos    1.000000000
-#nonCpG.pos 0.004798503
+#nonCpG.pos 0.005045138
 #CpG.neg    1.000000000
 #nonCpG.neg 1.000000000
 
 unlist(lapply(exonDiff, function(x) x[names(x)=="HP1BP3"]))
-#CpG.HP1BP3         nonCpG.HP1BP3 CpG.nonCpG.pos.HP1BP3 CpG.nonCpG.neg.HP1BP3
-#   0.00000              19.43043             -19.43043               0.00000
- 
+#           CpG.HP1BP3         nonCpG.HP1BP3 CpG.nonCpG.pos.HP1BP3 CpG.nonCpG.neg.HP1BP3
+#              0.00000              19.43043             -19.43043               0.00000  
+
 do.call(rbind,lapply(group, function(x) x[which(x$target=="CBX3"),]))
 #           rank target        id raw.score      p.value top.motif.prop
-#CpG.pos     815   CBX3 LOC653972 0.8138333 8.433663e-01     0.02583587
+#CpG.pos     813   CBX3 LOC653972 0.8142757 8.246305e-01     0.02623457
 #nonCpG.pos  745   CBX3 LOC653972 0.8090082 4.322330e-03     0.04386677
-#CpG.neg     882   CBX3 LOC653972 0.8402273 1.555749e-02     0.04566401
+#CpG.neg     882   CBX3 LOC653972 0.8405795 1.718781e-02     0.04549329
 #nonCpG.neg  781   CBX3 LOC653972 0.8325335 3.490931e-11     0.04472066
 #                   padj
 #CpG.pos    1.000000e+00
-#nonCpG.pos 1.326868e-02
-#CpG.neg    4.034012e-02
-#nonCpG.neg 1.022248e-10
+#nonCpG.pos 1.389149e-02
+#CpG.neg    4.100266e-02
+#nonCpG.neg 9.803415e-11
 
 do.call(rbind,lapply(group, function(x) x[which(x$target=="CBX7"),]))
 #           rank target   id raw.score      p.value top.motif.prop         padj
-#CpG.pos    1081   CBX7 CBX7  1.092068 1.000000e+00     0.04635258 1.000000e+00
-#nonCpG.pos  686   CBX7 CBX7  1.241742 4.146173e-04     0.07067425 1.382259e-03
-#CpG.neg     700   CBX7 CBX7  1.262932 3.120737e-21     0.06263092 1.019590e-20
-#nonCpG.neg  558   CBX7 CBX7  1.329684 5.331403e-52     0.07432086 2.185111e-51
+#CpG.pos    1085   CBX7 CBX7  1.093078 1.000000e+00     0.04475309 1.000000e+00
+#nonCpG.pos  686   CBX7 CBX7  1.241742 4.146173e-04     0.07067425 1.458092e-03
+#CpG.neg     706   CBX7 CBX7  1.262174 3.823963e-20     0.06211379 1.120082e-19
+#nonCpG.neg  558   CBX7 CBX7  1.329684 5.331403e-52     0.07432086 2.234940e-51
 
 unlist(lapply(exonDiff, function(x) x[names(x)=="CBX7"]))
-#   CpG.CBX7         nonCpG.CBX7 CpG.nonCpG.pos.CBX7 CpG.nonCpG.neg.CBX7 
-#-11918.4571       -3713625.2774            -28.2978       -3701735.1181 
+#           CpG.CBX7         nonCpG.CBX7 CpG.nonCpG.pos.CBX7 CpG.nonCpG.neg.CBX7 
+#      -9.118516e+03       -3.713625e+06       -2.829789e+01       -3.704535e+06 
 
 
 
@@ -299,12 +294,7 @@ lognBcgnd = makePWMLognBackground(sampleseq, pwms, algorithm = "human", bg.len =
 
 ## Run motifEnrichment on associated exons
 
-splice.exonBack = list()
-splice.exonBack$CpG.pos = motifEnrichment(seq$CpG.pos, lognBcgnd, verbose=F)
-splice.exonBack$nonCpG.pos = motifEnrichment(seq$nonCpG.pos, lognBcgnd, verbose=F)
-splice.exonBack$CpG.neg = motifEnrichment(seq$CpG.neg, lognBcgnd, verbose=F)
-splice.exonBack$nonCpG.neg = motifEnrichment(seq$nonCpG.neg, lognBcgnd, verbose=F)
-
+splice.exonBack = lapply(seq, function(x) motifEnrichment(x, lognBcgnd, verbose=F))
 
 # Make table of raw scores for distribution analysis
 
@@ -427,7 +417,7 @@ spliceMotif.group = do.call(rbind, Map(cbind, spliceMotif.group, Context = lappl
 
 scoreC = pvalC = list()
 for (i in 1:length(C.allMotifsBack)) {
-  scoreC[[i]] = pcalC[[i]] = list(vector("list", length(C.allMotifsBack[[i]]$sequences)))
+  scoreC[[i]] = pvalC[[i]] = list(vector("list", length(C.allMotifsBack[[i]]$sequences)))
   for (j in 1:length(C.allMotifsBack[[i]]$sequences)) {
     scoreC[[i]][[j]] = list(sequenceReport(C.allMotifsBack[[i]], seq.id=j),
                             sequenceReport(C.canonicalspliceBack[[i]], seq.id=j))
@@ -598,22 +588,84 @@ df = lapply(splPvalC, function(x) list(CTCF.Sig.by.Dir = data.frame(Pos = c(nrow
                                                   not = c(nrow(x[which(x$motifID=="MECP2" & x$FDR<=0.05 & x$Direction=="Negative Association" & x$C_in_exon=="C not in Exon"),]),
                                                          nrow(x[which(x$motifID=="MECP2" & x$FDR>0.05 & x$Direction=="Negative Association" & x$C_in_exon=="C not in Exon"),])), row.names = c("sigY","sigN"))))
 fish = lapply(df, function(x) lapply(x, fisher.test))
-unlist(lapply(df, function(x) lapply(x, function(y) y$p.value)))
+unlist(lapply(fish, function(x) lapply(x, function(y) y$p.value)))
 
 pvalC[which(pvalC$motifID=="CTCF" & pvalC$FDR<=0.05),]
 #                   Context            Direction motifID variable        FDR
-#CpG.neg.7172707        CpG Negative Association    CTCF  col6179 0.02023266
+#CpG.neg.7020616        CpG Negative Association    CTCF  col6048 0.02023266
 #nonCpG.neg.8816683  nonCpG Negative Association    CTCF  col7595 0.04258352
-#                       C_in_exon Target                     C_ID
-#CpG.neg.7172707    C not in Exon   CTCF     chr4:8307741-8307741
+#C_in_exon Target                     C_ID
+#CpG.neg.7020616    C not in Exon   CTCF     chr4:8307741-8307741
 #nonCpG.neg.8816683 C not in Exon   CTCF chr2:233346659-233346659
 pvalC[which(pvalC$motifID=="MECP2" & pvalC$FDR<=0.05),]
 #none
 
+splscoreC = split(scoreC, scoreC$Context)
+tstat = lapply(splscoreC, function(x) list(CTCF.byDir = t.test(x[which(x$motifID=="CTCF" & x$Direction=="Positive Association"),"value"],
+                                                          x[which(x$motifID=="CTCF" & x$Direction=="Negative Association"),"value"]),
+                                           CTCF.CinExon.PosDir = t.test(x[which(x$motifID=="CTCF" & x$Direction=="Positive Association" & x$C_in_exon=="C in Exon"),"value"],
+                                                                   x[which(x$motifID=="CTCF" & x$Direction=="Positive Association" & x$C_in_exon=="C not in Exon"),"value"]),
+                                           CTCF.CinExon.NegDir = t.test(x[which(x$motifID=="CTCF" & x$Direction=="Negative Association" & x$C_in_exon=="C in Exon"),"value"],
+                                                                   x[which(x$motifID=="CTCF" & x$Direction=="Negative Association" & x$C_in_exon=="C not in Exon"),"value"]),
+                                           MECP2.byDir = t.test(x[which(x$motifID=="MECP2" & x$Direction=="Positive Association"),"value"],
+                                                          x[which(x$motifID=="MECP2" & x$Direction=="Negative Association"),"value"]),
+                                           MECP2.CinExon.PosDir = t.test(x[which(x$motifID=="MECP2" & x$Direction=="Positive Association" & x$C_in_exon=="C in Exon"),"value"],
+                                                                   x[which(x$motifID=="MECP2" & x$Direction=="Positive Association" & x$C_in_exon=="C not in Exon"),"value"]),
+                                           MECP2.CinExon.NegDir = t.test(x[which(x$motifID=="MECP2" & x$Direction=="Negative Association" & x$C_in_exon=="C in Exon"),"value"],
+                                                                   x[which(x$motifID=="MECP2" & x$Direction=="Negative Association" & x$C_in_exon=="C not in Exon"),"value"])))
+df = data.frame(pval = unlist(lapply(tstat, function(x) lapply(x, function(y) y$p.value))),
+                tstat = unlist(lapply(tstat, function(x) lapply(x, function(y) y$statistic))),
+                comp = gsub(".t","",names(unlist(lapply(tstat, function(x) lapply(x, function(y) y$statistic))))))
+## CpG.byDir: negatively regulating Cs are more likely to have a CTCF binding site 
+#                                    pval       tstat
+#CpG.CTCF.byDir              8.730035e-05 -3.92504098
+#CpG.CTCF.CinExon.PosDir     6.092987e-01  0.51131125
+#CpG.CTCF.CinExon.NegDir     7.824377e-01 -0.27615464
+#CpG.MECP2.byDir             6.797704e-02 -1.82632631
+#CpG.MECP2.CinExon.PosDir    7.850724e-01 -0.27278958
+#CpG.MECP2.CinExon.NegDir    6.349520e-01  0.47480731
+#nonCpG.CTCF.byDir           1.154910e-01 -1.57417282
+#nonCpG.CTCF.CinExon.PosDir  1.613027e-01 -1.40194357
+#nonCpG.CTCF.CinExon.NegDir  9.889814e-01 -0.01381454
+#nonCpG.MECP2.byDir          5.745768e-01  0.56142618
+#nonCpG.MECP2.CinExon.PosDir 8.834245e-01 -0.14704552
+#nonCpG.MECP2.CinExon.NegDir 4.409520e-01  0.77102946
 
+splscore = split(score, scoreC$Context)
+tstat = lapply(splscore, function(x) list(CTCF.byDir = t.test(x[which(x$motifID=="CTCF" & x$Direction=="Positive Association"),"value"],
+                                                          x[which(x$motifID=="CTCF" & x$Direction=="Negative Association"),"value"]),
+                                          CTCF.CinExon.PosDir = t.test(x[which(x$motifID=="CTCF" & x$Direction=="Positive Association" & x$C_in_exon=="C in Exon"),"value"],
+                                                                   x[which(x$motifID=="CTCF" & x$Direction=="Positive Association" & x$C_in_exon=="C not in Exon"),"value"]),
+                                          CTCF.CinExon.NegDir = t.test(x[which(x$motifID=="CTCF" & x$Direction=="Negative Association" & x$C_in_exon=="C in Exon"),"value"],
+                                                                   x[which(x$motifID=="CTCF" & x$Direction=="Negative Association" & x$C_in_exon=="C not in Exon"),"value"]),
+                                          MECP2.byDir = t.test(x[which(x$motifID=="MECP2" & x$Direction=="Positive Association"),"value"],
+                                                          x[which(x$motifID=="MECP2" & x$Direction=="Negative Association"),"value"]),
+                                          MECP2.CinExon.PosDir = t.test(x[which(x$motifID=="MECP2" & x$Direction=="Positive Association" & x$C_in_exon=="C in Exon"),"value"],
+                                                                   x[which(x$motifID=="MECP2" & x$Direction=="Positive Association" & x$C_in_exon=="C not in Exon"),"value"]),
+                                          MECP2.CinExon.NegDir = t.test(x[which(x$motifID=="MECP2" & x$Direction=="Negative Association" & x$C_in_exon=="C in Exon"),"value"],
+                                                                   x[which(x$motifID=="MECP2" & x$Direction=="Negative Association" & x$C_in_exon=="C not in Exon"),"value"])))
+df = data.frame(pval = unlist(lapply(tstat, function(x) lapply(x, function(y) y$p.value))),
+                 tstat = unlist(lapply(tstat, function(x) lapply(x, function(y) y$statistic))),
+                comp = gsub(".t","",names(unlist(lapply(tstat, function(x) lapply(x, function(y) y$statistic))))))
+#                                    pval      tstat                        comp
+#CpG.CTCF.byDir              8.787657e-03  2.6239977              CpG.CTCF.byDir
+#CpG.CTCF.CinExon.PosDir     4.746548e-03 -2.8309108     CpG.CTCF.CinExon.PosDir
+#CpG.CTCF.CinExon.NegDir     1.415374e-01  1.4704656     CpG.CTCF.CinExon.NegDir
+#CpG.MECP2.byDir             4.949280e-01  0.6826348             CpG.MECP2.byDir
+#CpG.MECP2.CinExon.PosDir    7.594054e-01 -0.3063272    CpG.MECP2.CinExon.PosDir
+#CpG.MECP2.CinExon.NegDir    6.210428e-12  6.8884467    CpG.MECP2.CinExon.NegDir
+#nonCpG.CTCF.byDir           2.389861e-02  2.2616365           nonCpG.CTCF.byDir
+#nonCpG.CTCF.CinExon.PosDir  2.686990e-02 -2.2162465  nonCpG.CTCF.CinExon.PosDir
+#nonCpG.CTCF.CinExon.NegDir  7.043395e-03 -2.6955590  nonCpG.CTCF.CinExon.NegDir
+#nonCpG.MECP2.byDir          6.138577e-03  2.7440296          nonCpG.MECP2.byDir
+#nonCpG.MECP2.CinExon.PosDir 1.772224e-03  3.1920322 nonCpG.MECP2.CinExon.PosDir
+#nonCpG.MECP2.CinExon.NegDir 6.165861e-11  6.6184307 nonCpG.MECP2.CinExon.NegDir
 
+df[df$pval<=0.05,]
 
-
+score[which(score$motifID %in% c("MECP2","CTCF")),]
+scoreC[which(scoreC$motifID %in% c("MECP2","CTCF")),]
+pvalC[which(pvalC$motifID %in% c("MECP2","CTCF")),]
 
 
 
