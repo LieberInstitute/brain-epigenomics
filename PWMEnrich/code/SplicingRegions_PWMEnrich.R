@@ -298,20 +298,21 @@ splice.exonBack = lapply(seq, function(x) motifEnrichment(x, lognBcgnd, verbose=
 
 # Make table of raw scores for distribution analysis
 
-score = list()
+score = pval = list()
 for (i in 1:length(splice.exonBack)) {
   score[[i]] = list(vector("list", length(splice.exonBack[[i]]$sequences)))
+  pval[[i]] = list(vector("list", length(splice.exonBack[[i]]$sequences)))
   for (j in 1:length(splice.exonBack[[i]]$sequences)) {
     score[[i]][[j]] = sequenceReport(splice.exonBack[[i]], seq.id=j)
+    pval[[i]][[j]] = sequenceReport(splice.exonBack[[i]], seq.id=j)
   }
 }
-names(score) = names(splice.exonBack)
+names(score) = names(pval) = names(splice.exonBack)
 score = lapply(score, function(x) lapply(x, function(y) as.data.frame(y)[order(y$id),]))
 score = lapply(score, function(y) do.call(cbind, lapply(y, function(z) z$raw.score)))
 for (i in 1:length(score)) { rownames(score[[i]]) = group$CpG.pos$id }
 for (i in 1:length(score)) { colnames(score[[i]]) = names(splice.exonBack[[i]]$sequences) }
 score = lapply(score, as.data.frame)
-
 score = Map(cbind, score, Context = lapply(as.list(names(score)), function(x) gsub('\\..*', '', x)),
             Direction = lapply(as.list(names(score)), function(x) gsub('.*\\.', '', x)),
             id = lapply(score, rownames))
@@ -319,6 +320,19 @@ cols = lapply(score, colnames)
 cols = lapply(cols, function(x) data.frame(exonID = x[1:(length(x)-3)], col = paste0("col",1:length(x[1:(length(x)-3)]))))
 for (i in 1:length(score)) { colnames(score[[i]]) = c(as.character(cols[[i]][,"col"]),"Context","Direction","motifID") }
 score = lapply(score, reshape2::melt)
+
+pval = lapply(pval, function(x) lapply(x, function(y) as.data.frame(y)[order(y$id),]))
+pval = lapply(pval, function(y) do.call(cbind, lapply(y, function(z) p.adjust(z$p.value, method = "fdr"))))
+for (i in 1:length(pval)) { rownames(pval[[i]]) = group$CpG.pos$id }
+for (i in 1:length(pval)) { colnames(pval[[i]]) = names(splice.exonBack[[i]]$sequences) }
+pval = lapply(pval, as.data.frame)
+pval = Map(cbind, pval, Context = lapply(as.list(names(pval)), function(x) gsub('\\..*', '', x)),
+            Direction = lapply(as.list(names(pval)), function(x) gsub('.*\\.', '', x)),
+            id = lapply(pval, rownames))
+cols = lapply(pval, colnames)
+cols = lapply(cols, function(x) data.frame(exonID = x[1:(length(x)-3)], col = paste0("col",1:length(x[1:(length(x)-3)]))))
+for (i in 1:length(pval)) { colnames(pval[[i]]) = c(as.character(cols[[i]][,"col"]),"Context","Direction","motifID") }
+pval = lapply(pval, reshape2::melt)
 
 # does it overlap?
 gr = list(CpG.pos = rowRanges(mres$CpG$expr)[which(mres$CpG$eqtls$statistic>0),], nonCpG.pos = rowRanges(mres$nonCpG$expr)[which(mres$nonCpG$eqtls$statistic>0),],
@@ -337,6 +351,17 @@ x = Map(cbind, score, C_in_exon = mapply(function(dat, ov) ifelse(dat$variable %
             Target = lapply(score, function(x) group$CpG.pos[match(x$motifID, group$CpG.pos$id), "target"]),
             exonID = mapply(function(x, co) co[match(x$variable, co$col), "exonID"], score, cols, SIMPLIFY = F))
 score = do.call(rbind, x)
+
+x = Map(cbind, pval, C_in_exon = mapply(function(dat, ov) ifelse(dat$variable %in% ov, "Yes", "No"),
+                                         pval, colOverlaps, SIMPLIFY = F),
+        Target = lapply(pval, function(x) group$CpG.pos[match(x$motifID, group$CpG.pos$id), "target"]),
+        exonID = mapply(function(x, co) co[match(x$variable, co$col), "exonID"], pval, cols, SIMPLIFY = F))
+pval = do.call(rbind, x)
+
+score$Direction = ifelse(score$Direction=="pos", "Positive Association", "Negative Association")
+score$C_in_exon = ifelse(score$C_in_exon=="Yes", "C in Exon", "C not in Exon")
+pval$Direction = ifelse(pval$Direction=="pos", "Positive Association", "Negative Association")
+pval$C_in_exon = ifelse(pval$C_in_exon=="Yes", "C in Exon", "C not in Exon")
 
 save(score, splice.exonBack, lognBcgnd,
      file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/spliceRegions_PWMEnrich_objects_exonAdjustedBackgrounds.rda")
@@ -491,7 +516,7 @@ pvalC$Direction = ifelse(pvalC$Direction=="pos", "Positive Association", "Negati
 pvalC$C_in_exon = ifelse(pvalC$C_in_exon=="Yes", "C in Exon", "C not in Exon")
 colnames(pvalC)[colnames(pvalC)=="value"] = "FDR"
 
-save(score, splice.exonBack, lognBcgnd, lognSpliceSeq, C.allMotifsBack, C.canonicalspliceBack, spliceMotif.group, scoreC, pvalC,
+save(score, pval, splice.exonBack, lognBcgnd, lognSpliceSeq, C.allMotifsBack, C.canonicalspliceBack, spliceMotif.group, scoreC, pvalC,
      file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/spliceRegions_PWMEnrich_objects_exonAdjustedBackgrounds.rda")
 
 
@@ -665,6 +690,7 @@ df[df$pval<=0.05,]
 
 score[which(score$motifID %in% c("MECP2","CTCF")),]
 scoreC[which(scoreC$motifID %in% c("MECP2","CTCF")),]
+pval[which(pval$motifID %in% c("MECP2","CTCF")),]
 pvalC[which(pvalC$motifID %in% c("MECP2","CTCF")),]
 
 
