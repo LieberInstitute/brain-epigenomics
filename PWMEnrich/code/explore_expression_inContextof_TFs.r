@@ -142,4 +142,7 @@ save(PostnataltargettogeneID, postRPKM, TFnucresPostnatal,prepostTargettoGeneID,
      file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/filtered_TF_list_expressionInfo.rda")
 
 
+### How about TPM?
+
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/brainseq_pipeline/polyA_unstranded/rse_tx_polyA_dlpfc_n41.Rdata")
 
