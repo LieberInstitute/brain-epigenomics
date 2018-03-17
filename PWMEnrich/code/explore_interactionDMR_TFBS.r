@@ -6,6 +6,9 @@ library(pheatmap)
 library(RColorBrewer)
 library(rafalib)
 library(pvclust)
+library(clusterProfiler)
+library(org.Hs.eg.db)
+
 
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda")
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_PWMEnrich_objects.rda")
@@ -82,9 +85,6 @@ dev.off()
 
 # split TFs by cluster
 sIndexes = splitit(hc2_cut)
-nullgenes =  read.delim("/users/ajaffe/Lieber/Projects/450k/grant/ref_gene_hg19.txt", header=T,as.is=T)
-genes = sig$annotation
-goListByTF = lapply(sIndexes, function(x) dogo(genes[x],nullgenes[,2])[,-8])
 
 
 ## PCA
@@ -129,6 +129,69 @@ pheatmap(sampleDistMatrix,clustering_distance_rows=sampleDists, clustering_dista
          col=colors, main="Euclidean Distance Between\nTFs by Enrichment in Interaction DMRs")
 dev.off()
 # too large to be informative
+
+
+## Pull out significant TFs per kmeans cluster and compare
+
+intgroups = lapply(int.kmeans, groupReport)
+intgroups = lapply(intgroups, as.data.frame)
+intgroups = lapply(intgroups, function(x) x[which(x$target %in% names(PostnataltargettogeneID)),])
+intgroups = Map(cbind, intgroups, padj = lapply(intgroups, function(x) p.adjust(x$p.value, method = "fdr")))
+intgroups = lapply(intgroups, function(x) x[order(x$id),])
+
+inttargets = lapply(intgroups, function(x) unique(as.character(x[which(x$padj<=0.01),"target"])))
+inttargets = inttargets[elementNROWS(inttargets)>0]
+venn.diagram(inttargets, "/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich/figures/Interaction_DMR_TF_venn_6kmeans.jpeg", 
+             main="Interaction Kmeans Cluster TF Enrichment Overlap (FDR<0.01)",
+             col = "transparent",
+             fill = c("lightpink2","cornflowerblue", "olivedrab2", "khaki1", "plum2"),
+             cat.col = c("palevioletred4", "darkblue", "olivedrab4", "lightgoldenrod4", "orchid4"),
+             alpha = 0.50, fontfamily = "Arial", fontface = "bold", cat.fontfamily = "Arial", margin=0.2)
+
+VennInt = calculate.overlap(inttargets)
+entrez = list(all = VennInt$a31, "1:G-N+" = VennInt$a1, "2:G0N+" = VennInt$a2, "3:G0N-" = VennInt$a3, 
+              "5:G+N-" = VennInt$a4, "6:G-N0" = VennInt$a5)
+entrez = lapply(entrez, function(x) unlist(strsplit(x, "::", fixed=T)))
+entrez = lapply(entrez, function(x) unique(na.omit(as.character(geneMap[which(geneMap$Symbol %in% x),"EntrezID"]))))
+
+
+## Assess enriched terms limiting the gene universe to the terms associated with the master list of TFs
+
+GeneUniverse = unique(na.omit(as.character(geneMap[which(geneMap$gencodeID %in% PostnataltargettogeneID), "EntrezID"])))
+length(GeneUniverse) # 616
+
+# Find enriched pathways and processes
+
+keggList = lapply(entrez, function(x) enrichKEGG(x, organism="human", universe= GeneUniverse, minGSSize=5, 
+                                                                      pAdjustMethod="BH", qvalueCutoff=1))
+goList_MF = lapply(entrez, function(x) enrichGO(x, ont = "MF", OrgDb = org.Hs.eg.db, universe= GeneUniverse, 
+                                                                     minGSSize=5, pAdjustMethod="BH", qvalueCutoff=1))
+goList_BP = lapply(entrez, function(x) enrichGO(x, ont = "BP", OrgDb = org.Hs.eg.db,universe= GeneUniverse, 
+                                                                     minGSSize=5, pAdjustMethod="BH", qvalueCutoff=1))
+goList_CC = lapply(entrez, function(x) enrichGO(x, ont = "CC", OrgDb = org.Hs.eg.db, universe= GeneUniverse, 
+                                                                     minGSSize=5, pAdjustMethod="BH", qvalueCutoff=1))
+goList_DO = lapply(entrez, function(x) enrichDO(x, ont = "DO", universe= GeneUniverse, minGSSize=5, 
+                                                                     pAdjustMethod="BH", qvalueCutoff=1, readable=TRUE))
+
+# Compare the enriched terms
+
+compareKegg = compareCluster(entrez, fun="enrichKEGG", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+compareBP = compareCluster(entrez, fun="enrichGO", ont = "BP", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+compareMF = compareCluster(entrez, fun="enrichGO",  ont = "MF", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+compareCC = compareCluster(entrez, fun="enrichGO",  ont = "CC", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+compareDO = compareCluster(entrez, fun="enrichDO",  ont = "DO", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+
+save(keggList, goList_MF, goList_BP, goList_CC, goList_DO, compareBP, compareMF, compareCC, compareKegg, compareDO,
+     file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/interaction_DMR_kmeans_GO.objects.PWMEnrich.rda")
+
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich/figures/KEGG_MF_CC_DO_interaction_DMR_kmeans_TFs.pdf", width=14,height=70)
+plot(compareKegg, colorBy= "p.adjust",  showCategory = 700, title= "KEGG Pathway Enrichment")
+plot(compareMF, colorBy= "p.adjust",  showCategory = 700, title= "MF Pathway Enrichment")
+plot(compareCC, colorBy= "p.adjust",  showCategory = 700, title= "CC Pathway Enrichment")
+plot(compareDO, colorBy= "p.adjust",  showCategory = 700, title= "Disease Ontology Enrichment")
+plot(compareBP, colorBy= "p.adjust",  showCategory = 700, title= "Biological Process GO")
+dev.off()
 
 
 ### Cluster Cell Type and overall age DMRs by TF enrichment to see how the groups materialize
