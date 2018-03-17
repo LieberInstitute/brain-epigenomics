@@ -118,14 +118,15 @@ for(cp in names(mres)) {
 
     pc <- newgr$gene_type == 'protein_coding'
     meth11 <- mres[[cp]]$eqtls$meth_n >= 11
-    message(paste(Sys.time(), 'Filtering by meth_n >= 11 and protein_coding genes for set', cp))
-    pc_meth_tab <- addmargins(table('protein coding' = pc, 'meth_n >= 11' = meth11, useNA = 'ifany'))
+    meth11_all <- mres[[cp]]$eqtls$meth_all_n >= 11
+    message(paste(Sys.time(), 'Filtering by meth_n >= 11 and meth_all_n >= 11 and protein_coding genes for set', cp))
+    pc_meth_tab <- addmargins(table('protein coding' = pc, 'meth_n >= 11 & meth_all_n >= 11' = meth11 & meth11_all, useNA = 'ifany'))
     print(pc_meth_tab)
     print(round(pc_meth_tab / max(pc_meth_tab) * 100, 2))
-    mres[[cp]]$eqtls <- mres[[cp]]$eqtls[which(pc & meth11), ]
-    mres[[cp]]$expr <- mres[[cp]]$expr[which(pc & meth11), ]
-    mres[[cp]]$meth <- mres[[cp]]$meth[which(pc & meth11), ]
-    rm(pc, meth11, pc_meth_tab, newgr)
+    mres[[cp]]$eqtls <- mres[[cp]]$eqtls[which(pc & meth11 & meth11_all), ]
+    mres[[cp]]$expr <- mres[[cp]]$expr[which(pc & meth11 & meth11_all), ]
+    mres[[cp]]$meth <- mres[[cp]]$meth[which(pc & meth11 & meth11_all), ]
+    rm(pc, meth11, meth11_all, pc_meth_tab, newgr)
 }
 rm(cp)
 
@@ -146,7 +147,7 @@ session_info()
 # language (EN)
 # collate  en_US.UTF-8
 # tz       US/Eastern
-# date     2018-03-15
+# date     2018-03-16
 #
 # Packages --------------------------------------------------------------------------------------------------------------
 #     package              * version   date       source
