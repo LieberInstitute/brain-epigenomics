@@ -10,6 +10,125 @@ library(pvclust)
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda")
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_PWMEnrich_objects.rda")
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/filtered_TF_list_expressionInfo.rda")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/rda/limma_Neuron_CpGs_minCov_3_ageInfo_dmrs.Rdata")
+
+
+## Cluster Interaction DMRs by TF enrichment to see how the groups materialize
+
+## Extract matrices of pvalue enrichment for each DMR
+
+groupint = groupReport(all_int)
+groupint = as.data.frame(groupint)
+groupint = cbind(groupint, padj = p.adjust(groupint$p.value, method = "fdr"))
+groupint = groupint[which(groupint$target %in% names(PostnataltargettogeneID)),]
+groupint = groupint[order(groupint$id),]
+
+int = list()
+for (i in 1:length(all_int$sequences)) {
+  int[[i]] = sequenceReport(all_int, seq.id=i)
+}
+int = lapply(int, function(y) as.data.frame(y)[order(y$id),])
+int = lapply(int, function(x) x[which(x$target %in% names(PostnataltargettogeneID)),])
+int = do.call(cbind, lapply(int, function(z) p.adjust(z$p.value, method = "fdr")))
+rownames(int) = groupint$target
+colnames(int) = names(all_int$sequences)
+
+dim(int)
+thresh = int >= 0.9
+table(rowSums(thresh==TRUE)==ncol(thresh))
+#FALSE 
+#1157 
+table(colSums(thresh==TRUE)==nrow(thresh))
+#FALSE  TRUE 
+#1764   366 
+
+lMatInt = -log10(int)
+
+
+##  cluster by DMR (bootstrapped)
+
+hc.int <- pvclust(t(lMatInt), method.hclust="ward", method.dist="euclidean")
+hc_cut.int = lapply(hc.int, function(x) cutree(x, k= 10))
+
+## cluster by TF (bootstrapped)
+
+hct.int <- pvclust(lMatInt, method.hclust="ward", method.dist="euclidean")
+hct_cut.int = lapply(hct.int, function(x) cutree(x, k= 10))
+
+##  cluster by TF (not bootstrapped)
+
+int.ward.TF = hclust(dist(lMatInt, method = "euclidean"), method="ward") 
+int.ward.TF.cut = cutree(int.ward.TF, k= 6)
+
+## cluster by DMR (not bootstrapped)
+
+dmr.lMatInt = t(lMatInt)
+dmrs$regionID = paste0(as.character(seqnames(dmrs)), ":",as.character(start(dmrs)), "-",as.character(end(dmrs)))
+dmr.colors = dmrs$k6cluster[match(rownames(dmr.lMatInt), dmrs$regionID)]
+names(dmr.colors) = dmrs$regionID[match(rownames(dmr.lMatInt), dmrs$regionID)]
+
+int.ward.DMR = hclust(dist(dmr.lMatInt, method = "euclidean"), method="ward") 
+int.ward.DMR.cut = cutree(int.ward.DMR, k= 6)
+
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich/figures/Interaction_DMR_TFenrichment_cluster.pdf", h = 12, w = 60)
+palette(brewer.pal(12,"Paired"))
+myplclust(int.ward.TF, lab.col=int.ward.TF.cut, xlab="", hang=0.05, cex=1.1, main = "Cluster by TF")
+myplclust(int.ward.DMR, lab.col=int.ward.DMR.cut, xlab="", hang=0.05, cex=1.1, main = "Cluster by DMR")
+palette(brewer.pal(8, 'Dark2'))
+myplclust(int.ward.DMR, lab.col=dmr.colors, xlab="", hang=0.05, cex=1.1, main = "Cluster by DMR, Split by kmeans cluster")
+dev.off()
+
+
+# split TFs by cluster
+sIndexes = splitit(hc2_cut)
+nullgenes =  read.delim("/users/ajaffe/Lieber/Projects/450k/grant/ref_gene_hg19.txt", header=T,as.is=T)
+genes = sig$annotation
+goListByTF = lapply(sIndexes, function(x) dogo(genes[x],nullgenes[,2])[,-8])
+
+
+## PCA
+
+pca = prcomp(lMatInt)
+pcaVars <- jaffelab::getPcaVars(pca)
+names(pcaVars) <- paste0('PC', seq_len(length(pcaVars)))
+
+pcat = prcomp(t(lMatInt))
+pcatVars <- jaffelab::getPcaVars(pcat)
+names(pcatVars) <- paste0('PC', seq_len(length(pcatVars)))
+
+
+pdf('/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich/figures/pca_TF_Interaction_DMRs.pdf')
+barplot(pcaVars[1:10], col = '#377EB8', ylab = 'Percent of Variance Explained',
+        main = "PCA lMatInt")
+  
+plot(pca$x[, 1] ~ pca$x[, 2],
+     ylab = paste0('PC1: ', pcaVars[1], '% of Var Explained'),
+     xlab = paste0('PC2: ', pcaVars[2], '% of Var Explained'), pch = 19,
+     main = "PCA lMatInt")
+  
+barplot(pcatVars[1:10], col = '#377EB8', ylab = 'Percent of Variance Explained',
+        main = "PCA t(lMatInt)")
+  
+plot(pcat$x[, 1] ~ pcat$x[, 2],
+     ylab = paste0('PC1: ', pcatVars[1], '% of Var Explained'),
+     xlab = paste0('PC2: ', pcatVars[2], '% of Var Explained'), pch = 19,
+     main = "PCA t(lMatInt)")
+dev.off()
+
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich/figures/Interaction_DMR_TFenrichment_heatmap.pdf",h=16,w=8)
+sampleDists <- dist(t(lMatInt))
+sampleDistMatrix <- as.matrix(sampleDists)
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")) )(255)
+pheatmap(sampleDistMatrix,clustering_distance_rows=sampleDists, clustering_distance_cols=sampleDists,
+         col=colors, main="Euclidean Distance Between\nInteraction DMRs by TF Enrichment")
+sampleDists <- dist(lMatInt)
+sampleDistMatrix <- as.matrix(sampleDists)
+pheatmap(sampleDistMatrix,clustering_distance_rows=sampleDists, clustering_distance_cols=sampleDists,
+         col=colors, main="Euclidean Distance Between\nTFs by Enrichment in Interaction DMRs")
+dev.off()
+# too large to be informative
 
 
 ### Cluster Cell Type and overall age DMRs by TF enrichment to see how the groups materialize
@@ -96,104 +215,6 @@ for (i in 1:length(pcaVars)) {
           main = names(pcaVars)[i])
   
   plot(pca[[i]]$x[, 1] ~ pca[[i]]$x[, 2],
-     ylab = paste0('PC1: ', pcaVars[[i]][1], '% of Var Explained'),
-     xlab = paste0('PC2: ', pcaVars[[i]][2], '% of Var Explained'), pch = 19,
-     main = names(pca)[i])
-  
-  barplot(pcatVars[[i]][1:10], col = '#377EB8', ylab = 'Percent of Variance Explained',
-          main = names(pcatVars)[i])
-  
-  plot(pcat[[i]]$x[, 1] ~ pcat[[i]]$x[, 2],
-       ylab = paste0('PC1: ', pcatVars[[i]][1], '% of Var Explained'),
-       xlab = paste0('PC2: ', pcatVars[[i]][2], '% of Var Explained'), pch = 19,
-       main = names(pcat)[i])
-}
-dev.off()
-
-
-
-## co-occuring motifs in Cell Type and Age DMRs
-
-
-
-
-
-## Cluster Interaction DMRs by TF enrichment to see how the groups materialize
-
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/rda/limma_Neuron_CpGs_minCov_3_ageInfo_dmrs.Rdata")
-
-
-## Extract matrices of pvalue enrichment for each DMR
-
-groupint = groupReport(all_int)
-groupint = as.data.frame(groupint)
-groupint = cbind(groupint, padj = p.adjust(groupint$p.value, method = "fdr"))
-groupint = groupint[which(groupint$target %in% names(PostnataltargettogeneID)),]
-groupint = groupint[order(groupint$id),]
-
-int = list()
-for (i in 1:length(all_int$sequences)) {
-  int[[i]] = sequenceReport(all_int, seq.id=i)
-}
-int = lapply(int, function(y) as.data.frame(y)[order(y$id),])
-int = lapply(int, function(x) x[which(x$target %in% names(PostnataltargettogeneID)),])
-int = do.call(cbind, lapply(int, function(z) p.adjust(z$p.value, method = "fdr")))
-rownames(int) = groupint$target
-colnames(int) = names(all_int$sequences)
-
-dim(int)
-thresh = int >= 0.9
-table(rowSums(thresh==TRUE)==ncol(thresh))
-#FALSE 
-#1157 
-table(colSums(thresh==TRUE)==nrow(thresh))
-#FALSE  TRUE 
-#1764   366 
-
-lMatInt = -log10(int)
-
-
-##  cluster by DMR
-
-hc.int <- pvclust(t(lMatInt), method.hclust="ward", method.dist="euclidean")
-hc_cut.int = lapply(hc.int, function(x) cutree(x, k= 10))
-
-## cluster by TF
-
-hct.int <- pvclust(lMatInt, method.hclust="ward", method.dist="euclidean")
-hct_cut.int = lapply(hct.int, function(x) cutree(x, k= 10))
-
-
-
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich/figures/Interaction_DMR_TFenrichment_cluster.pdf", h = 8, w = 16)
-palette(brewer.pal(12,"Paired"))
-mapply(function(hc, hc_cut) myplclust(hc, lab.col=hc_cut,xlab="",hang=0.05,cex=1.1), hc.ctage, hc_cut.ctage, SIMPLIFY = F)
-dev.off()
-
-# split TFs by cluster
-sIndexes = splitit(hc2_cut)
-nullgenes =  read.delim("/users/ajaffe/Lieber/Projects/450k/grant/ref_gene_hg19.txt", header=T,as.is=T)
-genes = sig$annotation
-goListByTF = lapply(sIndexes, function(x) dogo(genes[x],nullgenes[,2])[,-8])
-
-
-## PCA
-
-pca = lapply(lMat, prcomp)
-pcaVars <- lapply(pca, function(x) jaffelab::getPcaVars(x))
-for (i in 1:length(pcaVars)) { names(pcaVars[[i]]) <- paste0('PC', seq_len(length(pcaVars[[i]]))) }
-
-pcat = lapply(lMat, function(x) prcomp(t(x)))
-pcatVars <- lapply(pcat, function(x) jaffelab::getPcaVars(x))
-for (i in 1:length(pcatVars)) { names(pcatVars[[i]]) <- paste0('PC', seq_len(length(pcatVars[[i]]))) }
-
-
-pdf('/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich/figures/pca_TF_CellType_Age.pdf')
-for (i in 1:length(pcaVars)) {
-  barplot(pcaVars[[i]][1:10], col = '#377EB8', ylab = 'Percent of Variance Explained',
-          main = names(pcaVars)[i])
-  
-  plot(pca[[i]]$x[, 1] ~ pca[[i]]$x[, 2],
        ylab = paste0('PC1: ', pcaVars[[i]][1], '% of Var Explained'),
        xlab = paste0('PC2: ', pcaVars[[i]][2], '% of Var Explained'), pch = 19,
        main = names(pca)[i])
@@ -210,38 +231,6 @@ dev.off()
 
 
 
+## co-occuring motifs in Cell Type and Age DMRs
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich/figures/Interaction_DMR_TFenrichment_heatmap.pdf",h=16,w=8)
-sampleDists <- dist(t(lMat))
-sampleDistMatrix <- as.matrix(sampleDists)
-colors <- colorRampPalette(rev(brewer.pal(9, "Blues")) )(255)
-pheatmap(sampleDistMatrix,clustering_distance_rows=sampleDists, clustering_distance_cols=sampleDists,
-         col=colors, main="Euclidean Distance Between\nInteraction DMRs by TF Enrichment")
-sampleDists <- dist(lMat)
-sampleDistMatrix <- as.matrix(sampleDists)
-pheatmap(sampleDistMatrix,clustering_distance_rows=sampleDists, clustering_distance_cols=sampleDists,
-         col=colors, main="Euclidean Distance Between\nTFs by Enrichment in Interaction DMRs")
-dev.off()
-# too large to be informative
-
-
-
-
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/PWMEnrich/figures/Interaction_DMR_TFenrichment_cluster.pdf", h = 5, w = 14)
-##  cluster by TF
-hc = hclust(dist(t(lMat)))
-hc_cut = cutree(hc, h= 40)
-palette(brewer.pal(12,"Paired"))
-myplclust(hc, lab.col=hc_cut,xlab="",hang=0.05,cex=1.1)
-# cluster by DMR
-hc2 = hclust(dist(lMat))
-hc2_cut = cutree(hc2, k= 20)
-myplclust(hc2, lab.col=hc2_cut,xlab="",hang=0)
-dev.off()
-
-### go by cluster
-sIndexes = splitit(hc2_cut)
-nullgenes =  read.delim("/users/ajaffe/Lieber/Projects/450k/grant/ref_gene_hg19.txt", header=T,as.is=T)
-genes = sig$annotation
-goListByTF = lapply(sIndexes, function(x) dogo(genes[x],nullgenes[,2])[,-8])
 
