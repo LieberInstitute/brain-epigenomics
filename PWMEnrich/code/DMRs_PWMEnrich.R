@@ -30,8 +30,8 @@ seq = lapply(gr, function(y) lapply(y, function(x) getSeq(Hsapiens, x)))
 
 ### Run PWMEnrich
 
-#useBigMemoryPWMEnrich(TRUE)
-registerCoresPWMEnrich(3)
+useBigMemoryPWMEnrich(TRUE)
+registerCoresPWMEnrich(5)
 
 # load the pre-compiled lognormal background computed using promoters
 data(PWMLogn.hg19.MotifDb.Hsap)
@@ -88,6 +88,25 @@ introns_split$Interaction.neg = motifEnrichment(seq$introns$Interaction.neg, PWM
 
 save(promoters_split, intergenic_split, introns_split, all_split, promoters_int, intergenic_int, introns_int, all_int,
      file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_PWMEnrich_objects.rda")
+
+
+## test each of the 6 kmeans clusters
+
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/rda/limma_Neuron_CpGs_minCov_3_ageInfo_dmrs.Rdata")
+
+names(dmrs) = dmrs$regionID
+dmrs = dmrs[width(dmrs)>30]
+int.groups = split(dmrs, dmrs$k6cluster_label)
+
+intseq = lapply(int.groups, function(x) getSeq(Hsapiens, x))
+int.kmeans = list()
+int.kmeans$"1:G-N+" = motifEnrichment(intseq$"1:G-N+", PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+int.kmeans$"2:G0N+" = motifEnrichment(intseq$"2:G0N+", PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+int.kmeans$"3:G0N-" = motifEnrichment(intseq$"3:G0N-", PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+int.kmeans$"4:G+N0" = motifEnrichment(intseq$"4:G+N0", PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+int.kmeans$"5:G+N-" = motifEnrichment(intseq$"5:G+N-", PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+int.kmeans$"6:G-N0" = motifEnrichment(intseq$"6:G-N0", PWMLogn.hg19.MotifDb.Hsap, verbose=F)
+    
 
 
 ## Test for Differential TF binding
@@ -148,7 +167,7 @@ for (i in 1:length(comps)) {
 }
 names(TFdiff) = names(comps)
 
-save(TFdiff, promoters_split, intergenic_split, introns_split, all_split, promoters_int, intergenic_int, introns_int, all_int,
+save(int.kmeans, TFdiff, promoters_split, intergenic_split, introns_split, all_split, promoters_int, intergenic_int, introns_int, all_int,
      file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_PWMEnrich_objects.rda")
 
 
