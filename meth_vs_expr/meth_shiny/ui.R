@@ -82,8 +82,8 @@ shinyUI(navbarPage(
             tags$li(p(strong('meth_adjust_age_FDR_less5percent'), 'Whether meth_adjust_age_FDR is less than 5 percent. If FALSE, then age is confounding the relationship between methylation and expression.')),
             tags$li(p(strong('venn_set'), 'Venn set identifier for the methylation and expression association. The 3 sets are nonCpG FDR <5%, CpG FDR <5% and CpG marg for CpG associations near the nonCpG locations that are marginally significant (not included in the table).')),
             tags$li(p(strong('promoter_present'), 'Is the cytosine present in the promoter of a gene? 2000 to 200 base pairs upstream of a gene.')),
-            tags$li(p(strong('body_present'), 'Is the cytosone present in the gene body? For genes > 250 bp, 200 bp upstream to 200 bp downstream of the gene.')),
-            tags$li(p(strong('flanking_present'), 'Is the cytosone present in the region flanking a gene? 10kbp upstream and downstream of the gene body as defined above.')),
+            tags$li(p(strong('body_present'), 'Is the cytosine present in the gene body? For genes > 250 bp, 200 bp upstream to 200 bp downstream of the gene.')),
+            tags$li(p(strong('flanking_present'), 'Is the cytosine present in the region flanking a gene? 10kbp upstream and downstream of the gene body as defined above.')),
             tags$li(p(strong('promoter_gencodeID'), 'GENCODE gene ids the cytosine is overlapping. IDs and annotation are from GENCODE v25 on hg19.')),
             tags$li(p(strong('body_gencodeID'), 'GENCODE gene ids the cytosine is overlapping.')),
             tags$li(p(strong('flanking_gencodeID'), 'GENCODE gene ids the cytosine is overlapping.'))
