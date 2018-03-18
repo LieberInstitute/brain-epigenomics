@@ -73,6 +73,7 @@ lapply(intclusters, function(x) x[which(x$regionID %in% c("chr18:74712838-747295
 #how about one from group 1?
 intclusters$'1:G-N+'[which(distToGene==0 & nearestSymbol %in% c("CUX1", "TCF4", "HDAC4", "CACNA1C", "MEGF6","NOTCH3")),]
 
+intclusters$AorB = ifelse()
 
 ## how many fall within CpG islands?
 
@@ -106,6 +107,20 @@ rbind(OR = unlist(lapply(lapply(df, fisher.test), function(y) y$estimate)), p = 
 #5:G+N-.odds ratio 6:G-N0.odds ratio
 #OR      2.589743e+02      1.516762e+02
 #p       9.724690e-45     6.289749e-285
+
+df = data.frame(YesIsland = c(x[islands=="CGI" & Cluster %in% c("1:G-N+","2:G0N+", "6:G-N0"), sum(V1),],
+                              x[islands=="CGI" & Cluster %in% c("3:G0N-","4:G+N0","5:G+N-"),sum(V1)]),
+                NoIsland = c(x[islands!="CGI" & Cluster %in% c("1:G-N+","2:G0N+", "6:G-N0"), sum(V1),],
+                             x[islands!="CGI" & Cluster %in% c("3:G0N-","4:G+N0","5:G+N-"),sum(V1)]), 
+                             row.names = c("GroupA","GroupB"))
+fisher.test(df)
+#p-value < 2.2e-16
+#alternative hypothesis: true odds ratio is not equal to 1
+#95 percent confidence interval:
+#  0.2273814 0.3888052
+#sample estimates:
+#  odds ratio 
+#0.2974871 
 
 
 ## Repetitive elements
@@ -143,6 +158,20 @@ rbind(OR = unlist(lapply(lapply(df, fisher.test), function(y) y$estimate)), p = 
 #              5:G+N-            6:G-N0
 #OR               Inf               Inf
 #p         0.02982786      1.810973e-14
+
+fisher.test(data.frame(Yes = c(x[repeats=="No repeats" & Cluster %in% c("1:G-N+","2:G0N+", "6:G-N0"), sum(V1),],
+                               x[repeats=="No repeats" & Cluster %in% c("3:G0N-","4:G+N0","5:G+N-"),sum(V1)]),
+                       No = c(x[repeats!="No repeats" & Cluster %in% c("1:G-N+","2:G0N+", "6:G-N0"), sum(V1),],
+                              x[repeats!="No repeats" & Cluster %in% c("3:G0N-","4:G+N0","5:G+N-"),sum(V1)]), 
+                       row.names = c("GroupA","GroupB")))
+#p-value = 0.07977
+#alternative hypothesis: true odds ratio is not equal to 1
+#95 percent confidence interval:
+#  0.6990714 1.0253477
+#sample estimates:
+#  odds ratio 
+#0.8457447 
+
 
 
 # assign genomic features
@@ -192,6 +221,22 @@ rbind(OR = unlist(lapply(lapply(df, fisher.test), function(y) y$estimate)), p = 
 #              5:G+N-            6:G-N0
 #OR      2.518328e+02      8.575791e+01
 #p       2.877309e-31     3.757413e-198
+
+f = lapply(as.list(unique(x$annotation)), function(a) fisher.test(data.frame(Yes = c(x[annotation==as.character(a) & Cluster %in% c("1:G-N+","2:G0N+", "6:G-N0"), sum(V1),],
+                                                                                     x[annotation==as.character(a) & Cluster %in% c("3:G0N-","4:G+N0","5:G+N-"),sum(V1)]),
+                                                                             No = c(x[annotation!=as.character(a) & Cluster %in% c("1:G-N+","2:G0N+", "6:G-N0"), sum(V1),],
+                                                                                    x[annotation!=as.character(a) & Cluster %in% c("3:G0N-","4:G+N0","5:G+N-"),sum(V1)]), 
+                                                                             row.names = c("GroupA","GroupB"))))
+names(f) = unique(x$annotation)
+rbind(OR = unlist(lapply(f, function(y) y$estimate)), p = p.adjust(unlist(lapply(f, function(y) y$p.value)), method = "fdr"))
+#   CDS.odds ratio Intron.odds ratio Promoter.odds ratio Intergenic.odds ratio
+#OR   2.586352e-01        1.19864741        2.4905823308          4.943342e+00
+#p    1.437108e-35        0.08747343        0.0001086105          1.573111e-23
+#   5'UTR.odds ratio 3'UTR.odds ratio
+#OR        1.3720357        0.6853964
+#p         0.2971496        0.2971496
+
+#compared to groups 3,4 and 5, groups 1,2 and 6 are: depleted in CDS, enriched in promoter and intergenic sequence
 
 
 ### Gene Ontology
@@ -245,17 +290,31 @@ dev.off()
 ## Explore results
 
 compareBP = lapply(compareBP, as.data.frame)
-compareBP = lapply(compareBP, function(x) split(x, x$Cluster))
-groups = lapply(compareBP, function(x) list(group1 = list(group = x[["1:G-N+"]], others = do.call(rbind, x[which(names(x)!="1:G-N+")])),
-                                            group2 = list(group = x[["2:G0N+"]], others = do.call(rbind, x[which(names(x)!="2:G0N+")])),
-                                            group3 = list(group = x[["3:G0N-"]], others = do.call(rbind, x[which(names(x)!="3:G0N-")])),
-                                            group4 = list(group = x[["4:G+N0"]], others = do.call(rbind, x[which(names(x)!="4:G+N0")])),
-                                            group5 = list(group = x[["5:G+N-"]], others = do.call(rbind, x[which(names(x)!="5:G+N-")])),
-                                            group6 = list(group = x[["6:G-N0"]], others = do.call(rbind, x[which(names(x)!="6:G-N0")]))))
+compareBP = lapply(compareBP, function(x) x[order(x$p.adjust),])
+geneBP = split(compareBP$Genes, compareBP$Genes$Cluster)
+lapply(geneBP,head)
 
-groups = lapply(groups, function(x) lapply(x, function(y) y[["group"]][,"Description"][!y[["group"]][,"Description"] %in% y[["others"]][,"Description"]]))
-groups = mapply(function(all, subset) mapply(function(all2, subset2) all2[which(all2$Description %in% subset2),], all, subset, SIMPLIFY = F), compareBP, groups, SIMPLIFY = F)
-lapply(groups[[1]], function(y) y$Description)
+selected = c("GO:0022604", "GO:0007272", "GO:0022010","GO:0007265", "GO:1901184",
+             "GO:0048813","GO:0031346","GO:0007411","GO:0051493","GO:0098742",
+             "GO:0050808","GO:0010975","GO:0098742","GO:0061351")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/CT_Age_Interaction/DMR_KEGG_GO_DO_objects_Interaction_kmeans_clusters.rda")
+
+## Plot select terms
+
+plotExample = compareBP$Genes # clusterProfiler output
+plotExample@compareClusterResult = plotExample@compareClusterResult[which(plotExample@compareClusterResult$ID %in% selected),]
+plotExample@compareClusterResult$Description = c("Ras protein signal transduction","regulation of ERBB signaling pathway",
+                                                 "dendrite morphogenesis","positive regulation of\ncell projection organization",
+                                                 "regulation of cytoskeleton organization","axon guidance","regulation of neuron projection development",
+                                                 "cell-cell adhesion via\nplasma-membrane adhesion molecules","regulation of neuron projection development",
+                                                 "synapse organization","cell-cell adhesion via\nplasma-membrane adhesion molecules","neural precursor cell proliferation",
+                                                 "regulation of cell morphogenesis","ensheathment of neurons","central nervous system myelination",
+                                                 "positive regulation of\ncell projection organization","Ras protein signal transduction","dendrite morphogenesis",
+                                                 "regulation of neuron projection development")
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/figures/BP_selectedTerms_Interaction_kmeansClusters.pdf", height = 6, width=8.5)
+plot(plotExample, colorBy="p.adjust", showCategory = 450, title= "Biological Process Enrichment")
+dev.off()
 
 
 ## Width of DMRs
