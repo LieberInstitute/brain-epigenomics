@@ -176,7 +176,8 @@ fisher.test(data.frame(Yes = c(x[repeats=="No repeats" & Cluster %in% c("1:G-N+"
 
 # assign genomic features
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/figures/DMR_annotation_kmeans_Interaction_clusters.pdf", width = 10)
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/figures/DMR_annotation_kmeans_Interaction_clusters.pdf", 
+    height = 9, width = 8)
 x = lapply(intclusters, function(x) x[,length(unique(regionID)), by = "annotation"])
 x = do.call(rbind, Map(cbind, x, perc = lapply(x, function(y) round(y$V1/sum(y$V1)*100,1)), Cluster = as.list(names(intclusters))))
 x$annotation = factor(x$annotation, levels = c("Intergenic", "Promoter", "5'UTR", "CDS", "Intron", "3'UTR"))
@@ -237,6 +238,23 @@ rbind(OR = unlist(lapply(f, function(y) y$estimate)), p = p.adjust(unlist(lapply
 #p         0.2971496        0.2971496
 
 #compared to groups 3,4 and 5, groups 1,2 and 6 are: depleted in CDS, enriched in promoter and intergenic sequence
+
+
+## Comparison of distance to gene?
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/figures/DMR_minDistToGene_kmeans_Interaction_clusters.pdf", width = 10)
+x = lapply(intclusters, function(x) x[, min(distToGene), by="regionID"])
+x = do.call(rbind, Map(cbind, x, Cluster = as.list(names(intclusters))))
+ggplot(x, aes(x = Cluster, y = V1)) + geom_boxplot() +
+  labs(fill="") + theme_classic() +
+  ylab("Minimum Distance to Nearest Gene") +
+  xlab("") +
+  ggtitle("Minimum Distance to Nearest Gene by Cluster") +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20))
+dev.off()
+
+
 
 
 ### Gene Ontology

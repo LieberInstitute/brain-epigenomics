@@ -89,35 +89,6 @@ fisher = lapply(unlist(tables, recursive=F), fisher.test)
 df = t(data.frame(pval = unlist(lapply(fisher, function(x) x$p.value)),
                   OR = unlist(lapply(fisher, function(x) x$estimate))))
 
-#                                   pval        OR
-#450K.CellType              0.000000e+00  30.45269
-#450K.Age                  6.783447e-124 188.51915
-#450K.Interaction           0.000000e+00  51.64631
-#rrbs.CellType              0.000000e+00  30.88139
-#rrbs.Age                  1.209423e-118 124.06565
-#rrbs.Interaction           0.000000e+00  44.79600
-#CHrrbs.CellType            0.000000e+00  22.13099
-#CHrrbs.Age                1.475627e-100  74.02029
-#CHrrbs.Interaction         0.000000e+00  30.28603
-#450K.upGABA.CellType       0.000000e+00  27.02892
-#450K.upGABA.Age           6.350689e-114 104.56721
-#450K.upGABA.Interaction    0.000000e+00  40.42791
-#rrbs.upGABA.CellType       0.000000e+00  30.93308
-#rrbs.upGABA.Age           2.650823e-128 145.53876
-#rrbs.upGABA.Interaction    0.000000e+00  47.52948
-#CHrrbs.upGABA.CellType     0.000000e+00  24.70284
-#CHrrbs.upGABA.Age         7.886822e-111  93.15982
-#CHrrbs.upGABA.Interaction  0.000000e+00  35.08002
-#450K.upGlut.CellType       0.000000e+00  31.09919
-#450K.upGlut.Age           7.119570e-122 137.08810
-#450K.upGlut.Interaction    0.000000e+00  51.45362
-#rrbs.upGlut.CellType       0.000000e+00  33.37056
-#rrbs.upGlut.Age           8.737987e-122 126.48668
-#rrbs.upGlut.Interaction    0.000000e+00  46.91774
-#CHrrbs.upGlut.CellType     0.000000e+00  24.26651
-#CHrrbs.upGlut.Age          3.479409e-94  61.99506
-#CHrrbs.upGlut.Interaction  0.000000e+00  32.79693
-
 write.csv(t(df),file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_Kozlenkov_Dracheva_NucAcidsRes_2016_GABA-GLU_dmC_Overlap.csv", quote=F)
 
 
@@ -137,10 +108,33 @@ df = data.frame(Group = names(ooCT), count = c(unlist(lapply(ooCT, function(x) l
 			   model = c(rep.int("Cell Type",9),rep.int("Age",9),rep.int("Interaction",9)), 
 			   list = rep.int(c("450K","rrbs","CHrrbs"),9),
 			   dir = rep.int(c(rep.int("Both",3),rep.int("More In\nGABA",3),rep.int("More In\nGlut",3)),3))
-			   
+
+
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/rda/limma_Neuron_CpGs_minCov_3_ageInfo_dmrs.Rdata")
+
+dmrs = split(dmrs, dmrs$k6cluster_label)
+oo = lapply(dmrs, function(x) findOverlaps(x, makeGRangesFromDataFrame(dtinteraction[sig=="FWER < 0.05",,])))
+dtinteraction = dtinteraction[sig=="FWER < 0.05",,]
+intclusters = lapply(oo, function(x) dtinteraction[subjectHits(x),,])
+
+gabglu = gabglu[which(names(gabglu) %in% c("rrbs.upGABA","CHrrbs.upGABA","rrbs.upGlut","CHrrbs.upGlut"))]
+ooInt = lapply(intclusters, function(i) lapply(gabglu, function(x) findOverlaps(makeGRangesFromDataFrame(i),x)))
+
+df2 = mapply(function(oo, i) lapply(oo, function(x) rbind(cbind(i[unique(queryHits(x)),,], Hit = "Yes"), cbind(i[-unique(queryHits(x)),,], Hit = "No"))),
+            ooInt, intclusters, SIMPLIFY = F)
+df2 = lapply(df2, function(x) lapply(x, function(y) y[,length(unique(regionID)), by = "Hit"]))
+df2 = lapply(df2, function(x) lapply(x, function(y) cbind(y, Perc = round(y$V1/sum(y$V1)*100,1))))
+df2 = do.call(rbind, Map(cbind, lapply(df2, function(d) do.call(rbind, Map(cbind, d, CT = as.list(names(d))))), Cluster = as.list(names(df2))))
+df2$dir[grep("GABA", df2$CT)] = "More In\nGABA"
+df2$dir[grep("Glut", df2$CT)] = "More In\nGlut"
+df2$list[-grep("CHrrbs", df2$CT)] = "CpG"
+df2$list[grep("CHrrbs", df2$CT)] = "CpH"
+df2$Cluster = factor(df2$Cluster, levels = c("1:G-N+", "2:G0N+", "3:G0N-", "4:G+N0", "5:G+N-", "6:G-N0"))
+
+
 ## Plot
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/figures/DMR_Kozlenkov_Dracheva_NucAcidsRes_2016_GABA-GLU_dmC_Overlap.pdf",width=10,height=12)
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/figures/DMR_Kozlenkov_Dracheva_NucAcidsRes_2016_GABA-GLU_dmC_Overlap.pdf",width=12,height=6)
 ggplot(df[df$dir=="Both",], aes(x = model, y = percent)) + geom_bar(stat = "identity") +
   geom_text(aes( label = count), vjust = -.5) +
   facet_grid(. ~ list) + theme_classic() +
@@ -160,4 +154,58 @@ ggplot(df[df$dir!="Both",], aes(x = dir, y = percent)) + geom_bar(stat = "identi
   ggtitle("DMRs Overlapping Neuronal Subtype DMPs") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
+ggplot(df[df$dir!="Both" & df$list!="450K",], aes(x = dir, y = percent)) + geom_bar(stat = "identity") +
+  geom_text(aes( label = count), vjust = -.5) +
+  facet_grid(list ~ model, scales = "free") + theme_classic() +
+  labs(fill="") +
+  ylab("Percent") + ylim(0,100) +
+  xlab("") +
+  ggtitle("DMRs Overlapping Neuronal Subtype DMPs") +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20))
+ggplot(df2[df2$Hit=="Yes",], aes(x = dir, y = Perc, fill=Cluster)) + geom_bar(stat = "identity") +
+  geom_text(aes( label = V1), vjust = -.5) + 
+  scale_fill_brewer(8, palette="Dark2") +
+  facet_grid(list ~ Cluster, scales = "free") + theme_classic() +
+  labs(fill="") +
+  ylab("Percent") + ylim(0,100) +
+  xlab("") +
+  ggtitle("DMRs Overlapping Neuronal Subtype DMPs") +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20)) +
+  theme(legend.position="none")
 dev.off()
+
+## find enrichment for interaction clusters
+
+ooClus = lapply(dmrs, function(x) findOverlaps(gr.clusters, x))
+df.clusters$Gr1 = ifelse(df.clusters$rnum %in% queryHits(ooClus[[1]]), "yes","no")
+df.clusters$Gr2 = ifelse(df.clusters$rnum %in% queryHits(ooClus[[2]]), "yes","no")
+df.clusters$Gr3 = ifelse(df.clusters$rnum %in% queryHits(ooClus[[3]]), "yes","no")
+df.clusters$Gr4 = ifelse(df.clusters$rnum %in% queryHits(ooClus[[4]]), "yes","no")
+df.clusters$Gr5 = ifelse(df.clusters$rnum %in% queryHits(ooClus[[5]]), "yes","no")
+df.clusters$Gr6 = ifelse(df.clusters$rnum %in% queryHits(ooClus[[6]]), "yes","no")
+
+tables = lapply(as.list(c("Gr1","Gr2","Gr3","Gr4","Gr5","Gr6")), function(x)
+  lapply(as.list(c("rrbs.upGABA","CHrrbs.upGABA","rrbs.upGlut","CHrrbs.upGlut")), function(y)
+    data.frame(Hit = c(nrow(df.clusters[which(df.clusters[,colnames(df.clusters)==x]=="yes" & df.clusters[,colnames(df.clusters)==y]!="no"),]),
+                 nrow(df.clusters[which(df.clusters[,colnames(df.clusters)==x]=="no" & df.clusters[,colnames(df.clusters)==y]!="no"),])),
+               noHit = c(nrow(df.clusters[which(df.clusters[,colnames(df.clusters)==x]=="yes" & df.clusters[,colnames(df.clusters)==y]=="no"),]),
+                 nrow(df.clusters[which(df.clusters[,colnames(df.clusters)==x]=="no" & df.clusters[,colnames(df.clusters)==y]=="no"),])))))
+
+fisher = lapply(tables, function(x) lapply(x, fisher.test))
+or = lapply(fisher, function(x) lapply(x, function(y) data.frame(OR = y$estimate, P = y$p.value)))
+or = do.call(rbind, Map(cbind, lapply(or, function(x) 
+  do.call(rbind, Map(cbind, x, Group = as.list(c("rrbs.upGABA","CHrrbs.upGABA","rrbs.upGlut","CHrrbs.upGlut"))))),
+  cluster = as.list(c("Gr1","Gr2","Gr3","Gr4","Gr5","Gr6"))))
+
+write.csv(or,file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/interaction_kmeans_clusters_Dracheva_2016_GABA-GLU_dmC_Overlap.csv", quote=F)
+
+
+
+  
+  
+  
+  
+  
+  
