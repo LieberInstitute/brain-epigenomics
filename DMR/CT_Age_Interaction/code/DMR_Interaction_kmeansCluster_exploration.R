@@ -57,6 +57,23 @@ df.clusters = Map(cbind, list(df.clusters,df.clusters,df.clusters,df.clusters,df
 names(df.clusters) = names(oo)
 
 
+## How many of the 2178 DMRs fall within each cluster?
+elementNROWS(lapply(intclusters, function(x) unique(x$regionID)))
+# 1:G-N+ 2:G0N+ 3:G0N- 4:G+N0 5:G+N- 6:G-N0 
+#    567    423    362     96    170    560 
+
+(567+423+560)/2179 # 0.7113355
+
+
+# Which groups are my two interaction example regions?
+lapply(intclusters, function(x) x[which(x$regionID %in% c("chr18:74712838-74729551","chr20:10219386-10230921")),unique(nearestSymbol),])
+#`6:G-N0` = MBP
+#`3:G0N-` = SNAP25
+
+#how about one from group 1?
+intclusters$'1:G-N+'[which(distToGene==0 & nearestSymbol %in% c("CUX1", "TCF4", "HDAC4", "CACNA1C", "MEGF6","NOTCH3")),]
+
+
 ## how many fall within CpG islands?
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/figures/DMR_overlap_CpG_Islands_kmeans_Interaction_clusters.pdf",width=16, height = 6)
@@ -210,6 +227,9 @@ compareMF = lapply(entrez2, function(x) compareCluster(x, fun="enrichGO",  ont =
 compareCC = lapply(entrez2, function(x) compareCluster(x, fun="enrichGO",  ont = "CC", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05))
 compareDO = lapply(entrez2, function(x) compareCluster(x, fun="enrichDO",  ont = "DO", qvalueCutoff = 0.05, pvalueCutoff = 0.05))
 
+compareBP.nolimit = lapply(entrez2, function(x) compareCluster(x, fun="enrichGO", ont = "BP", OrgDb = org.Hs.eg.db, pvalueCutoff = 1))
+
+
 # save
 save(compareKegg, compareBP, compareMF, compareCC, keggList, goList_BP, goList_MF, goList_CC, goList_DO,
      file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/CT_Age_Interaction/DMR_KEGG_GO_DO_objects_Interaction_kmeans_clusters.rda")
@@ -221,6 +241,22 @@ mapply(function(comp, title) plot(comp, colorBy="p.adjust", showCategory = 450, 
 mapply(function(comp, title) plot(comp, colorBy="p.adjust", showCategory = 450, title= paste0("Molecular Function GO: ", title)), compareMF, as.list(names(compareMF)), SIMPLIFY = F)
 mapply(function(comp, title) plot(comp, colorBy="p.adjust", showCategory = 450, title= paste0("Cellular Compartment GO: ", title)), compareCC, as.list(names(compareCC)), SIMPLIFY = F)
 dev.off()
+
+## Explore results
+
+compareBP = lapply(compareBP, as.data.frame)
+compareBP = lapply(compareBP, function(x) split(x, x$Cluster))
+groups = lapply(compareBP, function(x) list(group1 = list(group = x[["1:G-N+"]], others = do.call(rbind, x[which(names(x)!="1:G-N+")])),
+                                            group2 = list(group = x[["2:G0N+"]], others = do.call(rbind, x[which(names(x)!="2:G0N+")])),
+                                            group3 = list(group = x[["3:G0N-"]], others = do.call(rbind, x[which(names(x)!="3:G0N-")])),
+                                            group4 = list(group = x[["4:G+N0"]], others = do.call(rbind, x[which(names(x)!="4:G+N0")])),
+                                            group5 = list(group = x[["5:G+N-"]], others = do.call(rbind, x[which(names(x)!="5:G+N-")])),
+                                            group6 = list(group = x[["6:G-N0"]], others = do.call(rbind, x[which(names(x)!="6:G-N0")]))))
+
+groups = lapply(groups, function(x) lapply(x, function(y) y[["group"]][,"Description"][!y[["group"]][,"Description"] %in% y[["others"]][,"Description"]]))
+groups = mapply(function(all, subset) mapply(function(all2, subset2) all2[which(all2$Description %in% subset2),], all, subset, SIMPLIFY = F), compareBP, groups, SIMPLIFY = F)
+lapply(groups[[1]], function(y) y$Description)
+
 
 ## Width of DMRs
 
