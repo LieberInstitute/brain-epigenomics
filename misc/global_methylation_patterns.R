@@ -181,21 +181,36 @@ methCG$Age.Bin = factor(methCG$Age.Bin, levels = c("Neonate","Toddler","Child","
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/single_CpGs/figures/global_methylation.pdf")
 ggplot(methCG, aes(x = CellType, y = prop)) + geom_boxplot() +
-  ylab("mCpG / CpG") + xlab("") +
+  ylab("mCpG / CpG") + xlab("") + theme_classic() +
   ggtitle("Global Proportion of Methylated CpGs") + 
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 ggplot(methCG, aes(x = Age.Bin, y = prop)) + geom_boxplot() +
-  ylab("mCpG / CpG") + xlab("") +
+  ylab("mCpG / CpG") + xlab("") + theme_classic() +
   ggtitle("Global Proportion of Methylated CpGs") + 
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 ggplot(methCG, aes(x = Age.Bin, y = prop)) + geom_boxplot() +
-  ylab("mCpG / CpG") + xlab("") + facet_grid(. ~ CellType)
-  ggtitle("Global Proportion of Methylated CpGs") + 
+  ylab("mCpG / CpG") + xlab("") + facet_grid(. ~ CellType) +
+  ggtitle("Global Proportion of Methylated CpGs") + theme_classic() + 
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
+ggplot(methCG, aes(x = Age, y = prop, colour = CellType)) + geom_point() +
+  geom_smooth(method = "lm") +  
+  theme_classic() + scale_colour_brewer(8, palette="Dark2") +
+  ylab("mCpG / CpG") + xlab("") +
+  ggtitle("Global Proportion of Methylated CpGs") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(methCG, aes(x = Age, y = prop, colour = CellType)) + geom_point() +
+  geom_path() +  
+  theme_classic() + scale_colour_brewer(8, palette="Dark2") +
+  ylab("mCpG / CpG") + xlab("") +
+  ggtitle("Global Proportion of Methylated CpGs") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
 dev.off()
+
 
 # At nonCpGs
 
@@ -247,6 +262,14 @@ ggplot(methCH, aes(x = Age, y = prop, colour = CellType)) + geom_point() +
   ggtitle("Global Proportion of Methylated CpHs") + 
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(methCH, aes(x = Age, y = prop, colour = CellType)) + geom_point() +
+  geom_path() +  ylim(0,50) +
+  theme_classic() + scale_colour_brewer(8, palette="Dark2") +
+  ylab("mCpH / CpH") + xlab("") +
+  ggtitle("Global Proportion of Methylated CpHs") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+
 ggplot(methCH, aes(x = CellType, y = prop10)) + geom_boxplot() +
   theme_classic() +  ylim(0,30) +
   ylab("mCpH / CpH") + xlab("") +
@@ -268,6 +291,13 @@ ggplot(methCH, aes(x = Age.Bin, y = prop10)) + geom_boxplot() +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
 ggplot(methCH, aes(x = Age, y = prop10, colour = CellType)) + geom_point() +
   geom_smooth(method = "lm") +  ylim(0,30) +
+  theme_classic() + scale_colour_brewer(8, palette="Dark2") +
+  ylab("mCpH / CpH") + xlab("") +
+  ggtitle("Global Proportion of\nCpHs Methylated >10%") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(methCH, aes(x = Age, y = prop10, colour = CellType)) + geom_point() +
+  geom_path() +  ylim(0,30) +
   theme_classic() + scale_colour_brewer(8, palette="Dark2") +
   ylab("mCpH / CpH") + xlab("") +
   ggtitle("Global Proportion of\nCpHs Methylated >10%") + 
