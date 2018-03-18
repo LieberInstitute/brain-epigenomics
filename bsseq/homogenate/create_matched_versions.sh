@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -cwd
-#$ -l mem_free=280G,h_vmem=280G,h_fsize=300G
+#$ -l mem_free=350G,h_vmem=350G,h_fsize=300G
 #$ -N create_matched_versions
 #$ -o ./logs/create_matched_versions.txt
 #$ -e ./logs/create_matched_versions.txt
