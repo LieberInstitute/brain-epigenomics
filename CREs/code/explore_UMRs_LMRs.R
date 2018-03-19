@@ -65,6 +65,14 @@ lnum$rep = c(rep.int("Discovery",52), rep.int("Replication",4))
 write.csv(rbind(data.frame(unum, category = "UMR"),data.frame(lnum, category = "LMR")), quote=F,
           file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_number.csv")
 
+num = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_number.csv")
+range(num$num[which(num$category=="UMR" & num$celltype=="Prenatal")])
+range(num$num[which(num$category=="UMR" & num$celltype=="Neuron")])
+range(num$num[which(num$category=="UMR" & num$celltype=="Glia")])
+range(num$num[which(num$category=="LMR" & num$celltype=="Prenatal")])
+range(num$num[which(num$category=="LMR" & num$celltype=="Neuron")])
+range(num$num[which(num$category=="LMR" & num$celltype=="Glia")])
+
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/UMR_LMR_number_byAge_postnatal.pdf")
 w = unum[which(unum$celltype %in% c("Neuron", "Glia")),]
@@ -148,6 +156,14 @@ lwidths$rep = c(rep.int("Discovery",52), rep.int("Replication",4))
 write.csv(rbind(data.frame(uwidths, category = "UMR"),data.frame(lwidths, category = "LMR")), quote=F,
           file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_widths.csv")
 
+widths = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_widths.csv")
+range(widths$median[which(widths$category=="UMR" & widths$celltype=="Prenatal")])
+range(widths$median[which(widths$category=="UMR" & widths$celltype=="Neuron")])
+range(widths$median[which(widths$category=="UMR" & widths$celltype=="Glia")])
+range(widths$median[which(widths$category=="LMR" & widths$celltype=="Prenatal")])
+range(widths$median[which(widths$category=="LMR" & widths$celltype=="Neuron")])
+range(widths$median[which(widths$category=="LMR" & widths$celltype=="Glia")])
+
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/UMR_LMR_widths_byAge_postnatal.pdf")
 w = uwidths[which(uwidths$celltype %in% c("Neuron", "Glia")),]
@@ -208,26 +224,26 @@ pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/UMR_LMR_widths.pdf"
 ggplot(uwidths, aes(x = celltype, y = median)) + geom_boxplot() +
   facet_grid(. ~ rep, scales = "free_x") +  theme_classic() +
   labs(fill="") +
-  ylab("Count") + xlab("") +
+  ylab("Bases") + xlab("") +
   ggtitle("Median UMR Widths") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 ggplot(lwidths, aes(x = celltype, y = median)) + geom_boxplot() +
   facet_grid(. ~ rep, scales = "free_x") +  theme_classic() +
-  labs(fill="") + ylab("Count") + xlab("") +
+  labs(fill="") + ylab("Bases") + xlab("") +
   ggtitle("Median LMR Widths") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 ggplot(uwidths, aes(x = celltype, y = mean)) + geom_boxplot() +
   facet_grid(. ~ rep, scales = "free_x") +  theme_classic() +
   labs(fill="") +
-  ylab("Count") + xlab("") +
+  ylab("Bases") + xlab("") +
   ggtitle("Mean UMR Widths") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 ggplot(lwidths, aes(x = celltype, y = mean)) + geom_boxplot() +
   facet_grid(. ~ rep, scales = "free_x") +  theme_classic() +
-  labs(fill="") + ylab("Count") + xlab("") +
+  labs(fill="") + ylab("Bases") + xlab("") +
   ggtitle("Mean LMR Widths") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
@@ -320,13 +336,13 @@ pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/UMR_LMR_percent_gen
 ggplot(ugenome, aes(x = celltype, y = percent)) + geom_boxplot() +
   facet_grid(. ~ rep, scales = "free_x") +  theme_classic() +
   labs(fill="") +
-  ylab("Count") + xlab("") +
+  ylab("Percent") + xlab("") +
   ggtitle("Percent Genome: UMR") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 ggplot(lgenome, aes(x = celltype, y = percent)) + geom_boxplot() +
   facet_grid(. ~ rep, scales = "free_x") +  theme_classic() +
-  labs(fill="") + ylab("Count") + xlab("") +
+  labs(fill="") + ylab("Percent") + xlab("") +
   ggtitle("Percent Genome: LMR") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
@@ -356,10 +372,9 @@ elementNROWS(uall)
 #         all  allPrenatal allPostnatal   allNeurons      allGlia 
 #       12900        13185        17098        17525        18427
 
-round((unlist(lapply(uall, function(x) (sum(width(x))/sum(as.numeric(sLengths)))*100)))/
-        (sum(width(umaster))/sum(as.numeric(sLengths))*100),2)
-# all  allPrenatal allPostnatal   allNeurons      allGlia 
-# 0.07         0.08         0.09         0.10         0.11 
+round((unlist(lapply(uall, function(x) sum(width(x))))/sum(width(umaster))*100),2)
+# All  Prenatal Postnatal   Neurons      Glia 
+#6.61      7.64      9.43     10.42     11.08 
 # 7-11% of total bases in UMR state shared by all or most
 
 ushared = mapply(function(all,ind) lapply( ind, function(x) round(all / x *100,2)), unlist(lapply(uall, function(x) (sum(width(reduce(x)))/sum(as.numeric(sLengths))*100))), 
@@ -367,6 +382,10 @@ ushared = mapply(function(all,ind) lapply( ind, function(x) round(all / x *100,2
                    umrs$postnatal[which(names(umrs$postnatal) %in% pd[pd$Cell.Type=="Glia","Data.ID"])]), function(y) lapply(y, function(x) sum(width(reduce(x)))/sum(as.numeric(sLengths))*100)))
 ushared = data.frame(perc = unlist(ushared))
 ushared$Group = gsub("\\..*","", rownames(ushared))
+ushared$Person = gsub('.*\\.', '', rownames(ushared))
+ushared$Age = pd[match(ushared$Person, pd$Data.ID),"Age"]
+ushared$CellType = ifelse(ushared$Person %in% pd$Data.ID, pd[match(ushared$Person, pd$Data.ID),"Cell.Type"], "Prenatal")
+
 
 lall = list("All" = Reduce(intersect, c(lmrs$postnatal, lmrs$prenatal)),
             "Prenatal" = Reduce(intersect, lmrs$prenatal),
@@ -377,10 +396,9 @@ elementNROWS(lall)
 #      All  Prenatal Postnatal   Neurons      Glia 
 #       14        41      6162     11499     26041 
 
-round((unlist(lapply(lall, function(x) (sum(width(x))/sum(as.numeric(sLengths)))*100)))/
-        (sum(width(lmaster))/sum(as.numeric(sLengths))*100),2)
-#  all  allPrenatal allPostnatal   allNeurons      allGlia 
-# 0.00         0.00         0.01         0.02         0.05  
+round((unlist(lapply(lall, function(x) sum(width(x))))/sum(width(lmaster))*100),2)
+#      All  Prenatal Postnatal   Neurons      Glia 
+#     0.00      0.00      0.80      1.63      4.67 
 # Very little of total bases in LMR state shared by all or most
 
 lshared = mapply(function(all,ind) lapply( ind, function(x) round(all / x *100,2)), unlist(lapply(lall, function(x) (sum(width(reduce(x)))/sum(as.numeric(sLengths))*100))), 
@@ -388,6 +406,11 @@ lshared = mapply(function(all,ind) lapply( ind, function(x) round(all / x *100,2
                              lmrs$postnatal[which(names(lmrs$postnatal) %in% pd[pd$Cell.Type=="Glia","Data.ID"])]), function(y) lapply(y, function(x) sum(width(reduce(x)))/sum(as.numeric(sLengths))*100)))
 lshared = data.frame(perc = unlist(lshared))
 lshared$Group = gsub("\\..*","", rownames(lshared))
+lshared$Person = gsub('.*\\.', '', rownames(lshared))
+lshared$Age = pd[match(lshared$Person, pd$Data.ID),"Age"]
+lshared$CellType = ifelse(lshared$Person %in% pd$Data.ID, pd[match(lshared$Person, pd$Data.ID),"Cell.Type"], "Prenatal")
+
+
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/percent_shared_UMRs_LMRs_perSample_byBaseCoverage.pdf")
 ggplot(ushared, aes(x = Group, y = perc)) + geom_boxplot() +
@@ -403,6 +426,20 @@ ggplot(lshared, aes(x = Group, y = perc)) + geom_boxplot() +
   ggtitle("Percent Bases Shared Per Sample: LMR") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
+ggplot(ushared[ushared$CellType %in% c("Neuron","Glia"),], aes(x = Age, y = perc, colour = CellType)) + facet_grid(. ~ Group) +
+  geom_path() + geom_point() + ylim(0,100) +
+  theme_classic() + scale_colour_brewer(8, palette="Dark2") +
+  ylab("Percent") + xlab("Age") + 
+  ggtitle("Percent Bases Shared Per Sample: UMR") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(lshared[lshared$CellType %in% c("Neuron","Glia"),], aes(x = Age, y = perc, colour = CellType)) + facet_grid(. ~ Group) +
+  geom_path() + geom_point() + ylim(0,100) +
+  theme_classic() + scale_colour_brewer(8, palette="Dark2") +
+  ylab("Percent") + xlab("Age") + 
+  ggtitle("Percent Bases Shared Per Sample: LMR") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
 dev.off()
 
 
@@ -428,14 +465,23 @@ lapply(features, head)
 DMR = lapply(DMR, function(x) x[which(x$sig=="FWER < 0.05"),])
 DMRgr = lapply(DMR, function(x) makeGRangesFromDataFrame(x, keep.extra.columns = T))
 
-loo = lapply(c(lmrs$postnatal, lmrs$prenatal), function(x) lapply(c(DMRgr, lall, features), function(d) findOverlaps(x,d)))
-uoo = lapply(c(umrs$postnatal, umrs$prenatal), function(x) lapply(c(DMRgr, uall, features), function(d) findOverlaps(x,d)))
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/rda/limma_Neuron_CpGs_minCov_3_ageInfo_dmrs.Rdata")
+dmrs = split(dmrs, dmrs$k6cluster_label)
+names(dmrs) = c("Gr1","Gr2","Gr3","Gr4","Gr5","Gr6")
+
+loo = lapply(c(lmrs$postnatal, lmrs$prenatal), function(x) lapply(c(DMRgr[names(DMRgr) %in% c("CellType","Age")], as.list(dmrs), lall, features), function(d) findOverlaps(x,d)))
+uoo = lapply(c(umrs$postnatal, umrs$prenatal), function(x) lapply(c(DMRgr[names(DMRgr) %in% c("CellType","Age")], as.list(dmrs), uall, features), function(d) findOverlaps(x,d)))
 
 uDMR = lapply(c(umrs$postnatal, umrs$prenatal), as.data.frame)
 uDMR = lapply(uDMR, function(x) data.frame(x, rnum = 1:nrow(x)))
 uDMR = mapply(function(d,oo) data.frame(d, CT = ifelse(d$rnum %in% queryHits(oo$CellType), "CT", "no"),
                                         Age = ifelse(d$rnum %in% queryHits(oo$Age), "Age", "no"),
-                                        Interaction = ifelse(d$rnum %in% queryHits(oo$Interaction), "Int", "no"),
+                                        Gr1 = ifelse(d$rnum %in% queryHits(oo$Gr1), "Gr1", "no"),
+                                        Gr2 = ifelse(d$rnum %in% queryHits(oo$Gr2), "Gr2", "no"),
+                                        Gr3 = ifelse(d$rnum %in% queryHits(oo$Gr3), "Gr3", "no"),
+                                        Gr4 = ifelse(d$rnum %in% queryHits(oo$Gr4), "Gr4", "no"),
+                                        Gr5 = ifelse(d$rnum %in% queryHits(oo$Gr5), "Gr5", "no"),
+                                        Gr6 = ifelse(d$rnum %in% queryHits(oo$Gr6), "Gr6", "no"),
                                         All = ifelse(d$rnum %in% queryHits(oo$All), "All", "no"),
                                         Prenatal = ifelse(d$rnum %in% queryHits(oo$Prenatal), "Prenatal", "no"),
                                         Postnatal = ifelse(d$rnum %in% queryHits(oo$Postnatal), "Postnatal", "no"),
@@ -447,9 +493,9 @@ uDMR = mapply(function(d,oo) data.frame(d, CT = ifelse(d$rnum %in% queryHits(oo$
                                         UTR3 = ifelse(d$rnum %in% queryHits(oo$UTR3), "3'UTR", NA),
                                         islands = ifelse(d$rnum %in% queryHits(oo$islands), "CpG-Island", "non-Island"),
                                         promoter = ifelse(d$rnum %in% queryHits(oo$promoters), "Promoter", NA)), uDMR, uoo, SIMPLIFY = F) 
-uDMR = lapply(uDMR, function(d) data.frame(d, tog = paste(d$CT, d$Age, d$Interaction, d$All, d$Prenatal, 
+uDMR = lapply(uDMR, function(d) data.frame(d, tog = paste(d$CT, d$Age, d$Gr1,d$Gr2,d$Gr3,d$Gr4,d$Gr5,d$Gr6, d$All, d$Prenatal, 
                                                           d$Postnatal, d$Neurons, d$Glia, sep = ":"),
-                                           dmr = paste(d$CT, d$Age, d$Interaction, sep = ":"),
+                                           dmr = paste(d$CT, d$Age, d$Gr1,d$Gr2,d$Gr3,d$Gr4,d$Gr5,d$Gr6, sep = ":"),
                                            regionID = paste0(d$seqnames,":",d$start,"-", d$end),
                                            anno = paste0(d$cds,":",d$intron, ":", d$UTR5, ":", d$UTR3, ":", d$promoter)))
 for (i in 1:length(uDMR)) {
@@ -484,7 +530,12 @@ lDMR = lapply(c(lmrs$postnatal, lmrs$prenatal), as.data.frame)
 lDMR = lapply(lDMR, function(x) data.frame(x, rnum = 1:nrow(x)))
 lDMR = mapply(function(d,oo) data.frame(d, CT = ifelse(d$rnum %in% queryHits(oo$CellType), "CT", "no"),
                                         Age = ifelse(d$rnum %in% queryHits(oo$Age), "Age", "no"),
-                                        Interaction = ifelse(d$rnum %in% queryHits(oo$Interaction), "Int", "no"),
+                                        Gr1 = ifelse(d$rnum %in% queryHits(oo$Gr1), "Gr1", "no"),
+                                        Gr2 = ifelse(d$rnum %in% queryHits(oo$Gr2), "Gr2", "no"),
+                                        Gr3 = ifelse(d$rnum %in% queryHits(oo$Gr3), "Gr3", "no"),
+                                        Gr4 = ifelse(d$rnum %in% queryHits(oo$Gr4), "Gr4", "no"),
+                                        Gr5 = ifelse(d$rnum %in% queryHits(oo$Gr5), "Gr5", "no"),
+                                        Gr6 = ifelse(d$rnum %in% queryHits(oo$Gr6), "Gr6", "no"),
                                         All = ifelse(d$rnum %in% queryHits(oo$All), "All", "no"),
                                         Prenatal = ifelse(d$rnum %in% queryHits(oo$Prenatal), "Prenatal", "no"),
                                         Postnatal = ifelse(d$rnum %in% queryHits(oo$Postnatal), "Postnatal", "no"),
@@ -496,9 +547,9 @@ lDMR = mapply(function(d,oo) data.frame(d, CT = ifelse(d$rnum %in% queryHits(oo$
                                         UTR3 = ifelse(d$rnum %in% queryHits(oo$UTR3), "3'UTR", NA),
                                         islands = ifelse(d$rnum %in% queryHits(oo$islands), "CpG-Island", "non-Island"),
                                         promoter = ifelse(d$rnum %in% queryHits(oo$promoters), "Promoter", NA)), lDMR, loo, SIMPLIFY = F) 
-lDMR = lapply(lDMR, function(d) data.frame(d, tog = paste(d$CT, d$Age, d$Interaction, d$All, d$Prenatal, 
+lDMR = lapply(lDMR, function(d) data.frame(d, tog = paste(d$CT, d$Age, d$Gr1,d$Gr2,d$Gr3,d$Gr4,d$Gr5,d$Gr6, d$All, d$Prenatal, 
                                                           d$Postnatal, d$Neurons, d$Glia, sep = ":"),
-                                           dmr = paste(d$CT, d$Age, d$Interaction, sep = ":"),
+                                           dmr = paste(d$CT, d$Age, d$Gr1,d$Gr2,d$Gr3,d$Gr4,d$Gr5,d$Gr6, sep = ":"),
                                            regionID = paste0(d$seqnames,":",d$start,"-", d$end),
                                            anno = paste0(d$cds,":",d$intron, ":", d$UTR5, ":", d$UTR3, ":", d$promoter)))
 for (i in 1:length(lDMR)) {
@@ -578,6 +629,9 @@ ggplot(CpGIslands, aes(x = celltype, y = islands)) + geom_boxplot() +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
 dev.off()
 
+cgi = data.table(read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_CpG_Island_Overlap.csv"))
+x = cgi[,mean(islands), by = c("mr","celltype")]
+
 
 # How about Repetitive Elements?
 
@@ -613,6 +667,9 @@ ggplot(x[which(x$mr=="LMR"),], aes(x = celltype, y = perc, fill = repeats)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
 dev.off()
 
+repeats = data.table(read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_repeats_Overlap.csv"))
+x = repeats[repeats %in% c("No repeats","SINE","Low_complexity","Simple_repeat","LINE"),mean(perc), by = c("repeats","mr","celltype")]
+
 
 ## assign genomic features
 
@@ -637,6 +694,9 @@ ggplot(annotation, aes(x = celltype, y = perc, fill = annotation)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
 dev.off()
 
+annotation = data.table(read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_annotation_Overlap.csv"))
+x = annotation[,mean(perc), by = c("annotation","mr","celltype")]
+
 
 ## Overlap with DMRs
 
@@ -644,13 +704,17 @@ dmr = lapply(dt, function(x) lapply(x, function(y) y[,length(unique(regionID)), 
 dmr = lapply(dmr, function(x) lapply(x, function(y) data.frame(y, perc = round(y$V1/sum(y$V1)*100,2))))
 models = lapply(dmr, function(x) lapply(x, function(y) data.frame(CT = sum(data.frame(y)[grep("CT", y$dmr),"perc"]), 
                                                                   Age = sum(data.frame(y)[grep("Age", y$dmr),"perc"]),
-                                                                  Int = sum(data.frame(y)[grep("Int", y$dmr),"perc"]))))
+                                                                  Gr1 = sum(data.frame(y)[grep("Gr1", y$dmr),"perc"]),
+                                                                  Gr2 = sum(data.frame(y)[grep("Gr2", y$dmr),"perc"]),
+                                                                  Gr3 = sum(data.frame(y)[grep("Gr3", y$dmr),"perc"]),
+                                                                  Gr4 = sum(data.frame(y)[grep("Gr4", y$dmr),"perc"]),
+                                                                  Gr5 = sum(data.frame(y)[grep("Gr5", y$dmr),"perc"]),
+                                                                  Gr6 = sum(data.frame(y)[grep("Gr6", y$dmr),"perc"]))))
 dmr = lapply(dmr, function(x) do.call(rbind, Map(cbind, x, id = as.list(names(x)))))
 models = lapply(models, function(x) do.call(rbind, Map(cbind, x, id = as.list(names(x)))))
 
 dmr = do.call(rbind, Map(cbind, dmr, mr = as.list(names(dmr))))
 models = do.call(rbind, Map(cbind, models, mr = as.list(names(models))))
-dmr$dmr = factor(dmr$dmr, levels = c("no:no:no","CT:no:no","no:no:Int","CT:no:Int","no:Age:no","CT:Age:Int","no:Age:Int","CT:Age:no"))
 dmr[!(dmr$id %in% postnatalpd$Data.ID),"celltype"] = "Prenatal"
 dmr[which(dmr$id %in% postnatalpd[which(postnatalpd$Cell.Type=="Neuron"),"Data.ID"]),"celltype"] = "Neuron"
 dmr[which(dmr$id %in% postnatalpd[which(postnatalpd$Cell.Type=="Glia"),"Data.ID"]),"celltype"] = "Glia"
@@ -661,9 +725,10 @@ models[which(models$id %in% postnatalpd[which(postnatalpd$Cell.Type=="Glia"),"Da
 write.csv(dmr, quote=F,file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_dmr_Overlap.csv")
 write.csv(models, quote=F,file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_dmr_Overlap_byModel.csv")
 
+dmr$NO = ifelse(dmr$dmr=="no:no:no:no:no:no:no:no", "No overlap", "Overlap")
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/UMR_LMR_overlap_with_dmr.pdf", width = 14)
-ggplot(dmr, aes(x = celltype, y = perc, fill = dmr)) + 
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/UMR_LMR_overlap_with_dmr.pdf", width = 14, height = 6)
+ggplot(dmr, aes(x = celltype, y = perc, fill = NO)) + 
   theme_classic() + geom_bar(position = "fill",stat = "identity") +
   labs(fill="") + facet_grid(. ~ mr) +
   ylab("Proportion") + 
@@ -671,7 +736,7 @@ ggplot(dmr, aes(x = celltype, y = perc, fill = dmr)) +
   ggtitle("Proportion Overlapping DMRs") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
-ggplot(dmr[which(dmr$dmr=="no:no:no"),], aes(x = celltype, y = perc, fill = dmr)) + 
+ggplot(dmr[which(dmr$dmr=="no:no:no:no:no:no:no:no"),], aes(x = celltype, y = perc)) + 
   theme_classic() + geom_boxplot() +
   labs(fill="") + facet_grid(. ~ mr) +
   ylab("Percent") + 
@@ -683,7 +748,7 @@ ggplot(models, aes(x = celltype, y = CT)) +
   theme_classic() + geom_boxplot() +
   labs(fill="") + facet_grid(. ~ mr) +
   ylab("Percent") + 
-  xlab("") +
+  xlab("") + 
   ggtitle("Percent Overlapping Cell Type DMRs") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
@@ -691,20 +756,33 @@ ggplot(models, aes(x = celltype, y = Age)) +
   theme_classic() + geom_boxplot() +
   labs(fill="") + facet_grid(. ~ mr) +
   ylab("Percent") + 
-  xlab("") +
+  xlab("") + 
   ggtitle("Percent Overlapping Age DMRs") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
-ggplot(models, aes(x = celltype, y = Int)) + 
+
+x = melt(models[,!colnames(models) %in% c("CT","Age")])
+x$variable = gsub("Gr1","1:G-N+", x$variable)
+x$variable = gsub("Gr2","2:G0N+", x$variable)
+x$variable = gsub("Gr3","3:G0N-", x$variable)
+x$variable = gsub("Gr4","4:G+N0", x$variable)
+x$variable = gsub("Gr5","5:G+N-", x$variable)
+x$variable = gsub("Gr6","6:G-N0", x$variable)
+
+ggplot(x, aes(x = celltype, y = value, fill = variable)) + 
   theme_classic() + geom_boxplot() +
-  labs(fill="") + facet_grid(. ~ mr) +
-  ylab("Percent") + 
-  xlab("") +
-  ggtitle("Percent Overlapping Interaction DMRs") +
+  labs(fill="") + facet_grid(mr ~ variable) +
+  ylab("Percent") +  
+  xlab("") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_fill_brewer(8, palette="Dark2") +
+  ggtitle("Percent Overlapping DMRs") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
 dev.off()
 
+dmr = data.table(read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_dmr_Overlap.csv"))
+models = data.table(read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_dmr_Overlap_byModel.csv"))
+x = models[,list(Gr1=mean(Gr1),Gr2=mean(Gr2),Gr3=mean(Gr3),Gr4=mean(Gr4),Gr5=mean(Gr5),Gr6=mean(Gr6)),by=c("mr","celltype")]
 
 ## identify sequence present in all of a group
 
@@ -753,9 +831,48 @@ plot(compareBP, colorBy="p.adjust", showCategory = 1500, title= "Biological Proc
 dev.off()
 
 
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_KEGG_GO_DO_objects.rda")
+
+bp = as.data.frame(compareBP)
+bp = split(bp, bp$Cluster)
 
 
+ovgenes = list("All" = unique(unlist(lapply(dt, function(x) lapply(x, function(y) data.frame(y)[which(y$All=="All" & y$distToGene==0),"EntrezID"])))),
+             "Prenatal" = unique(unlist(lapply(dt, function(x) lapply(x, function(y) data.frame(y)[which(y$Prenatal=="Prenatal" & y$distToGene==0),"EntrezID"])))),
+             "Postnatal" = unique(unlist(lapply(dt, function(x) lapply(x, function(y) data.frame(y)[which(y$Postnatal=="Postnatal" & y$distToGene==0),"EntrezID"])))),
+             "Neurons" = unique(unlist(lapply(dt, function(x) lapply(x, function(y) data.frame(y)[which(y$Neurons=="Neurons" & y$distToGene==0),"EntrezID"])))),
+             "Glia" = unique(unlist(lapply(dt, function(x) lapply(x, function(y) data.frame(y)[which(y$Glia=="Glia" & y$distToGene==0),"EntrezID"])))),
+             "AllUMR" = unique(unlist(lapply(dt$UMR, function(x) data.frame(x)[which(x$All=="All" & x$distToGene==0),"EntrezID"]))),
+             "PrenatalUMR" = unique(unlist(lapply(dt$UMR, function(x) data.frame(x)[which(x$Prenatal=="Prenatal" & x$distToGene==0),"EntrezID"]))),
+             "PostnatalUMR" = unique(unlist(lapply(dt$UMR, function(x) data.frame(x)[which(x$Postnatal=="Postnatal" & x$distToGene==0),"EntrezID"]))),
+             "NeuronsUMR" = unique(unlist(lapply(dt$UMR, function(x) data.frame(x)[which(x$Neurons=="Neurons" & x$distToGene==0),"EntrezID"]))),
+             "GliaUMR" = unique(unlist(lapply(dt$UMR, function(x) data.frame(x)[which(x$Glia=="Glia" & x$distToGene==0),"EntrezID"]))),
+             "AllLMR" = unique(unlist(lapply(dt$LMR, function(x) data.frame(x)[which(x$All=="All" & x$distToGene==0),"EntrezID"]))),
+             "PrenatalLMR" = unique(unlist(lapply(dt$LMR, function(x) data.frame(x)[which(x$Prenatal=="Prenatal" & x$distToGene==0),"EntrezID"]))),
+             "PostnatalLMR" = unique(unlist(lapply(dt$LMR, function(x) data.frame(x)[which(x$Postnatal=="Postnatal" & x$distToGene==0),"EntrezID"]))),
+             "NeuronsLMR" = unique(unlist(lapply(dt$LMR, function(x) data.frame(x)[which(x$Neurons=="Neurons" & x$distToGene==0),"EntrezID"]))),
+             "GliaLMR" = unique(unlist(lapply(dt$LMR, function(x) data.frame(x)[which(x$Glia=="Glia" & x$distToGene==0),"EntrezID"]))))
+ovgenes = lapply(ovgenes, function(x) na.omit(as.character(x)))
 
+# Compare the enriched terms between 7 groups
+
+compareKeggOv = compareCluster(ovgenes[grep("MR", names(ovgenes))], fun="enrichKEGG", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+compareBPOv = compareCluster(ovgenes[grep("MR", names(ovgenes))], fun="enrichGO", ont = "BP", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+
+# save object
+save(compareKegg, compareBP, compareMF, compareCC, compareDO,compareKeggOv,compareBPOv,
+     file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_KEGG_GO_DO_objects.rda")
+
+bp = compareBPOv
+bp@compareClusterResult = bp@compareClusterResult[which(bp@compareClusterResult$Cluster %in% c("PostnatalLMR","NeuronsLMR","GliaLMR")),]
+
+# plot compared results
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/UMR_LMR_KEGG_onlyOverlapping_genes.pdf", height = 70, width = 18)
+plot(compareKeggOv, colorBy="p.adjust", showCategory = 1000, title= "KEGG Pathway Enrichment")
+dev.off()
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/LMR_BP_onlyOverlapping_genes.pdf", height = 100, width = 12)
+plot(bp, colorBy="p.adjust", showCategory = 1500, title= "Biological Process GO Enrichment")
+dev.off()
 
 
 

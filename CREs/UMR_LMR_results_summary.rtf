@@ -1,0 +1,252 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf470
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww18600\viewh9960\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b\fs32 \cf0 ## Number of UMRs and LMRs
+\b0\fs24 \
+\
+num = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_number.csv")\
+\
+number UMRs in Prenatal: 20052 22488\
+number UMRs in neurons: 19172 20519\
+number UMRs in glia: 19796 20956\
+number LMRs in Prenatal: 7009 68455\
+number LMRs in neurons: 45417 72377\
+number LMRs in glia: 54773 86159\
+\
+CREs/figures/UMR_LMR_number_byAge_postnatal.pdf\
+\
+number of UMRs, neurons v age, cor -0.3350825, t = -1.6681, df = 22, p-value = 0.1095\
+number of UMRs, glia v age, cor -0.2547386, t = -0.64527, df = 6, p-value = 0.5426\
+number of LMRs, neurons v age, cor -0.8510355, t = -7.6017, df = 22, p-value = 1.364e-07\
+number of LMRs, glia v age, cor 0.1020367, t = 0.25125, df = 6, p-value = 0.81\
+\
+
+\b\fs32 ## how long are these regions?
+\b0\fs24 \
+\
+widths = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_widths.csv")\
+\
+neuronal median UMR width range: 1875 1971\
+glial median UMR width range: 1828 1959\
+prenatal median UMR width range: 1862.5 3320.0\
+neuronal median LMR width range: 395 542\
+glial median LMR width range: 434 600\
+prenatal median LMR width range: 521 747\
+\
+CREs/figures/UMR_LMR_widths_byAge_postnatal.pdf\
+CREs/figures/UMR_LMR_widths.pdf\
+\
+median width, UMRs, neurons v age: t = -3.2393, df = 22, p-value = 0.003766, cor -0.568277\
+median width, UMRs, glia v age: t = -1.5712, df = 6, p-value = 0.1672, cor -0.5399092 \
+median width, LMRs, neurons v age: t = -3.2923, df = 22, p-value = 0.003322, cor -0.5745193\
+median width, LMRs, glia v age: t = -0.045923, df = 6, p-value = 0.9649, cor -0.01874469\
+\
+
+\b\fs32 ## What proportion of the genome do they cover?\
+
+\b0\fs24 \
+genome = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_genomeCoverage.csv")\
+\
+CREs/figures/UMR_LMR_percentGenome_byAge_postnatal.pdf\
+CREs/figures/UMR_LMR_percent_genome.pdf\
+\
+percent genome covered by UMRs, neurons v age, t = -2.2398, df = 22, p-value = 0.03554, cor -0.4309099 \
+percent genome covered by UMRs, glia v age, t = -1.0744, df = 6, p-value = 0.3239, cor -0.4016735 \
+percent genome covered by LMRs, neurons v age, t = -7.1489, df = 22, p-value = 3.624e-07, cor -0.836104  \
+percent genome covered by LMRs, glia v age, t = 0.25282, df = 6, p-value = 0.8088, cor 0.1026683\
+\
+
+\b\fs32 ### How much of the UMRs and LMRs overlap?
+\b0\fs24 \
+\
+CREs/figures/percent_shared_UMRs_LMRs_perSample_byBaseCoverage.pdf\
+\
+43995 total UMRs after collapsing all samples\
+238576 total LMRs after collapsing all samples\
+\
+#         mean median        sd min    max\
+#UMRs 7584.632   4822 12218.260 221 461743\
+#LMRs 1073.481    762  1064.274   8  52517\
+\
+## regions that are shared by samples\
+\
+elementNROWS(uall)\
+#         all  allPrenatal allPostnatal   allNeurons      allGlia \
+#       12900        13185        17098        17525        18427\
+\
+round((unlist(lapply(uall, function(x) sum(width(x))))/sum(width(umaster))*100),2)\
+# All  Prenatal Postnatal   Neurons      Glia \
+#6.61      7.64      9.43     10.42     11.08 \
+# 7-11% of total bases in UMR state shared by all or most\
+\
+elementNROWS(lall)\
+#      All  Prenatal Postnatal   Neurons      Glia \
+#       14        41      6162     11499     26041 \
+\
+round((unlist(lapply(lall, function(x) sum(width(x))))/sum(width(lmaster))*100),2)\
+#      All  Prenatal Postnatal   Neurons      Glia \
+#     0.00      0.00      0.80      1.63      4.67 \
+# Very little of total bases in LMR state shared by all or most\
+\
+\
+
+\b ## How many overlap CpG Islands?
+\b0 \
+\
+cgi = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_CpG_Island_Overlap.csv")\
+\
+CREs/figures/UMR_LMR_overlap_with_CpG-Islands.pdf\
+\
+mean percent:\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf0 \CocoaLigature0     mr celltype        V1\
+1: UMR     Glia 82.607500\
+2: UMR   Neuron 84.092500\
+3: UMR Prenatal 75.350500\
+4: LMR     Glia  2.636250\
+5: LMR   Neuron  4.637917\
+6: LMR Prenatal  4.415500\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \CocoaLigature1 \
+\
+
+\b ## Repetitive Elements?
+\b0 \
+\
+repeats = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_repeats_Overlap.csv")\
+\
+CREs/figures/UMR_LMR_overlap_with_repeats.pdf\
+\
+mean percent:\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf0 \CocoaLigature0            repeats  mr celltype        V1\
+ 1:           LINE UMR     Glia 14.215000\
+ 2:           LINE UMR   Neuron 14.742083\
+ 3:           LINE UMR Prenatal 16.443000\
+ 4:           LINE LMR     Glia 15.493750\
+ 5:           LINE LMR   Neuron 16.513333\
+ 6:           LINE LMR Prenatal 15.939500\
+ 7: Low_complexity UMR     Glia 24.267500\
+ 8: Low_complexity UMR   Neuron 23.906250\
+ 9: Low_complexity UMR Prenatal 20.773000\
+10: Low_complexity LMR     Glia  4.773750\
+11: Low_complexity LMR   Neuron  4.251250\
+12: Low_complexity LMR Prenatal  5.503000\
+13:     No repeats UMR     Glia  6.520000\
+14:     No repeats UMR   Neuron  5.803333\
+15:     No repeats UMR Prenatal  3.786500\
+16:     No repeats LMR     Glia 36.873750\
+17:     No repeats LMR   Neuron 36.992500\
+18:     No repeats LMR Prenatal 31.012500\
+19:  Simple_repeat UMR     Glia 18.417500\
+20:  Simple_repeat UMR   Neuron 18.362083\
+21:  Simple_repeat UMR Prenatal 17.078000\
+22:  Simple_repeat LMR     Glia  6.253750\
+23:  Simple_repeat LMR   Neuron  6.227500\
+24:  Simple_repeat LMR Prenatal  8.103000\
+25:           SINE UMR     Glia 25.261250\
+26:           SINE UMR   Neuron 25.534583\
+27:           SINE UMR Prenatal 25.844000\
+28:           SINE LMR     Glia 19.891250\
+29:           SINE LMR   Neuron 20.969583\
+30:           SINE LMR Prenatal 22.734000\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \CocoaLigature1 \
+\
+
+\b ## genomic features?\
+
+\b0 \
+annotation = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_annotation_Overlap.csv")\
+\
+CREs/figures/UMR_LMR_overlap_with_annotation.pdf\
+\
+mean percent:\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf0 \CocoaLigature0     annotation  mr celltype         V1\
+ 1:     Intron UMR     Glia 13.3675000\
+ 2:        CDS UMR     Glia 54.5650000\
+ 3:      5'UTR UMR     Glia 18.2800000\
+ 4:   Promoter UMR     Glia  2.5137500\
+ 5:      3'UTR UMR     Glia  0.7475000\
+ 6: Intergenic UMR     Glia 10.5250000\
+ 7:     Intron UMR   Neuron 12.6841667\
+ 8:        CDS UMR   Neuron 55.8512500\
+ 9:      5'UTR UMR   Neuron 18.4245833\
+10:   Promoter UMR   Neuron  2.4033333\
+11: Intergenic UMR   Neuron  9.8566667\
+12:      3'UTR UMR   Neuron  0.7841667\
+13:     Intron UMR Prenatal 16.0590000\
+14:        CDS UMR Prenatal 52.3015000\
+15:      3'UTR UMR Prenatal  0.8050000\
+16:      5'UTR UMR Prenatal 16.1705000\
+17:   Promoter UMR Prenatal  2.2930000\
+18: Intergenic UMR Prenatal 12.3720000\
+19:     Intron LMR     Glia 51.9875000\
+20: Intergenic LMR     Glia 32.7750000\
+21:        CDS LMR     Glia  8.1775000\
+22:      5'UTR LMR     Glia  1.7237500\
+23:      3'UTR LMR     Glia  2.3187500\
+24:   Promoter LMR     Glia  3.0175000\
+25:     Intron LMR   Neuron 53.0737500\
+26:        CDS LMR   Neuron 10.2720833\
+27: Intergenic LMR   Neuron 28.5129167\
+28:      5'UTR LMR   Neuron  1.6029167\
+29:      3'UTR LMR   Neuron  3.2908333\
+30:   Promoter LMR   Neuron  3.2458333\
+31: Intergenic LMR Prenatal 32.6090000\
+32:     Intron LMR Prenatal 49.8480000\
+33:        CDS LMR Prenatal  9.8200000\
+34:   Promoter LMR Prenatal  3.1825000\
+35:      3'UTR LMR Prenatal  2.4335000\
+36:      5'UTR LMR Prenatal  2.1085000\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \CocoaLigature1 \
+\
+
+\b ## Overlap with DMRs?
+\b0 \
+\
+dmr = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_dmr_Overlap.csv")\
+models = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_dmr_Overlap_byModel.csv")\
+\
+CREs/figures/UMR_LMR_overlap_with_dmr.pdf\
+\
+mean percents:\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf0 \CocoaLigature0     mr celltype       Gr1       Gr2       Gr3        Gr4       Gr5       Gr6\
+1: UMR     Glia 0.9762500 0.9550000 0.1925000 0.27625000 0.2087500 0.7150000\
+2: UMR   Neuron 0.5816667 0.5725000 0.7970833 0.32291667 0.3820833 0.3191667\
+3: UMR Prenatal 0.8660000 1.0035000 0.1940000 0.31400000 0.2975000 0.3655000\
+4: LMR     Glia 0.4925000 0.2475000 0.1162500 0.05875000 0.0912500 0.5587500\
+5: LMR   Neuron 0.3025000 0.3216667 0.6937500 0.03333333 0.2191667 0.1316667\
+6: LMR Prenatal 0.4950000 0.3435000 0.1320000 0.04100000 0.1535000 0.2675000\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \CocoaLigature1 \
+\
+
+\b ## Gene ontology?
+\b0 \
+\
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_KEGG_GO_DO_objects.rda")\
+\
+CREs/figures/UMR_LMR_KEGG_GO_DO_plots.pdf\
+CREs/figures/UMR_LMR_BP_plot.pdf\
+\
+\
+\
+\
+\
+\
+}
