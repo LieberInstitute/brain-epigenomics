@@ -153,8 +153,7 @@ ucsc_info <- function(i, feature, type) {
            as.character(seqnames(cbase)), ':',
            min(c(start(expr_r), start(cbase))), '-',
            max(c(end(expr_r), end(cbase))),
-           '&hub_32407_assembledTx=hide&hubUrl=https://s3.amazonaws.com/LIBD_DLPFC/libdDLPFC/hub.txt&hgt.customText=',
-           #file.path(getwd(), 'www', filename)
+           '&hub_32407_assembledTx=hide&hubUrl=https://s3.amazonaws.com/LIBD_DLPFC/libdDLPFC/hub.txt&hgt.customText=https://jhubiostatistics.shinyapps.io/wgbsExprs/',
            filename
     )
     return(res)

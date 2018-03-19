@@ -10,16 +10,16 @@
 # Define UI for application that draws a histogram
 shinyUI(navbarPage(
 
-    title = 'LIBD methylation explorer',
+    title = 'LIBD WGBS Expression explorer',
     tabPanel('home',
         tags$head(
             includeScript("google-analytics.js")
         ),
-        p('Welcome to the ', strong('LIBD methylation explorer!'), 'Here you can explore the methylation and expression associations described by Price et al, 2018. For more details check the documentation tab or simply jump to the next tab.'),
+        p('Welcome to the ', strong('LIBD WGBS Expression explorer!'), 'Here you can explore the methylation and expression associations described by Price et al, 2018. For more details check the documentation tab or simply jump to the next tab.'),
         tags$hr(),
         h3('Main publication'),
         tags$ul(
-            tags$li(HTML('<b>Price A</b>, Collado-Torres L, Jaffe AE. <a href="http://www.sciencemag.org/" onclick="ga(\'send\', \'event\', \'click\', \'link\', \'paper\', 1)">Paper title</a>. <i>paper journal</i>, 2018. doi: todo.'))
+            tags$li(HTML('<b>Price AJ</b>, Collado-Torres L, Ivanov NA, Xia W, Burke EE, Shin JH, Tao R, Ma L, Jia Y,  Hyde TM, Kleinman JE, Weinberger DR, Jaffe AE. <a href="http://www.sciencemag.org/" onclick="ga(\'send\', \'event\', \'click\', \'link\', \'paper\', 1)">Paper title TBD</a>. <i>paper journal</i>, 2018. doi: todo.'))
         )
     ),
     tabPanel('methylation data',
@@ -117,8 +117,8 @@ shinyUI(navbarPage(
         tags$ul(
             tags$li(p(strong('Expression feature information'), HTML('<a href="http://bioconductor.org/packages/GenomicRanges" onclick="ga(\'send\', \'event\', \'click\', \'link\', \'GenomicRanges\', 1)">GenomicRanges</a> information for the corresponding feature. If the feature type is PSI, it also includes the <a href="http://bioconductor.org/packages/SGSeq" onclick="ga(\'send\', \'event\', \'click\', \'link\', \'GenomicRanges\', 1)">SGSeq</a> data for the PSI event. Uses hg19 coordinates and GENCODE v25 annotation.') )),
             tags$li(p(strong('Cytosine information'), HTML('<a href="http://bioconductor.org/packages/GenomicRanges" onclick="ga(\'send\', \'event\', \'click\', \'link\', \'GenomicRanges\', 1)">GenomicRanges</a> information for the corresponding cytosine. Uses hg19 coordinates.'))),
-            tags$li(p(strong('TF information: cytosine level'), '(only for exons) transcription factor motif, the direction of the methylation association (defined previously), whether the cytosine is inside the exon, the raw score of the TF motif, the FDR adjusted p-value for the TF motif, and the i (defined above) where this cytosine is involved.')),
-            tags$li(p(strong('TF information: exon level'), '(only for exons) As above, but comparing the TF motif signal at the exon level. Exons with a length less than 30 base-pairs were not considered.'))
+            tags$li(p(strong('TF information: cytosine level'), '(only for exons) transcription factor motif enrichment in a +- 15 base-pair window around the cytosine. The direction of the methylation association (defined previously), whether the cytosine is inside the exon, the raw score of the TF motif, the FDR adjusted p-value for the TF motif, and the i (defined above) where this cytosine is involved.', HTML('raw-score is as defined by motifEnrichmenth() from <a href="http://bioconductor.org/packages/PWMEnrich" onclick="ga(\'send\', \'event\', \'click\', \'link\', \'PWMEnrich\', 1)">PWMEnrich</a>.'))),
+            tags$li(p(strong('TF information: exon level'), '(only for exons) transcription factor motif enrichment inside the exon, similar to the previous section. Exons with a length less than 30 base-pairs were not considered.'))
         ),
         tags$hr(),
         h3('Age colors'),
@@ -133,10 +133,10 @@ shinyUI(navbarPage(
     ),
     tags$hr(),
     h3('Data license'),
-    p('The data in ', strong('methylation explorer'), HTML(' is licensed under CC BY 4.0. The legal text can be found <a href="LICENSE.txt">here</a>.')),
+    p('The data in ', strong('LIBD WGBS Expression explorer'), HTML(' is licensed under CC BY 4.0. The legal text can be found <a href="LICENSE.txt">here</a>.')),
     tags$hr(),
     h3('Acknowledgements'),
-    p('This research was supported by NIH (TODO add grant info) and the Lieber Institute for Brain Development. We thank the Department of Biostatitics at Johns Hopkins Bloomberg School of Public Health for hosting our application on their shinyapps account.'),
+    p('This research was supported by NIH R21MH102791-01A1 and the Lieber Institute for Brain Development. We thank the Department of Biostatitics at Johns Hopkins Bloomberg School of Public Health for hosting our application on their shinyapps account.'),
     p(HTML('<a href="https://www.libd.org/" onclick="ga(\'send\', \'event\', \'click\', \'link\', \'LIBD\', 1)"><img src="http://LieberInstitute.github.io/rstatsclub/img/LIBD.jpg" align="left" width = "250"/></a>')),
     p(HTML('<a href="http://www.jhsph.edu/departments/biostatistics/">'), img(src='http://aejaffe.com/media/jhu-bloomberg-logo.jpg', align = 'right', width = '250'), HTML('</a>')),
     tags$br(),
