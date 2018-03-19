@@ -783,6 +783,15 @@ lapply(names(go_cluster_comp), function(bp) {
 })
 dev.off()
 
+if(FALSE) {
+    pdf(paste0('pdf/meth_vs_expr_venn_GO_compare_clusters_', opt$feature, '_custom.pdf'), width = 12, useDingbats = FALSE)
+    lapply(names(go_cluster_comp), function(bp) {
+        print(plot(go_cluster_comp[[bp]], title = paste('ontology:', bp), font.size = 18))
+        return(NULL)
+    })
+    dev.off()
+}
+
 
 save(go_venn_res, go_cluster_comp, uni, v_symb, file = paste0('rda/meqtl_venn_go_', opt$feature, '_using_near.Rdata'))
 } else {
@@ -927,9 +936,12 @@ save(c_by_gene, file = paste0('rda/meqtl_c_by_gene_', opt$feature, '_using_near.
 
 ## Extract beta and age coef info for the venn groups
 if(!file.exists(paste0('rda/meqtl_data_by_venn_', opt$feature, '_using_near.Rdata'))) {
-data_by_venn <- do.call(rbind, lapply(c('nonCpG', 'CpGmarg'), function(typeref) {
+data_by_venn <- do.call(rbind, lapply(c('nonCpG', 'CpG', 'CpGmarg'), function(typeref) {
     message(paste(Sys.time(), 'processing reference', typeref))
-    which_v <- grep(typeref, names(attr(vennres, 'intersections')))
+
+    which_v <- which(sapply(strsplit(names(attr(vennres, 'intersections')), ':'), function(vsetname) {
+        any(typeref == vsetname)
+    }))
     res_ref <- mapply(function(vset, vname) {
         message(paste(Sys.time(), 'processing venn set', vname))
         iset <- which(mres[[typeref]]$eqtls$gene %in% vset)
@@ -984,16 +996,16 @@ venn_5k <- function(sub5k) {
 }
 
 
-pdf(paste0('pdf/meth_vs_expr_venn_beta_', opt$feature, '.pdf'), width = 14, height = 10)
+pdf(paste0('pdf/meth_vs_expr_venn_beta_', opt$feature, '.pdf'), width = 15, height = 15)
 venn_5k(as.data.frame(data_by_venn))
 dev.off()
 
 ## For top in neurons, then in glia
-pdf(paste0('pdf/meth_vs_expr_venn_beta_', opt$feature, '_top5k.pdf'), width = 14, height = 10)
+pdf(paste0('pdf/meth_vs_expr_venn_beta_', opt$feature, '_top5k.pdf'), width = 15, height = 15)
 venn_5k(as.data.frame(subset(data_by_venn, gene %in% unlist(vinfo5k))))
 dev.off()
 
-pdf(paste0('pdf/meth_vs_expr_venn_beta_', opt$feature, '_top5kglia.pdf'), width = 14, height = 10)
+pdf(paste0('pdf/meth_vs_expr_venn_beta_', opt$feature, '_top5kglia.pdf'), width = 15, height = 15)
 venn_5k(as.data.frame(subset(data_by_venn, gene %in% unlist(vinfo5kglia))))
 dev.off()
 
@@ -1090,28 +1102,28 @@ plot_feature_level <- function(dvsumm) {
 
 
 ## Explore at the feature level
-pdf(paste0('pdf/meth_vs_expr_venn_byfeature_', opt$feature, '.pdf'), width = 14, height = 10)
+pdf(paste0('pdf/meth_vs_expr_venn_byfeature_', opt$feature, '.pdf'), width = 15, height = 15)
 plot_feature_level(data_venn_summ)
 dev.off()
 
 
 ## By gene region and whether age affects it or not
-pdf(paste0('pdf/meth_vs_expr_venn_byfeature_genebody_hasage_', opt$feature, '.pdf'), width = 14, height = 10)
+pdf(paste0('pdf/meth_vs_expr_venn_byfeature_genebody_hasage_', opt$feature, '.pdf'), width = 15, height = 15)
 plot_feature_level(summarize_venn(data_by_venn[intersect(which(data_by_venn$body_present), which(!data_by_venn$noage)), ]))
 dev.off()
-pdf(paste0('pdf/meth_vs_expr_venn_byfeature_genebody_noage_', opt$feature, '.pdf'), width = 14, height = 10)
+pdf(paste0('pdf/meth_vs_expr_venn_byfeature_genebody_noage_', opt$feature, '.pdf'), width = 15, height = 15)
 plot_feature_level(summarize_venn(data_by_venn[intersect(which(data_by_venn$body_present), which(data_by_venn$noage)), ]))
 dev.off()
-pdf(paste0('pdf/meth_vs_expr_venn_byfeature_geneflanking_hasage_', opt$feature, '.pdf'), width = 14, height = 10)
+pdf(paste0('pdf/meth_vs_expr_venn_byfeature_geneflanking_hasage_', opt$feature, '.pdf'), width = 15, height = 15)
 plot_feature_level(summarize_venn(data_by_venn[intersect(which(data_by_venn$flanking_present), which(!data_by_venn$noage)), ]))
 dev.off()
-pdf(paste0('pdf/meth_vs_expr_venn_byfeature_geneflanking_noage_', opt$feature, '.pdf'), width = 14, height = 10)
+pdf(paste0('pdf/meth_vs_expr_venn_byfeature_geneflanking_noage_', opt$feature, '.pdf'), width = 15, height = 15)
 plot_feature_level(summarize_venn(data_by_venn[intersect(which(data_by_venn$flanking_present), which(data_by_venn$noage)), ]))
 dev.off()
-pdf(paste0('pdf/meth_vs_expr_venn_byfeature_genepromoter_hasage_', opt$feature, '.pdf'), width = 14, height = 10)
+pdf(paste0('pdf/meth_vs_expr_venn_byfeature_genepromoter_hasage_', opt$feature, '.pdf'), width = 15, height = 15)
 plot_feature_level(summarize_venn(data_by_venn[intersect(which(data_by_venn$promoter_present), which(!data_by_venn$noage)), ]))
 dev.off()
-pdf(paste0('pdf/meth_vs_expr_venn_byfeature_genepromoter_noage_', opt$feature, '.pdf'), width = 14, height = 10)
+pdf(paste0('pdf/meth_vs_expr_venn_byfeature_genepromoter_noage_', opt$feature, '.pdf'), width = 15, height = 15)
 plot_feature_level(summarize_venn(data_by_venn[intersect(which(data_by_venn$promoter_present), which(data_by_venn$noage)), ]))
 dev.off()
 
@@ -1132,6 +1144,7 @@ saved_files <- c(paste0('rda/meqtl_mres_', opt$feature,
     paste0('rda/meqtl_delta_pval_', opt$feature, '_using_near.Rdata'),
     paste0('rda/meqtl_venn_go_', opt$feature, '_using_near.Rdata'),
     paste0('rda/meqtl_age_coef_', opt$feature, '_using_near.Rdata'),
+    paste0('rda/meqtl_agemeth_coef_', opt$feature, '_using_near.Rdata'),
     paste0('rda/meqtl_data_by_venn_', opt$feature, '_using_near.Rdata'),
     paste0('rda/meqtl_data_venn_summ_', opt$feature, '_using_near.Rdata'),
     'rda/gene_section.Rdata',

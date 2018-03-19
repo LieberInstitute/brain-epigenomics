@@ -39,9 +39,10 @@ meth_summary <- do.call(rbind, lapply(features, function(feature) {
     load(f, verbose = TRUE)
 
     message(paste(Sys.time(), 'processing data_by_venn'))
-    ## Keep only FDR < 0.05
-    res <- data_by_venn[data_by_venn$FDR < 0.05, ]
-    res$typeref[res$typeref == 'CpGmarg'] <- 'CpG'
+    ## Keep only FDR < 0.05 and drop CpGmarg
+    res <- data_by_venn[data_by_venn$FDR < 0.05 & data_by_venn$typeref != 'CpGmarg', ]
+    print(table(res$typeref))
+    #res$typeref[res$typeref == 'CpGmarg'] <- 'CpG'
 
     colnamesmap <- c(
         'snps' = 'c_id',
@@ -111,10 +112,10 @@ for(i in unique(meth_summary$feature)) {
 meth_summary$i <- NumericList(meth_summary$i)
 
 print(object.size(meth_summary), units = 'Mb')
-# 64.4 Mb
+# 68.5 Mb
 save(meth_summary, file = 'rda/meth_summary.Rdata')
 system('ls -lh rda/meth_summary.Rdata')
-# 9.8 Mb
+# 12 Mb
 
 
 meth_df <- as.data.frame(meth_summary)
@@ -123,10 +124,10 @@ for(i in which(sapply(meth_df, class) == 'AsIs')) {
 }
 
 print(object.size(meth_df), units = 'Mb')
-# 64.2 Mb
+# 67.8 Mb
 save(meth_df, file = 'rda/meth_df.Rdata')
 system('ls -lh rda/meth_df.Rdata')
-# 9.2 M
+# 11 M
 
 ## summarize TF results
 load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/spliceRegions_PWMEnrich_objects_exonAdjustedBackgrounds.rda', verbose = TRUE)
@@ -195,10 +196,10 @@ system('ls -lh rda/tf_data.Rdata')
 # 1.2M
 
 tools::md5sum(c('rda/meth_data.Rdata', 'rda/meth_summary.Rdata', 'rda/meth_df.Rdata', 'rda/tf_data.Rdata'))
-# rda/meth_data.Rdata             rda/meth_summary.Rdata
-# "c27b0f98c853be4a1e250665bae6c293" "060efade56edae016daef466f691e5fe"
-# rda/meth_df.Rdata                  rda/tf_data.Rdata
-# "16f274ba4843a423e854d9a5846c2705" "b061076ae8c39e8ab040f0dc37f52ccf"
+#                rda/meth_data.Rdata             rda/meth_summary.Rdata
+# "c27b0f98c853be4a1e250665bae6c293" "e781290d0f58cc780fbbc87825dde665"
+#                  rda/meth_df.Rdata                  rda/tf_data.Rdata
+# "12442bd38c02dbf2f056fdee1522c50c" "b061076ae8c39e8ab040f0dc37f52ccf"
 
 
 ## Reproducibility info

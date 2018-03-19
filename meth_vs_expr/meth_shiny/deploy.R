@@ -2,7 +2,7 @@ dir.create('www', showWarnings = FALSE)
 system('scp e:/dcl01/lieber/ajaffe/lab/brain-epigenomics/meth_vs_expr/rda/meth_data.Rdata .')
 system('scp e:/dcl01/lieber/ajaffe/lab/brain-epigenomics/meth_vs_expr/rda/meth_df.Rdata .')
 system('scp e:/dcl01/lieber/ajaffe/lab/brain-epigenomics/meth_vs_expr/rda/tf_data.Rdata .')
-#system('scp e:/dcl01/lieber/ajaffe/lab/brain-epigenomics/meth_vs_expr/rda/meth_summary.Rdata .')
+system('scp e:/dcl01/lieber/ajaffe/lab/brain-epigenomics/meth_vs_expr/rda/meth_summary.Rdata .')
 
 ## Add gene_symbol
 library('GenomicRanges')
@@ -15,6 +15,7 @@ system('scp e:/dcl01/lieber/ajaffe/lab/brain-epigenomics/brainseq_pipeline/polyA
 library('SummarizedExperiment')
 load('rse_gene_polyA_dlpfc_n41.Rdata')
 
+load('meth_df.Rdata')
 meth_df$symbol <- NA
 meth_df$symbol[meth_df$feature != 'exon'] <- rowRanges(rse_gene)$Symbol[match(meth_df$feature_id[meth_df$feature != 'exon'], rowRanges(rse_gene)$gencodeID)]
 meth_df$symbol[meth_df$feature == 'exon'] <- gr$exon$Symbol[match(meth_df$feature_id[meth_df$feature == 'exon'], gr$exon$exon_libdID)]
