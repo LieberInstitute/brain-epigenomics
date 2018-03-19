@@ -349,3 +349,10 @@ data.frame(mean = unlist(lapply(dmrs, function(x) mean(width(x)))), median = unl
 #6:G-N0 1467.284 1048.0 1591.8450   1 16714
 
 
+## Export for table in paper
+x = do.call(rbind, Map(cbind, intclusters, Cluster = as.list(names(intclusters))))
+x = as.data.frame(x)[,which(colnames(x) %in% c("seqnames","start","end","width","value","area","cluster","indexStart","indexEnd","L","clusterL","p.value","fwer","p.valueArea",
+                          "fwerArea","nearestSymbol","nearestID","distToGene","islands","annotation","Cluster"))]
+x = unique(x)
+write.csv(x, quote = F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/CT_Age_Interaction/cdDMRs_forPaper.csv")
+

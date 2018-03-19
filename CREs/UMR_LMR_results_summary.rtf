@@ -12,10 +12,18 @@ num = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_num
 number UMRs in Prenatal: 20052 22488\
 number UMRs in neurons: 19172 20519\
 number UMRs in glia: 19796 20956\
+\
 number LMRs in Prenatal: 7009 68455\
 number LMRs in neurons: 45417 72377\
 number LMRs in glia: 54773 86159\
 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 \CocoaLigature0 mean UMR total, 20507.34\
+mean LMR total, 47710.79\
+\
+fewer LMR in prenatal than postnatal, t = -6.7977, df = 23.266, p-value = 5.853e-07\CocoaLigature1 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
 CREs/figures/UMR_LMR_number_byAge_postnatal.pdf\
 \
 number of UMRs, neurons v age, cor -0.3350825, t = -1.6681, df = 22, p-value = 0.1095\
@@ -32,6 +40,7 @@ widths = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_
 neuronal median UMR width range: 1875 1971\
 glial median UMR width range: 1828 1959\
 prenatal median UMR width range: 1862.5 3320.0\
+\
 neuronal median LMR width range: 395 542\
 glial median LMR width range: 434 600\
 prenatal median LMR width range: 521 747\
@@ -43,6 +52,12 @@ median width, UMRs, neurons v age: t = -3.2393, df = 22, p-value = 0.003766, cor
 median width, UMRs, glia v age: t = -1.5712, df = 6, p-value = 0.1672, cor -0.5399092 \
 median width, LMRs, neurons v age: t = -3.2923, df = 22, p-value = 0.003322, cor -0.5745193\
 median width, LMRs, glia v age: t = -0.045923, df = 6, p-value = 0.9649, cor -0.01874469\
+\
+median UMR width, prenatal vs. postnatal, t = 5.425, df = 19.175, p-value = 3.009e-05\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 median LMR width, prenatal vs. postnatal, t = 12.961, df = 33.042, p-value = 1.66e-14\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
 \
 
 \b\fs32 ## What proportion of the genome do they cover?\
@@ -57,6 +72,24 @@ percent genome covered by UMRs, neurons v age, t = -2.2398, df = 22, p-value = 0
 percent genome covered by UMRs, glia v age, t = -1.0744, df = 6, p-value = 0.3239, cor -0.4016735 \
 percent genome covered by LMRs, neurons v age, t = -7.1489, df = 22, p-value = 3.624e-07, cor -0.836104  \
 percent genome covered by LMRs, glia v age, t = 0.25282, df = 6, p-value = 0.8088, cor 0.1026683\
+\
+mean:\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf0 \CocoaLigature0    category        V1\
+1:      UMR 1.9106380\
+2:      LMR 0.9438581\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \CocoaLigature1 percent UMR, prenatal vs. postnatal, t = 6.4475, df = 19.143, p-value = 3.392e-06\
+percent LMR, prenatal vs. postnatal, t = -3.9441, df = 23.7, p-value = 0.0006182\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf0 \CocoaLigature0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \CocoaLigature1 \
 \
 
 \b\fs32 ### How much of the UMRs and LMRs overlap?
@@ -91,6 +124,52 @@ round((unlist(lapply(lall, function(x) sum(width(x))))/sum(width(lmaster))*100),
 #     0.00      0.00      0.80      1.63      4.67 \
 # Very little of total bases in LMR state shared by all or most\
 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf0 \CocoaLigature0         Group CellType context        V1\
+ 1:       All     Glia     UMR 46.062500\
+ 2:       All   Neuron     UMR 45.115000\
+ 3:       All Prenatal     UMR 30.847500\
+ 4:  Prenatal Prenatal     UMR 35.676500\
+ 5: Postnatal     Glia     UMR 65.723750\
+ 6: Postnatal   Neuron     UMR 64.371667\
+ 7:   Neurons   Neuron     UMR 71.122083\
+ 8:      Glia     Glia     UMR 77.255000\
+ 9:       All     Glia     LMR  0.010000\
+10:       All   Neuron     LMR  0.010000\
+11:       All Prenatal     LMR  0.018500\
+12:  Prenatal Prenatal     LMR  0.072000\
+13: Postnatal     Glia     LMR  5.011250\
+14: Postnatal   Neuron     LMR  6.582083\
+15:   Neurons   Neuron     LMR 13.342500\
+16:      Glia     Glia     LMR 29.127500\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \CocoaLigature1 \
+\
+\
+
+\b\fs32 ## How much are from prenatal?\
+
+\b0\fs24 \
+CREs/figures/percent_shared_UMRs_LMRs_perSample_byBaseCoverage.pdf\
+\
+UMR neurons, t = -3.019, df = 22, p-value = 0.00631, cor -0.5412336\
+LMR neurons, t = -2.6291, df = 22, p-value = 0.01532, cor -0.4889486 \
+UMR glia, t = -2.6344, df = 6, p-value = 0.03883 cor -0.732338\
+LMR glia, t = -2.2626, df = 6, p-value = 0.06431 cor -0.678534 \
+ \
+mean:\
+CellType context        V1\
+1: Prenatal     UMR 100.00000\
+2:     Glia     UMR  97.74250\
+3:   Neuron     UMR  96.42208\
+4: Prenatal     LMR 100.00000\
+5:     Glia     LMR  66.90875\
+6:   Neuron     LMR  47.82542\
+\
+\
+\
 \
 
 \b ## How many overlap CpG Islands?
@@ -110,6 +189,10 @@ mean percent:\
 4: LMR     Glia  2.636250\
 5: LMR   Neuron  4.637917\
 6: LMR Prenatal  4.415500\
+\
+    mr        V1\
+1: UMR 80.501731\
+2: LMR  4.244423\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \f0\fs24 \cf0 \CocoaLigature1 \
@@ -208,6 +291,25 @@ mean percent:\
 34:   Promoter LMR Prenatal  3.1825000\
 35:      3'UTR LMR Prenatal  2.4335000\
 36:      5'UTR LMR Prenatal  2.1085000\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \CocoaLigature1 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf0 \CocoaLigature0    annotation  mr         V1\
+ 1:     Intron UMR 14.0873077\
+ 2:        CDS UMR 54.2880769\
+ 3:      5'UTR UMR 17.5353846\
+ 4:   Promoter UMR  2.3778846\
+ 5:      3'UTR UMR  0.7865385\
+ 6: Intergenic UMR 10.9269231\
+\
+ 7:     Intron LMR 51.6659615\
+ 8: Intergenic LMR 30.7440385\
+ 9:        CDS LMR  9.7759615\
+10:      5'UTR LMR  1.8159615\
+11:      3'UTR LMR  2.8115385\
+12:   Promoter LMR  3.1863462\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \f0\fs24 \cf0 \CocoaLigature1 \

@@ -133,6 +133,26 @@ ggplot(w, aes(x = Age, y = num, colour = celltype)) + geom_point() +
 
 dev.off()
 
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/UMR_LMR_numbers.pdf", height = 6)
+ggplot(num[num$rep=="Discovery",], aes(x = celltype, y = num)) + geom_boxplot() +
+  facet_grid(. ~ category, scales = "free_x") +  theme_classic() +
+  labs(fill="") + ylab("Number") + xlab("") +
+  ggtitle("Number of UMRs and LMRs") +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20))
+dev.off()
+
+t.test(num[num$rep=="Discovery" & num$category=="LMR" & num$celltype=="Prenatal","num"],
+       num[num$rep=="Discovery" & num$category=="LMR" & num$celltype!="Prenatal","num"])
+#t = -6.7977, df = 23.266, p-value = 5.853e-07
+#alternative hypothesis: true difference in means is not equal to 0
+#95 percent confidence interval:
+#  -42005.09 -22413.65
+#sample estimates:
+#  mean of x mean of y 
+#27371.60  59580.97 
+
+(59580.97-27371.60)/59580.97 # 54.1%
 
 ## how long are these regions?
 
@@ -220,7 +240,7 @@ ggplot(w, aes(x = Age, y = median, colour = celltype)) + geom_point() +
 dev.off()
 
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/UMR_LMR_widths.pdf")
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/UMR_LMR_widths.pdf", height = 6)
 ggplot(uwidths, aes(x = celltype, y = median)) + geom_boxplot() +
   facet_grid(. ~ rep, scales = "free_x") +  theme_classic() +
   labs(fill="") +
@@ -247,7 +267,32 @@ ggplot(lwidths, aes(x = celltype, y = mean)) + geom_boxplot() +
   ggtitle("Mean LMR Widths") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
+ggplot(widths[widths$rep=="Discovery",], aes(x = celltype, y = median)) + geom_boxplot() +
+  facet_grid(. ~ category, scales = "free_x") +  theme_classic() +
+  labs(fill="") + ylab("Bases") + xlab("") + ylim(0,3500) +
+  ggtitle("Median Widths") +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20))
 dev.off()
+
+t.test(widths[widths$rep=="Discovery" & widths$category=="UMR" & widths$celltype=="Prenatal","median"],
+       widths[widths$rep=="Discovery" & widths$category=="UMR" & widths$celltype!="Prenatal","median"])
+#t = 5.425, df = 19.175, p-value = 3.009e-05
+#alternative hypothesis: true difference in means is not equal to 0
+#95 percent confidence interval:
+#  309.1097 697.0653
+#sample estimates:
+#  mean of x mean of y 
+#2400.525  1897.438
+t.test(widths[widths$rep=="Discovery" & widths$category=="LMR" & widths$celltype=="Prenatal","median"],
+       widths[widths$rep=="Discovery" & widths$category=="LMR" & widths$celltype!="Prenatal","median"])
+#t = 12.961, df = 33.042, p-value = 1.66e-14
+#alternative hypothesis: true difference in means is not equal to 0
+#95 percent confidence interval:
+#  164.1335 225.2540
+#sample estimates:
+#  mean of x mean of y 
+#629.6000  434.9062
 
 
 ## What proportion of the genome do they cover?
@@ -332,7 +377,7 @@ ggplot(w, aes(x = Age, y = percent, colour = celltype)) + geom_point() +
 dev.off()
 
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/UMR_LMR_percent_genome.pdf")
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/UMR_LMR_percent_genome.pdf", height = 6)
 ggplot(ugenome, aes(x = celltype, y = percent)) + geom_boxplot() +
   facet_grid(. ~ rep, scales = "free_x") +  theme_classic() +
   labs(fill="") +
@@ -346,7 +391,36 @@ ggplot(lgenome, aes(x = celltype, y = percent)) + geom_boxplot() +
   ggtitle("Percent Genome: LMR") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
+ggplot(genome[genome$rep=="Discovery",], aes(x = celltype, y = percent)) + geom_boxplot() +
+  facet_grid(. ~ category, scales = "free_x") +  theme_classic() +
+  labs(fill="") + ylab("Percent") + xlab("") + ylim(0,4) +
+  ggtitle("Percent Genome") +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20))
 dev.off()
+
+genome = data.table(read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_genomeCoverage.csv"))
+x = genome[rep=="Discovery",mean(percent), by = c("category")]
+
+t.test(genome[genome$rep=="Discovery" & genome$category=="UMR" & genome$celltype=="Prenatal","percent"],
+       genome[genome$rep=="Discovery" & genome$category=="UMR" & genome$celltype!="Prenatal","percent"])
+#t = 6.4475, df = 19.143, p-value = 3.392e-06
+#alternative hypothesis: true difference in means is not equal to 0
+#95 percent confidence interval:
+#  0.5953663 1.1672711
+#sample estimates:
+#  mean of x mean of y 
+#2.452988  1.571669 
+
+t.test(genome[genome$rep=="Discovery" & genome$category=="LMR" & genome$celltype=="Prenatal","percent"],
+       genome[genome$rep=="Discovery" & genome$category=="LMR" & genome$celltype!="Prenatal","percent"])
+#t = -3.9441, df = 23.7, p-value = 0.0006182
+#alternative hypothesis: true difference in means is not equal to 0
+#95 percent confidence interval:
+#  -0.6346786 -0.1984273
+#sample estimates:
+#  mean of x mean of y 
+#0.6875178 1.1040708 
 
 
 ### How much of the UMRs and LMRs overlap?
@@ -410,9 +484,10 @@ lshared$Person = gsub('.*\\.', '', rownames(lshared))
 lshared$Age = pd[match(lshared$Person, pd$Data.ID),"Age"]
 lshared$CellType = ifelse(lshared$Person %in% pd$Data.ID, pd[match(lshared$Person, pd$Data.ID),"Cell.Type"], "Prenatal")
 
+shared = data.table(rbind(cbind(ushared, context = "UMR"), cbind(lshared, context = "LMR")))
+write.table(shared, quote = F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_shared_byGroup.csv")
 
-
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/percent_shared_UMRs_LMRs_perSample_byBaseCoverage.pdf")
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/percent_shared_UMRs_LMRs_perSample_byBaseCoverage.pdf", height = 6)
 ggplot(ushared, aes(x = Group, y = perc)) + geom_boxplot() +
   labs(fill="") + theme_classic() +
   ylim(0,100) +
@@ -426,22 +501,103 @@ ggplot(lshared, aes(x = Group, y = perc)) + geom_boxplot() +
   ggtitle("Percent Bases Shared Per Sample: LMR") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
-ggplot(ushared[ushared$CellType %in% c("Neuron","Glia"),], aes(x = Age, y = perc, colour = CellType)) + facet_grid(. ~ Group) +
+ggplot(shared[shared$CellType %in% c("Neuron","Glia"),], aes(x = Age, y = perc, colour = CellType)) + facet_grid(context ~ Group) +
   geom_path() + geom_point() + ylim(0,100) +
   theme_classic() + scale_colour_brewer(8, palette="Dark2") +
   ylab("Percent") + xlab("Age") + 
-  ggtitle("Percent Bases Shared Per Sample: UMR") + 
-  theme(title = element_text(size = 20)) +
-  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
-ggplot(lshared[lshared$CellType %in% c("Neuron","Glia"),], aes(x = Age, y = perc, colour = CellType)) + facet_grid(. ~ Group) +
-  geom_path() + geom_point() + ylim(0,100) +
-  theme_classic() + scale_colour_brewer(8, palette="Dark2") +
-  ylab("Percent") + xlab("Age") + 
-  ggtitle("Percent Bases Shared Per Sample: LMR") + 
+  ggtitle("Percent Bases Shared Per Sample") + 
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
 dev.off()
 
+shared[,mean(perc), by = c("Group","CellType", "context")]
+
+## How much of prenatal UMR, LMR is represented in each postnatal sample?
+
+upren = reduce(do.call(getMethod(c, "GenomicRanges"), GRangesList(umrs$prenatal)))
+lpren = reduce(do.call(getMethod(c, "GenomicRanges"), GRangesList(lmrs$prenatal)))
+
+sharedU = lapply(c(umrs$prenatal, umrs$postnatal), function(x) Reduce(intersect, list(x, upren)))
+sharedL = lapply(c(lmrs$prenatal, lmrs$postnatal), function(x) Reduce(intersect, list(x, lpren)))
+
+prenpercU = mapply(function(pren,ind) round(sum(width(reduce(pren))) / sum(width(reduce(ind))) *100,2), 
+                  sharedU, c(umrs$prenatal, umrs$postnatal), SIMPLIFY = F)
+prenpercL = mapply(function(pren,ind) round(sum(width(reduce(pren))) / sum(width(reduce(ind))) *100,2), 
+                   sharedL, c(lmrs$prenatal, lmrs$postnatal), SIMPLIFY = F)
+
+prenpercU = data.frame(perc = unlist(prenpercU))
+prenpercU$Person = rownames(prenpercU)
+prenpercU$Age = pd[match(prenpercU$Person, pd$Data.ID),"Age"]
+prenpercU$CellType = ifelse(prenpercU$Person %in% pd$Data.ID, pd[match(prenpercU$Person, pd$Data.ID),"Cell.Type"], "Prenatal")
+
+prenpercL = data.frame(perc = unlist(prenpercL))
+prenpercL$Person = rownames(prenpercL)
+prenpercL$Age = pd[match(prenpercL$Person, pd$Data.ID),"Age"]
+prenpercL$CellType = ifelse(prenpercL$Person %in% pd$Data.ID, pd[match(prenpercL$Person, pd$Data.ID),"Cell.Type"], "Prenatal")
+
+prenperc = data.table(rbind(cbind(prenpercU, context = "UMR"), cbind(prenpercL, context = "LMR")))
+write.table(prenperc, quote = F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_sharedWithPrenatal.csv")
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/percent_shared_UMRs_LMRs_perSample_byBaseCoverage.pdf", height = 4)
+ggplot(prenperc[CellType!="Prenatal",,], aes(x = CellType, y = perc)) + geom_boxplot() +
+  labs(fill="") + theme_classic() +
+  facet_grid(. ~ context, scales = "free_x") +
+  ylim(0,100) +
+  ylab("Percent") + xlab("") +
+  ggtitle("Percent Bases Shared with Prenatal") +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20))
+ggplot(prenperc[CellType!="Prenatal",,], aes(x = Age, y = perc, colour = CellType)) + facet_grid(. ~ context) +
+  geom_path() + geom_point() + ylim(0,100) +
+  theme_classic() + scale_colour_brewer(8, palette="Dark2") +
+  ylab("Percent") + xlab("Age") + 
+  ggtitle("Percent Bases Shared with Prenatal") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+ggplot(prenperc[CellType!="Prenatal",,], aes(x = Age, y = perc, colour = CellType)) + facet_grid(. ~ context) +
+  geom_smooth(method=lm, se=T, fullrange=TRUE) + geom_point() + ylim(0,100) +
+  theme_classic() + scale_colour_brewer(8, palette="Dark2") +
+  ylab("Percent") + xlab("Age") + 
+  ggtitle("Percent Bases Shared with Prenatal") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+dev.off()
+
+cor.test(x = prenperc[CellType=="Neuron" & context=="UMR",,]$Age, y = prenperc[CellType=="Neuron" & context=="UMR",,]$perc)
+#t = -3.019, df = 22, p-value = 0.00631
+#alternative hypothesis: true correlation is not equal to 0
+#95 percent confidence interval:
+#  -0.7753473 -0.1763368
+#sample estimates:
+#  cor 
+#-0.5412336
+cor.test(x = prenperc[CellType=="Neuron" & context=="LMR",,]$Age, y = prenperc[CellType=="Neuron" & context=="LMR",,]$perc)
+#t = -2.6291, df = 22, p-value = 0.01532
+#alternative hypothesis: true correlation is not equal to 0
+#95 percent confidence interval:
+#  -0.7453352 -0.1065722
+#sample estimates:
+#  cor 
+#-0.4889486 
+cor.test(x = prenperc[CellType=="Glia" & context=="UMR",,]$Age, y = prenperc[CellType=="Glia" & context=="UMR",,]$perc)
+#t = -2.6344, df = 6, p-value = 0.03883
+#alternative hypothesis: true correlation is not equal to 0
+#95 percent confidence interval:
+#  -0.94785965 -0.05716614
+#sample estimates:
+#  cor 
+#-0.732338 
+cor.test(x = prenperc[CellType=="Glia" & context=="LMR",,]$Age, y = prenperc[CellType=="Glia" & context=="LMR",,]$perc)
+#t = -2.2626, df = 6, p-value = 0.06431
+#alternative hypothesis: true correlation is not equal to 0
+#95 percent confidence interval:
+#  -0.93577244  0.05008845
+#sample estimates:
+#  cor 
+#-0.678534 
+
+prenperc[,mean(perc),by=c("CellType","context")]
+(66.90875-47.82542)/66.90875 # 28.5%
 
 ## Find overlaps with DMRs, features, shared groups
 
@@ -631,7 +787,7 @@ dev.off()
 
 cgi = data.table(read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_CpG_Island_Overlap.csv"))
 x = cgi[,mean(islands), by = c("mr","celltype")]
-
+x = cgi[,mean(islands), by = c("mr")]
 
 # How about Repetitive Elements?
 
@@ -696,10 +852,11 @@ dev.off()
 
 annotation = data.table(read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_annotation_Overlap.csv"))
 x = annotation[,mean(perc), by = c("annotation","mr","celltype")]
+x = annotation[,mean(perc), by = c("annotation","mr")]
 
 
 ## Overlap with DMRs
-
+10.9269231+14.0873077
 dmr = lapply(dt, function(x) lapply(x, function(y) y[,length(unique(regionID)), by = "dmr"]))
 dmr = lapply(dmr, function(x) lapply(x, function(y) data.frame(y, perc = round(y$V1/sum(y$V1)*100,2))))
 models = lapply(dmr, function(x) lapply(x, function(y) data.frame(CT = sum(data.frame(y)[grep("CT", y$dmr),"perc"]), 
