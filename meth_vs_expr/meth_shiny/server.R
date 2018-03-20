@@ -39,7 +39,7 @@ shinyServer(function(input, output, session) {
 
     observeEvent(input$meth_type, {
         if(length(input$meth_summary_rows_selected) == 0) output$meth_selector <- renderUI({
-            tagList(numericInput('meth_id', label = 'Result (i column in first table)', value = 1,
+            tagList(numericInput('meth_id', label = 'Result (association id from column i above)', value = 1,
                 min = 1, max = nrow(meth_data[[input$meth_feature]][[input$meth_type]]$ids), step = 1),
             helpText(paste('Max i is', nrow(meth_data[[input$meth_feature]][[input$meth_type]]$ids)))
         )})
@@ -47,7 +47,7 @@ shinyServer(function(input, output, session) {
 
     observeEvent(input$meth_feature, {
         if(length(input$meth_summary_rows_selected) == 0) output$meth_selector <- renderUI({
-            tagList(numericInput('meth_id', label = 'Result (i column in first table)', value = 1,
+            tagList(numericInput('meth_id', label = 'Result (association id from column i above)', value = 1,
                 min = 1, max = nrow(meth_data[[input$meth_feature]][[input$meth_type]]$ids), step = 1),
             helpText(paste('Max i is', nrow(meth_data[[input$meth_feature]][[input$meth_type]]$ids)))
         )})
@@ -61,12 +61,12 @@ shinyServer(function(input, output, session) {
         updateSelectInput(session, 'meth_type', selected = type)
         output$meth_selector <- renderUI(
             if(length(input$meth_summary_rows_selected) > 0 ) {
-                 tagList(numericInput('meth_id', label = 'Result (i column in first table)',
+                 tagList(numericInput('meth_id', label = 'Result (association id from column i above)',
                 value = as.integer(strsplit(meth_df$i[input$meth_summary_rows_selected], ',')[[1]][1]),
                 min = 1, max = nrow(meth_data[[feat]][[type]]$ids), step = 1),
             helpText(paste('Max i is', nrow(meth_data[[feat]][[type]]$ids))))
             } else {
-                tagList(numericInput('meth_id', label = 'Result (i column in first table)', value = 1,
+                tagList(numericInput('meth_id', label = 'Result (association id from column i above)', value = 1,
                 min = 1, max = nrow(meth_data[[input$meth_feature]][[input$meth_type]]$ids), step = 1),
             helpText(paste('Max i is', nrow(meth_data[[input$meth_feature]][[input$meth_type]]$ids))))
             }

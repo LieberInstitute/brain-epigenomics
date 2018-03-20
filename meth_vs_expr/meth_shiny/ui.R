@@ -29,7 +29,7 @@ shinyUI(navbarPage(
         downloadLink('download_data', 'Download methylation data'),
         tags$hr(),
         h1('Association details'),
-        p('Here you can explore in further detail a particular methylation and expression association. Choose the feature type, the methylation type (CpG or nonCpG) and select which association (i column) you want to explore.'),
+        p('Here you can explore in further detail a particular methylation and expression association. Choose the feature type, the methylation type (CpG or nonCpG) and select which association id (from column', strong('i'), 'in previous table) you want to explore.'),
         helpText('You can also select a row in the table above and the options will be chosen for you automatically. The i chosen will be the first one in the row.'),
         fillRow(
             selectInput('meth_feature', label = 'Feature', c('gene', 'exon', 'psi'), selected = 'gene'),

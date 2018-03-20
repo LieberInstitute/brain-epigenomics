@@ -55,11 +55,15 @@ plotting_code <- function(i, type = 'nonCpG', feature) {
         sapply(i, plotting_code, type = type, feature = feature)
         return(NULL)
     }
+
     main <- paste(feature,
                   ifelse(feature != 'exon', meth_data[[feature]][[type]]$ids$feature_id[i],
                          rowRanges(meth_data[[feature]][[type]]$expr[i])$exon_gencodeID),
                   'FDR', signif(meth_data[[feature]][[type]]$ids$FDR[i], 3), '\n',
-                  ifelse(feature %in% c('gene', 'exon'), rowRanges(meth_data[[feature]][[type]]$expr[i])$Symbol, '')
+                  ifelse(feature %in% c('gene', 'exon'),
+                         rowRanges(meth_data[[feature]][[type]]$expr[i])$Symbol,
+                         as.character(meth_df$symbol[ which(meth_df$feature_id == meth_data[[feature]][[type]]$ids$feature_id[i])[1] ])
+                         )
     )
 
     plot(
