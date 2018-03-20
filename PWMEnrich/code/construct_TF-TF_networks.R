@@ -3,7 +3,7 @@ library(PWMEnrich)
 library(PWMEnrich.Hsapiens.background)
 library(ggplot2)
 library(SummarizedExperiment)
-
+library(jaffelab)
 
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/TSS_TFs_bysample.rda")
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/filtered_TF_list_expressionInfo.rda")
@@ -115,14 +115,70 @@ elementNROWS(gr)
 
 save(pmat,gr, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/pmat.rda")
 
-
-
+#####
 ## label regions with their appropriate gene TSS
+gr = GRangesList(gr)
+grFull = unlist(gr)
+grFull$SampleID = rep(names(gr), times = lengths(gr))
+grFull$chrpos = paste0(seqnames(grFull), ":", start(grFull), "-", end(grFull))
+grFull$FullID = paste0(grFull$SampleID, "_", grFull$chrpos)
 
-TSSs = makeGRangesFromDataFrame(data.frame(seqnames = geneMap$Chr, start = geneMap$Start-5000, end = geneMap$Start+5000, strand = geneMap$Strand))
-names(TSSs) = geneMap$gencodeID
-tfTSS = TSSs[which(names(TSSs) %in% prepostTargettoGeneID)]
-tfTSS = as.list(tfTSS)
+for(i in seq(along=pmat)) {
+	colnames(pmat[[i]]) = paste0(names(pmat)[i], "_", colnames(pmat[[i]]))
+}
+
+## filter to TFs
+geneMap= rowRanges(rse_gene)
+
+# promoters, -5kb to +5kb
+genePromoters = GRanges(seqnames(geneMap),
+	IRanges(start = ifelse(strand(geneMap) == "+",
+		start(geneMap)-5000, end(geneMap)-5000),
+	end = ifelse(strand(geneMap) == "+",
+		start(geneMap)+5000, end(geneMap)+5000)),
+		strand = strand(geneMap))
+mcols(genePromoters) = mcols(geneMap)
+names(genePromoters) = names(geneMap)
+tfTSS = genePromoters[which(names(genePromoters) %in% prepostTargettoGeneID)]
+tfTSS$otherSymbol = names(prepostTargettoGeneID)[match(tfTSS$gencodeID, prepostTargettoGeneID)]
+
+## get symbol
+oo1 = findOverlaps(grFull, tfTSS)
+grFull$Symbol = NA
+grFull$Symbol[queryHits(oo1)] = tfTSS$otherSymbol[subjectHits(oo1)]
+grFull$gencodeID = NA
+grFull$gencodeID[queryHits(oo1)] = tfTSS$gencodeID[subjectHits(oo1)]
+
+## find overlaps
+oo = findOverlaps(tfTSS, grFull)
+
+## filter
+tfTSS_sub = tfTSS[unique(queryHits(oo)),]
+idUniq = unique(grFull$FullID[subjectHits(oo)])
+pmat_sub = lapply(pmat, function(x) x[,colnames(x) %in% idUniq])
+pmat_sub = do.call("rbind", lapply(pmat_sub,t))
+grFull_sub = grFull[grFull$FullID %in% idUniq,]
+pmat_sub = pmat_sub[grFull_sub$FullID,]
+
+#### 
+sIndexes = splitit(grFull_sub$SampleID)
+adjMatList = vector("list", length(sIndexes))
+names(adjMatList) = names(sIndexes)
+for(i in seq(along=sIndexes)) {
+	adjMat = matrix(FALSE, nr = length(tfTSS), ncol = length(tfTSS),
+		dimnames = list(tfTSS$otherSymbol, tfTSS$otherSymbol))
+	ii = sIndexes[[i]]
+	g = grFull_sub[ii]
+	p = pmat_sub[ii,] < 0.01
+	pp = sapply(splitit(colnames(p)), function(jj) rowSums(t(t(p[,jj]))) > 0)
+	pp = pp[,colnames(adjMat)]
+	pp = t(sapply(splitit(g$Symbol), function(jj) {
+		if(length(jj) > 1) colSums(pp[jj,]) > 0 else pp[jj,] > 0
+	}))
+	adjMat[rownames(pp), colnames(pp)] = pp
+	adjMatList[[i]] = adjMat
+}
+save(adjMatList, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/adjMat_List_TFs_LMRs.rda")
 
 oo = lapply(tfTSS, function(t) lapply(pmat, function(x) findOverlaps(t, GRanges(colnames(x)))))
 
