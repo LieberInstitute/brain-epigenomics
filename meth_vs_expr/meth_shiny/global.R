@@ -147,7 +147,10 @@ ucsc_info <- function(i, feature, type) {
     cbase <- rowRanges(meth_data[[feature]][[type]]$meth[i])
 
     textinfo <- c('track name=eqtl description="Methylation-feature pair" visibility=pack',
-                  make_track_info(expr_r, ifelse(feature == 'psi', mcols(expr)$variantName, names(expr))),
+                  make_track_info(expr_r,
+                                  ifelse(feature == 'psi', mcols(expr)$variantName,
+                                         ifelse(feature == 'exon', rowRanges(meth_data[[feature]][[type]]$expr[i])$exon_gencodeID,
+                                                names(expr)))),
                   make_track_info(cbase, paste0(type, start(cbase))))
 
     filename <- paste0(feature, '_', type, '_', i)
