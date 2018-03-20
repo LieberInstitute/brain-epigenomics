@@ -13,13 +13,23 @@ gr_all <- c(gr_all_highCov, gr_cpgs)
 
 ## Load and filter:
 load_filt <- function(f) {
+    f_filtered <- gsub('.Rdata', '_filtered.Rdata', f)
+    if(file.exists(f_filtered)) {
+        message(paste(Sys.time(), 'loading', f_filtered))
+        load(f, verbose = TRUE)
+        return(BSobj)
+    }
+    
     message(paste(Sys.time(), 'loading', f))
-    load(f)
+    load(f, verbose = TRUE)
     ## Tweak reportFiles so they can be combined
     colData(BSobj)$reportFiles <- gsub('chr.*', '', colData(BSobj)$reportFiles)
     
     message(paste(Sys.time(), 'filtering to our bases'))
     BSobj <- BSobj[subjectHits(findOverlaps(gr_all, rowRanges(BSobj))), ]
+    
+    message(paste(Sys.time(), 'saving filtered version'))
+    save(BSobj, file = f_filtered)
     
     return(BSobj)
 }
