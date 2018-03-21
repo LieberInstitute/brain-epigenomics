@@ -171,3 +171,24 @@ save(int.kmeans, TFdiff, promoters_split, intergenic_split, introns_split, all_s
      file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/DMR_PWMEnrich_objects.rda")
 
 
+## Run PWMenrich on Interaction Kmeans clusters
+
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/newPromoterBackground.rda", verbose = T)
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/rda/limma_Neuron_CpGs_minCov_3_ageInfo_dmrs.Rdata")
+
+dmrs = split(dmrs, dmrs$k6cluster_label)
+
+for (i in 1:length(dmrs)) { 
+  names(dmrs[[i]]) = paste0(as.character(seqnames(dmrs[[i]])), ":",as.character(start(dmrs[[i]])), "-",as.character(end(dmrs[[i]])))
+}
+seq = lapply(dmrs, function(y) lapply(y, function(x) getSeq(Hsapiens, x)))
+
+useBigMemoryPWMEnrich(TRUE)
+registerCoresPWMEnrich(5)
+
+intClusters_TFs = lapply(seq, function(x) motifEnrichment(x, lognPromoters, verbose=F))
+intClusters_groupReport = lapply(intClusters_TFs, groupReport)
+intClusters_groupReport = lapply(intClusters_groupReport, as.data.frame)
+intClusters_groupReport = Map(cbind, intClusters_groupReport, padj = lapply(intClusters_groupReport, function(x) p.adjust(x$p.value, method = "fdr")))
+
+save(intClusters_TFs, geneMap, pd, intClusters_groupReport, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/intClusters_PWMEnrich.rda")
