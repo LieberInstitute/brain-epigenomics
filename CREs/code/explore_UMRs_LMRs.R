@@ -538,7 +538,7 @@ prenpercL$CellType = ifelse(prenpercL$Person %in% pd$Data.ID, pd[match(prenpercL
 prenperc = data.table(rbind(cbind(prenpercU, context = "UMR"), cbind(prenpercL, context = "LMR")))
 write.table(prenperc, quote = F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_sharedWithPrenatal.csv")
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/percent_shared_UMRs_LMRs_perSample_byBaseCoverage.pdf", height = 4)
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/percent_shared_withPrenatal_UMRs_LMRs_perSample_byBaseCoverage.pdf", height = 4)
 ggplot(prenperc[CellType!="Prenatal",,], aes(x = CellType, y = perc)) + geom_boxplot() +
   labs(fill="") + theme_classic() +
   facet_grid(. ~ context, scales = "free_x") +

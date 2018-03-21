@@ -6,9 +6,9 @@ library(SummarizedExperiment)
 library(jaffelab)
 
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/TSS_TFs_bysample.rda")
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/filtered_TF_list_expressionInfo.rda")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/filtered_TF_list_expressionInfo.rda", verbose = T)
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/brainseq_pipeline/polyA_unstranded/rse_gene_polyA_dlpfc_n41.Rdata", verbose = T)
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMRs_LMRs_annotated.rda")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMRs_LMRs_annotated.rda", verbose = T)
 
 
 ## construct matrix of TF-TF regulatory networks for each sample
@@ -30,13 +30,11 @@ names(pmat1.10) = names(TSS_TFs_bysample)[1:10]
 pmat1.10 = lapply(pmat1.10, function(x) lapply(x, function(y) as.data.frame(y)[order(y$id),]))
 pmat1.10 = lapply(pmat1.10, function(y) do.call(cbind, lapply(y, function(z) p.adjust(z$p.value, method = "fdr"))))
 for (i in 1:length(pmat1.10)) { rownames(pmat1.10[[i]]) = group$target }
-pmat1.10 = lapply(pmat1.10, function(x) x[which(rownames(x) %in% names(prepostTargettoGeneID)),])
 cols = list()
 for (i in 1:10) { cols[[i]] = names(TSS_TFs_bysample[[i]]$sequences) }
 cols = cols[which(elementNROWS(cols)>0)]
 for (i in 1:length(pmat1.10)) { colnames(pmat1.10[[i]]) = cols[[i]] }
 save(pmat1.10, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/pmat1.10.rda")
-
 # 11-20
 for (i in 11:20) {
   pmat11.20[[i]] = list(vector("list", length(TSS_TFs_bysample[[i]]$sequences)))
@@ -48,7 +46,6 @@ names(pmat11.20) = names(TSS_TFs_bysample)[11:20]
 pmat11.20 = lapply(pmat11.20, function(x) lapply(x, function(y) as.data.frame(y)[order(y$id),]))
 pmat11.20 = lapply(pmat11.20, function(y) do.call(cbind, lapply(y, function(z) p.adjust(z$p.value, method = "fdr"))))
 for (i in 1:length(pmat11.20)) { rownames(pmat11.20[[i]]) = group$target }
-pmat11.20 = lapply(pmat11.20, function(x) x[which(rownames(x) %in% names(prepostTargettoGeneID)),])
 for (i in 11:20) { cols[[i]] = names(TSS_TFs_bysample[[i]]$sequences) }
 cols = cols[which(elementNROWS(cols)>0)]
 for (i in 1:length(pmat11.20)) { colnames(pmat11.20[[i]]) = cols[[i]] }
@@ -63,7 +60,6 @@ for (i in 21:30) {
 pmat21.30 = pmat21.30[which(elementNROWS(pmat21.30)>0)]
 names(pmat21.30) = names(TSS_TFs_bysample)[21:30]
 pmat21.30 = lapply(pmat21.30, function(x) lapply(x, function(y) as.data.frame(y)[order(y$id),]))
-pmat21.30 = lapply(pmat21.30, function(t) lapply(t, function(x) x[which(x$target %in% names(prepostTargettoGeneID)),]))
 pmat21.30 = lapply(pmat21.30, function(y) do.call(cbind, lapply(y, function(z) p.adjust(z$p.value, method = "fdr"))))
 for (i in 1:length(pmat21.30)) { rownames(pmat21.30[[i]]) = group$target }
 cols = list()
@@ -81,7 +77,6 @@ for (i in 31:40) {
 pmat31.40 = pmat31.40[which(elementNROWS(pmat31.40)>0)]
 names(pmat31.40) = names(TSS_TFs_bysample)[31:40]
 pmat31.40 = lapply(pmat31.40, function(x) lapply(x, function(y) as.data.frame(y)[order(y$id),]))
-pmat31.40 = lapply(pmat31.40, function(t) lapply(t, function(x) x[which(x$target %in% names(prepostTargettoGeneID)),]))
 pmat31.40 = lapply(pmat31.40, function(y) do.call(cbind, lapply(y, function(z) p.adjust(z$p.value, method = "fdr"))))
 for (i in 1:length(pmat31.40)) { rownames(pmat31.40[[i]]) = group$target }
 cols = list()
@@ -99,7 +94,6 @@ for (i in 41:52) {
 pmat41.52 = pmat41.52[which(elementNROWS(pmat41.52)>0)]
 names(pmat41.52) = names(TSS_TFs_bysample)[41:52]
 pmat41.52 = lapply(pmat41.52, function(x) lapply(x, function(y) as.data.frame(y)[order(y$id),]))
-pmat41.52 = lapply(pmat41.52, function(t) lapply(t, function(x) x[which(x$target %in% names(prepostTargettoGeneID)),]))
 pmat41.52 = lapply(pmat41.52, function(y) do.call(cbind, lapply(y, function(z) p.adjust(z$p.value, method = "fdr"))))
 for (i in 1:length(pmat41.52)) { rownames(pmat41.52[[i]]) = group$target }
 cols = list()
@@ -179,45 +173,6 @@ for(i in seq(along=sIndexes)) {
 	adjMatList[[i]] = adjMat
 }
 save(adjMatList, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/adjMat_List_TFs_LMRs.rda")
-
-oo = lapply(tfTSS, function(t) lapply(pmat, function(x) findOverlaps(t, GRanges(colnames(x)))))
-
-tfB = lapply(oo, function(x) mapply(function(mat, ov) mat[,subjectHits(ov)], pmat, x, SIMPLIFY = F))
-for (i in 1:length(tfB)) {
-  geneB = tfB[[i]]
-  for (j in 1:length(tfB[[i]])) {
-    geneB.sampleJ = geneB[[j]]
-    if (class(geneB.sampleJ) == "numeric") {
-      geneB.sampleJ = names(geneB.sampleJ)[geneB.sampleJ<=0.01] }
-    else if (ncol(geneB.sampleJ)>0) {
-      geneB.sampleJ = rownames(geneB.sampleJ[which(apply(geneB.sampleJ, 1, FUN=min)<=0.01),]) }
-    else { geneB.sampleJ = NA }
-    tfB[[i]][[j]] = geneB.sampleJ
-  }
-}
-
-names(tfB) = names(prepostTargettoGeneID)[match(names(tfTSS),prepostTargettoGeneID)]
-
-networkBySamp = list()
-for (i in 1:length(tfB)) {
-  networkBySamp[[i]] = list()
-  for (j in 1:length(tfB[[i]])) {
-    if (length(tfB[[i]][[j]])>0) {
-      if (class(tfB[[i]][[j]])=="numeric") {
-        networkBySamp[[i]][[j]] == data.frame(source = names(tfB[[i]][[j]]), target = names(tfB)[i]) } else {
-          networkBySamp[[i]][[j]] == data.frame(source = rownames(tfB[[i]][[j]]), target = names(tfB)[i]) }
-      names(networkBySamp[[i]])[j] = names(tfB[[i]])[j]
-    }
-  }
-}
-
-  
-
-
-
-
-
-
 
 
 ### Construct networks for DMRs
