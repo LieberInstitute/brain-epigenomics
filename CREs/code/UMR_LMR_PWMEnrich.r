@@ -53,7 +53,7 @@ seq = lapply(c(lapply(uall, function(x) x[which(width(x)>=30)]),
 ### Run PWMEnrich
 
 useBigMemoryPWMEnrich(TRUE)
-registerCoresPWMEnrich(4)
+registerCoresPWMEnrich(6)
 
 # load the pre-compiled lognormal background computed using promoters
 
@@ -122,41 +122,62 @@ save(ulTFdiff, LMR_UMR_pwmenrich, geneMap,pd, file="/dcl01/lieber/ajaffe/lab/bra
 
 ## Call binding motifs in 10kb region around TSSs for TF network analysis
 
-umrs = unlist(umrs, recursive = F)
+## Get PWMs
+
+data(MotifDb.Hsap)
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/filtered_TF_list_expressionInfo.rda")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/spliceRegions_PWMEnrich_objects.rda")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/brainseq_pipeline/polyA_unstranded/rse_gene_polyA_dlpfc_n41.Rdata", verbose = T)
+
+group = lapply(splice.exon, groupReport)
+group = lapply(group, as.data.frame)
+group = lapply(group, function(x) x[which(x$target %in% names(PostnataltargettogeneID)),])
+
+pwms = MotifDb.Hsap[which(names(MotifDb.Hsap) %in% group$CpG.pos$id)] # all the motifs included in my other analyses
+
+## Make new log-normal background on 2kb promoters
+
+data(hg19.upstream2000)
+lognPromoters = makePWMLognBackground(hg19.upstream2000, pwms, algorithm = "human", verbose=F)
+
+## Filter regions to those around the TSS
+
+geneMap = rowRanges(rse_gene)
+
+# promoters, -5kb to +5kb
+genePromoters = GRanges(seqnames(geneMap),
+                        IRanges(start = ifelse(strand(geneMap) == "+",
+                                               start(geneMap)-5000, end(geneMap)-5000),
+                                end = ifelse(strand(geneMap) == "+",
+                                             start(geneMap)+5000, end(geneMap)+5000)),
+                        strand = strand(geneMap))
+mcols(genePromoters) = mcols(geneMap)
+
 lmrs = unlist(lmrs, recursive = F)
-
-TSSs = makeGRangesFromDataFrame(data.frame(seqnames = geneMap$Chr, start = geneMap$Start-5000, end = geneMap$Start+5000, strand = geneMap$Strand))
-names(TSSs) = geneMap$gencodeID
-
-uoo = lapply(umrs, function(x) findOverlaps(TSSs, x)) 
-loo = lapply(lmrs, function(x) findOverlaps(TSSs, x)) 
-
-umrs = mapply(function(u, oo) u[subjectHits(oo)], umrs, uoo, SIMPLIFY = F)
+loo = lapply(lmrs, function(x) findOverlaps(genePromoters, x)) 
 lmrs = mapply(function(l, oo) l[subjectHits(oo)], lmrs, loo, SIMPLIFY = F)
-
-for (i in 1:length(umrs)) {
-  names(umrs[[i]]) = paste0(seqnames(umrs[[i]]), ":", data.frame(ranges(umrs[[i]]))$start,"-", data.frame(ranges(umrs[[i]]))$end)
+for (i in 1:length(lmrs)) {
   names(lmrs[[i]]) = paste0(seqnames(lmrs[[i]]), ":", data.frame(ranges(lmrs[[i]]))$start,"-", data.frame(ranges(lmrs[[i]]))$end)
 }
 
-UMR.seq = lapply(lapply(umrs, function(x) x[which(width(x)>=30)]), function(x) getSeq(Hsapiens, x))
-names(UMR.seq) = paste0("UMR.", names(UMR.seq))
 LMR.seq = lapply(lapply(lmrs, function(x) x[which(width(x)>=30)]), function(x) getSeq(Hsapiens, x))
-names(LMR.seq) = paste0("LMR.", names(LMR.seq))
 
-rm(list=ls()[-which(ls() %in% c("LMR.seq","PWMLogn.hg19.MotifDb.Hsap", "geneMap", "pd"))])
+rm(list=ls()[-which(ls() %in% c("LMR.seq","lognPromoters", "geneMap", "pd"))])
+
+save(LMR.seq,lognPromoters, geneMap, pd, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/newPromoterBackground.rda")
 
 for (i in 1:length(LMR.seq)) { 
-  umrlmr_pwmenrich = motifEnrichment(LMR.seq[[i]], PWMLogn.hg19.MotifDb.Hsap, verbose=F)
-  save(umrlmr_pwmenrich, 
+  lmr_pwmenrich = motifEnrichment(LMR.seq[[i]], lognPromoters, verbose=F)
+  save(lmr_pwmenrich, 
        file = paste0("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/umrlmr/",names(LMR.seq)[i],"_TSS_TFs_bysample.rda"))
 }
+
 
 TSS_TFs_bysample = list()
 for (i in 1:length(LMR.seq)) { 
   load(paste0("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/umrlmr/",names(LMR.seq)[i],"_TSS_TFs_bysample.rda"))
-  TSS_TFs_bysample[[i]] = umrlmr_pwmenrich
-  rm(umrlmr_pwmenrich)
+  TSS_TFs_bysample[[i]] = lmr_pwmenrich
+  rm(lmr_pwmenrich)
 }
 names(TSS_TFs_bysample) = names(LMR.seq)
 
