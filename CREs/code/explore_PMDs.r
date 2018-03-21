@@ -312,18 +312,18 @@ t.test(genome[genome$celltype=="Prenatal","percent"],genome[genome$celltype!="Pr
 #t = -1.5283, df = 38.828, p-value = 0.1345
 #  mean of x mean of y 
 #2.485500  2.886875 
-t.test(genome[genome$celltype=="Prenatal","percent"],genome[genome$celltype!="Neuron","percent"])
-#t = -2.4742, df = 33.446, p-value = 0.01859
+t.test(genome[genome$celltype=="Prenatal","percent"],genome[genome$celltype=="Neuron","percent"])
+#t = 1.9502, df = 41.617, p-value = 0.05791
 #  mean of x mean of y 
-#2.485500  3.158929 
-t.test(genome[genome$celltype=="Glia","percent"],genome[genome$celltype!="Neuron","percent"])
-#t = 2.9233, df = 10.726, p-value = 0.0142
+#2.4855    2.2350 
+t.test(genome[genome$celltype=="Glia","percent"],genome[genome$celltype=="Neuron","percent"])
+#t = 4.9806, df = 7.4389, p-value = 0.001338
 #  mean of x mean of y 
-#4.842500  3.158929 
-t.test(genome[genome$celltype=="Prenatal","percent"],genome[genome$celltype!="Glia","percent"])
-#t = 1.2135, df = 39.787, p-value = 0.2321
+#4.8425    2.2350 
+t.test(genome[genome$celltype=="Prenatal","percent"],genome[genome$celltype=="Glia","percent"])
+#t = -4.5021, df = 7.4387, p-value = 0.002397
 #  mean of x mean of y 
-#2.485500  2.348864
+#2.4855    4.8425 
 
 
 ### How much of the PMDs overlap?
@@ -1151,12 +1151,14 @@ compareDO = lapply(entrez, function(x) compareCluster(x, fun="enrichDO",  ont = 
 save(compareKegg, compareBP, compareMF, compareCC, compareDO, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_KEGG_GO_DO_objects.rda")
 
 # plot compared results
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/PMD_KEGG_GO_DO_plots.pdf", height = 60, width = 24)
-lapply(compareKegg, function(x) plot(x, colorBy="p.adjust", showCategory = 1000, title= "KEGG Pathway Enrichment"))
-lapply(compareBP, function(x) plot(x, colorBy="p.adjust", showCategory = 1500, title= "Biological Process GO Enrichment"))
-lapply(compareMF, function(x) plot(x, colorBy="p.adjust", showCategory = 1000, title= "Molecular Function GO Enrichment"))
-lapply(compareCC, function(x) plot(x, colorBy="p.adjust", showCategory = 1000, title= "Cellular Compartment GO Enrichment"))
-lapply(compareDO, plot(x, colorBy="p.adjust", showCategory = 1000, title= "Disease Ontology Enrichment"))
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/PMD_KEGG_GO_DO_plots.pdf", height = 40, width = 24)
+for (i in 1:length(compareKegg)) {
+  print(plot(compareKegg[[i]], colorBy="p.adjust", showCategory = 1000, title= paste0("KEGG Pathway Enrichment: ", names(entrez)[i])))
+  print(plot(compareBP[[i]], colorBy="p.adjust", showCategory = 1500, title= paste0("Biological Process GO Enrichment: ", names(entrez)[i])))
+  print(plot(compareMF[[i]], colorBy="p.adjust", showCategory = 1000, title= paste0("Molecular Function GO Enrichment: ", names(entrez)[i])))
+  print(plot(compareCC[[i]], colorBy="p.adjust", showCategory = 1000, title= paste0("Cellular Compartment GO Enrichment: ", names(entrez)[i])))
+  print(plot(compareDO[[i]], colorBy="p.adjust", showCategory = 1000, title= paste0("Disease Ontology Enrichment ", names(entrez)[i])))
+}
 dev.off()
 
 
