@@ -1162,6 +1162,13 @@ for (i in 1:length(compareKegg)) {
 dev.off()
 
 
+PMD.CTcomps = lapply(CTcomps, function(x) geneMap[match(x, geneMap$gencodeID),])
+PMD.Agecomps = lapply(Agecomps, function(x) geneMap[match(x, geneMap$gencodeID),])
+
+save(PMD.CTcomps, PMD.Agecomps, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_gene_comps.rda")
+
+
+
 ## Plot example PMDs
 
 library("MethylSeekR")

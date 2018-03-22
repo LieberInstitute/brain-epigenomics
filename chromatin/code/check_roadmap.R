@@ -2,6 +2,47 @@
 library(GenomicRanges)
 library(jaffelab)
 
+
+### load regions to check
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda", verbose = T)
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMDs_100kb_noGaps.rda", verbose = T)
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMRs_LMRs_annotated.rda", verbose = T)
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/dmvs_annotated.rda", verbose = T)
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/rda/limma_Neuron_CpGs_minCov_3_ageInfo_dmrs.Rdata")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_gene_comps.rda")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_gene_comps.rda")
+
+
+## Prepare DMRs
+
+dmrs = split(dmrs, dmrs$k6cluster_label)
+oo = lapply(dmrs, function(x) findOverlaps(x, makeGRangesFromDataFrame(DMR$Interaction)))
+dmrs = c(lapply(DMR[which(names(DMR) %in% c("CellType","Age"))], function(x) x[which(x$sig=="FWER < 0.05"),]), lapply(oo, function(x) DMR$Interaction[subjectHits(x),]))
+names(dmrs) = c("CellType","Age","Gr1","Gr2","Gr3","Gr4","Gr5","Gr6")
+rdmrs = lapply(dmrs, function(x) reduce(makeGRangesFromDataFrame(x)))
+
+## Prepare methylation features
+
+methfeatures = list(UMR = lapply(uDMR, makeGRangesFromDataFrame, keep=T), LMR = lapply(lDMR, makeGRangesFromDataFrame, keep=T), 
+                    PMD = lapply(total.nogaps[-grep("GSM", names(total.nogaps))], function(x) x[which(x$type=="PMD")]), 
+                    DMV = lapply(dmvDMR, makeGRangesFromDataFrame, keep=T))
+methfeatures$UMR = mapply(function(u,d) u[!u %in% d],  methfeatures$UMR, methfeatures$DMV, SIMPLIFY = F) # because DMV is a special case of UMR, remove DMVs from UMR list
+rmethfeatures = lapply(methfeatures, function(m) lapply(m, reduce))
+do.call(cbind, lapply(rmethfeatures, elementNROWS))
+
+
+## Object lists to check for chromatin state
+
+rdmrs # Cell type and overall age DMRs, and the 6 kmeans cluster groups of interaction DMRs
+rmethfeatures # a list of all UMRs, LMRs, DMVs and PMDs in each samples (52 total)
+DMV.CTcomps # genes differentially included in DMVs by cell type
+DMV.Agecomps # genes differentially included in DMVs by age in neurons
+PMD.CTcomps # genes differentially included in PMDs by cell type
+PMD.Agecomps # genes differentially included in PMDs by age in neurons
+
+
+
+
 ## load eqtls
 load("/users/ajaffe/Lieber/Projects/RNAseq/DLPFC_eQTL_paper/joint/rdas/gwas_hits_allEqtl_subset_fdr.rda")
 load("/users/ajaffe/Lieber/Projects/RNAseq/DLPFC_eQTL_paper/joint/rdas/PGC_SZ_hits_allEqtl_subset_fdr.rda")

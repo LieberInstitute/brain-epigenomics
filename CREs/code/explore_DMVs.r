@@ -851,6 +851,7 @@ elementNROWS(CTcomps)
 #sharedGN allshared 
 #    2117      2105 
 
+
 inDMV.byAge = list(infant = unique(unlist(inDMV[which(names(inDMV) %in% pd[pd$Cell.Type=="Neuron" & pd$Age<1,"Data.ID"])])),
                    child = unique(unlist(inDMV[which(names(inDMV) %in% pd[pd$Cell.Type=="Neuron" & pd$Age>1 & pd$Age<=12,"Data.ID"])])), 
                    teen = unique(unlist(inDMV[which(names(inDMV) %in% pd[pd$Cell.Type=="Neuron" & pd$Age>12 & pd$Age<=17,"Data.ID"])])),
@@ -904,13 +905,34 @@ compareDO = lapply(entrez, function(x) compareCluster(x, fun="enrichDO",  ont = 
 save(compareKegg, compareBP, compareMF, compareCC, compareDO, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_KEGG_GO_DO_objects.rda")
 
 # plot compared results
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_KEGG_GO_DO_plots.pdf", height = 80, width = 24)
-lapply(compareKegg, function(x) plot(x, colorBy="p.adjust", showCategory = 1000, title= "KEGG Pathway Enrichment"))
-lapply(compareBP, function(x) plot(x, colorBy="p.adjust", showCategory = 1500, title= "Biological Process GO Enrichment"))
-lapply(compareMF, function(x) plot(x, colorBy="p.adjust", showCategory = 1000, title= "Molecular Function GO Enrichment"))
-lapply(compareCC, function(x) plot(x, colorBy="p.adjust", showCategory = 1000, title= "Cellular Compartment GO Enrichment"))
-lapply(compareDO, plot(x, colorBy="p.adjust", showCategory = 1000, title= "Disease Ontology Enrichment"))
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_KEGG_GO_DO_plots.pdf", height = 160, width = 22)
+for (i in 1:length(compareKegg)) {
+  print(plot(compareKegg[[i]], colorBy="p.adjust", showCategory = 1500, title= paste0("KEGG Pathway Enrichment: ", names(compareKegg)[i])))
+  print(plot(compareBP[[i]], colorBy="p.adjust", showCategory = 1500, title= paste0("Biological Process GO Enrichment: ", names(compareKegg)[i])))
+  print(plot(compareMF[[i]], colorBy="p.adjust", showCategory = 1500, title= paste0("Molecular Function GO Enrichment: ", names(compareKegg)[i])))
+  print(plot(compareCC[[i]], colorBy="p.adjust", showCategory = 1500, title= paste0("Cellular Compartment GO Enrichment: ", names(compareKegg)[i])))
+  print(plot(compareDO[[i]], colorBy="p.adjust", showCategory = 1500, title= paste0("Disease Ontology Enrichment: ", names(compareKegg)[i])))
+}
 dev.off()
+
+
+## Plot select terms
+
+plotCellType = compareBP$CellType # clusterProfiler output
+plotCellType@compareClusterResult = plotCellType@compareClusterResult[-grep("shared", as.character(plotCellType@compareClusterResult$Cluster)),]
+plotAge = compareBP$Age # clusterProfiler output
+plotAge@compareClusterResult = plotAge@compareClusterResult[-grep("shared", as.character(plotAge@compareClusterResult$Cluster)),]
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_BP_noshared.pdf", height = 70, width=16)
+plot(plotCellType, colorBy="p.adjust", showCategory = 450, title= "Biological Process Enrichment: Cell type")
+plot(plotAge, colorBy="p.adjust", showCategory = 450, title= "Biological Process Enrichment: Development")
+dev.off()
+
+
+DMV.CTcomps = lapply(CTcomps, function(x) geneMap[match(x, geneMap$gencodeID),])
+DMV.Agecomps = lapply(Agecomps, function(x) geneMap[match(x, geneMap$gencodeID),])
+
+save(DMV.CTcomps, DMV.Agecomps, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_gene_comps.rda")
 
 
 ## What's the relationship between heterochromatin spreading and TFs in hypo-DMRs? 
