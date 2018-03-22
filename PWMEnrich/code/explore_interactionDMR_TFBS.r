@@ -53,6 +53,8 @@ lMatInt = -log10(int)
 hc.int <- pvclust(t(lMatInt), method.hclust="ward", method.dist="euclidean")
 hc_cut.int = lapply(hc.int, function(x) cutree(x, k= 10))
 
+save(hc.int, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/hc.int_bootstrapped.rda")
+
 ## cluster by TF (bootstrapped)
 
 hct.int <- pvclust(lMatInt, method.hclust="ward", method.dist="euclidean")
