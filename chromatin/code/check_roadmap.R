@@ -15,38 +15,30 @@ load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_gene_comps.rda")
 
 ## Prepare DMRs
 
-dmrs = split(dmrs, dmrs$k6cluster_label)
-oo = lapply(dmrs, function(x) findOverlaps(x, makeGRangesFromDataFrame(DMR$Interaction)))
-dmrs = c(lapply(DMR[which(names(DMR) %in% c("CellType","Age"))], function(x) x[which(x$sig=="FWER < 0.05"),]), lapply(oo, function(x) DMR$Interaction[subjectHits(x),]))
-names(dmrs) = c("CellType","Age","Gr1","Gr2","Gr3","Gr4","Gr5","Gr6")
-rdmrs = lapply(dmrs, function(x) reduce(makeGRangesFromDataFrame(x)))
+cdDmrs = split(dmrs, dmrs$k6cluster_label)
+dmrsList = endoapply(cdDmrs, granges)
+
+ageDMRs = makeGRangesFromDataFrame(DMR$Age[DMR$Age$sig=="FWER < 0.05",])
+dmrsList$Age = ageDMRs[!duplicated(ageDMRs)]
+cellDMRs = makeGRangesFromDataFrame(DMR$CellType[DMR$CellType$sig=="FWER < 0.05",])
+dmrsList$CellType = cellDMRs[!duplicated(cellDMRs)]
 
 ## Prepare methylation features
 
-methfeatures = list(UMR = lapply(uDMR, makeGRangesFromDataFrame, keep=T), LMR = lapply(lDMR, makeGRangesFromDataFrame, keep=T), 
-                    PMD = lapply(total.nogaps[-grep("GSM", names(total.nogaps))], function(x) x[which(x$type=="PMD")]), 
-                    DMV = lapply(dmvDMR, makeGRangesFromDataFrame, keep=T))
-methfeatures$UMR = mapply(function(u,d) u[!u %in% d],  methfeatures$UMR, methfeatures$DMV, SIMPLIFY = F) # because DMV is a special case of UMR, remove DMVs from UMR list
+methfeatures = list(UMR = lapply(uDMR, makeGRangesFromDataFrame, keep=T), 
+				LMR = lapply(lDMR, makeGRangesFromDataFrame, keep=T), 
+                PMD = lapply(total.nogaps[-grep("GSM", names(total.nogaps))], function(x) x[which(x$type=="PMD")]), 
+                DMV = lapply(dmvDMR, makeGRangesFromDataFrame, keep=T))
+methfeatures$UMR = mapply(function(u,d) u[!u %in% d],  methfeatures$UMR, 
+						methfeatures$DMV, SIMPLIFY = F) # because DMV is a special case of UMR, remove DMVs from UMR list
 rmethfeatures = lapply(methfeatures, function(m) lapply(m, reduce))
-do.call(cbind, lapply(rmethfeatures, elementNROWS))
-
+methFeat = unlist(rmethfeatures)
 
 ## Object lists to check for chromatin state
+allList = c(dmrsList, GRangesList(methFeat))
+length(allList)
 
-rdmrs # Cell type and overall age DMRs, and the 6 kmeans cluster groups of interaction DMRs
-rmethfeatures # a list of all UMRs, LMRs, DMVs and PMDs in each samples (52 total)
-DMV.CTcomps # genes differentially included in DMVs by cell type
-DMV.Agecomps # genes differentially included in DMVs by age in neurons
-PMD.CTcomps # genes differentially included in PMDs by cell type
-PMD.Agecomps # genes differentially included in PMDs by age in neurons
-
-
-
-
-## load eqtls
-load("/users/ajaffe/Lieber/Projects/RNAseq/DLPFC_eQTL_paper/joint/rdas/gwas_hits_allEqtl_subset_fdr.rda")
-load("/users/ajaffe/Lieber/Projects/RNAseq/DLPFC_eQTL_paper/joint/rdas/PGC_SZ_hits_allEqtl_subset_fdr.rda")
-
+#########################################
 ## load roadmap genomic state objects
 load("/dcl01/lieber/ajaffe/PublicData/EpigenomeRoadmap/ChromHMM/chromHMM_15state_coverageDF.rda")
 
@@ -61,106 +53,53 @@ brainIDs = which(dat$ANATOMY == "BRAIN")
 ### OVERLAPS ########
 #####################
 
-## check PGC 
-pgcEqtl_novel = pgcEqtls[which(pgcEqtls$Class == "Novel" & pgcEqtls$Type=="ER"),]
-pgcEqtl_novel = pgcEqtl_novel[!duplicated(pgcEqtl_novel$Feature),]
-gr_pgc_novel = GRanges(ss(pgcEqtl_novel$Coordinates,":"),
-	IRanges(as.numeric(ss(ss(pgcEqtl_novel$Coordinates,":",2), "-")),
-			as.numeric(ss(ss(ss(pgcEqtl_novel$Coordinates,":",2), "-",2),"\\("))))
-seqlevels(gr_pgc_novel) = names(stateCovDf	)
-
-length(gr_pgc_novel)
-sum(width(gr_pgc_novel))
+## only autosomal
+allList= endoapply(allList, keepSeqlevels, names(stateCovDf), pruning.mode="coarse")
+length(allList)
+sum(width(allList))
 
 # split by chr
-pgcByChr = split(gr_pgc_novel, seqnames(gr_pgc_novel))
-pgcByChr = pgcByChr[names(stateCovDf)]
+enrichmentsList = mclapply(allList, function(x) {
+	
+	byChr = split(x, seqnames(x))
+	byChr = byChr[names(stateCovDf)]
 
-bpOverlapByChr_pgc = mapply(function(regByChr, stateByChr) {
-	cat(".")	
-	enr = stateByChr[ranges(regByChr),]
-	bg = stateByChr
+	bpOverlapByChr = mapply(function(regByChr, stateByChr) {
+		cat(".")	
+		enr = stateByChr[ranges(regByChr),]
+		bg = stateByChr
 
-	list(enrTab = sapply(enr, table),
-		bgTab  = sapply(bg, table))
-}, pgcByChr, stateCovDf,SIMPLIFY=FALSE)
+		list(enrTab = sapply(enr, table),
+			bgTab  = sapply(bg, table))
+	}, byChr, stateCovDf,SIMPLIFY=FALSE)
 
+	bpOverlapEnr = sapply(bpOverlapByChr, "[", "enrTab")
+	bpOverlapArray = array(unlist(bpOverlapEnr), 
+		dim = c(nrow(bpOverlapEnr[[1]]), 
+		ncol(bpOverlapEnr[[1]]), length(bpOverlapEnr)))
+	enrTab = apply(bpOverlapArray, 1:2, sum)
+	dimnames(enrTab) = list(rownames(bpOverlapEnr[[1]]),
+		colnames(bpOverlapEnr[[1]]))
+	
+		
+	# states in rest of genome	
+	bpOverlapBg = sapply(bpOverlapByChr, "[", "bgTab")
+	bpOverlapArray = array(unlist(bpOverlapBg), 
+		dim = c(nrow(bpOverlapBg[[1]]), 
+		ncol(bpOverlapBg[[1]]), length(bpOverlapBg)))
+	bgTab = apply(bpOverlapArray, 1:2, function(x) sum(as.numeric(x)))
+	dimnames(bgTab) = list(rownames(bpOverlapBg[[1]]),
+		colnames(bpOverlapBg[[1]]))
 
-# states in s1+s2
-bpOverlapEnr = sapply(bpOverlapByChr_pgc, "[", "enrTab")
-bpOverlapArray = array(unlist(bpOverlapEnr), 
-	dim = c(nrow(bpOverlapEnr[[1]]), 
-	ncol(bpOverlapEnr[[1]]), length(bpOverlapEnr)))
-enrTab = apply(bpOverlapArray, 1:2, sum)
-dimnames(enrTab) = list(rownames(bpOverlapEnr[[1]]),
-	colnames(bpOverlapEnr[[1]]))
-
-# states in rest of genome	
-bpOverlapBg = sapply(bpOverlapByChr_pgc, "[", "bgTab")
-bpOverlapArray = array(unlist(bpOverlapBg), 
-	dim = c(nrow(bpOverlapBg[[1]]), 
-	ncol(bpOverlapBg[[1]]), length(bpOverlapBg)))
-bgTab = apply(bpOverlapArray, 1:2, function(x) sum(as.numeric(x)))
-dimnames(bgTab) = list(rownames(bpOverlapBg[[1]]),
-	colnames(bpOverlapBg[[1]]))
-
-# take ratio
-statTab_pgc = as.data.frame(t(prop.table(enrTab,2) / 
-	prop.table(bgTab,2)))
-statTab_pgc$Sample = dat$Standardized.Epigenome.name
-statTab_pgc = statTab_pgc[,c(16,1:15)]
-
-###############
-## check other GWAS
-allEqtl_novel = allEqtlGwas[which(allEqtlGwas$Class == "Novel" & allEqtlGwas$Type=="ER"),]
-allEqtl_novel = allEqtl_novel[!duplicated(allEqtl_novel$Feature),]
-gr_all_novel = GRanges(ss(allEqtl_novel$Coordinates,":"),
-	IRanges(as.numeric(ss(ss(allEqtl_novel$Coordinates,":",2), "-")),
-			as.numeric(ss(ss(ss(allEqtl_novel$Coordinates,":",2), "-",2),"\\("))))
-seqlevels(gr_all_novel) = names(stateCovDf	)
-
-length(gr_all_novel)
-sum(width(gr_all_novel))
-
-# split by chr
-allByChr = split(gr_all_novel, seqnames(gr_all_novel))
-allByChr = allByChr[names(stateCovDf)]
-
-bpOverlapByChr_all = mapply(function(regByChr, stateByChr) {
-	cat(".")	
-	enr = stateByChr[ranges(regByChr),]
-	bg = stateByChr
-
-	list(enrTab = sapply(enr, table),
-		bgTab  = sapply(bg, table))
-}, allByChr, stateCovDf,SIMPLIFY=FALSE)
-
-
-# states in s1+s2
-bpOverlapEnr = sapply(bpOverlapByChr_all, "[", "enrTab")
-bpOverlapArray = array(unlist(bpOverlapEnr), 
-	dim = c(nrow(bpOverlapEnr[[1]]), 
-	ncol(bpOverlapEnr[[1]]), length(bpOverlapEnr)))
-enrTab = apply(bpOverlapArray, 1:2, sum)
-dimnames(enrTab) = list(rownames(bpOverlapEnr[[1]]),
-	colnames(bpOverlapEnr[[1]]))
-
-# states in rest of genome	
-bpOverlapBg = sapply(bpOverlapByChr_all, "[", "bgTab")
-bpOverlapArray = array(unlist(bpOverlapBg), 
-	dim = c(nrow(bpOverlapBg[[1]]), 
-	ncol(bpOverlapBg[[1]]), length(bpOverlapBg)))
-bgTab = apply(bpOverlapArray, 1:2, function(x) sum(as.numeric(x)))
-dimnames(bgTab) = list(rownames(bpOverlapBg[[1]]),
-	colnames(bpOverlapBg[[1]]))
-
-# take ratio
-statTab_all = as.data.frame(t(prop.table(enrTab,2) / 
-	prop.table(bgTab,2)))
-statTab_all$Sample = dat$Standardized.Epigenome.name
-statTab_all = statTab_all[,c(16,1:15)]
-
-boxplot(log2(statTab_all[,-1]))
+	# take ratio
+	statTab = as.data.frame(t(prop.table(enrTab,2) / 
+		prop.table(bgTab,2)))
+	statTab$Sample = dat$Standardized.Epigenome.name
+	statTab = statTab[,c(16,1:15)]
+	return(statTab)
+}, mc.cores=5)
+save(enrichmentsList, allList, dat, compress=TRUE,
+	file = "../rdas/enrichmentState_byObj_allRoadmap.rda")
 
 ###############
 # make plots ##
