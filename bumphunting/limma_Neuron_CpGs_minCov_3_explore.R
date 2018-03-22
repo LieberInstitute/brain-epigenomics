@@ -198,7 +198,7 @@ cols <- brewer.pal(8, 'Dark2')
 
 
 ## Compare glia vs neuron mean coefficient with K-means clusters
-pdf('pdf/glia_vs_neuron_mean_coef.pdf')
+pdf('pdf/glia_vs_neuron_mean_coef.pdf', useDingbats = FALSE)
 
 ## Basic plots without clusters
 plot(x = dmrs$age_glia_coef_mean, y = dmrs$age_neuron_coef_mean, xlab = 'Glia mean coefficient', ylab = 'Neuron mean coefficient', pch = 20, cex = 0.5)
@@ -328,7 +328,7 @@ custom_col <- function(p) {
 
 ## Plot the t-stats and the coefficient metrics against each other,
 ## colored by the 6 clusters we labeled already
-pdf('pdf/age_for_interaction_dmrs.pdf', width = 10, height = 10)
+pdf('pdf/age_for_interaction_dmrs.pdf', width = 10, height = 10, useDingbats = FALSE)
 custom_col(ggpairs(dmrs_df, columns = grep('tstat_mean',
     colnames(dmrs_df)), mapping = aes(color = k6cluster_label),
     upper = list(continuous = wrap("cor", size = 4.75, alignPercent = 0.8))))
@@ -374,7 +374,7 @@ dev.off()
 #
 
     
-pdf('pdf/interaction_dmrs_cpg_vs_dmr_metrics.pdf', width = 20, height = 20)
+pdf('pdf/interaction_dmrs_cpg_vs_dmr_metrics.pdf', width = 20, height = 20, useDingbats = FALSE)
 dmrs_df2 <- dmrs_df
 colnames(dmrs_df2) <- gsub('age_cell_difference_', '', colnames(dmrs_df2))
 custom_col(ggpairs(dmrs_df2,
@@ -419,7 +419,7 @@ colnames(dmrs_int) <- gsub('Age.Cell.TypeNeuron', 'intSmooth', colnames(dmrs_int
 ## Save for later
 save(dmrs_int, file = 'rda/limma_Neuron_CpGs_minCov_3_ageInfo_interaction_smooth.Rdata')
 
-pdf('pdf/interaction_dmrs_cpg_vs_dmr_metrics_with_smooth.pdf', width = 15, height = 15)
+pdf('pdf/interaction_dmrs_cpg_vs_dmr_metrics_with_smooth.pdf', width = 15, height = 15, useDingbats = FALSE)
 
 custom_col(ggpairs(dmrs_int,
     columns = c(which(colnames(dmrs_int) %in% c('value', 'area', 'coef')),
@@ -455,7 +455,7 @@ if(FALSE) {
 }
 
 
-pdf('pdf/age_for_interaction_dmrs_diff.pdf')
+pdf('pdf/age_for_interaction_dmrs_diff.pdf', useDingbats = FALSE)
 
 boxplot(dmrs$age_glia_coef_mean, dmrs$age_neuron_coef_mean, names = paste0(c('Glia', 'Neuron'), ' (', round(c(mean(dmrs$age_glia_coef_mean > 0), mean(dmrs$age_neuron_coef_mean > 0)) * 100, 0), '% up)'), ylab = 'Age mean coefficient')
 legend('bottomright', legend = paste('p-value <', signif(t.test(dmrs$age_glia_coef_mean, dmrs$age_neuron_coef_mean, paired = TRUE)$p.value, 3)), bty = 'n')
@@ -533,7 +533,7 @@ print('Cutoff: 2')
 tcuts2
 
 
-pdf('pdf/age_for_interaction_dmrs_by_overall_mean_tstat.pdf')
+pdf('pdf/age_for_interaction_dmrs_by_overall_mean_tstat.pdf', useDingbats = FALSE)
 plot(x = dmrs$overall_tstat_mean, y = dmrs$age_cell_difference_tstat_mean, col = cols[k6$cluster], xlab = 'Overall age mean t-statistic', ylab = 'Interaction mean t-statistic', pch = 20, cex = 0.5, main = 't-statistics for global age vs interaction', sub = 'Lines at interaction quantile 2.5% and 2')
 abline(v = c(2, -2), col = 'grey80')
 abline(v = c(cutoff, - cutoff), col = 'grey80')
