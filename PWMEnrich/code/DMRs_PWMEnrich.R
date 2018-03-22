@@ -181,7 +181,7 @@ dmrs = split(dmrs, dmrs$k6cluster_label)
 for (i in 1:length(dmrs)) { 
   names(dmrs[[i]]) = paste0(as.character(seqnames(dmrs[[i]])), ":",as.character(start(dmrs[[i]])), "-",as.character(end(dmrs[[i]])))
 }
-seq = lapply(dmrs, function(y) lapply(y, function(x) getSeq(Hsapiens, x)))
+seq = lapply(dmrs, function(y) lapply(y, function(x) getSeq(Hsapiens, x[which(width(x)>30)])))
 
 useBigMemoryPWMEnrich(TRUE)
 registerCoresPWMEnrich(5)
