@@ -867,6 +867,7 @@ for (i in 1:length(pmdGene)) {
 }
 
 pmdGenedt = lapply(pmdGene, data.table)
+pmdGenedt = Map(cbind, pmdGenedt, regionID = lapply(pmdGenedt, function(x) paste0(x$seqnames,":",x$start,"-",x$end)))
 promoverlap = lapply(pmdGene, function(y) round(length(unique(as.character(data.frame(y)[which(y$promoters=="promoters"),"regionID"])))/
                                                  length(unique(as.character(y$regionID)))*100,2))
 promoverlap = data.frame(promoverlap = unlist(promoverlap), id = names(promoverlap))
@@ -875,7 +876,6 @@ promoverlap[which(promoverlap$id %in% postnatalpd[which(postnatalpd$Cell.Type=="
 promoverlap[which(promoverlap$id %in% postnatalpd[which(postnatalpd$Cell.Type=="Glia"),"Data.ID"]),"celltype"] = "Glia"
 write.csv(promoverlap, quote=F,file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_prom_Overlap.csv")
 
-pmdGenedt = Map(cbind, pmdGenedt, regionID = lapply(pmdGenedt, function(x) paste0(x$seqnames,":",x$start,"-",x$end)))
 numproms = lapply(pmdGenedt, function(y) y[promoters=="promoters",length(unique(nearestID)), by = "regionID"])
 numproms = do.call(rbind, Map(cbind, lapply(numproms, function(y) 
   data.frame(mean = mean(y$V1), median = median(y$V1), sd = sd(y$V1), min = min(y$V1), max = max(y$V1))), id = as.list(names(numproms))))

@@ -17,9 +17,7 @@ dmvs = c(DMVs.100kb,DMVs_100kb.pren)
 ## How many are identified?
 
 num = data.frame(num = unlist(elementNROWS(dmvs)), id = names(dmvs))
-num[which(num$id %in% names(DMVs_100kb.pren)),"celltype"] = "Prenatal"
-num[which(num$id %in% pd[pd$Cell.Type=="Neuron","Data.ID"]),"celltype"] = "Neuron"
-num[which(num$id %in% pd[pd$Cell.Type=="Glia","Data.ID"]),"celltype"] = "Glia"
+num$celltype = ifelse(num$id %in% pd$Data.ID, pd[match(num$id, pd$Data.ID),"Cell.Type"], "Prenatal")
 write.csv(num, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_number.csv")
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_number_byAge_postnatal.pdf")
@@ -27,21 +25,10 @@ pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_number_byAge_po
 w = num[which(num$celltype %in% c("Neuron", "Glia")),]
 w = cbind(w, Age = pd[match(w$id, pd$Data.ID), "Age"])
 cor.test(x = w[which(w$celltype=="Neuron"),"Age"], y = w[which(w$celltype=="Neuron"),"num"])
-#t = -0.82869, df = 22, p-value = 0.4162
-#alternative hypothesis: true correlation is not equal to 0
-#95 percent confidence interval:
-#  -0.5395138  0.2467310
-#sample estimates:
-#  cor 
-#-0.1739822 
+#t = -0.82869, df = 22, p-value = 0.4162, cor -0.1739822 
+
 cor.test(x = w[which(w$celltype=="Glia"),"Age"], y = w[which(w$celltype=="Glia"),"num"])
-#t = -1.1274, df = 6, p-value = 0.3026
-#alternative hypothesis: true correlation is not equal to 0
-#95 percent confidence interval:
-#  -0.8672563  0.4062756
-#sample estimates:
-#  cor 
-#-0.4180941 
+#t = -1.1274, df = 6, p-value = 0.3026, cor -0.4180941 
 
 ggplot(w, aes(x = Age, y = num, colour = celltype)) + geom_point() +
   geom_smooth(method=lm, se=T, fullrange=TRUE) + scale_colour_brewer(8, palette="Dark2") + 
@@ -59,14 +46,23 @@ ggplot(num, aes(x = celltype, y = num)) + geom_boxplot() +
   theme(text = element_text(size = 20))
 dev.off()
 
+num = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_number.csv")
+range(num$num[which(num$celltype=="Prenatal")]) # 1098 5305
+range(num$num[which(num$celltype=="Neuron")]) # 1113 1410
+range(num$num[which(num$celltype=="Glia")]) # 915 1144
+
+t.test(num[num$celltype=="Prenatal","num"],num[num$celltype!="Prenatal","num"])
+#t = 6.0393, df = 19.216, p-value = 7.875e-06
+#  mean of x mean of y 
+# 2856.850  1164.469 
+
+
 
 ## how long are these regions?
 
 widths = do.call(rbind, Map(cbind, lapply(dmvs, function(y) data.frame(mean = mean(width(y)), median = median(width(y)), 
                                                                        sd = sd(width(y)), min = min(width(y)), max = max(width(y)))), id = as.list(names(dmvs))))
-widths[which(widths$id %in% names(DMVs_100kb.pren)),"celltype"] = "Prenatal"
-widths[which(widths$id %in% pd[pd$Cell.Type=="Neuron","Data.ID"]),"celltype"] = "Neuron"
-widths[which(widths$id %in% pd[pd$Cell.Type=="Glia","Data.ID"]),"celltype"] = "Glia"
+widths$celltype = ifelse(widths$id %in% pd$Data.ID, pd[match(widths$id, pd$Data.ID),"Cell.Type"], "Prenatal")
 write.csv(widths, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_widths.csv")
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_widths.pdf")
@@ -74,21 +70,10 @@ pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_widths.pdf")
 w = widths[which(widths$celltype %in% c("Neuron", "Glia")),]
 w = cbind(w, Age = pd[match(w$id, pd$Data.ID), "Age"])
 cor.test(x = w[which(w$celltype=="Neuron"),"Age"], y = w[which(w$celltype=="Neuron"),"median"])
-#t = 0.25929, df = 22, p-value = 0.7978
-#alternative hypothesis: true correlation is not equal to 0
-#95 percent confidence interval:
-#  -0.3561291  0.4486052
-#sample estimates:
-#  cor 
-#0.05519736
+#t = 0.25929, df = 22, p-value = 0.7978, cor 0.05519736
+
 cor.test(x = w[which(w$celltype=="Glia"),"Age"], y = w[which(w$celltype=="Glia"),"median"])
-#t = -0.99175, df = 6, p-value = 0.3596
-#alternative hypothesis: true correlation is not equal to 0
-#95 percent confidence interval:
-#  -0.8540912  0.4478129
-#sample estimates:
-#  cor 
-#-0.3752859 
+#t = -0.99175, df = 6, p-value = 0.3596, cor -0.3752859 
 
 ggplot(w, aes(x = Age, y = median, colour = celltype)) + geom_point() +
   geom_smooth(method=lm, se=T, fullrange=TRUE) + scale_colour_brewer(8, palette="Dark2") + 
@@ -113,6 +98,23 @@ ggplot(widths, aes(x = celltype, y = mean)) + geom_boxplot() +
   theme(text = element_text(size = 20))
 dev.off()
 
+t.test(widths[widths$celltype=="Prenatal","median"],widths[widths$celltype!="Prenatal","median"])
+#t = 6.7297, df = 20.132, p-value = 1.459e-06
+#  mean of x mean of y 
+# 7239.625  6665.750 
+t.test(widths[widths$celltype=="Prenatal","median"],widths[widths$celltype=="Neuron","median"])
+#t = 6.8666, df = 19.939, p-value = 1.153e-06
+#  mean of x mean of y 
+#7239.625  6655.500 
+t.test(widths[widths$celltype=="Glia","median"],widths[widths$celltype=="Neuron","median"])
+#t = 0.92004, df = 8.387, p-value = 0.3833
+#  mean of x mean of y 
+#6696.5    6655.5 
+t.test(widths[widths$celltype=="Glia","median"],widths[widths$celltype=="Prenatal","median"])
+#t = -5.7655, df = 25.452, p-value = 4.887e-06
+#  mean of x mean of y 
+#6696.500  7239.625 
+
 
 ## What proportion of the genome do they cover?
 
@@ -122,9 +124,8 @@ sLengths = c(lapply(PMDsegments.CG, reduce), lapply(PMDsegments.CGpren, reduce))
 rm(PMDsegments.CGpren, PMDsegments.CG)
 percGenome = data.frame(percent = unlist(mapply(function(p, t) round((sum(width(p))/sum(as.numeric(width(t)))*100),2), dmvs, sLengths)),
                         id = names(dmvs))
-percGenome[which(percGenome$id %in% names(DMVs_100kb.pren)),"celltype"] = "Prenatal"
-percGenome[which(percGenome$id %in% pd[pd$Cell.Type=="Neuron","Data.ID"]),"celltype"] = "Neuron"
-percGenome[which(percGenome$id %in% pd[pd$Cell.Type=="Glia","Data.ID"]),"celltype"] = "Glia"
+percGenome$celltype = ifelse(percGenome$id %in% pd$Data.ID, pd[match(percGenome$id, pd$Data.ID),"Cell.Type"], "Prenatal")
+
 write.csv(percGenome, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_genomeCoverage.csv")
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_percentGenome.pdf")
@@ -132,21 +133,10 @@ pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_percentGenome.p
 w = percGenome[which(percGenome$celltype %in% c("Neuron", "Glia")),]
 w = cbind(w, Age = pd[match(w$id, pd$Data.ID), "Age"])
 cor.test(x = w[which(w$celltype=="Neuron"),"Age"], y = w[which(w$celltype=="Neuron"),"percent"])
-#t = -1.2851, df = 22, p-value = 0.2121
-#alternative hypothesis: true correlation is not equal to 0
-#95 percent confidence interval:
-#  -0.6033294  0.1557545
-#sample estimates:
-#  cor 
-#-0.264245 
+#t = -1.2851, df = 22, p-value = 0.2121, cor -0.264245 
+
 cor.test(x = w[which(w$celltype=="Glia"),"Age"], y = w[which(w$celltype=="Glia"),"percent"])
-#t = -1.321, df = 6, p-value = 0.2346
-#alternative hypothesis: true correlation is not equal to 0
-#95 percent confidence interval:
-#  -0.8837414  0.3456068
-#sample estimates:
-#  cor 
-#-0.4746662 
+#t = -1.321, df = 6, p-value = 0.2346, cor -0.4746662 
 
 ggplot(w, aes(x = Age, y = percent, colour = celltype)) + geom_point() +
   geom_smooth(method=lm, se=T, fullrange=TRUE) + scale_colour_brewer(8, palette="Dark2") + 
@@ -163,6 +153,31 @@ ggplot(percGenome, aes(x = celltype, y = percent)) + geom_boxplot() +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 dev.off()
+
+genome = data.table(read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_genomeCoverage.csv"))
+genome[,mean(percent), by = c("celltype")]
+#   celltype        V1
+#1:     Glia 0.2925000
+#2:   Neuron 0.3408333
+#3: Prenatal 0.9515000
+
+t.test(genome[genome$celltype=="Prenatal","percent"],genome[genome$celltype!="Prenatal","percent"])
+#t = 5.9192, df = 19.101, p-value = 1.044e-05
+#  mean of x mean of y 
+#0.95150   0.32875 
+t.test(genome[genome$celltype=="Prenatal","percent"],genome[genome$celltype=="Neuron","percent"])
+#t = 5.8072, df = 19.064, p-value = 1.338e-05
+#  mean of x mean of y 
+#0.9515000 0.3408333 
+t.test(genome[genome$celltype=="Glia","percent"],genome[genome$celltype=="Neuron","percent"])
+#t = -4.676, df = 10.093, p-value = 0.0008513
+#  mean of x mean of y 
+#0.2925000 0.3408333 
+t.test(genome[genome$celltype=="Prenatal","percent"],genome[genome$celltype=="Glia","percent"])
+#t = 6.2471, df = 19.302, p-value = 4.966e-06
+#  mean of x mean of y 
+#0.9515    0.2925 
+
 
 
 ### How much of the dmvs overlap?
@@ -186,11 +201,10 @@ elementNROWS(all)
 #      All  Prenatal Postnatal   Neurons      Glia 
 #      318       559       399       588       554 
 
-round((unlist(lapply(all, function(x) (sum(width(x))/sum(as.numeric(width(sLengths[[1]]))))*100)))/
-        (sum(width(dmaster))/sum(as.numeric(width(sLengths[[1]])))*100),2)
+round((unlist(lapply(all, function(x) sum(width(x))))/sum(width(dmaster))*100),2)
 #      All  Prenatal Postnatal   Neurons      Glia 
-#     0.01      0.03      0.02      0.03      0.03 
-# 1-3% of total bases in the DMV state are shared by all or most
+#     1.49      2.88      1.97      2.85      2.79 
+# 1.5-3% of total bases in the DMV state are shared by all or most
 
 shared = mapply(function(all,ind) lapply( ind, function(x) round(all / x *100,2)), lapply(all, function(x) (sum(width(x))/sum(as.numeric(width(sLengths[[1]])))*100)), 
                 lapply( list(dmvs,DMVs_100kb.pren,DMVs.100kb,
@@ -210,6 +224,61 @@ ggplot(shared, aes(x = group, y = percent)) + geom_boxplot() +
 dev.off()
 
 
+data.table(shared)[,mean(percent), by = c("group")]
+#       group       V1
+#1:       All 20.18327
+#2:  Prenatal 22.17000
+#3: Postnatal 34.00156
+#4:   Neurons 47.20042
+#5:      Glia 54.08875
+
+
+## How much of prenatal DMVs is represented in each postnatal sample?
+
+pren = reduce(do.call(getMethod(c, "GenomicRanges"), GRangesList(dmvs[-which(names(dmvs) %in% pd$Data.ID)])))
+
+sharedP = lapply(dmvs, function(x) Reduce(intersect, list(x, pren)))
+
+prenperc = mapply(function(pren,ind) round(sum(width(reduce(pren))) / sum(width(reduce(ind))) *100,2), 
+                   sharedP, dmvs, SIMPLIFY = F)
+
+prenperc = data.frame(perc = unlist(prenperc))
+prenperc$Person = rownames(prenperc)
+prenperc$Age = pd[match(prenperc$Person, pd$Data.ID),"Age"]
+prenperc$CellType = ifelse(prenperc$Person %in% pd$Data.ID, pd[match(prenperc$Person, pd$Data.ID),"Cell.Type"], "Prenatal")
+
+write.table(prenperc, quote = F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_sharedWithPrenatal.csv")
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/percent_shared_withPrenatal_DMV_perSample_byBaseCoverage.pdf", height = 4)
+ggplot(prenperc[prenperc$CellType!="Prenatal",], aes(x = CellType, y = perc)) + geom_boxplot() +
+  labs(fill="") + theme_classic() +
+  ylim(0,100) +
+  ylab("Percent") + xlab("") +
+  ggtitle("Percent Bases Shared with Prenatal") +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20))
+ggplot(prenperc[prenperc$CellType!="Prenatal",], aes(x = Age, y = perc, colour = CellType)) + 
+  geom_path() + geom_point() + ylim(0,100) +
+  theme_classic() + scale_colour_brewer(8, palette="Dark2") +
+  ylab("Percent") + xlab("Age") + 
+  ggtitle("Percent Bases Shared with Prenatal") + 
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+dev.off()
+
+cor.test(x = prenperc[prenperc$CellType=="Neuron",]$Age, y = prenperc[prenperc$CellType=="Neuron",]$perc)
+#t = -3.2655, df = 22, p-value = 0.00354, cor -0.5713691 
+cor.test(x = prenperc[prenperc$CellType=="Glia",,]$Age, y = prenperc[prenperc$CellType=="Glia",,]$perc)
+#t = -2.1369, df = 6, p-value = 0.07648, cor -0.6573872 
+
+
+data.table(prenperc)[,mean(perc),by="CellType"]
+#   CellType        V1
+#1:     Glia  97.29125
+#2:   Neuron  95.51083
+#3: Prenatal 100.00000
+
+
 ## Find overlaps with DMRs, features, shared groups
 
 txdb = loadDb("/dcl01/lieber/ajaffe/Amanda/annotation_objects/gencode.v25lift37.annotation.sqlite")
@@ -224,13 +293,22 @@ lapply(features, head)
 DMR = lapply(DMR, function(x) x[which(x$sig=="FWER < 0.05"),])
 DMRgr = lapply(DMR, function(x) makeGRangesFromDataFrame(x, keep.extra.columns = T))
 
-oo = lapply(dmvs, function(x) lapply(c(DMRgr, all, features), function(d) findOverlaps(x,d)))
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/rda/limma_Neuron_CpGs_minCov_3_ageInfo_dmrs.Rdata")
+dmrs = split(dmrs, dmrs$k6cluster_label)
+names(dmrs) = c("Gr1","Gr2","Gr3","Gr4","Gr5","Gr6")
+
+oo = lapply(dmvs, function(x) lapply(c(DMRgr[names(DMRgr) %in% c("CellType","Age")], as.list(dmrs), all, features), function(d) findOverlaps(x,d)))
 
 dmvDMR = lapply(dmvs, as.data.frame)
 dmvDMR = lapply(dmvDMR, function(x) data.frame(x, rnum = 1:nrow(x)))
 dmvDMR = mapply(function(d,oo) data.frame(d, CT = ifelse(d$rnum %in% queryHits(oo$CellType), "CT", "no"),
                                           Age = ifelse(d$rnum %in% queryHits(oo$Age), "Age", "no"),
-                                          Interaction = ifelse(d$rnum %in% queryHits(oo$Interaction), "Int", "no"),
+                                          Gr1 = ifelse(d$rnum %in% queryHits(oo$Gr1), "Gr1", "no"),
+                                          Gr2 = ifelse(d$rnum %in% queryHits(oo$Gr2), "Gr2", "no"),
+                                          Gr3 = ifelse(d$rnum %in% queryHits(oo$Gr3), "Gr3", "no"),
+                                          Gr4 = ifelse(d$rnum %in% queryHits(oo$Gr4), "Gr4", "no"),
+                                          Gr5 = ifelse(d$rnum %in% queryHits(oo$Gr5), "Gr5", "no"),
+                                          Gr6 = ifelse(d$rnum %in% queryHits(oo$Gr6), "Gr6", "no"),
                                           All = ifelse(d$rnum %in% queryHits(oo$All), "All", "no"),
                                           Prenatal = ifelse(d$rnum %in% queryHits(oo$Prenatal), "Prenatal", "no"),
                                           Postnatal = ifelse(d$rnum %in% queryHits(oo$Postnatal), "Postnatal", "no"),
@@ -239,9 +317,9 @@ dmvDMR = mapply(function(d,oo) data.frame(d, CT = ifelse(d$rnum %in% queryHits(o
                                           genes = ifelse(d$rnum %in% queryHits(oo$genes), "Gene", NA),
                                           islands = ifelse(d$rnum %in% queryHits(oo$islands), "CpG-Island", "non-Island"),
                                           promoters = ifelse(d$rnum %in% queryHits(oo$promoters), "promoter", "no")), dmvDMR, oo, SIMPLIFY = F) 
-dmvDMR = lapply(dmvDMR, function(d) data.frame(d, tog = paste(d$CT, d$Age, d$Interaction, d$All, d$Prenatal, 
+dmvDMR = lapply(dmvDMR, function(d) data.frame(d, tog = paste(d$CT, d$Age, d$Gr1,d$Gr2,d$Gr3,d$Gr4,d$Gr5,d$Gr6, d$All, d$Prenatal, 
                                                               d$Postnatal, d$Neurons, d$Glia, sep = ":"),
-                                               dmr = paste(d$CT, d$Age, d$Interaction, sep = ":"),
+                                               dmr = paste(d$CT, d$Age, d$Gr1,d$Gr2,d$Gr3,d$Gr4,d$Gr5,d$Gr6, sep = ":"),
                                                regionID = paste0(d$seqnames,":",d$start,"-", d$end)))
 for (i in 1:length(dmvDMR)) {
   if (length(unique(queryHits(oo[[i]][["rpmskgr"]])))==nrow(dmvDMR[[i]])) {
@@ -267,32 +345,12 @@ save(dmvDMR, postnatalpd, geneMap, file = "/dcl01/lieber/ajaffe/lab/brain-epigen
 ### Annotate to genomic features
 
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/dmvs_annotated.rda")
-load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/BSobj_bsseqSmooth_Neuron_minCov_3.Rdata')
-
-# Identify all CpG clusters in the genome
-gr = granges(BSobj)
-cl = clusterMaker( chr = as.character(seqnames(gr)), pos = start(gr),   maxGap = 1000)
-gr.clusters = split(gr, cl)
-gr.clusters = unlist(range(gr.clusters))
-df.clusters = as.data.frame(gr.clusters)
-df.clusters$regionID = paste0(df.clusters$seqnames,":",df.clusters$start,"-",df.clusters$end)
-df.clusters$rnum = 1:length(gr.clusters)
-df.clusters$Islands = ifelse(df.clusters$rnum %in% subjectHits(findOverlaps(features$islands, gr.clusters)), "island","no")
-df.clusters$repeats = ifelse(df.clusters$rnum %in% subjectHits(findOverlaps(features$rpmskgr, gr.clusters)), "repeat","no")
-df.clusters$genes = ifelse(df.clusters$rnum %in% subjectHits(findOverlaps(makeGRangesFromDataFrame(geneMap), gr.clusters)), "gene","no")
-df.clusters$promoters = ifelse(df.clusters$rnum %in% subjectHits(findOverlaps(makeGRangesFromDataFrame(geneMap), gr.clusters)), "promoter","no")
-
-oo = lapply(dmvDMR, function(y) findOverlaps(gr.clusters, makeGRangesFromDataFrame(y)))
-df.clusters = lapply(oo, function(y) data.frame(df.clusters, overlap = ifelse(df.clusters$rnum %in% queryHits(y), "hit","no")))
-
 
 ## how many fall within CpG islands?
 
 CpGIslands = lapply(dmvDMR, function(y) round(length(unique(y[which(y$islands=="CpG-Island"),,]$regionID))/length(unique(y$regionID))*100,2))
 CpGIslands = data.frame(islands = unlist(CpGIslands), id = names(CpGIslands))
-CpGIslands[!(CpGIslands$id %in% postnatalpd$Data.ID),"celltype"] = "Prenatal"
-CpGIslands[which(CpGIslands$id %in% postnatalpd[which(postnatalpd$Cell.Type=="Neuron"),"Data.ID"]),"celltype"] = "Neuron"
-CpGIslands[which(CpGIslands$id %in% postnatalpd[which(postnatalpd$Cell.Type=="Glia"),"Data.ID"]),"celltype"] = "Glia"
+CpGIslands$celltype = ifelse(CpGIslands$id %in% pd$Data.ID, pd[match(CpGIslands$id, pd$Data.ID),"Cell.Type"], "Prenatal")
 write.csv(CpGIslands, quote=F,file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_CpG_Island_Overlap.csv")
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_overlap_with_CpG-Islands.pdf")
@@ -306,6 +364,14 @@ ggplot(CpGIslands, aes(x = celltype, y = islands)) + geom_boxplot() +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
 dev.off()
 
+cgi = data.table(read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_CpG_Island_Overlap.csv"))
+cgi[,mean(islands), by = "celltype"]
+#   celltype       V1
+#1:     Glia 93.37250
+#2:   Neuron 90.88583
+#3: Prenatal 86.89900
+mean(cgi$islands) # 89.735
+
 
 # How about Repetitive Elements?
 
@@ -315,9 +381,7 @@ repeats = lapply(repeats, function(y) data.frame(y, perc = round(y$V1/sum(y$V1)*
 repeats = do.call(rbind, Map(cbind, repeats, id = as.list(names(repeats))))
 repeats$repeats = factor(repeats$repeats, levels = c("SINE","LINE","Simple_repeat","DNA","LTR","Low_complexity","No repeats","Unknown","snRNA",
                                                      "Other","DNA?","Satellite","RC","scRNA","tRNA","SINE?","srpRNA","RNA","rRNA","LINE?","LTR?","Unknown?"))
-repeats[!(repeats$id %in% postnatalpd$Data.ID),"celltype"] = "Prenatal"
-repeats[which(repeats$id %in% postnatalpd[which(postnatalpd$Cell.Type=="Neuron"),"Data.ID"]),"celltype"] = "Neuron"
-repeats[which(repeats$id %in% postnatalpd[which(postnatalpd$Cell.Type=="Glia"),"Data.ID"]),"celltype"] = "Glia"
+repeats$celltype = ifelse(repeats$id %in% pd$Data.ID, pd[match(repeats$id, pd$Data.ID),"Cell.Type"], "Prenatal")
 write.csv(repeats, quote=F,file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_repeats_Overlap.csv")
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_overlap_with_repeats.pdf")
@@ -333,6 +397,25 @@ ggplot(x, aes(x = celltype, y = perc, fill = repeats)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
 dev.off()
 
+repeats = data.table(read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_repeats_Overlap.csv"))
+repeats[repeats %in% c("No repeats","SINE","Low_complexity","Simple_repeat","LINE"),mean(perc), by = c("repeats","celltype")]
+#           repeats celltype       V1
+# 1: Low_complexity     Glia 27.05000
+# 2:  Simple_repeat     Glia 25.42625
+# 3:           SINE     Glia 19.77125
+# 4:           LINE     Glia 14.25000
+# 5:     No repeats     Glia  0.13125
+# 6:  Simple_repeat   Neuron 25.06875
+# 7: Low_complexity   Neuron 26.29000
+# 8:           SINE   Neuron 20.25458
+# 9:           LINE   Neuron 14.61542
+#10:     No repeats   Neuron  0.08250
+#11:           LINE Prenatal 17.10400
+#12: Low_complexity Prenatal 21.68050
+#13:  Simple_repeat Prenatal 20.32200
+#14:           SINE Prenatal 21.17250
+#15:     No repeats Prenatal  0.04850
+
 
 ## Overlap with DMRs
 
@@ -340,32 +423,34 @@ dmr = lapply(dmvDMRdt, function(y) y[,length(unique(regionID)), by = "dmr"])
 dmr = lapply(dmr, function(y) data.frame(y, perc = round(y$V1/sum(y$V1)*100,2)))
 models = lapply(dmr, function(y) data.frame(CT = sum(data.frame(y)[grep("CT", y$dmr),"perc"]), 
                                             Age = sum(data.frame(y)[grep("Age", y$dmr),"perc"]),
-                                            Int = sum(data.frame(y)[grep("Int", y$dmr),"perc"])))
+                                            Gr1 = sum(data.frame(y)[grep("Gr1", y$dmr),"perc"]),
+                                            Gr2 = sum(data.frame(y)[grep("Gr2", y$dmr),"perc"]),
+                                            Gr3 = sum(data.frame(y)[grep("Gr3", y$dmr),"perc"]),
+                                            Gr4 = sum(data.frame(y)[grep("Gr4", y$dmr),"perc"]),
+                                            Gr5 = sum(data.frame(y)[grep("Gr5", y$dmr),"perc"]),
+                                            Gr6 = sum(data.frame(y)[grep("Gr6", y$dmr),"perc"])))
 dmr = do.call(rbind, Map(cbind, dmr, id = as.list(names(dmr))))
 models = do.call(rbind, Map(cbind, models, id = as.list(names(models))))
 
-dmr$dmr = factor(dmr$dmr, levels = c("no:no:no","CT:no:no","no:no:Int","CT:no:Int","no:Age:no","CT:Age:Int","no:Age:Int","CT:Age:no"))
-dmr[!(dmr$id %in% postnatalpd$Data.ID),"celltype"] = "Prenatal"
-dmr[which(dmr$id %in% postnatalpd[which(postnatalpd$Cell.Type=="Neuron"),"Data.ID"]),"celltype"] = "Neuron"
-dmr[which(dmr$id %in% postnatalpd[which(postnatalpd$Cell.Type=="Glia"),"Data.ID"]),"celltype"] = "Glia"
-models[!(models$id %in% postnatalpd$Data.ID),"celltype"] = "Prenatal"
-models[which(models$id %in% postnatalpd[which(postnatalpd$Cell.Type=="Neuron"),"Data.ID"]),"celltype"] = "Neuron"
-models[which(models$id %in% postnatalpd[which(postnatalpd$Cell.Type=="Glia"),"Data.ID"]),"celltype"] = "Glia"
+dmr$celltype = ifelse(dmr$id %in% pd$Data.ID, pd[match(dmr$id, pd$Data.ID),"Cell.Type"], "Prenatal")
+models$celltype = ifelse(models$id %in% pd$Data.ID, pd[match(models$id, pd$Data.ID),"Cell.Type"], "Prenatal")
+
+dmr$NO = ifelse(dmr$dmr=="no:no:no:no:no:no:no:no", "No overlap", "Overlap")
 
 write.csv(dmr, quote=F,file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_dmr_Overlap.csv")
 write.csv(models, quote=F,file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_dmr_Overlap_byModel.csv")
 
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_overlap_with_dmr.pdf", width = 14)
-ggplot(dmr, aes(x = celltype, y = perc, fill = dmr)) + 
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_overlap_with_dmr.pdf", width = 14, height = 6)
+ggplot(dmr, aes(x = celltype, y = perc, fill = NO)) + 
   theme_classic() + geom_bar(position = "fill",stat = "identity") +
   labs(fill="") + 
-  ylab("Percent") + 
+  ylab("Proportion") + 
   xlab("") +
-  ggtitle("Percent Overlapping DMRs") +
+  ggtitle("Proportion Overlapping DMRs") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
-ggplot(dmr[which(dmr$dmr=="no:no:no"),], aes(x = celltype, y = perc, fill = dmr)) + 
+ggplot(dmr[which(dmr$dmr=="no:no:no:no:no:no:no:no"),], aes(x = celltype, y = perc)) + 
   theme_classic() + geom_boxplot() +
   labs(fill="") + 
   ylab("Percent") + 
@@ -377,7 +462,7 @@ ggplot(models, aes(x = celltype, y = CT)) +
   theme_classic() + geom_boxplot() +
   labs(fill="") + 
   ylab("Percent") + 
-  xlab("") +
+  xlab("") + 
   ggtitle("Percent Overlapping Cell Type DMRs") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
@@ -385,57 +470,118 @@ ggplot(models, aes(x = celltype, y = Age)) +
   theme_classic() + geom_boxplot() +
   labs(fill="") + 
   ylab("Percent") + 
-  xlab("") +
+  xlab("") + 
   ggtitle("Percent Overlapping Age DMRs") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
-ggplot(models, aes(x = celltype, y = Int)) + 
+
+x = melt(models[,!colnames(models) %in% c("CT","Age")])
+x$variable = gsub("Gr1","1:G-N+", x$variable)
+x$variable = gsub("Gr2","2:G0N+", x$variable)
+x$variable = gsub("Gr3","3:G0N-", x$variable)
+x$variable = gsub("Gr4","4:G+N0", x$variable)
+x$variable = gsub("Gr5","5:G+N-", x$variable)
+x$variable = gsub("Gr6","6:G-N0", x$variable)
+
+ggplot(x, aes(x = celltype, y = value, fill = variable)) + 
   theme_classic() + geom_boxplot() +
-  labs(fill="") + 
-  ylab("Percent") + 
-  xlab("") +
-  ggtitle("Percent Overlapping Interaction DMRs") +
+  labs(fill="") + facet_grid(. ~ variable) +
+  ylab("Percent") +  
+  xlab("") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_fill_brewer(8, palette="Dark2") +
+  ggtitle("Percent Overlapping DMRs") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+dev.off()
+
+dmr = data.table(read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_dmr_Overlap.csv"))
+models = data.table(read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_dmr_Overlap_byModel.csv"))
+models[,list(Gr1=mean(Gr1),Gr2=mean(Gr2),Gr3=mean(Gr3),Gr4=mean(Gr4),Gr5=mean(Gr5),Gr6=mean(Gr6)),by="celltype"]
+#   celltype     Gr1       Gr2      Gr3      Gr4     Gr5     Gr6
+#1:     Glia 2.71625 1.6100000 0.297500 1.258750 0.31750 1.72125
+#2:   Neuron 1.13625 0.7054167 1.562083 1.418333 0.83375 0.32125
+#3: Prenatal 1.54000 1.5705000 0.215000 1.360000 0.42350 0.51550
+
+
+# Are DMRs overlapping DMVs at the DMV periphery, or uniformly distributed?
+
+dmvDMR = Map(cbind, lapply(dmvDMR, function(x) data.frame(x[,1:5], dmr = x$dmr, regionID = x$regionID)), id = as.list(names(dmvDMR)))
+dmvDMR = lapply(dmvDMR, unique)
+tiles = lapply(dmvDMR, function(x) tile(makeGRangesFromDataFrame(x[which(x$dmr!="no:no:no:no:no:no:no:no"),]), n = 100))
+tiles = lapply(tiles, as.list)
+ti = list(Prenatal = unlist(tiles[-which(names(tiles) %in% postnatalpd$Data.ID)], recursive = F),
+          Neuron = unlist(tiles[which(names(tiles) %in% postnatalpd[which(postnatalpd$Cell.Type=="Neuron"),"Data.ID"])], recursive = F),
+          Glia = unlist(tiles[which(names(tiles) %in% postnatalpd[which(postnatalpd$Cell.Type=="Glia"),"Data.ID"])], recursive = F))
+DMR = lapply(DMR, function(x) x[which(x$sig=="FWER < 0.05"),])
+DMR = lapply(DMR, function(x) reduce(makeGRangesFromDataFrame(x)))
+CTov = lapply(ti, function(x) lapply(x, function(y) findOverlaps(y,DMR$CellType)))
+Aov = lapply(ti, function(x) lapply(x, function(y) findOverlaps(y,DMR$Age)))
+Iov = lapply(ti, function(x) lapply(x, function(y) findOverlaps(y,DMR$Interaction)))
+
+CToverlaps = Ageoverlaps = Intoverlaps = list(list(),list(),list())
+for (i in 1:length(ti)) {
+  for (j in 1:length(ti[[i]])) {
+    if (length(queryHits(CTov[[i]][[j]]))>0) {
+      CToverlaps[[i]][[j]] = data.frame(region = queryHits(CTov[[i]][[j]])) } else {
+        CToverlaps[[i]][[j]] = data.frame(region = 0) }
+    if (length(queryHits(Aov[[i]][[j]]))>0) {
+      Ageoverlaps[[i]][[j]] = data.frame(region = queryHits(Aov[[i]][[j]])) } else {
+        Ageoverlaps[[i]][[j]] = data.frame(region = 0) }
+    if (length(queryHits(Iov[[i]][[j]]))>0) {
+      Intoverlaps[[i]][[j]] = data.frame(region = queryHits(Iov[[i]][[j]])) } else {
+        Intoverlaps[[i]][[j]] = data.frame(region = 0) } 
+  }
+}
+CToverlaps = do.call(rbind, Map(cbind, lapply(CToverlaps, function(x) do.call(rbind, x)), celltype = as.list(names(ti))))
+Ageoverlaps = do.call(rbind, Map(cbind, lapply(Ageoverlaps, function(x) do.call(rbind, x)), celltype = as.list(names(ti))))
+Intoverlaps = do.call(rbind, Map(cbind, lapply(Intoverlaps, function(x) do.call(rbind, x)), celltype = as.list(names(ti))))
+overlaps = rbind(cbind(CToverlaps, model = "Cell Type"), cbind(Ageoverlaps, model = "Age"),
+                 cbind(Intoverlaps, model = "Interaction"))
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMR_position_in_DMV.pdf", width = 10)
+ggplot(overlaps, aes(region, colour = model)) + geom_density() + theme_classic() +
+  labs(fill="") + facet_grid(. ~ celltype) +
+  ylab("Density") + xlab("% of DMV") +
+  ggtitle("DMR Position in DMV") +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.position="bottom", legend.title=element_blank())
 dev.off()
 
 
 ## association of existing DMVs with genes
 
-geneoverlap = lapply(dmvDMR, function(y) round(length(unique(as.character(data.frame(y)[which(y$nearestID!="NoGeneOverlap"),"regionID"])))/
+oo = lapply(dmvs, function(x) findOverlaps(makeGRangesFromDataFrame(geneMap), makeGRangesFromDataFrame(x))) 
+dmvGene = mapply(function(p, ov) if (nrow(p)>length(unique(subjectHits(ov)))) {
+  rbind(data.frame(p[subjectHits(ov),], nearestSymbol = geneMap[queryHits(ov),"Symbol"],
+                   nearestID = geneMap[queryHits(ov),"gencodeID"], 
+                   EntrezID = geneMap[queryHits(ov),"EntrezID"]),
+        data.frame(p[-unique(subjectHits(ov)),], nearestSymbol = "NoGeneOverlap", 
+                   nearestID = "NoGeneOverlap", EntrezID = "NoGeneOverlap")) } else {
+                     data.frame(p[subjectHits(ov),], nearestSymbol = geneMap[queryHits(ov),"Symbol"],
+                                nearestID = geneMap[queryHits(ov),"gencodeID"], EntrezID = geneMap[queryHits(ov),"EntrezID"])      
+                   },lapply(dmvs, as.data.frame), oo, SIMPLIFY = F)
+save(dmvGene, postnatalpd, geneMap, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMVs_geneOverlap.rda")
+
+dmvDMRdt = lapply(dmvGene, data.table)
+dmvDMRdt = Map(cbind, dmvDMRdt, regionID = lapply(dmvDMRdt, function(x) paste0(x$seqnames,":",x$start,"-",x$end)))
+geneoverlap = lapply(dmvDMRdt, function(y) round(length(unique(as.character(data.frame(y)[which(y$nearestID!="NoGeneOverlap"),"regionID"])))/
                                                  length(unique(as.character(y$regionID)))*100,2))
 geneoverlap = data.frame(geneoverlap = unlist(geneoverlap), id = names(geneoverlap))
-geneoverlap[!(geneoverlap$id %in% postnatalpd$Data.ID),"celltype"] = "Prenatal"
-geneoverlap[which(geneoverlap$id %in% postnatalpd[which(postnatalpd$Cell.Type=="Neuron"),"Data.ID"]),"celltype"] = "Neuron"
-geneoverlap[which(geneoverlap$id %in% postnatalpd[which(postnatalpd$Cell.Type=="Glia"),"Data.ID"]),"celltype"] = "Glia"
+geneoverlap$celltype = ifelse(geneoverlap$id %in% pd$Data.ID, pd[match(geneoverlap$id, pd$Data.ID),"Cell.Type"], "Prenatal")
 write.csv(geneoverlap, quote=F,file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_Gene_Overlap.csv")
 
 numgenes = lapply(dmvDMRdt, function(y) y[,length(unique(nearestID)), by = "regionID"])
 numgenes = do.call(rbind, Map(cbind, lapply(numgenes, function(y) 
            data.frame(mean = mean(y$V1), median = median(y$V1), sd = sd(y$V1), min = min(y$V1), max = max(y$V1))), id = as.list(names(numgenes))))
-numgenes[!which(numgenes$id %in% postnatalpd$Data.ID),"celltype"] = "Prenatal"
-numgenes[which(numgenes$id %in% postnatalpd[postnatalpd$Cell.Type=="Neuron","Data.ID"]),"celltype"] = "Neuron"
-numgenes[which(numgenes$id %in% postnatalpd[postnatalpd$Cell.Type=="Glia","Data.ID"]),"celltype"] = "Glia"
+numgenes$celltype = ifelse(numgenes$id %in% pd$Data.ID, pd[match(numgenes$id, pd$Data.ID),"Cell.Type"], "Prenatal")
 write.csv(numgenes, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_numgenes.csv")
 
 w = numgenes[which(numgenes$celltype %in% c("Neuron", "Glia")),]
 w = cbind(w, Age = postnatalpd[match(w$id, postnatalpd$Data.ID), "Age"])
 cor.test(x = w[which(w$celltype=="Neuron"),"Age"], y = w[which(w$celltype=="Neuron"),"mean"])
-#t = -0.86357, df = 22, p-value = 0.3971
-#alternative hypothesis: true correlation is not equal to 0
-#95 percent confidence interval:
-#  -0.5446817  0.2398456
-#sample estimates:
-#  cor 
-#-0.1810702 
+#t = -0.86357, df = 22, p-value = 0.3971, cor -0.1810702 
 cor.test(x = w[which(w$celltype=="Glia"),"Age"], y = w[which(w$celltype=="Glia"),"mean"])
-#t = -1.0309, df = 6, p-value = 0.3423
-#alternative hypothesis: true correlation is not equal to 0
-#95 percent confidence interval:
-#  -0.8580426  0.4359092
-#sample estimates:
-#  cor 
-#-0.3879235 
+#t = -1.0309, df = 6, p-value = 0.3423, cor -0.3879235 
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_overlap_with_Genes.pdf")
 ggplot(geneoverlap, aes(x = celltype, y = geneoverlap)) + geom_boxplot() +
@@ -449,61 +595,57 @@ ggplot(geneoverlap, aes(x = celltype, y = geneoverlap)) + geom_boxplot() +
 ggplot(w, aes(x = Age, y = mean, colour = celltype)) + geom_point() +
   geom_smooth(method=lm, se=T, fullrange=TRUE) + scale_colour_brewer(8, palette="Dark2") + 
   labs(fill="") + theme_classic() +
-  ylab("Bases") + xlab("Age (Years)") +
+  ylab("Number") + xlab("Age (Years)") +
   ggtitle("Median DMV Gene Number by Age") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
 ggplot(numgenes, aes(x = celltype, y = median)) + geom_boxplot() +
   theme_classic() +
   labs(fill="") +
-  ylab("Bases") + xlab("") +
+  ylab("Number") + xlab("") +
   ggtitle("Median DMV Gene Number") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 ggplot(numgenes, aes(x = celltype, y = mean)) + geom_boxplot() +
   theme_classic() +
   labs(fill="") +
-  ylab("Bases") + xlab("") +
+  ylab("Number") + xlab("") +
   ggtitle("Mean DMV Gene Number") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 dev.off()
 
 
-promoverlap = lapply(dmvDMR, function(y) round(length(unique(as.character(data.frame(y)[which(y$promoters=="promoter"),"regionID"])))/
+library(GenomicFeatures)
+txdb = loadDb("/dcl01/lieber/ajaffe/Amanda/annotation_objects/gencode.v25lift37.annotation.sqlite")
+promoters = promoters(txdb, upstream=2000, downstream=200)
+promoters = reduce(promoters)
+oo = lapply(dmvGene, function(x) findOverlaps(promoters, makeGRangesFromDataFrame(x))) 
+for (i in 1:length(dmvGene)) {
+  dmvGene[[i]][unique(subjectHits(oo[[i]])),"promoters"] = "promoters"
+  dmvGene[[i]][-unique(subjectHits(oo[[i]])),"promoters"] = "no"
+}
+
+dmvGenedt = lapply(dmvGene, data.table)
+dmvGenedt = Map(cbind, dmvGenedt, regionID = lapply(dmvGenedt, function(x) paste0(x$seqnames,":",x$start,"-",x$end)))
+promoverlap = lapply(dmvGenedt, function(y) round(length(unique(as.character(data.frame(y)[which(y$promoters=="promoters"),"regionID"])))/
                                                  length(unique(as.character(y$regionID)))*100,2))
 promoverlap = data.frame(promoverlap = unlist(promoverlap), id = names(promoverlap))
-promoverlap[!(promoverlap$id %in% postnatalpd$Data.ID),"celltype"] = "Prenatal"
-promoverlap[which(promoverlap$id %in% postnatalpd[which(postnatalpd$Cell.Type=="Neuron"),"Data.ID"]),"celltype"] = "Neuron"
-promoverlap[which(promoverlap$id %in% postnatalpd[which(postnatalpd$Cell.Type=="Glia"),"Data.ID"]),"celltype"] = "Glia"
+promoverlap$celltype = ifelse(promoverlap$id %in% pd$Data.ID, pd[match(promoverlap$id, pd$Data.ID),"Cell.Type"], "Prenatal")
 write.csv(promoverlap, quote=F,file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_prom_Overlap.csv")
 
-numproms = lapply(dmvDMRdt, function(y) y[promoters=="promoter",length(unique(nearestID)), by = "regionID"])
+numproms = lapply(dmvGenedt, function(y) y[promoters=="promoters",length(unique(nearestID)), by = "regionID"])
 numproms = do.call(rbind, Map(cbind, lapply(numproms, function(y) 
   data.frame(mean = mean(y$V1), median = median(y$V1), sd = sd(y$V1), min = min(y$V1), max = max(y$V1))), id = as.list(names(numproms))))
-numproms[!which(numproms$id %in% postnatalpd$Data.ID),"celltype"] = "Prenatal"
-numproms[which(numproms$id %in% postnatalpd[postnatalpd$Cell.Type=="Neuron","Data.ID"]),"celltype"] = "Neuron"
-numproms[which(numproms$id %in% postnatalpd[postnatalpd$Cell.Type=="Glia","Data.ID"]),"celltype"] = "Glia"
+numproms$celltype = ifelse(numproms$id %in% pd$Data.ID, pd[match(numproms$id, pd$Data.ID),"Cell.Type"], "Prenatal")
 write.csv(numproms, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_numproms.csv")
 
 w = numproms[which(numproms$celltype %in% c("Neuron", "Glia")),]
 w = cbind(w, Age = postnatalpd[match(w$id, postnatalpd$Data.ID), "Age"])
 cor.test(x = w[which(w$celltype=="Neuron"),"Age"], y = w[which(w$celltype=="Neuron"),"mean"])
-#t = -1.2137, df = 22, p-value = 0.2377
-#alternative hypothesis: true correlation is not equal to 0
-#95 percent confidence interval:
-#  -0.5938903  0.1700746
-#sample estimates:
-#  cor 
-#-0.2505089 
+#t = -1.2137, df = 22, p-value = 0.2377, cor -0.2505089 
 cor.test(x = w[which(w$celltype=="Glia"),"Age"], y = w[which(w$celltype=="Glia"),"mean"])
-#t = -1.1737, df = 6, p-value = 0.285
-#alternative hypothesis: true correlation is not equal to 0
-#95 percent confidence interval:
-#  -0.8714336  0.3918957
-#sample estimates:
-#  cor 
-#-0.4321072 
+#t = -1.1737, df = 6, p-value = 0.285, cor -0.4321072 
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_overlap_with_proms.pdf")
 ggplot(promoverlap, aes(x = celltype, y = promoverlap)) + geom_boxplot() +
@@ -517,36 +659,110 @@ ggplot(promoverlap, aes(x = celltype, y = promoverlap)) + geom_boxplot() +
 ggplot(w, aes(x = Age, y = mean, colour = celltype)) + geom_point() +
   geom_smooth(method=lm, se=T, fullrange=TRUE) + scale_colour_brewer(8, palette="Dark2") + 
   labs(fill="") + theme_classic() +
-  ylab("Bases") + xlab("Age (Years)") +
+  ylab("Number") + xlab("Age (Years)") +
   ggtitle("Median DMV Promoter Number by Age") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
 ggplot(numproms, aes(x = celltype, y = median)) + geom_boxplot() +
   theme_classic() +
   labs(fill="") +
-  ylab("Bases") + xlab("") +
+  ylab("Number") + xlab("") +
   ggtitle("Median DMV Promoter Number") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 ggplot(numproms, aes(x = celltype, y = mean)) + geom_boxplot() +
   theme_classic() +
   labs(fill="") +
-  ylab("Bases") + xlab("") +
+  ylab("Number") + xlab("") +
   ggtitle("Mean DMV Promoter Number") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 dev.off()
 
 
+## transcription factor genes in our DMVs?
+
+library(PWMEnrich.Hsapiens.background)
+tfs = unlist(lapply(MotifDb.Hsap, function(x) x$name))
+tfs = tfs[-grep("UW",tfs)]
+
+not = tfs[!tfs %in% geneMap$Symbol]
+not = na.omit(not[-grep("::", not, fixed=T)])
+
+nomatch = c("SMCR7L","DUX4","MYF","MZF1_1-4","MZF1_5-13","RORA_1","RORA_2","MIZF","EWSR1-FLI1","ZNF238",
+            "ZNF306","POU5F1P1","BHLHB2","BHLHB3","CART1","RAXL1","TRP53","TRP73","ZNF435","HNF1B")
+nomatch[which(nomatch %in% geneMap$Symbol)]      
+nomatch[which(nomatch %in% good)]      
+
+tfs = unique(c(tfs[tfs %in% geneMap$Symbol], c("HINFP1","RBM8B"), unique(unlist(strsplit(not[grep("::", not, fixed=T)], "::", fixed=T)))))
+tfs = geneMap[which(geneMap$Symbol %in% tfs),] # 830 genes
+
+oo = lapply(dmvs, function(p) findOverlaps(p,makeGRangesFromDataFrame(tfs)))
+hits = lapply(oo, function(x) data.frame(tfs = length(unique(subjectHits(x))), dmvs = length(unique(queryHits(x)))))
+hits = do.call(rbind, Map(cbind, hits, id = as.list(names(dmvs)), num.dmvs = as.list(elementNROWS(dmvs))))
+hits$celltype = ifelse(hits$id %in% pd$Data.ID, pd[match(hits$id, pd$Data.ID),"Cell.Type"], "Prenatal")
+hits$DMV.perc = round(hits$dmvs / hits$num.dmvs * 100,1)
+hits$TF.perc = round(hits$tfs / nrow(tfs) * 100,1)
+write.csv(hits, quote=F,file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_tfsgenes_Overlap.csv")
+
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_tfsgenes_Overlap.pdf")
+ggplot(reshape2::melt(hits)[grep("perc", reshape2::melt(hits)$variable),], aes(x = celltype, y = value)) + geom_boxplot() +
+  theme_classic() + facet_grid( ~ variable) +
+  labs(fill="") +
+  ylab("Percent") + 
+  xlab("") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ggtitle("Percent Genes and DMVs Overlapping") +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+dev.off()
+
+
+## Enrichment in transcription factor genes
+
+geneuniverse = na.omit(unique(geneMap$gencodeID))
+sets = na.omit(unique(tfs$gencodeID))
+inDMV = lapply(dmvGene, function(x) na.omit(unique(x$nearestID)))
+outDMV = lapply(inDMV, function(x) geneuniverse[!(geneuniverse %in% x)])
+
+DMVenrich = mapply(function(yes, no) {
+  DMV_OVERLAP = c( sum( yes %in% sets),sum(!(yes %in% sets)))
+  NOT_DMV_OVERLAP= c(sum(no %in% sets), sum(!(no %in% sets)))
+  enrich_table = cbind(DMV_OVERLAP, NOT_DMV_OVERLAP)
+  res = fisher.test(enrich_table)
+  dat=c(res$p.value, res$estimate)
+  names(dat) <- c("P.Value","Odds.Ratio")
+  return(dat)
+}, inDMV, outDMV, SIMPLIFY =F)
+DMVenrich = do.call(rbind, Map(cbind, lapply(DMVenrich, function(y) data.frame(P.Value = y["P.Value"], Odds.Ratio = y["Odds.Ratio"])),
+                               id = as.list(names(DMVenrich))))
+DMVenrich$celltype = ifelse(DMVenrich$id %in% pd$Data.ID, pd[match(DMVenrich$id, pd$Data.ID),"Cell.Type"], "Prenatal")
+DMVenrich$FDR = p.adjust(DMVenrich$P.Value, method = "fdr")
+DMVenrich$celltype = factor(DMVenrich$celltype, levels = c("Prenatal", "Neuron", "Glia"))
+write.csv(DMVenrich,file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_tfsgenes_enrichment.csv",quote=F)
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_tfsgenes_Enrichment.pdf", height = 4, width = 8.5)
+ggplot(DMVenrich[DMVenrich$FDR<=0.05,], aes(x = celltype, y = Odds.Ratio)) + geom_boxplot() +
+  theme_classic() +
+  labs(fill="") +
+  ylab("Odds Ratio") + ylim(0,15) +
+  geom_hline(yintercept=1, linetype="dotted") +
+  xlab("") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ggtitle("Fisher Test for TF Genes in DMVs (FDR<0.05)") +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+dev.off()
+
+
+
 ## Identify the regions that are getting smaller or larger over age
 
-dmvDMRdt = Map(cbind, dmvDMRdt, tog2 = lapply(dmvDMR, function(d) paste(d$All, d$Prenatal, d$Postnatal, d$Neurons, d$Glia, sep = ":")))
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/dmvs_annotated.rda")
+dmvDMRdt = Map(cbind, lapply(dmvDMR, data.table), tog2 = lapply(dmvDMR, function(d) paste(d$All, d$Prenatal, d$Postnatal, d$Neurons, d$Glia, sep = ":")))
 lapply(dmvDMRdt, function(x) x[,length(unique(regionID)),by="tog2"])
 
 subset = do.call(rbind, Map(cbind, lapply(dmvDMRdt, function(x) data.frame(regionID = x$regionID, width = x$width, tog2 = x$tog2)), id = as.list(names(dmvDMRdt))))
-subset[!which(subset$id %in% postnatalpd$Data.ID),"celltype"] = "Prenatal"
-subset[which(subset$id %in% postnatalpd[postnatalpd$Cell.Type=="Neuron","Data.ID"]),"celltype"] = "Neuron"
-subset[which(subset$id %in% postnatalpd[postnatalpd$Cell.Type=="Glia","Data.ID"]),"celltype"] = "Glia"
+subset$celltype = ifelse(subset$id %in% pd$Data.ID, pd[match(subset$id, pd$Data.ID),"Cell.Type"], "Prenatal")
 subset = unique(subset)
 w = subset[which(subset$celltype %in% c("Neuron", "Glia")),]
 w = cbind(w, Age = postnatalpd[match(w$id, postnatalpd$Data.ID), "Age"])
@@ -608,181 +824,116 @@ print(g)
 dev.off()
 
 
+## Do same comparison but of shared or absent genes in DMVs
+
+inDMV = lapply(inDMV, as.character)
+inDMV.byCT = list(Prenatal = unique(unlist(inDMV[-which(names(inDMV) %in% pd$Data.ID)])),
+                  Neuron = unique(unlist(inDMV[which(names(inDMV) %in% pd[pd$Cell.Type=="Neuron","Data.ID"])])),
+                  Glia = unique(unlist(inDMV[which(names(inDMV) %in% pd[pd$Cell.Type=="Glia","Data.ID"])])))
+
+elementNROWS(inDMV.byCT)
+# Prenatal   Neuron     Glia 
+#    16320     3556     2735 
+
+CTcomps = list(PnotN = inDMV.byCT$Prenatal[-which(inDMV.byCT$Prenatal %in% inDMV.byCT$Neuron)],
+               NnotP = inDMV.byCT$Neuron[-which(inDMV.byCT$Neuron %in% inDMV.byCT$Prenatal)],
+               sharedPN = inDMV.byCT$Prenatal[which(inDMV.byCT$Prenatal %in% inDMV.byCT$Neuron)],
+               PnotG = inDMV.byCT$Prenatal[-which(inDMV.byCT$Prenatal %in% inDMV.byCT$Glia)],
+               GnotP = inDMV.byCT$Glia[-which(inDMV.byCT$Glia %in% inDMV.byCT$Prenatal)],
+               sharedPG = inDMV.byCT$Prenatal[which(inDMV.byCT$Prenatal %in% inDMV.byCT$Glia)],
+               GnotN = inDMV.byCT$Glia[-which(inDMV.byCT$Glia %in% inDMV.byCT$Neuron)],
+               NnotG = inDMV.byCT$Neuron[-which(inDMV.byCT$Neuron %in% inDMV.byCT$Glia)],
+               sharedGN = inDMV.byCT$Glia[which(inDMV.byCT$Glia %in% inDMV.byCT$Neuron)],
+               allshared = Reduce(intersect, inDMV.byCT))
+elementNROWS(CTcomps)
+#PnotN     NnotP  sharedPN     PnotG     GnotP  sharedPG     GnotN     NnotG 
+#12940       176      3380     13635        50      2685       618      1439 
+#sharedGN allshared 
+#    2117      2105 
+
+inDMV.byAge = list(infant = unique(unlist(inDMV[which(names(inDMV) %in% pd[pd$Cell.Type=="Neuron" & pd$Age<1,"Data.ID"])])),
+                   child = unique(unlist(inDMV[which(names(inDMV) %in% pd[pd$Cell.Type=="Neuron" & pd$Age>1 & pd$Age<=12,"Data.ID"])])), 
+                   teen = unique(unlist(inDMV[which(names(inDMV) %in% pd[pd$Cell.Type=="Neuron" & pd$Age>12 & pd$Age<=17,"Data.ID"])])),
+                   adult = unique(unlist(inDMV[which(names(inDMV) %in% pd[pd$Cell.Type=="Neuron" & pd$Age>17,"Data.ID"])])))
+elementNROWS(inDMV.byAge)
+#infant  child   teen  adult 
+#  2576   2782   2825   2906 
+
+Agecomps = list(InotC = inDMV.byAge$infant[-which(inDMV.byAge$infant %in% inDMV.byAge$child)],
+                CnotI = inDMV.byAge$child[-which(inDMV.byAge$child %in% inDMV.byAge$infant)],
+                sharedIC = inDMV.byAge$infant[which(inDMV.byAge$infant %in% inDMV.byAge$child)],
+                InotT = inDMV.byAge$infant[-which(inDMV.byAge$infant %in% inDMV.byAge$teen)],
+                TnotI = inDMV.byAge$teen[-which(inDMV.byAge$teen %in% inDMV.byAge$infant)],
+                sharedIT = inDMV.byAge$infant[which(inDMV.byAge$infant %in% inDMV.byAge$teen)],
+                InotA = inDMV.byAge$infant[-which(inDMV.byAge$infant %in% inDMV.byAge$adult)],
+                AnotI = inDMV.byAge$adult[-which(inDMV.byAge$adult %in% inDMV.byAge$infant)],
+                sharedIA = inDMV.byAge$infant[which(inDMV.byAge$infant %in% inDMV.byAge$adult)],
+                CnotT = inDMV.byAge$child[-which(inDMV.byAge$child %in% inDMV.byAge$teen)],
+                TnotC = inDMV.byAge$teen[-which(inDMV.byAge$teen %in% inDMV.byAge$child)],
+                sharedCT = inDMV.byAge$child[which(inDMV.byAge$child %in% inDMV.byAge$teen)],
+                CnotA = inDMV.byAge$child[-which(inDMV.byAge$child %in% inDMV.byAge$adult)],
+                AnotC = inDMV.byAge$adult[-which(inDMV.byAge$adult %in% inDMV.byAge$child)],
+                sharedCA = inDMV.byAge$child[which(inDMV.byAge$child %in% inDMV.byAge$adult)],
+                TnotA = inDMV.byAge$teen[-which(inDMV.byAge$teen %in% inDMV.byAge$adult)],
+                AnotT = inDMV.byAge$adult[-which(inDMV.byAge$adult %in% inDMV.byAge$teen)],
+                sharedTA = inDMV.byAge$teen[which(inDMV.byAge$teen %in% inDMV.byAge$adult)])
+elementNROWS(Agecomps)
+#   InotC    CnotI sharedIC    InotT    TnotI sharedIT    InotA    AnotI 
+#     373      579     2203      368      617     2208      356      686 
+#sharedIA    CnotT    TnotC sharedCT    CnotA    AnotC sharedCA    TnotA 
+#    2220      285      328     2497      284      408     2498      234 
+#AnotT sharedTA 
+#  315     2591 
+
+
 ## Gene ontology of genes in different categories
 
-subset = do.call(rbind, Map(cbind, lapply(dmvDMRdt, function(x) data.frame(regionID = x$regionID, EntrezID = x$EntrezID, tog2 = x$tog2)),
-                            id = as.list(names(dmvDMRdt))))
-subset[-which(subset$id %in% postnatalpd$Data.ID),"celltype"] = "Prenatal"
-subset[which(subset$id %in% postnatalpd[postnatalpd$Cell.Type=="Neuron","Data.ID"]),"celltype"] = "Neuron"
-subset[which(subset$id %in% postnatalpd[postnatalpd$Cell.Type=="Glia","Data.ID"]),"celltype"] = "Glia"
-subset = unique(subset)
-subset = split(subset, subset$tog2)
-subset = lapply(subset, function(x) split(x$EntrezID, x$celltype))
-subset = lapply(subset, function(x) lapply(x, function(y) na.omit(unique(as.character(y)))))
-subset = lapply(subset, function(x) lapply(x, function(y) y[which(y!="NoGeneOverlap")]))
+entrez = list(CellType = lapply(CTcomps, function(x) na.omit(unique(geneMap[which(geneMap$gencodeID %in% x),"EntrezID"]))),
+              Age = lapply(Agecomps, function(x) na.omit(unique(geneMap[which(geneMap$gencodeID %in% x),"EntrezID"]))))
+
 
 # Compare the enriched terms between 7 groups
-# KEGG
-compareKegg = lapply(subset, function(x) compareCluster(x, fun="enrichKEGG", qvalueCutoff = 0.05, pvalueCutoff = 0.05))
-compareKegg.collapsed = compareCluster(unlist(subset, recursive = F), fun="enrichKEGG", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
-# Biological Process
-compareBP = lapply(subset, function(x) compareCluster(x, fun="enrichGO", ont = "BP", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05))
-compareBP.collapsed = compareCluster(unlist(subset, recursive = F), fun="enrichGO", ont = "BP", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
-# Molecular Function
-compareMF = lapply(subset, function(x) compareCluster(x, fun="enrichGO",  ont = "MF", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05))
-compareMF.collapsed = compareCluster(unlist(subset, recursive = F), fun="enrichGO",  ont = "MF", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
-# Cellular Component
-compareCC = lapply(subset, function(x) compareCluster(x, fun="enrichGO",  ont = "CC", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05))
-compareCC.collapsed = compareCluster(unlist(subset, recursive = F), fun="enrichGO",  ont = "CC", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
-# Disease Ontology
-compareDO = lapply(subset, function(x) compareCluster(x, fun="enrichDO",  ont = "DO", qvalueCutoff = 0.05, pvalueCutoff = 0.05))
-compareDO.collapsed = compareCluster(unlist(subset, recursive = F), fun="enrichDO",  ont = "DO", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+
+compareKegg = lapply(entrez, function(x) compareCluster(x, fun="enrichKEGG", qvalueCutoff = 0.05, pvalueCutoff = 0.05))
+compareBP = lapply(entrez, function(x) compareCluster(x, fun="enrichGO", ont = "BP", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05))
+compareMF = lapply(entrez, function(x) compareCluster(x, fun="enrichGO",  ont = "MF", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05))
+compareCC = lapply(entrez, function(x) compareCluster(x, fun="enrichGO",  ont = "CC", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05))
+compareDO = lapply(entrez, function(x) compareCluster(x, fun="enrichDO",  ont = "DO", qvalueCutoff = 0.05, pvalueCutoff = 0.05))
 
 # save object
-save(compareKegg.collapsed, compareBP.collapsed, compareMF.collapsed, compareCC.collapsed, compareDO.collapsed,
-     file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_KEGG_GO_DO_objects.rda")
+save(compareKegg, compareBP, compareMF, compareCC, compareDO, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_KEGG_GO_DO_objects.rda")
 
 # plot compared results
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_KEGG_GO_DO_plots.pdf", height = 80, width = 24)
-plot(compareKegg.collapsed, colorBy="p.adjust", showCategory = 1000, title= "KEGG Pathway Enrichment")
-plot(compareMF.collapsed, colorBy="p.adjust", showCategory = 1000, title= "Molecular Function GO Enrichment")
-plot(compareCC.collapsed, colorBy="p.adjust", showCategory = 1000, title= "Cellular Compartment GO Enrichment")
-plot(compareDO.collapsed, colorBy="p.adjust", showCategory = 1000, title= "Disease Ontology Enrichment")
-dev.off()
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_BP_plot.pdf", height = 275, width = 24)
-plot(compareBP.collapsed, colorBy="p.adjust", showCategory = 1500, title= "Biological Process GO Enrichment")
+lapply(compareKegg, function(x) plot(x, colorBy="p.adjust", showCategory = 1000, title= "KEGG Pathway Enrichment"))
+lapply(compareBP, function(x) plot(x, colorBy="p.adjust", showCategory = 1500, title= "Biological Process GO Enrichment"))
+lapply(compareMF, function(x) plot(x, colorBy="p.adjust", showCategory = 1000, title= "Molecular Function GO Enrichment"))
+lapply(compareCC, function(x) plot(x, colorBy="p.adjust", showCategory = 1000, title= "Cellular Compartment GO Enrichment"))
+lapply(compareDO, plot(x, colorBy="p.adjust", showCategory = 1000, title= "Disease Ontology Enrichment"))
 dev.off()
 
 
-#### association with H3K27me3, H3K9me and other states
+## What's the relationship between heterochromatin spreading and TFs in hypo-DMRs? 
 
-gr <- granges(BSobj)
-cl = clusterMaker( chr = as.character(seqnames(gr)), 
-                   pos = start(gr),   maxGap = 1000)
-gr.clusters = split(gr, cl)
-gr.clusters = unlist(range(gr.clusters))
-
-# load roadmap states
-
-load("/dcl01/lieber/ajaffe/PublicData/EpigenomeRoadmap/ChromHMM/chromHMM_15state_coverageDF.rda")
-dat = read.delim("/dcl01/lieber/ajaffe/PublicData/EpigenomeRoadmap/ChromHMM/jul2013.roadmapData.qc - Consolidated_EpigenomeIDs_summary_Table.tsv",
-                 as.is=TRUE)
-colnames(dat)[2] = "EID"
-dat = dat[dat$EID != "",]
-
-# split out DMRs per background
-
-dmvList = do.call(rbind, Map(cbind, lapply(dmvDMRdt, function(x) data.frame(x[,1:5], regionID = x$regionID, tog2 = x$tog2)), id = as.list(names(dmvDMRdt))))
-dmvList[-which(dmvList$id %in% postnatalpd$Data.ID),"celltype"] = "Prenatal"
-dmvList[which(dmvList$id %in% postnatalpd[postnatalpd$Cell.Type=="Neuron","Data.ID"]),"celltype"] = "Neuron"
-dmvList[which(dmvList$id %in% postnatalpd[postnatalpd$Cell.Type=="Glia","Data.ID"]),"celltype"] = "Glia"
-dmvList = unique(dmvList)
-dmvList = unlist(lapply(split(dmvList, dmvList$tog2), function(x) split(x, x$celltype)), recursive = F)
-dmvList = lapply(dmvList, makeGRangesFromDataFrame, keep=TRUE)
-dmvList = GRangesList(lapply(dmvList, reduce))
-
-bgWithDmv = endoapply(dmvList, function(x) {
-  x = granges(x)
-  m = c(x, gr.clusters)
-  d = disjoin(m)
-  d$inDMV = countOverlaps(d,x) > 0
-  return(d)
-})
+## Roadmap state in different groups of DMV genes? Compare to parent DMV roadmap state in different groups
 
 
-#### split by chromosome 
-DMVsByChr = lapply(bgWithDmv, function(x) split(x, seqnames(x)))
 
-## autosomal
-DMVs_bpOverlapByChr = lapply(DMVsByChr, function(x) mapply(function(regByChr, stateByChr) {
-  cat(".")
-  inDMV = regByChr[regByChr$inDMV]
-  outDMV = regByChr[!regByChr$inDMV]
-  
-  enr = stateByChr[ranges(inDMV),]
-  bg = stateByChr[ranges(outDMV),]
-  
-  list(enrTab = sapply(enr, table),
-       bgTab  = sapply(bg, table))
-}, x[paste0("chr",1:22)], stateCovDf, SIMPLIFY=FALSE))
+## Which ones are TFs, and what are they doing in terms of our TF analysis? 
 
-## states
-DMVs_bpOverlapEnr = lapply(DMVs_bpOverlapByChr, function(x) sapply(x, "[", "enrTab"))
-bpOverlapArray = lapply(DMVs_bpOverlapEnr, function(x) array(unlist(x), dim = c(nrow(x[[1]]), ncol(x[[1]]), length(x))))
-DMVs_enrTab = lapply(bpOverlapArray, function(x) apply(x, 1:2, sum))
-for (i in 1:length(DMVs_enrTab)) {
-dimnames(DMVs_enrTab[[i]]) = list(rownames(DMVs_bpOverlapEnr[[i]][[1]]), colnames(DMVs_bpOverlapEnr[[i]][[1]]))
-}
-
-# states in rest of genome	
-DMVs_bpOverlapBg = lapply(DMVs_bpOverlapByChr, function(x) sapply(x, "[", "bgTab"))
-bpOverlapArray = lapply(DMVs_bpOverlapBg, function(x) array(unlist(x), dim = c(nrow(x[[1]]), ncol(x[[1]]), length(x))))
-DMVs_bgTab = lapply(bpOverlapArray, function(y) apply(y, 1:2, function(x) sum(as.numeric(x))))
-for (i in 1:length(DMVs_bgTab)) {
-dimnames(DMVs_bgTab[[i]]) = list(rownames(DMVs_bpOverlapBg[[i]][[1]]), colnames(DMVs_bpOverlapBg[[i]][[1]]))
-}
-
-# take ratio
-DMVs_statTab = mapply(function(enr,bg) as.data.frame(t(prop.table(enr,2) / prop.table(bg,2))), DMVs_enrTab, DMVs_bgTab, SIMPLIFY = F)
-DMVs_statTab = Map(cbind, DMVs_statTab, Sample = lapply(DMVs_statTab, function(x) dat$Standardized.Epigenome.name[match(rownames(x), dat$EID)]))
-DMVs_statTab = lapply(DMVs_statTab, function(x) x[,c(16,1:15)])
-names(DMVs_statTab) = c("A:Pr:Po:N:G-Glia","A:Pr:Po:N:G-Neuron","A:Pr:Po:N:G-Prenatal",":::N:-Glia",":::N:-Neuron",":::N:-Prenatal","::::G-Glia",
-                        "::::G-Neuron","::::G-Prenatal","::::-Glia","::::-Neuron","::::-Prenatal","::Po:N:G-Glia","::Po:N:G-Neuron","::Po:N:G-Prenatal",
-                        ":Pr::N:-Glia",":Pr::N:-Neuron",":Pr::N:-Prenatal",":Pr:::G-Glia",":Pr:::G-Neuron",":Pr:::G-Prenatal",":Pr:::-Glia",
-                        ":Pr:::-Neuron",":Pr:::-Prenatal",":Pr:Po:N:G-Glia",":Pr:Po:N:G-Neuron",":Pr:Po:N:G-Prenatal",":Pr::N:G-Neuron")
-save(DMVs_statTab, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_chromHMM_15state_enrichment.rda")
-
-dlpfcStats = do.call(rbind, lapply(DMVs_statTab, function(x) x["E073",-1]))
-rownames(dlpfcStats) = names(DMVs_statTab)
-dlpfcStats = t(signif(dlpfcStats,3))
-
-tmpList = lapply(DMVs_statTab, function(x) vector("list", nrow(x)))
-for (j in 1:length(tmpList)) {
-for(i in 1:nrow(DMVs_statTab[[j]])) {
-  tmp =  do.call(rbind, lapply(DMVs_statTab, function(x) x[i,-1]))
-  rownames(tmp) = names(DMVs_statTab)
-  tmpList[[j]][[i]] = t(signif(tmp,3)) / dlpfcStats
-  }
-  names(tmpList[[j]]) = rownames(DMVs_statTab[[j]])
-}
+oo = lapply(dmvs, function(p) findOverlaps(p,makeGRangesFromDataFrame(tfs)))
+hits = lapply(oo, function(x) data.frame(tfs = length(unique(subjectHits(x))), dmvs = length(unique(queryHits(x)))))
+hits = do.call(rbind, Map(cbind, hits, id = as.list(names(dmvs)), num.dmvs = as.list(elementNROWS(dmvs))))
+hits$celltype = ifelse(hits$id %in% pd$Data.ID, pd[match(hits$id, pd$Data.ID),"Cell.Type"], "Prenatal")
+hits$DMV.perc = round(hits$dmvs / hits$num.dmvs * 100,1)
+hits$TF.perc = round(hits$tfs / nrow(tfs) * 100,1)
+write.csv(hits, quote=F,file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_tfsgenes_Overlap.csv")
 
 
-### relative enrichments
-
-VsDlpfc = vector("list",length(tmpList))
-VsDlpfc = lapply(VsDlpfc, function(x) vector("list", ncol(tmpList[[1]][[1]])))
-for (i in 1:length(tmpList)) {
-  for (j in 1:ncol(tmpList[[1]][[i]])) {
-    VsDlpfc[[i]][[j]] = sapply(tmpList[[i]], function(x) x[,j])
-  }
-  names(VsDlpfc[[i]]) = colnames(tmpList[[i]][[j]])
-}
-names(VsDlpfc) = names(tmpList)
 
 
-## general
-gen.enr = lapply(VsDlpfc, function(x) lapply(x, function(y) rowSums(y > 2)))
-gen.enr = lapply(gen.enr, function(x) do.call(rbind, x))
-gen.depl = lapply(VsDlpfc, function(x) lapply(x, function(y) rowSums(y < 0.5)))
-gen.depl = lapply(gen.depl, function(x) do.call(rbind, x))
 
-## brain
-brain.enr = lapply(VsDlpfc, function(x) lapply(x, function(y) rowMeans(y[,grep("Brain", dat$Standardized.Epigenome.name)] > 2)))
-brain.enr = lapply(brain.enr, function(x) do.call(rbind, x))
-brain.depl = lapply(VsDlpfc, function(x) lapply(x, function(y) rowMeans(y[,grep("Brain", dat$Standardized.Epigenome.name)] < 0.5)))
-brain.depl = lapply(brain.depl, function(x) do.call(rbind, x))
 
-## not brain
-notbrain.enr = lapply(VsDlpfc, function(x) lapply(x, function(y) rowMeans(y[,-grep("Brain", dat$Standardized.Epigenome.name)] > 2)))
-notbrain.enr = lapply(notbrain.enr, function(x) do.call(rbind, x))
-notbrain.depl = lapply(VsDlpfc, function(x) lapply(x, function(y) rowMeans(y[,-grep("Brain", dat$Standardized.Epigenome.name)] < 0.5)))
-notbrain.depl = lapply(notbrain.depl, function(x) do.call(rbind, x))
 
-atriumStats = do.call(rbind, lapply(DMVs_statTab, function(x) x["E104",-1]))
-rownames(atriumStats) = names(DMVs_statTab)
-atriumStats = t(signif(atriumStats,3))
 
-## other tissues
-otherList = list(cellDMRs_statTab, ageDMRs_statTab, intDMRs_statTab)
-ageVsCell = ageDMRs_statTab[,-1] / cellDMRs_statTab[,-1]
-cor(t(ageVsCell),t(ageVsCell["E073",]))
+

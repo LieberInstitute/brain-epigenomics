@@ -1,0 +1,309 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf470
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww21640\viewh13060\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 ## Is this independent of centromeres, telomeres?\
+\
+10.8 - 39.2% of PMDs identified overlap with a gap from the genome table browser\
+\
+## How many are identified?\
+\
+num = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_number.csv")\
+\
+CREs/figures/PMD_number_byAge_postnatal.pdf\
+\
+"Neuron" vs "Age": num\
+#t = 1.9391, df = 22, p-value = 0.06543, cor 0.3820491\
+\
+"Glia","Age": num\
+#t = -0.367, df = 6, p-value = 0.7262, cor -0.1481735 \
+\
+range(num$num[which(num$celltype=="Prenatal")]) # 237 548\
+range(num$num[which(num$celltype=="Neuron")]) # 245 404\
+range(num$num[which(num$celltype=="Glia")]) # 471 1013\
+\
+t.test(num[num$celltype=="Prenatal","num"],num[num$celltype!="Prenatal","num"])\
+#t = -0.82741, df = 47.026, p-value = 0.4122\
+#mean of x mean of y \
+#403.0500  433.7812 \
+\
+\
+## how long are these regions?\
+\
+widths = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_widths.csv")\
+range(widths$median[which(widths$celltype=="Prenatal")]) # 130562.5 138176.0\
+range(widths$median[which(widths$celltype=="Neuron")]) # 136230 158870\
+range(widths$median[which(widths$celltype=="Glia")]) # 147797 164566\
+\
+\
+CREs/figures/PMD_widths.pdf\
+\
+cor.test(x = w[which(w$celltype=="Neuron"),"Age"], y = w[which(w$celltype=="Neuron"),"median"])\
+#t = 3.3111, df = 22, p-value = 0.003177, cor 0.576706 \
+\
+cor.test(x = w[which(w$celltype=="Glia"),"Age"], y = w[which(w$celltype=="Glia"),"median"])\
+#t = 0.52835, df = 6, p-value = 0.6162, cor 0.2108469 \
+\
+t.test(widths[widths$celltype=="Prenatal","median"],widths[widths$celltype!="Prenatal","median"])\
+#t = -13.579, df = 40.241, p-value < 2.2e-16\
+#  mean of x mean of y \
+#134570.0  151129.1 \
+t.test(widths[widths$celltype=="Prenatal","median"],widths[widths$celltype=="Neuron","median"])\
+#t = -12.42, df = 30.638, p-value = 1.709e-13\
+#  mean of x mean of y \
+#134570.0  149289.4 \
+t.test(widths[widths$celltype=="Glia","median"],widths[widths$celltype=="Neuron","median"])\
+#t = 2.9443, df = 10.524, p-value = 0.01394\
+#  mean of x mean of y \
+#156648.0  149289.4 \
+t.test(widths[widths$celltype=="Glia","median"],widths[widths$celltype=="Prenatal","median"])\
+#t = 9.6256, df = 7.5883, p-value = 1.615e-05\
+#  mean of x mean of y \
+#156648    134570 \
+\
+\
+## What proportion of the genome do they cover?\
+\
+CREs/figures/PMD_percentGenome.pdf\
+\
+cor.test(x = w[which(w$celltype=="Neuron"),"Age"], y = w[which(w$celltype=="Neuron"),"percent"])\
+#t = 0.90213, df = 22, p-value = 0.3768, cor 0.1888729 \
+\
+cor.test(x = w[which(w$celltype=="Glia"),"Age"], y = w[which(w$celltype=="Glia"),"percent"])\
+#t = -0.1845, df = 6, p-value = 0.8597, cor -0.07510928 \
+\
+genome = data.table(read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_genomeCoverage.csv"))\
+\
+genome[,mean(percent), by = c("celltype")]\
+#celltype     V1\
+#1:     Glia 4.8425\
+#2:   Neuron 2.2350\
+#3: Prenatal 2.4855\
+\
+t.test(genome[genome$celltype=="Prenatal","percent"],genome[genome$celltype!="Prenatal","percent"])\
+#t = -1.5283, df = 38.828, p-value = 0.1345\
+#  mean of x mean of y \
+#2.485500  2.886875 \
+t.test(genome[genome$celltype=="Prenatal","percent"],genome[genome$celltype=="Neuron","percent"])\
+#t = 1.9502, df = 41.617, p-value = 0.05791\
+#  mean of x mean of y \
+#2.4855    2.2350 \
+t.test(genome[genome$celltype=="Glia","percent"],genome[genome$celltype=="Neuron","percent"])\
+#t = 4.9806, df = 7.4389, p-value = 0.001338\
+#  mean of x mean of y \
+#4.8425    2.2350 \
+t.test(genome[genome$celltype=="Prenatal","percent"],genome[genome$celltype=="Glia","percent"])\
+#t = -4.5021, df = 7.4387, p-value = 0.002397\
+#  mean of x mean of y \
+#2.4855    4.8425 \
+\
+\
+### How much of the PMDs overlap?\
+\
+# Master list of all bases in each setting\
+pmaster = reduce(do.call(getMethod(c, "GenomicRanges"), GRangesList(pmds))) # 2874 total\
+c(mean=mean(width(pmaster)), median=median(width(pmaster)), sd=sd(width(pmaster)), min=min(width(pmaster)), max=max(width(pmaster)))/1000\
+#       mean     median         sd        min        max \
+#kb:239.7188   160.3775   343.9905   100.0460 11078.1050 \
+\
+\
+## regions that are shared by samples\
+\
+elementNROWS(all)\
+#All  Prenatal Postnatal   Neurons      Glia \
+# 17       137        98       189       277 \
+\
+round((unlist(lapply(all, function(x) sum(width(x))))/sum(width(pmaster))*100),2)\
+#      All  Prenatal Postnatal   Neurons      Glia \
+#     0.38     40.30     38.12     39.95     44.95 \
+# 38-45% of total bases in the PMD state are shared by all in a cell type but not across all\
+\
+shared = read.table(file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_shared_byGroup.csv")\
+\
+CREs/figures/percent_shared_PMDs_perSample_byBaseCoverage.pdf\
+\
+data.table(shared)[,mean(percent), by = c("group")]\
+#group        V1\
+#1:       All  3.464231\
+#2:  Prenatal 65.415000\
+#3: Postnatal 68.937187\
+#4:   Neurons 76.955417\
+#5:      Glia 65.411250\
+\
+\
+## How much of prenatal PMDs is represented in each postnatal sample?\
+\
+prenpercP = read.table(file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_sharedWithPrenatal.csv")\
+\
+CREs/figures/percent_shared_withPrenatal_PMD_perSample_byBaseCoverage.pdf\
+\
+cor.test(x = prenpercP[prenpercP$CellType=="Neuron",]$Age, y = prenpercP[prenpercP$CellType=="Neuron",]$perc)\
+#t = -6.2697, df = 22, p-value = 2.61e-06, cor -0.800725 \
+cor.test(x = prenpercP[prenpercP$CellType=="Glia",,]$Age, y = prenpercP[prenpercP$CellType=="Glia",,]$perc)\
+#t = -0.23369, df = 6, p-value = 0.823 cor -0.09497095 \
+\
+data.table(prenpercP)[,mean(perc),by="CellType"]\
+#   CellType       V1\
+#1:     Glia  57.4575\
+#2:   Neuron  42.6600\
+#3: Prenatal 100.0000\
+(57.4575-42.6600)/57.4575 # 25.8%\
+\
+\
+## how many fall within CpG islands?\
+\
+CREs/figures/PMD_overlap_with_CpG-Islands.pdf\
+\
+cgi = data.table(read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_CpG_Island_Overlap.csv"))\
+cgi[,mean(islands), by = "celltype"]\
+#   celltype       V1\
+#1:     Glia 18.34250\
+#2:   Neuron 40.67375\
+#3: Prenatal 39.84250\
+mean(cgi$islands) # 36.91846\
+\
+\
+# How about Repetitive Elements?\
+\
+CREs/figures/PMD_overlap_with_repeats.pdf\
+\
+repeats = data.table(read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_repeats_Overlap.csv"))\
+repeats[repeats %in% c("No repeats","SINE","Low_complexity","Simple_repeat","LINE"),mean(perc), by = c("repeats","celltype")]\
+#          repeats celltype       V1\
+#1:           SINE     Glia 14.06125\
+#2:  Simple_repeat     Glia 14.04250\
+#3: Low_complexity     Glia 14.04000\
+#4:           LINE     Glia 14.06250\
+#5:           SINE   Neuron 13.86250\
+#6:           LINE   Neuron 13.86250\
+#7: Low_complexity   Neuron 13.85167\
+#8:  Simple_repeat   Neuron 13.86250\
+#9:           LINE Prenatal 14.14800\
+#10: Low_complexity Prenatal 14.12450\
+#11:           SINE Prenatal 14.14450\
+#12:  Simple_repeat Prenatal 14.13850\
+\
+\
+## Overlap with DMRs\
+\
+CREs/figures/PMD_overlap_with_dmr.pdf\
+\
+dmr = data.table(read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_dmr_Overlap.csv"))\
+models = data.table(read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_dmr_Overlap_byModel.csv"))\
+models[,list(Gr1=mean(Gr1),Gr2=mean(Gr2),Gr3=mean(Gr3),Gr4=mean(Gr4),Gr5=mean(Gr5),Gr6=mean(Gr6)),by="celltype"]\
+#   celltype     Gr1      Gr2      Gr3       Gr4      Gr5      Gr6\
+#1:     Glia 2.03875 1.555000 0.500000 0.0800000 0.246250 1.210000\
+#2:   Neuron 4.03000 1.874583 5.615417 0.7433333 2.807917 2.345833\
+#3: Prenatal 2.80850 3.211500 1.211500 0.0540000 0.766000 1.937500\
+\
+\
+# Are DMRs overlapping PMDs at the PMD periphery, or uniformly distributed?\
+\
+CREs/figures/DMR_position_in_PMD.pdf\
+\
+\
+## Overlap with Lister samples\
+\
+# Total bases\
+overlap = read.csv(file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_Lister_Overlap.csv")\
+\
+CREs/figures/PMD_Lister_Overlap.pdf\
+\
+## Do PMDs correspond to CpH deserts?\
+\
+desertstats = read.csv(file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_CpH_desert_Overlap.csv")\
+\
+\
+## association of existing PMDs with genes\
+\
+geneoverlap = read.csv(file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_Gene_Overlap.csv")\
+\
+numgenes = read.csv(file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_numgenes.csv")\
+\
+cor.test(x = w[which(w$celltype=="Neuron"),"Age"], y = w[which(w$celltype=="Neuron"),"mean"])\
+#t = -2.0171, df = 22, p-value = 0.05605, cor -0.3950679 \
+\
+cor.test(x = w[which(w$celltype=="Glia"),"Age"], y = w[which(w$celltype=="Glia"),"mean"])\
+#t = 0.69919, df = 6, p-value = 0.5106, cor 0.2744798 \
+\
+CREs/figures/PMD_overlap_with_Genes.pdf\
+\
+promoverlap = read.csv(file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_prom_Overlap.csv")\
+\
+numproms = read.csv(file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_numproms.csv")\
+\
+\
+## Overlap with promoters\
+\
+cor.test(x = w[which(w$celltype=="Neuron"),"Age"], y = w[which(w$celltype=="Neuron"),"mean"])\
+#t = -2.4206, df = 22, p-value = 0.0242, cor -0.4586086 \
+\
+cor.test(x = w[which(w$celltype=="Glia"),"Age"], y = w[which(w$celltype=="Glia"),"mean"])\
+#t = 0.46925, df = 6, p-value = 0.6555, cor o.1881491 \
+\
+CREs/figures/PMD_overlap_with_proms.pdf\
+\
+\
+## SHSY5Y PMD genes in ours?\
+\
+hits = read.csv(file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_SHSY5Ygenes_Overlap.csv")\
+\
+CREs/figures/PMD_SHSY5Ygenes_Overlap.pdf\
+\
+\
+## Enrichment in SHSY5Y PMD genes\
+\
+PMDenrich = read.csv(file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_SHSY5Ygenes_enrichment.csv")\
+\
+CREs/figures/PMD_SHSY5Ygenes_Enrichment.pdf\
+\
+\
+## Identify the regions that are getting smaller or larger over age\
+\
+#no:no:no:no:no                                           9243\
+#no:no:no:Neurons:no                                      1906\
+#no:no:no:no:Glia                                         1363\
+#All:Prenatal:Postnatal:Neurons:Glia                       494\
+#no:Prenatal:no:no:Glia                                    391\
+#no:Prenatal:Postnatal:Neurons:Glia                        267\
+#no:no:Postnatal:Neurons:Glia                              128\
+#no:Prenatal:no:no:no                                       89\
+\
+\
+sharedcorr = read.csv(file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/shared_PMDs_correlation.csv")\
+\
+CREs/figures/shared_PMD_width_correlation.pdf\
+\
+\
+## Do same comparison but of shared or absent genes in PMDs\
+\
+elementNROWS(inPMD.byCT)\
+# Prenatal   Neuron     Glia \
+#     8373     3744     6200 \
+\
+# PnotN     NnotP  sharedPN     PnotG     GnotP  sharedPG     GnotN     NnotG \
+#  6248      1619      2125      4358      2185      4015      4442      1986 \
+# sharedGN allshared \
+#     1758      1576 \
+\
+elementNROWS(inPMD.byAge)\
+# infant  child   teen  adult \
+#   1896   2465   2561   2894 \
+\
+# InotC    CnotI sharedIC    InotT    TnotI sharedIT    InotA    AnotI \
+#   595     1164     1301      566     1231     1330      585     1583 \
+# sharedIA    CnotT    TnotC sharedCT    CnotA    AnotC sharedCA    TnotA \
+#     1311      357      453     2108      264      693     2201      241 \
+# AnotT sharedTA \
+#   574     2320 \
+\
+\
+## Gene ontology of genes in different categories\
+\
+CREs/figures/PMD_KEGG_GO_DO_plots.pdf\
+\
+## Plot example PMDs\
+\
+CREs/figures/PMDsegments_visualized_CG_100kb.pdf}
