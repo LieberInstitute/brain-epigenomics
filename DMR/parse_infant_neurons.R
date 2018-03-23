@@ -8,14 +8,23 @@ library(clusterProfiler)
 require(org.Hs.eg.db)
 
 
-## load dmrs
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/bumps_bsseqSmooth_Neuron_interaction_250_perm.Rdata")
-sigInt = bumps$table[bumps$table$fwer < 0.05,]
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/bumps_bsseqSmooth_Neuron_age_250_perm.Rdata")
-sigAge = bumps$table[bumps$table$fwer < 0.05,]
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/bumps_bsseqSmooth_Neuron_cell_250_perm.Rdata")
-sigCT = bumps$table[bumps$table$fwer < 0.05,]
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda")
+# ## load dmrs
+# load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/bumps_bsseqSmooth_Neuron_interaction_250_perm.Rdata")
+# sigInt = bumps$table[bumps$table$fwer < 0.05,]
+# load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/bumps_bsseqSmooth_Neuron_age_250_perm.Rdata")
+# sigAge = bumps$table[bumps$table$fwer < 0.05,]
+# load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/bumps_bsseqSmooth_Neuron_cell_250_perm.Rdata")
+# sigCT = bumps$table[bumps$table$fwer < 0.05,]
+# load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda")
+
+### add k-means labels
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda", verbose = T)
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/rda/limma_Neuron_CpGs_minCov_3_ageInfo_dmrs.Rdata")
+sigInt = dmrs
+sigAge = makeGRangesFromDataFrame(DMR$Age[DMR$Age$sig=="FWER < 0.05",], keep=TRUE)
+sigCT = makeGRangesFromDataFrame(DMR$CellType[DMR$CellType$sig=="FWER < 0.05",], keep=TRUE)
+sigAge = sigAge[!duplicated(sigAge)]
+sigCT = sigCT[!duplicated(sigCT)]
 
 ## load data
 load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/BSobj_bsseqSmooth_Neuron_minCov_3.Rdata')
