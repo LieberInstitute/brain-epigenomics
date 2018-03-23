@@ -6,6 +6,8 @@ library('devtools')
 library('RColorBrewer')
 library('shiny')
 
+enableBookmarking(store = "url")
+
 load('meth_df_withSymbol.Rdata')
 load('meth_data.Rdata')
 load('tf_data.Rdata')

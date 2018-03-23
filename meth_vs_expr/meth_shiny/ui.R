@@ -52,7 +52,8 @@ shinyUI(navbarPage(
         verbatimTextOutput('meth_info', placeholder = TRUE),
         downloadLink('meth_info_download', 'Download to an Rdata file'),
         uiOutput('tf_info'),
-        helpText('For more information check the documentation tab.')
+        helpText('For more information check the documentation tab.'),
+        bookmarkButton(id = 'bookmark1')
     ),
     tabPanel('methylation summary',
         p('This table summarizes the methylation and expression associations that you have filtered in the previous tab.'),
