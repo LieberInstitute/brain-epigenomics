@@ -197,6 +197,11 @@ shinyServer(function(input, output, session) {
         }
     )
 
+    setBookmarkExclude(c("bookmark1", 'meth_summary_cell_clicked', 'meth_summary_rows_all'))
+    observeEvent(input$bookmark1, {
+        session$doBookmark()
+    })
+
     ## Reproducibility info
     output$session_info <- renderPrint(session_info(), width = 120)
 })

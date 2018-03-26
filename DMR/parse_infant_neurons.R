@@ -41,10 +41,11 @@ postmeth <- getMeth(BSobj, type = 'raw')
 
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/BSobj_bsseqSmooth_Neuron_minCov_3_prenatal.Rdata")
 prenmeth = getMeth(BSobj, type = 'raw')
+prenmeth = as.matrix(prenmeth)
 prenpd = pData(BSobj)
 
-meth = dataframe(postmeth, prenmeth)
-meth = as.matrix(meth)
+# merge DNAm
+meth = cbind(postmeth, prenmeth)
 
 ### interaction
 topIndsInt = mapply(function(s,e) s:e, sigInt$indexStart, sigInt$indexEnd)
@@ -85,6 +86,22 @@ pheatmap(sampleDistMatrixAge,clustering_distance_rows=sampleDistsAge, clustering
          col=colors, main = "129 Age DMRs - Euclidean Distance")
 pheatmap(sampleDistMatrixCT, clustering_distance_rows=sampleDistsCT, clustering_distance_cols=sampleDistsCT,
          col=colors, main = "11179 Cell Type DMRs - Euclidean Distance")
+dev.off()
+
+## split by age interaction dmr type
+meanMethIntList = split(as.data.frame(meanMethInt), sigInt$k6cluster)
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/figures/heatmap_euclidean_dist_3models_includingFetals_kmeans.pdf",width=10,height=10)
+for(i in seq(along=meanMethIntList)) {
+		
+	sampleDistsInt <- dist(t(meanMethIntList[[i]]))
+	sampleDistMatrixInt <- as.matrix(sampleDistsInt)
+	colnames(sampleDistMatrixInt) = rownames(sampleDistMatrixInt) = c(paste(
+			postpd$Cell.Type, postpd$Age.Bin, postpd$Working.Num, sep = ":"), paste0("Prenatal:",prenpd$Brain.Num))
+	pheatmap(sampleDistMatrixInt,clustering_distance_rows=sampleDistsInt, 
+		clustering_distance_cols=sampleDistsInt,
+         col=colors, main = paste(nrow(meanMethIntList[[i]]), "Interaction DMRs - Euclidean Distance - k =",
+			names(meanMethIntList)[i]))
+}
 dev.off()
 
 ## which DMRs show the association?
