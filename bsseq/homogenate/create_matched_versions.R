@@ -22,6 +22,7 @@ if (!is.null(opt$help)) {
 ## For testing
 if(FALSE) {
     opt <- list(chr = 'chr21', type = 'CpG')
+    opt <- list(chr = 'all', type = 'CpG')
 }
 
 
@@ -66,10 +67,11 @@ stopifnot(opt$type %in% c('CpG', 'CpH'))
 
 
 message(paste(Sys.time(), 'Combining results for the chrs'))
-patt <- paste('_cleaned_CX_Homogenate_filtered_', ifelse(opt$type == 'CpG', 'CpG', 'CpH'), '.Rdata')
+patt <- paste0('_cleaned_CX_Homogenate_filtered_', ifelse(opt$type == 'CpG', 'CpG', 'CpH'), '.Rdata')
 
 files <- dir('rda', pattern = patt, full.names = TRUE)
-
+message(paste(Sys.time(), 'files to combine:'))
+print(files)
 
 
 
@@ -95,10 +97,12 @@ if(!file.exists(f_filt)) {
 
 if(opt$type == 'CpG') {
     ## nonCG next
+    message(paste(Sys.time(), 'loading our GR'))
+    load('../lister/gr_all_highCov.Rdata', verbose = TRUE)
+    
     message(paste(Sys.time(), 'filtering nonCpGs'))
-
-    gr <- rowRanges(BSobj)
-
+    
+    
     Cov <- M <- matrix(0, nrow = length(gr_all_highCov), ncol = ncol(BSobj))
     colnames(Cov) <- colnames(M) <- colnames(BSobj)
 
@@ -111,8 +115,11 @@ if(opt$type == 'CpG') {
     save(BSobj, file = 'allChrs_matched_cleaned_CX_Homogenate_nonCG_highCov.Rdata')
 } else {
     ## CG next
+    message(paste(Sys.time(), 'loading our GR'))
+    load('../lister/gr_cps_minCov_3.Rdata', verbose = TRUE)
+    
     message(paste(Sys.time(), 'filtering CpGs'))
-    load('allChrs_cleaned_CX_Homogenate.Rdata', verbose = TRUE)
+
     Cov <- M <- matrix(0, nrow = length(gr_cpgs), ncol = ncol(BSobj))
     colnames(Cov) <- colnames(M) <- colnames(BSobj)
 
