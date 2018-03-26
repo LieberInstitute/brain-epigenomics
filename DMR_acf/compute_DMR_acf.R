@@ -73,7 +73,8 @@ if(opt$context != 'all') {
     rowRanges(DMR)$c_context <- gr$c_context[subjectHits(ov)]
     rowRanges(DMR)$trinucleotide_context <- gr$trinucleotide_context[subjectHits(ov)]
     
-    
+    ## Sort by chr position
+    DMR <- sort(DMR, ignore.strand = TRUE)
     
     print('Final number of bases of interest -- after merging')
     print(nrow(DMR))
