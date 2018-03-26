@@ -626,23 +626,23 @@ pvalC[which(pvalC$motifID=="MECP2" & pvalC$FDR<=0.05),]
 #none
 
 splscoreC = split(scoreC, scoreC$Context)
-tstat = lapply(splscoreC, function(x) list(CTCF.byDir = t.test(x[which(x$motifID=="CTCF" & x$Direction=="Positive Association"),"value"],
+stat = lapply(splscoreC, function(x) list(CTCF.byDir = wilcox.test(x[which(x$motifID=="CTCF" & x$Direction=="Positive Association"),"value"],
                                                           x[which(x$motifID=="CTCF" & x$Direction=="Negative Association"),"value"]),
-                                           CTCF.CinExon.PosDir = t.test(x[which(x$motifID=="CTCF" & x$Direction=="Positive Association" & x$C_in_exon=="C in Exon"),"value"],
+                                           CTCF.CinExon.PosDir = wilcox.test(x[which(x$motifID=="CTCF" & x$Direction=="Positive Association" & x$C_in_exon=="C in Exon"),"value"],
                                                                    x[which(x$motifID=="CTCF" & x$Direction=="Positive Association" & x$C_in_exon=="C not in Exon"),"value"]),
-                                           CTCF.CinExon.NegDir = t.test(x[which(x$motifID=="CTCF" & x$Direction=="Negative Association" & x$C_in_exon=="C in Exon"),"value"],
+                                           CTCF.CinExon.NegDir = wilcox.test(x[which(x$motifID=="CTCF" & x$Direction=="Negative Association" & x$C_in_exon=="C in Exon"),"value"],
                                                                    x[which(x$motifID=="CTCF" & x$Direction=="Negative Association" & x$C_in_exon=="C not in Exon"),"value"]),
-                                           MECP2.byDir = t.test(x[which(x$motifID=="MECP2" & x$Direction=="Positive Association"),"value"],
+                                           MECP2.byDir = wilcox.test(x[which(x$motifID=="MECP2" & x$Direction=="Positive Association"),"value"],
                                                           x[which(x$motifID=="MECP2" & x$Direction=="Negative Association"),"value"]),
-                                           MECP2.CinExon.PosDir = t.test(x[which(x$motifID=="MECP2" & x$Direction=="Positive Association" & x$C_in_exon=="C in Exon"),"value"],
+                                           MECP2.CinExon.PosDir = wilcox.test(x[which(x$motifID=="MECP2" & x$Direction=="Positive Association" & x$C_in_exon=="C in Exon"),"value"],
                                                                    x[which(x$motifID=="MECP2" & x$Direction=="Positive Association" & x$C_in_exon=="C not in Exon"),"value"]),
-                                           MECP2.CinExon.NegDir = t.test(x[which(x$motifID=="MECP2" & x$Direction=="Negative Association" & x$C_in_exon=="C in Exon"),"value"],
+                                           MECP2.CinExon.NegDir = wilcox.test(x[which(x$motifID=="MECP2" & x$Direction=="Negative Association" & x$C_in_exon=="C in Exon"),"value"],
                                                                    x[which(x$motifID=="MECP2" & x$Direction=="Negative Association" & x$C_in_exon=="C not in Exon"),"value"])))
-df = data.frame(pval = unlist(lapply(tstat, function(x) lapply(x, function(y) y$p.value))),
-                tstat = unlist(lapply(tstat, function(x) lapply(x, function(y) y$statistic))),
-                comp = gsub(".t","",names(unlist(lapply(tstat, function(x) lapply(x, function(y) y$statistic))))))
+df = data.frame(pval = unlist(lapply(stat, function(x) lapply(x, function(y) y$p.value))),
+                stat = unlist(lapply(stat, function(x) lapply(x, function(y) y$statistic))),
+                comp = gsub(".W","",names(unlist(lapply(stat, function(x) lapply(x, function(y) y$statistic))))))
 ## CpG.byDir: negatively regulating Cs are more likely to have a CTCF binding site 
-#                                    pval       tstat
+#                                    pval       stat
 #CpG.CTCF.byDir              8.730035e-05 -3.92504098
 #CpG.CTCF.CinExon.PosDir     6.092987e-01  0.51131125
 #CpG.CTCF.CinExon.NegDir     7.824377e-01 -0.27615464
@@ -657,22 +657,22 @@ df = data.frame(pval = unlist(lapply(tstat, function(x) lapply(x, function(y) y$
 #nonCpG.MECP2.CinExon.NegDir 4.409520e-01  0.77102946
 
 splscore = split(score, scoreC$Context)
-tstat = lapply(splscore, function(x) list(CTCF.byDir = t.test(x[which(x$motifID=="CTCF" & x$Direction=="Positive Association"),"value"],
+stat = lapply(splscore, function(x) list(CTCF.byDir = wilcox.test(x[which(x$motifID=="CTCF" & x$Direction=="Positive Association"),"value"],
                                                           x[which(x$motifID=="CTCF" & x$Direction=="Negative Association"),"value"]),
-                                          CTCF.CinExon.PosDir = t.test(x[which(x$motifID=="CTCF" & x$Direction=="Positive Association" & x$C_in_exon=="C in Exon"),"value"],
+                                          CTCF.CinExon.PosDir = wilcox.test(x[which(x$motifID=="CTCF" & x$Direction=="Positive Association" & x$C_in_exon=="C in Exon"),"value"],
                                                                    x[which(x$motifID=="CTCF" & x$Direction=="Positive Association" & x$C_in_exon=="C not in Exon"),"value"]),
-                                          CTCF.CinExon.NegDir = t.test(x[which(x$motifID=="CTCF" & x$Direction=="Negative Association" & x$C_in_exon=="C in Exon"),"value"],
+                                          CTCF.CinExon.NegDir = wilcox.test(x[which(x$motifID=="CTCF" & x$Direction=="Negative Association" & x$C_in_exon=="C in Exon"),"value"],
                                                                    x[which(x$motifID=="CTCF" & x$Direction=="Negative Association" & x$C_in_exon=="C not in Exon"),"value"]),
-                                          MECP2.byDir = t.test(x[which(x$motifID=="MECP2" & x$Direction=="Positive Association"),"value"],
+                                          MECP2.byDir = wilcox.test(x[which(x$motifID=="MECP2" & x$Direction=="Positive Association"),"value"],
                                                           x[which(x$motifID=="MECP2" & x$Direction=="Negative Association"),"value"]),
-                                          MECP2.CinExon.PosDir = t.test(x[which(x$motifID=="MECP2" & x$Direction=="Positive Association" & x$C_in_exon=="C in Exon"),"value"],
+                                          MECP2.CinExon.PosDir = wilcox.test(x[which(x$motifID=="MECP2" & x$Direction=="Positive Association" & x$C_in_exon=="C in Exon"),"value"],
                                                                    x[which(x$motifID=="MECP2" & x$Direction=="Positive Association" & x$C_in_exon=="C not in Exon"),"value"]),
-                                          MECP2.CinExon.NegDir = t.test(x[which(x$motifID=="MECP2" & x$Direction=="Negative Association" & x$C_in_exon=="C in Exon"),"value"],
+                                          MECP2.CinExon.NegDir = wilcox.test(x[which(x$motifID=="MECP2" & x$Direction=="Negative Association" & x$C_in_exon=="C in Exon"),"value"],
                                                                    x[which(x$motifID=="MECP2" & x$Direction=="Negative Association" & x$C_in_exon=="C not in Exon"),"value"])))
-df = data.frame(pval = unlist(lapply(tstat, function(x) lapply(x, function(y) y$p.value))),
-                 tstat = unlist(lapply(tstat, function(x) lapply(x, function(y) y$statistic))),
-                comp = gsub(".t","",names(unlist(lapply(tstat, function(x) lapply(x, function(y) y$statistic))))))
-#                                    pval      tstat                        comp
+df = data.frame(pval = unlist(lapply(stat, function(x) lapply(x, function(y) y$p.value))),
+                 stat = unlist(lapply(stat, function(x) lapply(x, function(y) y$statistic))),
+                comp = gsub(".W","",names(unlist(lapply(stat, function(x) lapply(x, function(y) y$statistic))))))
+#                                    pval      stat                        comp
 #CpG.CTCF.byDir              8.787657e-03  2.6239977              CpG.CTCF.byDir
 #CpG.CTCF.CinExon.PosDir     4.746548e-03 -2.8309108     CpG.CTCF.CinExon.PosDir
 #CpG.CTCF.CinExon.NegDir     1.415374e-01  1.4704656     CpG.CTCF.CinExon.NegDir
@@ -693,5 +693,92 @@ scoreC[which(scoreC$motifID %in% c("MECP2","CTCF")),]
 pval[which(pval$motifID %in% c("MECP2","CTCF")),]
 pvalC[which(pvalC$motifID %in% c("MECP2","CTCF")),]
 
+
+## Try making 2x2 contingency tables about scores > or <= 2
+
+stat = list(CTCF.byDir.CpG = data.frame(c(nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="CTCF" & splscoreC$CpG$Direction=="Positive Association" & splscoreC$CpG$value>2),]),
+                                          nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="CTCF" & splscoreC$CpG$Direction=="Positive Association" & splscoreC$CpG$value<=2),])),
+                                        c(nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="CTCF" & splscoreC$CpG$Direction=="Negative Association" & splscoreC$CpG$value>2),]),
+                                          nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="CTCF" & splscoreC$CpG$Direction=="Negative Association" & splscoreC$CpG$value<=2),]))),
+            CTCF.byDir.CpH = data.frame(c(nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="CTCF" & splscoreC$nonCpG$Direction=="Positive Association" & splscoreC$nonCpG$value>2),]),
+                                          nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="CTCF" & splscoreC$nonCpG$Direction=="Positive Association" & splscoreC$nonCpG$value<=2),])),
+                                        c(nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="CTCF" & splscoreC$nonCpG$Direction=="Negative Association" & splscoreC$nonCpG$value>2),]),
+                                          nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="CTCF" & splscoreC$nonCpG$Direction=="Negative Association" & splscoreC$nonCpG$value<=2),]))),
+            CTCF.CinExon.PosDir.CpG = data.frame(c(nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="CTCF" & splscoreC$CpG$Direction=="Positive Association" & splscoreC$CpG$C_in_exon=="C in Exon" & splscoreC$CpG$value>2),]),
+                                                   nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="CTCF" & splscoreC$CpG$Direction=="Positive Association" & splscoreC$CpG$C_in_exon=="C in Exon" & splscoreC$CpG$value<=2),])),
+                                                 c(nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="CTCF" & splscoreC$CpG$Direction=="Positive Association" & splscoreC$CpG$C_in_exon=="C not in Exon" & splscoreC$CpG$value>2),]),
+                                                   nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="CTCF" & splscoreC$CpG$Direction=="Positive Association" & splscoreC$CpG$C_in_exon=="C not in Exon" & splscoreC$CpG$value<=2),]))),
+            CTCF.CinExon.PosDir.CpH = data.frame(c(nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="CTCF" & splscoreC$nonCpG$Direction=="Positive Association" & splscoreC$nonCpG$C_in_exon=="C in Exon" & splscoreC$nonCpG$value>2),]),
+                                                   nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="CTCF" & splscoreC$nonCpG$Direction=="Positive Association" & splscoreC$nonCpG$C_in_exon=="C in Exon" & splscoreC$nonCpG$value<=2),])),
+                                                 c(nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="CTCF" & splscoreC$nonCpG$Direction=="Positive Association" & splscoreC$nonCpG$C_in_exon=="C not in Exon" & splscoreC$nonCpG$value>2),]),
+                                                   nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="CTCF" & splscoreC$nonCpG$Direction=="Positive Association" & splscoreC$nonCpG$C_in_exon=="C not in Exon" & splscoreC$nonCpG$value<=2),]))),
+            CTCF.CinExon.NegDir.CpG = data.frame(c(nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="CTCF" & splscoreC$CpG$Direction=="Negative Association" & splscoreC$CpG$C_in_exon=="C in Exon" & splscoreC$CpG$value>2),]),
+                                                   nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="CTCF" & splscoreC$CpG$Direction=="Negative Association" & splscoreC$CpG$C_in_exon=="C in Exon" & splscoreC$CpG$value<=2),])),
+                                                 c(nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="CTCF" & splscoreC$CpG$Direction=="Negative Association" & splscoreC$CpG$C_in_exon=="C not in Exon" & splscoreC$CpG$value>2),]),
+                                                   nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="CTCF" & splscoreC$CpG$Direction=="Negative Association" & splscoreC$CpG$C_in_exon=="C not in Exon" & splscoreC$CpG$value<=2),]))),
+            CTCF.CinExon.NegDir.CpH = data.frame(c(nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="CTCF" & splscoreC$nonCpG$Direction=="Negative Association" & splscoreC$nonCpG$C_in_exon=="C in Exon" & splscoreC$nonCpG$value>2),]),
+                                                   nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="CTCF" & splscoreC$nonCpG$Direction=="Negative Association" & splscoreC$nonCpG$C_in_exon=="C in Exon" & splscoreC$nonCpG$value<=2),])),
+                                                 c(nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="CTCF" & splscoreC$nonCpG$Direction=="Negative Association" & splscoreC$nonCpG$C_in_exon=="C not in Exon" & splscoreC$nonCpG$value>2),]),
+                                                   nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="CTCF" & splscoreC$nonCpG$Direction=="Negative Association" & splscoreC$nonCpG$C_in_exon=="C not in Exon" & splscoreC$nonCpG$value<=2),]))),
+            CTCF.CinExon.Dir.CpG = data.frame(c(nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="CTCF" & splscoreC$CpG$Direction=="Positive Association" & splscoreC$CpG$C_in_exon=="C in Exon" & splscoreC$CpG$value>2),]),
+                                                   nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="CTCF" & splscoreC$CpG$Direction=="Positive Association" & splscoreC$CpG$C_in_exon=="C in Exon" & splscoreC$CpG$value<=2),])),
+                                                 c(nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="CTCF" & splscoreC$CpG$Direction=="Negative Association" & splscoreC$CpG$C_in_exon=="C in Exon" & splscoreC$CpG$value>2),]),
+                                                   nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="CTCF" & splscoreC$CpG$Direction=="Negative Association" & splscoreC$CpG$C_in_exon=="C in Exon" & splscoreC$CpG$value<=2),]))),
+            CTCF.CinExon.Dir.CpH = data.frame(c(nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="CTCF" & splscoreC$nonCpG$Direction=="Positive Association" & splscoreC$nonCpG$C_in_exon=="C in Exon" & splscoreC$nonCpG$value>2),]),
+                                                   nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="CTCF" & splscoreC$nonCpG$Direction=="Positive Association" & splscoreC$nonCpG$C_in_exon=="C in Exon" & splscoreC$nonCpG$value<=2),])),
+                                                 c(nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="CTCF" & splscoreC$nonCpG$Direction=="Negative Association" & splscoreC$nonCpG$C_in_exon=="C in Exon" & splscoreC$nonCpG$value>2),]),
+                                                   nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="CTCF" & splscoreC$nonCpG$Direction=="Negative Association" & splscoreC$nonCpG$C_in_exon=="C in Exon" & splscoreC$nonCpG$value<=2),]))),
+            CTCF.CNOTinExon.Dir.CpG = data.frame(c(nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="CTCF" & splscoreC$CpG$Direction=="Positive Association" & splscoreC$CpG$C_in_exon=="C not in Exon" & splscoreC$CpG$value>2),]),
+                                                   nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="CTCF" & splscoreC$CpG$Direction=="Positive Association" & splscoreC$CpG$C_in_exon=="C not in Exon" & splscoreC$CpG$value<=2),])),
+                                                 c(nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="CTCF" & splscoreC$CpG$Direction=="Negative Association" & splscoreC$CpG$C_in_exon=="C not in Exon" & splscoreC$CpG$value>2),]),
+                                                   nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="CTCF" & splscoreC$CpG$Direction=="Negative Association" & splscoreC$CpG$C_in_exon=="C not in Exon" & splscoreC$CpG$value<=2),]))),
+            CTCF.CNOTinExon.Dir.CpH = data.frame(c(nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="CTCF" & splscoreC$nonCpG$Direction=="Positive Association" & splscoreC$nonCpG$C_in_exon=="C not in Exon" & splscoreC$nonCpG$value>2),]),
+                                                   nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="CTCF" & splscoreC$nonCpG$Direction=="Positive Association" & splscoreC$nonCpG$C_in_exon=="C not in Exon" & splscoreC$nonCpG$value<=2),])),
+                                                 c(nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="CTCF" & splscoreC$nonCpG$Direction=="Negative Association" & splscoreC$nonCpG$C_in_exon=="C not in Exon" & splscoreC$nonCpG$value>2),]),
+                                                   nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="CTCF" & splscoreC$nonCpG$Direction=="Negative Association" & splscoreC$nonCpG$C_in_exon=="C not in Exon" & splscoreC$nonCpG$value<=2),]))),
+            MECP2.byDir.CpG = data.frame(c(nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="MECP2" & splscoreC$CpG$Direction=="Positive Association" & splscoreC$CpG$value>2),]),
+                                           nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="MECP2" & splscoreC$CpG$Direction=="Positive Association" & splscoreC$CpG$value<=2),])),
+                                         c(nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="MECP2" & splscoreC$CpG$Direction=="Negative Association" & splscoreC$CpG$value>2),]),
+                                           nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="MECP2" & splscoreC$CpG$Direction=="Negative Association" & splscoreC$CpG$value<=2),]))),
+            MECP2.byDir.CpH = data.frame(c(nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="MECP2" & splscoreC$nonCpG$Direction=="Positive Association" & splscoreC$nonCpG$value>2),]),
+                                           nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="MECP2" & splscoreC$nonCpG$Direction=="Positive Association" & splscoreC$nonCpG$value<=2),])),
+                                         c(nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="MECP2" & splscoreC$nonCpG$Direction=="Negative Association" & splscoreC$nonCpG$value>2),]),
+                                           nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="MECP2" & splscoreC$nonCpG$Direction=="Negative Association" & splscoreC$nonCpG$value<=2),]))),
+            MECP2.CinExon.PosDir.CpG = data.frame(c(nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="MECP2" & splscoreC$CpG$Direction=="Positive Association" & splscoreC$CpG$C_in_exon=="C in Exon" & splscoreC$CpG$value>2),]),
+                                                    nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="MECP2" & splscoreC$CpG$Direction=="Positive Association" & splscoreC$CpG$C_in_exon=="C in Exon" & splscoreC$CpG$value<=2),])),
+                                                  c(nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="MECP2" & splscoreC$CpG$Direction=="Positive Association" & splscoreC$CpG$C_in_exon=="C not in Exon" & splscoreC$CpG$value>2),]),
+                                                    nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="MECP2" & splscoreC$CpG$Direction=="Positive Association" & splscoreC$CpG$C_in_exon=="C not in Exon" & splscoreC$CpG$value<=2),]))),
+            MECP2.CinExon.PosDir.CpH = data.frame(c(nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="MECP2" & splscoreC$nonCpG$Direction=="Positive Association" & splscoreC$nonCpG$C_in_exon=="C in Exon" & splscoreC$nonCpG$value>2),]),
+                                                    nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="MECP2" & splscoreC$nonCpG$Direction=="Positive Association" & splscoreC$nonCpG$C_in_exon=="C in Exon" & splscoreC$nonCpG$value<=2),])),
+                                                  c(nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="MECP2" & splscoreC$nonCpG$Direction=="Positive Association" & splscoreC$nonCpG$C_in_exon=="C not in Exon" & splscoreC$nonCpG$value>2),]),
+                                                    nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="MECP2" & splscoreC$nonCpG$Direction=="Positive Association" & splscoreC$nonCpG$C_in_exon=="C not in Exon" & splscoreC$nonCpG$value<=2),]))),
+            MECP2.CinExon.NegDir.CpG = data.frame(c(nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="MECP2" & splscoreC$CpG$Direction=="Negative Association" & splscoreC$CpG$C_in_exon=="C in Exon" & splscoreC$CpG$value>2),]),
+                                                    nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="MECP2" & splscoreC$CpG$Direction=="Negative Association" & splscoreC$CpG$C_in_exon=="C in Exon" & splscoreC$CpG$value<=2),])),
+                                                  c(nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="MECP2" & splscoreC$CpG$Direction=="Negative Association" & splscoreC$CpG$C_in_exon=="C not in Exon" & splscoreC$CpG$value>2),]),
+                                                    nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="MECP2" & splscoreC$CpG$Direction=="Negative Association" & splscoreC$CpG$C_in_exon=="C not in Exon" & splscoreC$CpG$value<=2),]))),
+            MECP2.CinExon.NegDir.CpH = data.frame(c(nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="MECP2" & splscoreC$nonCpG$Direction=="Negative Association" & splscoreC$nonCpG$C_in_exon=="C in Exon" & splscoreC$nonCpG$value>2),]),
+                                                    nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="MECP2" & splscoreC$nonCpG$Direction=="Negative Association" & splscoreC$nonCpG$C_in_exon=="C in Exon" & splscoreC$nonCpG$value<=2),])),
+                                                  c(nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="MECP2" & splscoreC$nonCpG$Direction=="Negative Association" & splscoreC$nonCpG$C_in_exon=="C not in Exon" & splscoreC$nonCpG$value>2),]),
+                                                    nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="MECP2" & splscoreC$nonCpG$Direction=="Negative Association" & splscoreC$nonCpG$C_in_exon=="C not in Exon" & splscoreC$nonCpG$value<=2),]))),
+            MECP2.CinExon.Dir.CpG = data.frame(c(nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="MECP2" & splscoreC$CpG$Direction=="Positive Association" & splscoreC$CpG$C_in_exon=="C in Exon" & splscoreC$CpG$value>2),]),
+                                                nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="MECP2" & splscoreC$CpG$Direction=="Positive Association" & splscoreC$CpG$C_in_exon=="C in Exon" & splscoreC$CpG$value<=2),])),
+                                              c(nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="MECP2" & splscoreC$CpG$Direction=="Negative Association" & splscoreC$CpG$C_in_exon=="C in Exon" & splscoreC$CpG$value>2),]),
+                                                nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="MECP2" & splscoreC$CpG$Direction=="Negative Association" & splscoreC$CpG$C_in_exon=="C in Exon" & splscoreC$CpG$value<=2),]))),
+            MECP2.CinExon.Dir.CpH = data.frame(c(nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="MECP2" & splscoreC$nonCpG$Direction=="Positive Association" & splscoreC$nonCpG$C_in_exon=="C in Exon" & splscoreC$nonCpG$value>2),]),
+                                                nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="MECP2" & splscoreC$nonCpG$Direction=="Positive Association" & splscoreC$nonCpG$C_in_exon=="C in Exon" & splscoreC$nonCpG$value<=2),])),
+                                              c(nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="MECP2" & splscoreC$nonCpG$Direction=="Negative Association" & splscoreC$nonCpG$C_in_exon=="C in Exon" & splscoreC$nonCpG$value>2),]),
+                                                nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="MECP2" & splscoreC$nonCpG$Direction=="Negative Association" & splscoreC$nonCpG$C_in_exon=="C in Exon" & splscoreC$nonCpG$value<=2),]))),
+            MECP2.CNOTinExon.Dir.CpG = data.frame(c(nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="MECP2" & splscoreC$CpG$Direction=="Positive Association" & splscoreC$CpG$C_in_exon=="C not in Exon" & splscoreC$CpG$value>2),]),
+                                                   nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="MECP2" & splscoreC$CpG$Direction=="Positive Association" & splscoreC$CpG$C_in_exon=="C not in Exon" & splscoreC$CpG$value<=2),])),
+                                                 c(nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="MECP2" & splscoreC$CpG$Direction=="Negative Association" & splscoreC$CpG$C_in_exon=="C not in Exon" & splscoreC$CpG$value>2),]),
+                                                   nrow(splscoreC$CpG[which(splscoreC$CpG$motifID=="MECP2" & splscoreC$CpG$Direction=="Negative Association" & splscoreC$CpG$C_in_exon=="C not in Exon" & splscoreC$CpG$value<=2),]))),
+            MECP2.CNOTinExon.Dir.CpH = data.frame(c(nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="MECP2" & splscoreC$nonCpG$Direction=="Positive Association" & splscoreC$nonCpG$C_in_exon=="C not in Exon" & splscoreC$nonCpG$value>2),]),
+                                                   nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="MECP2" & splscoreC$nonCpG$Direction=="Positive Association" & splscoreC$nonCpG$C_in_exon=="C not in Exon" & splscoreC$nonCpG$value<=2),])),
+                                                 c(nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="MECP2" & splscoreC$nonCpG$Direction=="Negative Association" & splscoreC$nonCpG$C_in_exon=="C not in Exon" & splscoreC$nonCpG$value>2),]),
+                                                   nrow(splscoreC$nonCpG[which(splscoreC$nonCpG$motifID=="MECP2" & splscoreC$nonCpG$Direction=="Negative Association" & splscoreC$nonCpG$C_in_exon=="C not in Exon" & splscoreC$nonCpG$value<=2),]))))
+fisher = lapply(stat, fisher.test)
+df = data.frame(comp = names(fisher), Odds.Ratio = unlist(lapply(fisher, function(y) y$estimate)), pval = unlist(lapply(fisher, function(y) y$p.value)))
+df$FDR = p.adjust(df$pval, method = "fdr")
+rownames(df) = NULL
 
 
