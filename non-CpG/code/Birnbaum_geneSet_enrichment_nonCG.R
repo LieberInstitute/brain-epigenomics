@@ -4,15 +4,29 @@ load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/CHneurons_object.r
 
 aej_sets = openxlsx::read.xlsx('/dcl01/lieber/ajaffe/lab/Nicotine/DLPFC/RNAseq/csvs/sets/Supplementary Tables for paper.Birnbaum November 2013.AJP.xlsx')
 
+## create pgc2 loci granges object
+
+pgc = read.delim("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/tableS3_Nature2014_pgc2_loci.txt",as.is=TRUE)
+pgc$chr = ss(pgc$Position..hg19.,":")
+tmp = ss(pgc$Position..hg19.,":",2)
+pgc$start = as.numeric(ss(tmp, "-"))
+pgc$end = as.numeric(ss(tmp, "-",2))
+pgcGR = GRanges(pgc$chr, IRanges(pgc$start,pgc$end))
+
+geneMapgr = makeGRangesFromDataFrame(geneMap, keep.extra.columns = T)
+oo = findOverlaps(pgcGR, geneMapgr)
+PGCgenes = geneMap[subjectHits(oo),]
+
+
 ## Enrichment in dmCH by cell type, age and interaction
 
 geneuniverse = na.omit(unique(CH$EntrezID))
-sigCH = list("CellType" = na.omit(unique(CH[which(CH$padj.CellType<=0.01),"EntrezID"])),
+sigCH = list("CellType" = na.omit(unique(CH[which(CH$padj.CellType<=0.05),"EntrezID"])),
              "Age" = na.omit(unique(CH[which(CH$padj.Age<=0.01),"EntrezID"])), 
-             "Interaction" = na.omit(unique(CH[which(CH$padj.Interaction<=0.01),"EntrezID"])))
+             "Interaction" = na.omit(unique(CH[which(CH$padj.Interaction<=0.05),"EntrezID"])))
 notsigCH = lapply(sigCH, function(x) geneuniverse[!(geneuniverse %in% x)])
 aej_sets_expressed = aej_sets[which(aej_sets$EntrezGene.ID %in% geneuniverse), ] # drop genes that are not present in the test set
-splitSets = split(aej_sets_expressed, aej_sets_expressed$Gene.Set)
+splitSets = c(split(aej_sets_expressed, aej_sets_expressed$Gene.Set), list(PGC2 = unique(PGCgenes$EntrezID)[which(unique(PGCgenes$EntrezID) %in% geneuniverse)]))
 
 CHenrich = mapply(function(sig,notsig) sapply(splitSets, function(x) {
   DE_OVERLAP = c( sum( sig %in% x$EntrezGene.ID),sum(!(sig %in% x$EntrezGene.ID)))
@@ -32,7 +46,7 @@ mapply(function(x,y) write.csv(x,file=paste0("/dcl01/lieber/ajaffe/lab/brain-epi
 ## Enrichment in dmCH in neurons by age only
 
 geneuniverse = na.omit(unique(CHneurons$EntrezID))
-sigCHneurons = na.omit(unique(CHneurons[which(CHneurons$padj<=0.01),"EntrezID"]))
+sigCHneurons = na.omit(unique(CHneurons[which(CHneurons$padj<=0.05),"EntrezID"]))
 notsigCHneurons = geneuniverse[!(geneuniverse %in% sigCHneurons)]
 aej_sets_expressed = aej_sets[which(aej_sets$EntrezGene.ID %in% geneuniverse), ] # drop genes that are not present in the test set
 splitSets = split(aej_sets_expressed, aej_sets_expressed$Gene.Set)

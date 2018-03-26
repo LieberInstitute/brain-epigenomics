@@ -84,13 +84,13 @@ PGCgenes = geneMap[subjectHits(oo),]
 
 ## Enrichment in DMRs by cell type, age and interaction
 
-geneuniverse = unique(geneMap$gencodeID)
-sig = lapply(DMR, function(x) unique(x[which(x$fwer<=0.05),"nearestID"]))
+geneuniverse = unique(geneMap$EntrezID)
+sig = lapply(DMR, function(x) unique(x[which(x$fwer<=0.05),"EntrezID"]))
 notsig = lapply(sig, function(x) geneuniverse[!(geneuniverse %in% x)])
 
 DMRenrichPGC = mapply(function(sig,notsig) {
-  DE_OVERLAP = c( sum( sig %in% PGCgenes$gencodeID),sum(!(sig %in% PGCgenes$gencodeID)))
-  NOT_DE_OVERLAP= c(sum(notsig %in% PGCgenes$gencodeID), sum(!(notsig %in% PGCgenes$gencodeID)))
+  DE_OVERLAP = c( sum( sig %in% PGCgenes$EntrezID),sum(!(sig %in% PGCgenes$EntrezID)))
+  NOT_DE_OVERLAP= c(sum(notsig %in% PGCgenes$EntrezID), sum(!(notsig %in% PGCgenes$EntrezID)))
   enrich_table = cbind(DE_OVERLAP, NOT_DE_OVERLAP)
   res = fisher.test(enrich_table)
   dat=c(res$p.value, res$estimate)
@@ -100,9 +100,9 @@ DMRenrichPGC = mapply(function(sig,notsig) {
 
 data.frame(do.call(rbind, DMRenrichPGC), row.names=names(DMRenrichPGC))
 #                 P.Value Odds.Ratio
-#CellType    3.612019e-08   1.776787
-#Age         2.071183e-02   3.300659
-#Interaction 4.356683e-04   1.898462
+#CellType    1.973096e-06   1.770269
+#Age         5.978461e-03   3.880647
+#Interaction 1.541955e-03   1.816927
 
 
-unique(DMR$Interaction[which(DMR$Interaction$nearestID %in% PGCgenes$gencodeID & DMR$Interaction$distToGene==0),"nearestSymbol"])
+unique(DMR$Interaction[which(DMR$Interaction$nearestID %in% PGCgenes$EntrezID & DMR$Interaction$distToGene==0),"nearestSymbol"])
