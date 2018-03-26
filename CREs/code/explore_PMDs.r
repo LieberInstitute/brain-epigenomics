@@ -198,6 +198,11 @@ t.test(num[num$celltype=="Prenatal","num"],num[num$celltype!="Prenatal","num"])
 #mean of x mean of y 
 #403.0500  433.7812 
 
+t.test(num[num$celltype=="Glia","num"],num[num$celltype!="Glia","num"])
+#t = 4.9442, df = 7.3556, p-value = 0.001444
+#  mean of x mean of y 
+#698.2500  371.7273 
+
 
 ## how long are these regions?
 
@@ -274,6 +279,8 @@ percGenome[which(percGenome$id %in% names(PMDsegments.CGpren)),"celltype"] = "Pr
 percGenome[which(percGenome$id %in% pd[pd$Cell.Type=="Neuron","Data.ID"]),"celltype"] = "Neuron"
 percGenome[which(percGenome$id %in% pd[pd$Cell.Type=="Glia","Data.ID"]),"celltype"] = "Glia"
 write.csv(percGenome, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_genomeCoverage.csv")
+
+range(percGenome[which(percGenome$celltype=="Neuron"),"percent"]) # 1.47 3.30
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/PMD_percentGenome.pdf")
 
@@ -401,19 +408,19 @@ prenpercP$CellType = ifelse(prenpercP$Person %in% pd$Data.ID, pd[match(prenpercP
 
 write.table(prenpercP, quote = F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_sharedWithPrenatal.csv")
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/percent_shared_withPrenatal_PMD_perSample_byBaseCoverage.pdf", height = 4)
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/percent_shared_withPrenatal_PMD_perSample_byBaseCoverage.pdf", width = 4,height = 4)
 ggplot(prenpercP[prenpercP$CellType!="Prenatal",], aes(x = CellType, y = perc)) + geom_boxplot() +
   labs(fill="") + theme_classic() +
   ylim(0,100) +
   ylab("Percent") + xlab("") +
-  ggtitle("Percent Bases Shared with Prenatal") +
+  ggtitle("Percent Bases Shared\nwith Prenatal") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 ggplot(prenpercP[prenpercP$CellType!="Prenatal",], aes(x = Age, y = perc, colour = CellType)) + 
   geom_path() + geom_point() + ylim(0,100) +
   theme_classic() + scale_colour_brewer(8, palette="Dark2") +
   ylab("Percent") + xlab("Age") + 
-  ggtitle("Percent Bases Shared with Prenatal") + 
+  ggtitle("Percent Bases Shared\nwith Prenatal") + 
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
 dev.off()
@@ -739,22 +746,24 @@ lister = list(ListerNeuron = reduce(do.call(getMethod(c, "GenomicRanges"), GRang
 
 overlap = lapply(celltype, function(cell) lapply(lister, function(list) c( OurOverlap = round(sum(width(Reduce(intersect, list(cell,list))))/sum(width(cell))*100,1),
        ListerOverlap = round(sum(width(Reduce(intersect, list(cell,list))))/sum(width(list))*100,1))))
-overlap = lapply(overlap, function(x) do.call(rbind, Map(cbind, x, Lister = as.list(names(x)))))
+overlap = lapply(overlap, function(x) do.call(rbind, Map(cbind, lapply(x, function(y) data.frame(OurOverlap = y["OurOverlap"], ListerOverlap = y["ListerOverlap"])),
+                                                         Lister = as.list(names(x)))))
 overlap = do.call(rbind, Map(cbind, overlap, LIBD = as.list(names(celltype))))
-overlap = data.frame(overlap, Comparison = rownames(overlap))
+overlap = reshape2::melt(overlap)
 overlap$LIBD = gsub("LIBD", "", overlap$LIBD)
 overlap$Lister = gsub("ListerN", "n", overlap$Lister)
 overlap$Lister = gsub("ListerG", "g", overlap$Lister)
 overlap$Lister = gsub("ListerP", "p", overlap$Lister)
-overlap$Comparison = gsub("Our", "LIBD ", overlap$Comparison)
-overlap$Comparison = gsub("Lister", "Lister ", overlap$Comparison)
-class(overlap$V1) = "numeric"
+overlap$variable = gsub("Our", "LIBD\n", overlap$variable)
+overlap$variable = gsub("Lister", "Lister\n", overlap$variable)
+colnames(overlap) = c("Lister", "LIBD", "Comparison", "Percent")
+overlap$Lister = factor(overlap$Lister, levels = c("glia","neuron"))
 
 write.csv(overlap, quote=F,file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_Lister_Overlap.csv")
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/PMD_Lister_Overlap.pdf", width = 10)
-ggplot(overlap, aes(x = Comparison, y = V1, fill = Lister)) + 
-  theme_classic() + geom_boxplot() +
+ggplot(overlap, aes(x = Comparison, y = Percent, fill = Lister)) + 
+  theme_classic() + geom_bar(stat = "identity") +
   labs(fill="") + facet_grid(Lister ~ LIBD) +
   ylab("Percent") + ylim(0,100) + xlab("") + 
   scale_fill_brewer(8, palette="Dark2") +
@@ -810,8 +819,8 @@ write.csv(geneoverlap, quote=F,file = "/dcl01/lieber/ajaffe/lab/brain-epigenomic
 numgenes = lapply(pmdDMRdt, function(y) y[,length(unique(nearestID)), by = "regionID"])
 numgenes = do.call(rbind, Map(cbind, lapply(numgenes, function(y) 
   data.frame(mean = mean(y$V1), median = median(y$V1), sd = sd(y$V1), min = min(y$V1), max = max(y$V1))), id = as.list(names(numgenes))))
-numgenes[!which(numgenes$id %in% postnatalpd$Data.ID),"celltype"] = "Prenatal"
-numgenes[which(numgenes$id %in% postnatalpd[postnatalpd$Cell.Type=="Neuron","Data.ID"]),"celltype"] = "Neuron"
+numgenes[-which(numgenes$id %in% postnatalpd$Data.ID),"celltype"] = "Prenatal"
+numgenes$celltype = ifelse(numgenes$id %in% postnatalpd$Data.ID, postnatalpd[match(numgenes$id, postnatalpd$Data.ID),"Cell.Type"],"Prenatal")
 numgenes[which(numgenes$id %in% postnatalpd[postnatalpd$Cell.Type=="Glia","Data.ID"]),"celltype"] = "Glia"
 write.csv(numgenes, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_numgenes.csv")
 
@@ -868,9 +877,9 @@ for (i in 1:length(pmdGene)) {
 
 pmdGenedt = lapply(pmdGene, data.table)
 pmdGenedt = Map(cbind, pmdGenedt, regionID = lapply(pmdGenedt, function(x) paste0(x$seqnames,":",x$start,"-",x$end)))
-promoverlap = lapply(pmdGene, function(y) round(length(unique(as.character(data.frame(y)[which(y$promoters=="promoters"),"regionID"])))/
+promoverlap = lapply(pmdGenedt, function(y) round(length(unique(as.character(data.frame(y)[which(y$promoters=="promoters"),"regionID"])))/
                                                  length(unique(as.character(y$regionID)))*100,2))
-promoverlap = data.frame(promoverlap = unlist(promoverlap), id = names(promoverlap))
+promoverlap = data.frame(promoverlap = unlist(promoverlap), id = numgenes$id)
 promoverlap[!(promoverlap$id %in% postnatalpd$Data.ID),"celltype"] = "Prenatal"
 promoverlap[which(promoverlap$id %in% postnatalpd[which(postnatalpd$Cell.Type=="Neuron"),"Data.ID"]),"celltype"] = "Neuron"
 promoverlap[which(promoverlap$id %in% postnatalpd[which(postnatalpd$Cell.Type=="Glia"),"Data.ID"]),"celltype"] = "Glia"
@@ -878,8 +887,8 @@ write.csv(promoverlap, quote=F,file = "/dcl01/lieber/ajaffe/lab/brain-epigenomic
 
 numproms = lapply(pmdGenedt, function(y) y[promoters=="promoters",length(unique(nearestID)), by = "regionID"])
 numproms = do.call(rbind, Map(cbind, lapply(numproms, function(y) 
-  data.frame(mean = mean(y$V1), median = median(y$V1), sd = sd(y$V1), min = min(y$V1), max = max(y$V1))), id = as.list(names(numproms))))
-numproms[!which(numproms$id %in% postnatalpd$Data.ID),"celltype"] = "Prenatal"
+  data.frame(mean = mean(y$V1), median = median(y$V1), sd = sd(y$V1), min = min(y$V1), max = max(y$V1))), id = as.list(numgenes$id)))
+numproms[-which(numproms$id %in% postnatalpd$Data.ID),"celltype"] = "Prenatal"
 numproms[which(numproms$id %in% postnatalpd[postnatalpd$Cell.Type=="Neuron","Data.ID"]),"celltype"] = "Neuron"
 numproms[which(numproms$id %in% postnatalpd[postnatalpd$Cell.Type=="Glia","Data.ID"]),"celltype"] = "Glia"
 write.csv(numproms, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_numproms.csv")
@@ -908,21 +917,21 @@ ggplot(promoverlap, aes(x = celltype, y = promoverlap)) + geom_boxplot() +
 ggplot(w, aes(x = Age, y = mean, colour = celltype)) + geom_point() +
   geom_smooth(method=lm, se=T, fullrange=TRUE) + scale_colour_brewer(8, palette="Dark2") + 
   labs(fill="") + theme_classic() +
-  ylab("Bases") + xlab("Age (Years)") +
+  ylab("Number") + xlab("Age (Years)") +
   ggtitle("Median PMD Promoter Number by Age") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
 ggplot(numproms, aes(x = celltype, y = median)) + geom_boxplot() +
   theme_classic() +
   labs(fill="") +
-  ylab("Bases") + xlab("") +
+  ylab("Number") + xlab("") +
   ggtitle("Median PMD Promoter Number") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 ggplot(numproms, aes(x = celltype, y = mean)) + geom_boxplot() +
   theme_classic() +
   labs(fill="") +
-  ylab("Bases") + xlab("") +
+  ylab("Number") + xlab("") +
   ggtitle("Mean PMD Promoter Number") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))

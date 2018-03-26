@@ -4,12 +4,15 @@
 \margl1440\margr1440\vieww21640\viewh13060\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\f0\fs24 \cf0 ## Is this independent of centromeres, telomeres?\
-\
+\f0\b\fs24 \cf0 ## Is this independent of centromeres, telomeres?\
+
+\b0 \
 10.8 - 39.2% of PMDs identified overlap with a gap from the genome table browser\
 \
-## How many are identified?\
-\
+
+\b ## How many are identified?\
+
+\b0 \
 num = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_number.csv")\
 \
 CREs/figures/PMD_number_byAge_postnatal.pdf\
@@ -29,9 +32,16 @@ t.test(num[num$celltype=="Prenatal","num"],num[num$celltype!="Prenatal","num"])\
 #mean of x mean of y \
 #403.0500  433.7812 \
 \
+t.test(num[num$celltype=="Glia","num"],num[num$celltype!="Glia","num"])\
+#t = 4.9442, df = 7.3556, p-value = 0.001444\
+#  mean of x mean of y \
+#698.2500  371.7273 \
 \
-## how long are these regions?\
 \
+
+\b ## how long are these regions?\
+
+\b0 \
 widths = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_widths.csv")\
 range(widths$median[which(widths$celltype=="Prenatal")]) # 130562.5 138176.0\
 range(widths$median[which(widths$celltype=="Neuron")]) # 136230 158870\
@@ -81,6 +91,8 @@ genome[,mean(percent), by = c("celltype")]\
 #1:     Glia 4.8425\
 #2:   Neuron 2.2350\
 #3: Prenatal 2.4855\
+\
+range(percGenome[which(percGenome$celltype=="Neuron"),"percent"]) # 1.47 3.30\
 \
 t.test(genome[genome$celltype=="Prenatal","percent"],genome[genome$celltype!="Prenatal","percent"])\
 #t = -1.5283, df = 38.828, p-value = 0.1345\
