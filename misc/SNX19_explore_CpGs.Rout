@@ -1,0 +1,144 @@
+
+R version 3.4.3 Patched (2018-01-20 r74142) -- "Kite-Eating Tree"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+n*** Successfully loaded .Rprofile ***n
+> # qrsh -l bluejay,mem_free=40G,h_vmem=40G
+> library('bsseq')
+Loading required package: BiocGenerics
+Loading required package: parallel
+
+Attaching package: ‘BiocGenerics’
+
+The following objects are masked from ‘package:parallel’:
+
+    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+    clusterExport, clusterMap, parApply, parCapply, parLapply,
+    parLapplyLB, parRapply, parSapply, parSapplyLB
+
+The following objects are masked from ‘package:stats’:
+
+    IQR, mad, sd, var, xtabs
+
+The following objects are masked from ‘package:base’:
+
+    anyDuplicated, append, as.data.frame, cbind, colMeans, colnames,
+    colSums, do.call, duplicated, eval, evalq, Filter, Find, get, grep,
+    grepl, intersect, is.unsorted, lapply, lengths, Map, mapply, match,
+    mget, order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+    rbind, Reduce, rowMeans, rownames, rowSums, sapply, setdiff, sort,
+    table, tapply, union, unique, unsplit, which, which.max, which.min
+
+Loading required package: GenomicRanges
+Loading required package: stats4
+Loading required package: S4Vectors
+
+Attaching package: ‘S4Vectors’
+
+The following object is masked from ‘package:base’:
+
+    expand.grid
+
+Loading required package: IRanges
+Loading required package: GenomeInfoDb
+Loading required package: SummarizedExperiment
+Loading required package: Biobase
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+Loading required package: DelayedArray
+Loading required package: matrixStats
+
+Attaching package: ‘matrixStats’
+
+The following objects are masked from ‘package:Biobase’:
+
+    anyMissing, rowMedians
+
+
+Attaching package: ‘DelayedArray’
+
+The following objects are masked from ‘package:matrixStats’:
+
+    colMaxs, colMins, colRanges, rowMaxs, rowMins, rowRanges
+
+The following object is masked from ‘package:base’:
+
+    apply
+
+> library('bumphunter')
+Loading required package: foreach
+Loading required package: iterators
+Loading required package: locfit
+locfit 1.5-9.1 	 2013-03-22
+> library('devtools')
+> library('RColorBrewer')
+> library('ggplot2')
+> library('EnsDb.Hsapiens.v75')
+Loading required package: ensembldb
+Loading required package: GenomicFeatures
+Loading required package: AnnotationDbi
+Loading required package: AnnotationFilter
+
+Attaching package: 'ensembldb'
+
+The following object is masked from 'package:stats':
+
+    filter
+
+> 
+>     
+> dir.create('pdf', showWarnings = FALSE)
+> 
+> window_extend <- 1000
+> 
+> ## Load CpG data
+> load(file.path('/dcl01/lieber/ajaffe/lab/brain-epigenomics', 'bumphunting',
++    'BSobj_bsseqSmooth_Neuron_minCov_3.Rdata'))
+> 
+> ## Regions of interest to plot
+> regions <- GRanges(c('chr11'),
++     IRanges(
++         c(130735611),
++         c(130796536)
++     )
++ )
+> names(regions) <- c('SNX19')
+> regions_long <- resize(regions, width(regions) + window_extend * 2, fix = 'center')
+> 
+> ## Subset BSobj
+> ov <- findOverlaps(regions_long, rowRanges(BSobj))
+> BSobj <- BSobj[subjectHits(ov), ]
+> 
+> ## Look only inside the original regions, not outside
+> gr_meth <- rowRanges(BSobj[subjectHits(findOverlaps(regions, rowRanges(BSobj)))])
+> 
+> ## Define new clusters and add them to the regions
+> clusters <- clusterMaker(seqnames(gr_meth), start(gr_meth), maxGap = 1000)
+> regs_w_clus <- unlist(range(split(gr_meth, clusters)))
+> 
+> ## APOE only has 1 cluster, so remove it
+> countOverlaps(regions, regs_w_clus)
+SNX19 
+    3 
+> regs_w_clus <- regs_w_clus[-queryHits(findOverlaps(regs_w_clus, regions['APOE']))]
+Error: subscript contains invalid names
+Execution halted
