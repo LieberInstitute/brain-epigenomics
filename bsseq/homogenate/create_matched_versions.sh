@@ -52,7 +52,7 @@ echo "Creating script for type ${type}"
 cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l mem_free=400G,h_vmem=400G,h_fsize=300G
+#$ -l mem_free=300G,h_vmem=300G,h_fsize=300G
 #$ -N ${SHORT}
 #$ -o ./logs/${SHORT}.txt
 #$ -e ./logs/${SHORT}.txt
