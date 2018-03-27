@@ -27,31 +27,54 @@ if(FALSE) {
 
 
 if(opt$chr != 'all') {
-    load('../lister/gr_all_highCov.Rdata', verbose = TRUE)
-    load('../lister/gr_cps_minCov_3.Rdata', verbose = TRUE)
-    gr_cpgs$c_context <- Rle('CG')
-    gr_cpgs$trinucleotide_context <- Rle(NA)
-    gr_all <- c(gr_all_highCov, gr_cpgs)
     
-    f <- paste0('rda/', opt$chr, '_cleaned_CX_Homogenate.Rdata')
-    message(paste(Sys.time(), 'loading', f))
-    load(f, verbose = TRUE)
+    filt_cpg <- paste0('rda/', opt$chr,
+        '_cleaned_CX_Homogenate_filtered_CpG.Rdata')
+    filt_cph <- paste0('rda/', opt$chr, 
+        '_cleaned_CX_Homogenate_filtered_CpH.Rdata')
     
-    ## Tweak reportFiles so they can be combined
-    colData(BSobj)$reportFiles <- gsub('chr.*', '', colData(BSobj)$reportFiles)
-    BSobj_all <- BSobj
+    if(!all(file.exists(c(filt_cpg, filt_cph)))) {
+        load('../lister/gr_all_highCov.Rdata', verbose = TRUE)
+        load('../lister/gr_cps_minCov_3.Rdata', verbose = TRUE)
+        gr_cpgs$c_context <- Rle('CG')
+        gr_cpgs$trinucleotide_context <- Rle(NA)
+        gr_all <- c(gr_all_highCov, gr_cpgs)
     
-    message(paste(Sys.time(), 'filtering to our CpG bases'))
-    BSobj <- BSobj_all[subjectHits(findOverlaps(gr_cpgs, rowRanges(BSobj_all))), ]
+        f <- paste0('rda/', opt$chr, '_cleaned_CX_Homogenate.Rdata')
+        message(paste(Sys.time(), 'loading', f))
+        load(f, verbose = TRUE)
     
-    message(paste(Sys.time(), 'saving filtered version'))
-    save(BSobj, file = paste0('rda/', opt$chr, '_cleaned_CX_Homogenate_filtered_CpG.Rdata'))
+        ## Tweak reportFiles so they can be combined
+        colData(BSobj)$reportFiles <- gsub('chr.*', '', colData(BSobj)$reportFiles)
+        BSobj_all <- BSobj
     
-    message(paste(Sys.time(), 'filtering to our CpH bases'))
-    BSobj <- BSobj_all[subjectHits(findOverlaps(gr_all_highCov, rowRanges(BSobj_all))), ]
+        message(paste(Sys.time(), 'filtering to our CpG bases'))
+        BSobj <- BSobj_all[subjectHits(findOverlaps(gr_cpgs, rowRanges(BSobj_all))), ]
+        message(paste(Sys.time(), 'saving filtered version'))
+        save(BSobj, file = filt_cpg)
     
-    message(paste(Sys.time(), 'saving filtered version'))
-    save(BSobj, file = paste0('rda/', opt$chr, '_cleaned_CX_Homogenate_filtered_CpH.Rdata'))
+        message(paste(Sys.time(), 'filtering to our CpH bases'))
+        BSobj <- BSobj_all[subjectHits(findOverlaps(gr_all_highCov, rowRanges(BSobj_all))), ]
+        message(paste(Sys.time(), 'saving filtered version'))
+        save(BSobj, file = filt_cph)
+    } else {
+        message(paste(Sys.time(), 'loading', filt_cpg))
+        load(filt_cpg, verbose = TRUE)
+        message(paste(Sys.time(), 'coercing to matrix'))
+        assays(BSobj)$M <- as.matrix(assays(BSobj)$M)
+        assays(BSobj)$Cov <- as.matrix(assays(BSobj)$Cov)
+        message(paste(Sys.time(), 'saving filtered & coerced version'))
+        save(BSobj, file = gsub('.Rdata', '_coerced.Rdata', filt_cpg))
+        
+        
+        message(paste(Sys.time(), 'loading', filt_cph))
+        load(filt_cph, verbose = TRUE)
+        message(paste(Sys.time(), 'coercing to matrix'))
+        assays(BSobj)$M <- as.matrix(assays(BSobj)$M)
+        assays(BSobj)$Cov <- as.matrix(assays(BSobj)$Cov)
+        message(paste(Sys.time(), 'saving filtered & coerced version'))
+        save(BSobj, file = gsub('.Rdata', '_coerced.Rdata', filt_cph))
+    }
     
     ## Reproducibility information
     print('Reproducibility information:')
@@ -67,7 +90,7 @@ stopifnot(opt$type %in% c('CpG', 'CpH'))
 
 
 message(paste(Sys.time(), 'Combining results for the chrs'))
-patt <- paste0('_cleaned_CX_Homogenate_filtered_', ifelse(opt$type == 'CpG', 'CpG', 'CpH'), '.Rdata')
+patt <- paste0('_cleaned_CX_Homogenate_filtered_', ifelse(opt$type == 'CpG', 'CpG', 'CpH'), '_coerced.Rdata')
 
 files <- dir('rda', pattern = patt, full.names = TRUE)
 message(paste(Sys.time(), 'files to combine:'))
@@ -79,11 +102,6 @@ print(files)
 load_filt <- function(f) {
     message(paste(Sys.time(), 'loading', f))
     load(f, verbose = TRUE)
-    
-    ## Coerce to matrix obj
-    assays(BSobj)$M <- as.matrix(assays(BSobj)$M)
-    assays(BSobj)$Cov <- as.matrix(assays(BSobj)$Cov)
-    
     return(BSobj)
 }
 
