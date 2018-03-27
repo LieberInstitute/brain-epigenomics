@@ -46,7 +46,7 @@ df = do.call(rbind, Map(cbind, df, group = as.list(names(df)), num.dmrs = as.lis
 df$perc.dmrHits = round(df$dmrHits / df$num.dmrs * 100, 1)
 df$perc.dmrHits.transf = df$perc.dmrHits / df$num.bases * 1000000
 df$perc.featureHits = round(df$featureHits / df$num.features * 100, 1)
-df$group = gsub("CellType","Cell Type (11,179)", df$group)
+df$group = gsub("CellType","Cell Type (11179)", df$group)
 df$group = gsub("Age","Age (129)", df$group)
 df$group = gsub("Gr1","1:G-N+ (567)", df$group)
 df$group = gsub("Gr2","2:G0N+ (423)", df$group)
@@ -57,22 +57,22 @@ df$group = gsub("Gr6","6:G-N0 (560)", df$group)
 df$celltype = ifelse(df$id %in% pd$Data.ID, pd[match(df$id, pd$Data.ID),"Cell.Type"], "Prenatal")
 df$age = pd[match(df$id, pd$Data.ID),"Age"]
 df$feature = factor(df$feature, levels = c("UMR","LMR","DMV","PMD"))
-df$group = factor(df$group, levels = c("Cell Type (11,179)","Age (129)","1:G-N+ (567)","2:G0N+ (423)","3:G0N- (362)","4:G+N0 (96)","5:G+N- (170)","6:G-N0 (560)"))
+df$group = factor(df$group, levels = c("Cell Type (11179)","Age (129)","1:G-N+ (567)","2:G0N+ (423)","3:G0N- (362)","4:G+N0 (96)","5:G+N- (170)","6:G-N0 (560)"))
 df$celltype = factor(df$celltype, levels = c("Prenatal","Glia","Neuron"))
 
 write.csv(df, quote=F,file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/methFeatures_Overlap_withDMRs.csv")
 
-
+df = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/methFeatures_Overlap_withDMRs.csv")
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/methFeatures_Overlap_withDMRs.pdf", width = 12, height = 8)
-ggplot(df[which(df$group %in% c("Cell Type (11,179)","Age (129)")),], aes(x = celltype, y = perc.dmrHits)) + geom_boxplot() +
+ggplot(df[which(df$group %in% c("Cell Type (11179)","Age (129)")),], aes(x = celltype, y = perc.dmrHits)) + geom_boxplot() +
   labs(fill="") + facet_grid(group ~ feature) +
   ylab("Percent") + 
   xlab("") +
   ggtitle("Percent DMRs Overlapped by Methylation Features") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
-ggplot(df[-which(df$group %in% c("Cell Type (11,179)","Age (129)")),], aes(x = celltype, y = perc.dmrHits, fill = group)) + geom_boxplot() + 
+ggplot(df[-which(df$group %in% c("Cell Type (11179)","Age (129)")),], aes(x = celltype, y = perc.dmrHits, fill = group)) + geom_boxplot() + 
   labs(fill="") + facet_grid(feature ~ group) +
   scale_fill_brewer(8, palette="Dark2") +
   ylab("Percent") + xlab("") +
@@ -80,7 +80,14 @@ ggplot(df[-which(df$group %in% c("Cell Type (11,179)","Age (129)")),], aes(x = c
   ggtitle("Percent cdDMRs Overlapped by Methylation Features") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
-w = df[-which(df$group %in% c("Cell Type (11,179)","Age (129)")),]
+w = df[-which(df$group %in% c("Cell Type (11179)","Age (129)")),]
+ggplot(w[which(w$celltype!="Prenatal"),], aes(x = age, y = perc.dmrHits, colour = celltype)) + geom_point() +
+  geom_smooth(method="loess", se=T, fullrange=TRUE) + scale_colour_brewer(8, palette="Dark2") + 
+  labs(fill="") + facet_grid(feature ~ group) +
+  ylab("Percent") + xlab("Age (Years)") +
+  ggtitle("Percent cdDMRs Overlapped by Methylation Features") +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
 ggplot(w[which(w$celltype!="Prenatal"),], aes(x = age, y = perc.dmrHits, colour = celltype)) + geom_point() +
   geom_smooth(method=lm, se=T, fullrange=TRUE) + scale_colour_brewer(8, palette="Dark2") + 
   labs(fill="") + facet_grid(feature ~ group) +
@@ -88,7 +95,7 @@ ggplot(w[which(w$celltype!="Prenatal"),], aes(x = age, y = perc.dmrHits, colour 
   ggtitle("Percent cdDMRs Overlapped by Methylation Features") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
-ggplot(df[-which(df$group %in% c("Cell Type (11,179)","Age (129)")),], aes(x = celltype, y = perc.dmrHits.transf, fill = group)) + geom_boxplot() + 
+ggplot(df[-which(df$group %in% c("Cell Type (11179)","Age (129)")),], aes(x = celltype, y = perc.dmrHits.transf, fill = group)) + geom_boxplot() + 
   labs(fill="") + facet_grid(feature ~ group) +
   scale_fill_brewer(8, palette="Dark2") +
   ylab("Percent / Mb") + xlab("") +
@@ -96,7 +103,14 @@ ggplot(df[-which(df$group %in% c("Cell Type (11,179)","Age (129)")),], aes(x = c
   ggtitle("Percent cdDMRs Overlapped by Methylation Features") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
-w = df[-which(df$group %in% c("Cell Type (11,179)","Age (129)")),]
+w = df[-which(df$group %in% c("Cell Type (11179)","Age (129)")),]
+ggplot(w[which(w$celltype!="Prenatal"),], aes(x = age, y = perc.dmrHits.transf, colour = celltype)) + geom_point() +
+  geom_smooth(method="loess", se=T, fullrange=TRUE) + scale_colour_brewer(8, palette="Dark2") + 
+  labs(fill="") + facet_grid(feature ~ group) +
+  ylab("Percent / Mb") + xlab("Age (Years)") +
+  ggtitle("Percent cdDMRs Overlapped by Methylation Features") +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
 ggplot(w[which(w$celltype!="Prenatal"),], aes(x = age, y = perc.dmrHits.transf, colour = celltype)) + geom_point() +
   geom_smooth(method=lm, se=T, fullrange=TRUE) + scale_colour_brewer(8, palette="Dark2") + 
   labs(fill="") + facet_grid(feature ~ group) +

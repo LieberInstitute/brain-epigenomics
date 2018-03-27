@@ -61,7 +61,7 @@ t.test(widths[widths$celltype=="Glia","median"],widths[widths$celltype=="Prenata
 \b ## What proportion of the genome do they cover?
 \b0 \
 \
-CREs/figures/DMV_percentGenome.pdf")\
+CREs/figures/DMV_percentGenome.pdf\
 \
 cor.test(x = w[which(w$celltype=="Neuron"),"Age"], y = w[which(w$celltype=="Neuron"),"percent"])\
 #t = -1.2851, df = 22, p-value = 0.2121, cor -0.264245 \
@@ -128,10 +128,8 @@ data.table(shared)[,mean(percent), by = c("group")]\
 \b ## How much of prenatal DMVs is represented in each postnatal sample?\
 
 \b0 \
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
-\cf0 prenperc  = read.table("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_sharedWithPrenatal.csv")\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
-\cf0 \
+prenperc  = read.table("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_sharedWithPrenatal.csv")\
+\
 CREs/figures/percent_shared_withPrenatal_DMV_perSample_byBaseCoverage.pdf\
 \
 cor.test(x = prenperc[prenperc$CellType=="Neuron",]$Age, y = prenperc[prenperc$CellType=="Neuron",]$perc)\
@@ -214,9 +212,9 @@ CREs/figures/DMR_position_in_DMV.pdf\
 \b ## association of existing DMVs with genes\
 
 \b0 \
-write.csv(geneoverlap, quote=F,file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_Gene_Overlap.csv")\
+geneoverlap = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_Gene_Overlap.csv")\
 \
-write.csv(numgenes, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_numgenes.csv")\
+numgenes = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_numgenes.csv")\
 \
 cor.test(x = w[which(w$celltype=="Neuron"),"Age"], y = w[which(w$celltype=="Neuron"),"mean"])\
 #t = -0.86357, df = 22, p-value = 0.3971, cor -0.1810702 \
@@ -227,7 +225,7 @@ cor.test(x = w[which(w$celltype=="Glia"),"Age"], y = w[which(w$celltype=="Glia")
 CREs/figures/DMV_overlap_with_Genes.pdf\
 \
 \
-lwrite.csv(promoverlap, quote=F,file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_prom_Overlap.csv")\
+write.csv(promoverlap, quote=F,file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_prom_Overlap.csv")\
 \
 write.csv(numproms, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_numproms.csv")\
 \
@@ -244,10 +242,9 @@ CREs/figures/DMV_overlap_with_proms.pdf\
 \b ## transcription factor genes in our DMVs?\
 
 \b0 \
-write.csv(hits, quote=F,file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_tfsgenes_Overlap.csv")\
+hits  = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_tfsgenes_Overlap.csv")\
 \
-\
-CREs/figures/DMV_tfsgenes_Overlap.pd)\
+CREs/figures/DMV_tfsgenes_Overlap.pdf\
 \
 \
 ## Enrichment in transcription factor genes\
@@ -273,10 +270,8 @@ elementNROWS(w)\
 #no:Prenatal:Postnatal:Neurons:Glia                7\
 #no:Prenatal:no:Neurons:Glia                       1\
 \
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
-\cf0 shared_DMVs = read.csv(\'94/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/shared_DMVs_correlation.csv")\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
-\cf0 \
+shared_DMVs = read.csv(\'94/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/shared_DMVs_correlation.csv")\
+\
 CREs/figures/shared_DMV_width_correlation.pdf\
 \
 \
