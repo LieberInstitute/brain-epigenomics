@@ -26,6 +26,8 @@ if (!is.null(opt$help)) {
 if(FALSE) {
     opt <- list(cores = 1, context = 'CHG', model = 'age')
     opt <- list(cores = 1, context = 'all', model = 'age')
+    opt <- list(cores = 1, context = 'all', model = 'cell')
+    opt <- list(cores = 1, context = 'all', model = 'interaction')
 }
 
 stopifnot(opt$context %in% c('nonCG', 'CG', 'CHG', 'CHH', 'all'))
@@ -111,6 +113,34 @@ gr_list <- gr_list[names(gr_list)[n_group >= 5]]
 
 print('Summary of number of Cs per DMR')
 summary(sapply(meth_list, nrow))
+
+if(opt$context == 'all') {
+    byctxt <- do.call(rbind, lapply(gr_list, function(x) { table(x$c_context)}))
+    print(nrow(byctxt))
+    print(summary(byctxt))
+    dir.create('rda', showWarnings = FALSE)
+    save(byctxt, file = paste0('rda/byctxt_context', opt$context, '_',
+        opt$model, '.Rdata'))
+        
+        
+    panel.hist <- function(x, ...)
+    {
+        usr <- par("usr"); on.exit(par(usr))
+        par(usr = c(usr[1:2], 0, 1.5) )
+        h <- hist(x, plot = FALSE, breaks = 50)
+        breaks <- h$breaks; nB <- length(breaks)
+        y <- h$counts; y <- y/max(y)
+        rect(breaks[-nB], 0, breaks[-1], y, col = "light blue", ...)
+    }
+
+    dir.create('pdf', showWarnings = FALSE)
+    pdf(paste0('pdf/byctxt_context', opt$context, '_', opt$model, '.pdf'),
+        width = 10, height = 10)
+    pairs(byctxt, panel = panel.smooth, diag.panel = panel.hist, cex.labels = 2, font.labels = 2)
+    dev.off()
+    
+}
+
 
 
 if(opt$cores == 1) {
