@@ -108,7 +108,6 @@ save(enrichmentsList, allList, dat, compress=TRUE,
 
 # for the roadmap state analysis, I'd like 
 # 1) comparison of cell type, overall age, and interaction DMRs in brain (adult DLPFC?) to other tissues
-# 2) in adult DLPFC and fetal cortex samples, enrichment of UMR, LMR, PMD, and DMV states
 
 # long stats
 enrichListLong = lapply(enrichmentsList, function(x) {
@@ -124,14 +123,15 @@ enrichListLong = lapply(enrichmentsList, function(x) {
 	return(y)
 })
 
-## comparison of cell type, overall age, and interaction DMRs in brain (adult DLPFC?) to other tissues
+## 1) comparison of cell type, overall age, and interaction DMRs in brain (adult DLPFC?) to other tissues
 enrichDMRs = enrichListLong[1:9]
-names(enrichDMRs)[7] = "All_cdDMRs")
+names(enrichDMRs)[7] = "All_cdDMRs"
+
 # plot
 pdf("../plots/DMRs_roadmap_enrichments.pdf",h=5,w=10,useDingbats=FALSE)
+par(mar=c(10,6,2,2),cex.axis=1.6,cex.lab=1.6,cex.main=1.6)
 for(i in seq(along=enrichDMRs)) {
 	x = enrichDMRs[[i]]
-	par(mar=c(10,6,2,2),cex.axis=1.6,cex.lab=1.6,cex.main=1.6)
 	boxplot(log2Enrich ~ State, data = x, las=3, outline=FALSE,
 		main = names(enrichDMRs)[i],ylim=c(-10,10),
 		ylab = "Coverage Ratio (log2)")
@@ -143,41 +143,65 @@ for(i in seq(along=enrichDMRs)) {
 }
 dev.off()
 
+# 2) in adult DLPFC and fetal cortex samples, enrichment of UMR, LMR, PMD, and DMV states
+gIndexes = splitit(ss(names(enrichListLong), "\\."))
+gIndexes = gIndexes[10:13]
 
+states = unique(enrichDMRs[[1]]$State)
+adultDLPFC_list = lapply(gIndexes, function(ii) {
+	out = t(sapply(enrichListLong[ii], function(x) {
+		x$log2Enrich[x$Sample == "E073"]
+	}))
+	colnames(out)  = states
+	out
+})
 
+fetalDLPFC_list = lapply(gIndexes, function(ii) {
+	out = t(sapply(enrichListLong[ii], function(x) {
+		(x$log2Enrich[x$Sample == "E082"] + 
+			x$log2Enrich[x$Sample == "E081"])/2
+	}))
+	colnames(out)  = states
+	out
+})
 
+## plots
+DLPFC_list = c(adultDLPFC_list, fetalDLPFC_list)
+names(DLPFC_list) = paste0(rep(c("AdultDLPFC", "FetalBrain"), each=4),
+			"_", names(DLPFC_list))
 
-# long, all
-allLong = data.frame(State = rep(colnames(statTab_all)[-1],each=nrow(statTab_all)),
-	Enrichment = as.numeric(as.matrix(statTab_all[,-1])),
-	Sample = rep(rownames(statTab_all), times= ncol(statTab_all)-1))
-	
-allLong$log2Enrich = log2(allLong$Enrichment)
-allLong$State = factor(allLong$State, levels=unique(allLong$State))
-allLong$inBrain = as.numeric(allLong$Sample %in% dat$EID[brainIDs])+1
+## colors for plots
+pdFull = read.csv("/dcl01/lieber/WGBS/LIBD_Data/phenoData/FullMasterList_clean.csv",
+	as.is=TRUE, row.names=1)
 
-abline(h=0,lty=2,col="blue")
-legend("topright", "Brain", col = "red", pch =15,cex=1.6)
-boxplot(log2Enrich ~ State, data = allLong, las=3, outline=FALSE,
-	main = "NHGRI GWAS",ylim=c(-4,4),
-	ylab = "Coverage Ratio (log2)")
-points(log2Enrich ~ jitter(as.numeric(State), amount=0.15), 
-	data = allLong, pch = 21, bg = ifelse(inBrain == 2, "red", "grey"),
-	cex = ifelse(inBrain == 2, 1, 0.5))
-abline(h=0,lty=2,col="blue")
+pdFull$age_group <- factor(ifelse(pdFull$Age < 0, 'Prenatal',
+    ifelse(pdFull$Age < 1, 'Infant',
+    ifelse(pdFull$Age <= 12, 'Child',
+    ifelse(pdFull$Age <= 17, 'Teen', 'Adult')))),
+    levels = c('Infant', 'Child', 'Teen', 'Adult', 'Prenatal'))
+    
+pdFull$age_group_cell <- factor(paste0(pdFull$age_group, '_',
+    pdFull$Cell.Type),
+    levels = c(paste0(rep(levels(pdFull$age_group)[1:4], each = 2),
+    '_', c('NeuN-', 'NeuN+')), 'Prenatal_H'), 
+		labels =  c(paste0(rep(levels(pdFull$age_group)[1:4], each = 2),
+		'_', c('Glia', 'Neuron')), 'Prenatal_H'))
+pdFull$col <- c(brewer.pal(8, "Paired"), 'grey50')[c(5:6, 7:8, 3:4, 1:2, 9)][pdFull$age_group_cell]
+newPd = pdFull[ss(rownames( DLPFC_list[[1]]), "\\.",2),]
+
+## make plots
+pdf("../plots/feature_roadmap_enrichments.pdf",h=5,w=10,useDingbats=FALSE)
+par(mar=c(10,6,2,2),cex.axis=1.6,cex.lab=1.6,cex.main=1.6)
+for(i in seq(along=DLPFC_list)) {
+	x = DLPFC_list[[i]]
+	boxplot(x, data = x, las=3, outline=FALSE,
+		main = names(DLPFC_list)[i],ylim=c(-10,10),
+		ylab = "Coverage Ratio (log2)")
+	for(j in 1:ncol(x)) {
+		points(x = jitter(rep(j,nrow(x)), amount=0.3), y= x[,j], 
+			bg = newPd$col, pch = 21,cex=0.75)
+	}
+	abline(h=0,lty=2,col="blue")
+
+}
 dev.off()
-	
-#### extract numbers for SCZD
-round(2^tapply(pgcLong$log2Enrich, pgcLong$State, 
-	function(x) mean(x[is.finite(x)])),3)
-round(2^tapply(pgcLong$log2Enrich[pgcLong$inBrain==1], 
-	pgcLong$State[pgcLong$inBrain==1], 
-	function(x) mean(x[is.finite(x)])),3)
-	
-#### extract numbers for NHGRI
-round(2^tapply(allLong$log2Enrich, allLong$State, 
-	function(x) mean(x[is.finite(x)])),3)
-round(2^tapply(allLong$log2Enrich[allLong$inBrain==1], 
-	allLong$State[allLong$inBrain==1], 
-	function(x) mean(x[is.finite(x)])),3)
-	
