@@ -30,8 +30,7 @@ for (i in 1:length(dd_ch_mat)) { colnames(dd_ch_mat[[i]]) = rownames(dd_ch_mat[[
 
 
 # mean meth in each DMR
-meanMeth_ch = mapply(function(sig, oo) do.call("rbind", sapply(split(subjectHits(oo), factor(queryHits(oo), levels=1:length(sig))), function(ii) colMeans(t(t(meth_ch[ii,]))))),
-                     c(list(CellType = makeGRangesFromDataFrame(sigCT), Age = makeGRangesFromDataFrame(sigAge), Interaction = makeGRangesFromDataFrame(sigInt)), as.list(dmrs)), oo_ch, SIMPLIFY = F)
+meanMeth_ch = lapply(oo_ch, function(oo) do.call("rbind", lapply(split(subjectHits(oo), queryHits(oo)), function(ii) colMeans(t(t(meth_ch[ii,]))))))
 dd_ch_mean = lapply(meanMeth_ch, function(x) dist(t(x)))
 dd_ch_mean_mat = lapply(dd_ch_mean, as.matrix)
 for (i in 1:length(dd_ch_mean_mat)) { colnames(dd_ch_mean_mat[[i]]) = rownames(dd_ch_mean_mat[[i]]) = paste(pd$Cell.Type, pd$Age.Bin, pd$Working.Num, sep = ":") }
