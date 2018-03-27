@@ -1027,185 +1027,30 @@ venn.diagram(inDMV.byAgeG, "/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figu
              alpha = 0.50, fontfamily = "Arial", fontface = "bold", cat.fontfamily = "Arial", margin=0.2)
 
 
-## Associate with gene expression
+## Plot venn diagram of TF genes
 
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/sorted_nuclear_RNA/DE_limma_results_objects.rda")
-DMV.CTcomps = Map(cbind, DMV.CTcomps, lapply(DMV.CTcomps, function(x) nucRNAres[match(x$gencodeID, nucRNAres$gencodeID),]))
-elementNROWS(DMV.CTcomps)
-elementNROWS(lapply(DMV.CTcomps, function(x) unique(x$gencodeID)))
-tstat.CT = list(PnotN = t.test(DMV.CTcomps$PnotN$Tstat.CellTypeNeuron, DMV.CTcomps$NnotP$Tstat.CellTypeNeuron),
-                NnotP = t.test(DMV.CTcomps$PnotN$Tstat.CellTypeNeuron, DMV.CTcomps$NnotP$Tstat.CellTypeNeuron),
-                PnotG = t.test(DMV.CTcomps$PnotG$Tstat.CellTypeNeuron, DMV.CTcomps$GnotP$Tstat.CellTypeNeuron),
-                GnotP = t.test(DMV.CTcomps$PnotG$Tstat.CellTypeNeuron, DMV.CTcomps$GnotP$Tstat.CellTypeNeuron),
-                GnotN = t.test(DMV.CTcomps$GnotN$Tstat.CellTypeNeuron, DMV.CTcomps$NnotG$Tstat.CellTypeNeuron),
-                NnotG = t.test(DMV.CTcomps$GnotN$Tstat.CellTypeNeuron, DMV.CTcomps$NnotG$Tstat.CellTypeNeuron))
-ct = data.frame(Tstat = unlist(lapply(tstat.CT, function(x) x$statistic)), mean1 = unlist(lapply(tstat.CT, function(x) x$estimate[1])),
-                mean2 = unlist(lapply(tstat.CT, function(x) x$estimate[2])), pval = unlist(lapply(tstat.CT, function(x) x$p.value)), comps = names(tstat.CT), row.names = NULL)
-# negative Tstat.CellTypeNeuron means higher expressed in glia
-#       Tstat      mean1     mean2         pval       comps
-#1  -6.889639  0.4861798  2.852575 1.274992e-10 PnotN.NnotP
-#2   5.871658  0.8119004 -2.901443 4.781105e-07 PnotG.GnotP
-#3 -22.430365 -2.0202821  2.841388 6.231489e-90 GnotN.NnotG
-# Genes that are escaping the DMV state (likely accumulating DNAm) are higher expressed in the cell type in which the gene escapes
+venn.diagram(lapply(inDMV.byCT, function(x) x[which(x %in% tfs$gencodeID)]), "/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/venn_diagram_DMV_TFgenes_byCellType.jpeg", 
+             main="TF Genes within DMVs by Cell Type",
+             col = "transparent",
+             fill = c("lightpink2","cornflowerblue", "olivedrab2"),
+             cat.col = c("palevioletred4", "darkblue", "olivedrab4"),
+             alpha = 0.50, fontfamily = "Arial", fontface = "bold", cat.fontfamily = "Arial", margin=0.2)
 
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/homogenate_RNA/DE_limma_results_homogenateRNAseq.rda")
-DMV.Agecomps = Map(cbind, DMV.Agecomps, lapply(DMV.Agecomps, function(x) postRNAres[match(x$gencodeID, postRNAres$gencodeID),]))
-elementNROWS(DMV.Agecomps)
-elementNROWS(lapply(DMV.Agecomps, function(x) unique(x$gencodeID)))
-tstat = list(InotC = t.test(DMV.Agecomps$InotC$Tstat, DMV.Agecomps$CnotI$Tstat),
-             CnotI = t.test(DMV.Agecomps$InotC$Tstat, DMV.Agecomps$CnotI$Tstat),
-             InotT = t.test(DMV.Agecomps$InotT$Tstat, DMV.Agecomps$TnotI$Tstat),
-             TnotI = t.test(DMV.Agecomps$InotT$Tstat, DMV.Agecomps$TnotI$Tstat),
-             InotA = t.test(DMV.Agecomps$InotA$Tstat, DMV.Agecomps$AnotI$Tstat),
-             AnotI = t.test(DMV.Agecomps$InotA$Tstat, DMV.Agecomps$AnotI$Tstat),
-             CnotT = t.test(DMV.Agecomps$CnotT$Tstat, DMV.Agecomps$TnotC$Tstat),
-             TnotC = t.test(DMV.Agecomps$CnotT$Tstat, DMV.Agecomps$TnotC$Tstat),
-             CnotA = t.test(DMV.Agecomps$CnotA$Tstat, DMV.Agecomps$AnotC$Tstat),
-             AnotC = t.test(DMV.Agecomps$CnotA$Tstat, DMV.Agecomps$AnotC$Tstat),
-             TnotA = t.test(DMV.Agecomps$TnotA$Tstat, DMV.Agecomps$AnotT$Tstat),
-             AnotT = t.test(DMV.Agecomps$TnotA$Tstat, DMV.Agecomps$AnotT$Tstat))
-age = data.frame(Tstat = unlist(lapply(tstat, function(x) x$statistic)), mean1 = unlist(lapply(tstat, function(x) x$estimate[1])),
-                 mean2 = unlist(lapply(tstat, function(x) x$estimate[2])), pval = unlist(lapply(tstat, function(x) x$p.value)), comps = names(tstat), row.names = NULL)
+venn.diagram(lapply(inDMV.byAgeN, function(x) x[which(x %in% tfs$gencodeID)]), "/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/venn_diagram_DMV_TFgenes_byAge_inNeurons.jpeg", 
+             main="TF Genes within DMVs by Age in Neurons",
+             col = "transparent",
+             fill = c("lightpink2","cornflowerblue", "olivedrab2", "khaki1"),
+             cat.col = c("palevioletred4", "darkblue", "olivedrab4", "lightgoldenrod4"),
+             alpha = 0.50, fontfamily = "Arial", fontface = "bold", cat.fontfamily = "Arial", margin=0.2)
 
-DMV.AgecompsG = Map(cbind, DMV.AgecompsG, lapply(DMV.AgecompsG, function(x) postRNAres[match(x$gencodeID, postRNAres$gencodeID),]))
-elementNROWS(DMV.AgecompsG)
-elementNROWS(lapply(DMV.AgecompsG, function(x) unique(x$gencodeID)))
-tstat = list(InotC.CnotI = t.test(DMV.AgecompsG$InotC$Tstat, DMV.AgecompsG$CnotI$Tstat),
-             InotT.TnotI = t.test(DMV.AgecompsG$InotT$Tstat, DMV.AgecompsG$TnotI$Tstat),
-             InotA.AnotI = t.test(DMV.AgecompsG$InotA$Tstat, DMV.AgecompsG$AnotI$Tstat),
-             CnotT.TnotC = t.test(DMV.AgecompsG$CnotT$Tstat, DMV.AgecompsG$TnotC$Tstat),
-             CnotA.AnotC = t.test(DMV.AgecompsG$CnotA$Tstat, DMV.AgecompsG$AnotC$Tstat),
-             TnotA.AnotT = t.test(DMV.AgecompsG$TnotA$Tstat, DMV.AgecompsG$AnotT$Tstat))
-ageG = data.frame(Tstat = unlist(lapply(tstat, function(x) x$statistic)), mean1 = unlist(lapply(tstat, function(x) x$estimate[1])),
-                  mean2 = unlist(lapply(tstat, function(x) x$estimate[2])), pval = unlist(lapply(tstat, function(x) x$p.value)), comps = names(tstat), row.names = NULL)
+venn.diagram(lapply(inDMV.byAgeG, function(x) x[which(x %in% tfs$gencodeID)]), "/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/venn_diagram_DMV_TFgenes_byAge_inGlia.jpeg", 
+             main="TF Genes within DMVs by Age in Glia",
+             col = "transparent",
+             fill = c("lightpink2","cornflowerblue", "olivedrab2", "khaki1"),
+             cat.col = c("palevioletred4", "darkblue", "olivedrab4", "lightgoldenrod4"),
+             alpha = 0.50, fontfamily = "Arial", fontface = "bold", cat.fontfamily = "Arial", margin=0.2)
 
-expr = rbind(cbind(ct, Model = "Cell Type"), cbind(age, Model = "Age: Neurons"), cbind(ageG, Model = "Age: Glia"))
-expr$FDR = p.adjust(expr$pval, method = "fdr")
-
-write.csv(expr, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/t.test_DMV_gene_expression.csv")
-
-
-## How does this relate to DNAm at these genes?
-
-## CpG
-
-load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/BSobj_bsseqSmooth_Neuron_minCov_3.Rdata')
-postpd = pData(BSobj)
-postpd$Race[postpd$Race== "CAUC "] <- 'CAUC'
-postpd$Sex[postpd$Sex == " M"] <- 'M'
-postpd$RIN <- as.numeric(gsub(" ", "", postpd$RIN))
-postpd$pg.DNA.nuclei.input <- as.numeric(postpd$pg.DNA.nuclei.input)
-postpd$Reads <- as.numeric(postpd$Reads)
-postpd$Percent.GreaterThan.Q30 <- as.numeric(postpd$Percent.GreaterThan.Q30)
-meth =getMeth(BSobj, type = 'raw')
-methMap = granges(BSobj)
-
-ids = lapply(c(DMV.CTcomps,DMV.Agecomps,DMV.AgecompsG), function(x) paste0(x$Chr,":",x$Start,"-",x$End,":",x$Strand))
-ids = lapply(ids, function(x) GRanges(x[which(x != "NA:NA-NA:NA")]))
-oo = lapply(ids, function(x) findOverlaps(x, methMap))
-
-meanMeth = lapply(oo, function(x) do.call("rbind", lapply(split(subjectHits(x), factor(queryHits(x))), function(ii) colMeans(t(t(meth[ii,]))))))
-meanMeth = lapply(meanMeth, reshape2::melt)
-
-tstat.CT = list(PnotN.NnotP = t.test(meanMeth$GnotN[meanMeth$GnotN$Var2 %in% pd[pd$Cell.Type=="Neuron","Data.ID"],"value"],
-                                     meanMeth$NnotG[meanMeth$NnotG$Var2 %in% pd[pd$Cell.Type=="Glia","Data.ID"],"value"]),
-                PnotG.GnotP = t.test(meanMeth$GnotN[meanMeth$GnotN$Var2 %in% pd[pd$Cell.Type=="Glia","Data.ID"],"value"],
-                                     meanMeth$NnotG[meanMeth$NnotG$Var2 %in% pd[pd$Cell.Type=="Glia","Data.ID"],"value"]),
-                GnotN.NnotG = t.test(meanMeth$GnotN[meanMeth$GnotN$Var2 %in% pd[pd$Cell.Type=="Glia","Data.ID"],"value"],
-                                     meanMeth$NnotG[meanMeth$NnotG$Var2 %in% pd[pd$Cell.Type=="Neuron","Data.ID"],"value"]))
-ct = data.frame(Tstat = unlist(lapply(tstat.CT, function(x) x$statistic)), mean1 = unlist(lapply(tstat.CT, function(x) x$estimate[1])),
-                mean2 = unlist(lapply(tstat.CT, function(x) x$estimate[2])), pval = unlist(lapply(tstat.CT, function(x) x$p.value)), comps = names(tstat.CT), row.names = NULL)
-
-names(meanMeth)[29:46] = paste0(names(meanMeth)[29:46],".G")
-tstat.N = list(InotC.CnotI = t.test(meanMeth$InotC[meanMeth$InotC$Var2 %in% pd[pd$Age<=1 & pd$Cell.Type=="Neuron","Data.ID"],"value"],
-                                    meanMeth$CnotI[meanMeth$CnotI$Var2 %in% pd[pd$Age>1 & pd$Age<=12 & pd$Cell.Type=="Neuron","Data.ID"],"value"]),
-               InotT.TnotI = t.test(meanMeth$InotT[meanMeth$InotT$Var2 %in% pd[pd$Age<=1 & pd$Cell.Type=="Neuron","Data.ID"],"value"],
-                                    meanMeth$TnotI[meanMeth$TnotI$Var2 %in% pd[pd$Age>12 & pd$Age<=17 & pd$Cell.Type=="Neuron","Data.ID"],"value"]),
-               InotA.AnotI = t.test(meanMeth$InotA[meanMeth$InotA$Var2 %in% pd[pd$Age<=1 & pd$Cell.Type=="Neuron","Data.ID"],"value"],
-                                    meanMeth$AnotI[meanMeth$AnotI$Var2 %in% pd[pd$Age>17 & pd$Cell.Type=="Neuron","Data.ID"],"value"]),
-               CnotT.TnotC = t.test(meanMeth$CnotT[meanMeth$CnotT$Var2 %in% pd[pd$Age>1 & pd$Age<=12 & pd$Cell.Type=="Neuron","Data.ID"],"value"],
-                                    meanMeth$TnotC[meanMeth$TnotC$Var2 %in% pd[pd$Age>12 & pd$Age<=17 & pd$Cell.Type=="Neuron","Data.ID"],"value"]),
-               CnotA.AnotC = t.test(meanMeth$CnotA[meanMeth$CnotA$Var2 %in% pd[pd$Age>1 & pd$Age<=12 & pd$Cell.Type=="Neuron","Data.ID"],"value"],
-                                    meanMeth$AnotC[meanMeth$AnotC$Var2 %in% pd[pd$Age>17 & pd$Cell.Type=="Neuron","Data.ID"],"value"]),
-               TnotA.AnotT = t.test(meanMeth$TnotA[meanMeth$TnotA$Var2 %in% pd[pd$Age>12 & pd$Age<=17 & pd$Cell.Type=="Neuron","Data.ID"],"value"],
-                                    meanMeth$AnotT[meanMeth$AnotT$Var2 %in% pd[pd$Age>17 & pd$Cell.Type=="Neuron","Data.ID"],"value"]))
-neuro = data.frame(Tstat = unlist(lapply(tstat.N, function(x) x$statistic)), mean1 = unlist(lapply(tstat.N, function(x) x$estimate[1])),
-                   mean2 = unlist(lapply(tstat.N, function(x) x$estimate[2])), pval = unlist(lapply(tstat.N, function(x) x$p.value)), comps = names(tstat.N), row.names = NULL)
-
-tstat.G = list(InotC.CnotI = t.test(meanMeth$InotC.G[meanMeth$InotC.G$Var2 %in% pd[pd$Age<=1 & pd$Cell.Type=="Glia","Data.ID"],"value"],
-                                    meanMeth$CnotI.G[meanMeth$CnotI.G$Var2 %in% pd[pd$Age>1 & pd$Age<=12 & pd$Cell.Type=="Glia","Data.ID"],"value"]),
-               InotT.TnotI = t.test(meanMeth$InotT.G[meanMeth$InotT.G$Var2 %in% pd[pd$Age<=1 & pd$Cell.Type=="Glia","Data.ID"],"value"],
-                                    meanMeth$TnotI.G[meanMeth$TnotI.G$Var2 %in% pd[pd$Age>12 & pd$Age<=17 & pd$Cell.Type=="Glia","Data.ID"],"value"]),
-               InotA.AnotI = t.test(meanMeth$InotA.G[meanMeth$InotA.G$Var2 %in% pd[pd$Age<=1 & pd$Cell.Type=="Glia","Data.ID"],"value"],
-                                    meanMeth$AnotI.G[meanMeth$AnotI.G$Var2 %in% pd[pd$Age>17 & pd$Cell.Type=="Glia","Data.ID"],"value"]),
-               CnotT.TnotC = t.test(meanMeth$CnotT.G[meanMeth$CnotT.G$Var2 %in% pd[pd$Age>1 & pd$Age<=12 & pd$Cell.Type=="Glia","Data.ID"],"value"],
-                                    meanMeth$TnotC.G[meanMeth$TnotC.G$Var2 %in% pd[pd$Age>12 & pd$Age<=17 & pd$Cell.Type=="Glia","Data.ID"],"value"]),
-               CnotA.AnotC = t.test(meanMeth$CnotA.G[meanMeth$CnotA.G$Var2 %in% pd[pd$Age>1 & pd$Age<=12 & pd$Cell.Type=="Glia","Data.ID"],"value"],
-                                    meanMeth$AnotC.G[meanMeth$AnotC.G$Var2 %in% pd[pd$Age>17 & pd$Cell.Type=="Glia","Data.ID"],"value"]),
-               TnotA.AnotT = t.test(meanMeth$TnotA.G[meanMeth$TnotA.G$Var2 %in% pd[pd$Age>12 & pd$Age<=17 & pd$Cell.Type=="Glia","Data.ID"],"value"],
-                                    meanMeth$AnotT.G[meanMeth$AnotT.G$Var2 %in% pd[pd$Age>17 & pd$Cell.Type=="Glia","Data.ID"],"value"]))
-gli = data.frame(Tstat = unlist(lapply(tstat.G, function(x) x$statistic)), mean1 = unlist(lapply(tstat.G, function(x) x$estimate[1])),
-                 mean2 = unlist(lapply(tstat.G, function(x) x$estimate[2])), pval = unlist(lapply(tstat.G, function(x) x$p.value)), comps = names(tstat.G), row.names = NULL)
-
-dfCG = rbind(cbind(neuro, Comp = "Neurons Age"), cbind(gli, Comp = "Glia Age"), cbind(ct, Comp = "Cell Type"))
-
-
-
-## CpH
-
-load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/allChrs_postNatal_cleaned_nonCG_noHomogenate_highCov.Rdata')
-BSobj_ch = BSobj
-meth_ch = getMeth(BSobj_ch, type = 'raw')
-methMap_ch = granges(BSobj_ch)
-
-ids = lapply(c(DMV.CTcomps,DMV.Agecomps,DMV.AgecompsG), function(x) paste0(x$Chr,":",x$Start,"-",x$End,":",x$Strand))
-ids = lapply(ids, function(x) GRanges(x[which(x != "NA:NA-NA:NA")]))
-oo_ch = lapply(ids, function(x) findOverlaps(x, methMap_ch))
-meanMeth_ch = lapply(oo_ch, function(x) do.call("rbind", lapply(split(subjectHits(x), factor(queryHits(x), levels=1:length(unique(queryHits(x))))), 
-                                                                function(ii) colMeans(t(t(meth_ch[ii,]))))))
-meanMeth_ch = lapply(meanMeth_ch, reshape2::melt)
-
-
-GnotN.NnotG = t.test(meanMeth_ch$GnotN[meanMeth_ch$GnotN$Var2 %in% pd[pd$Cell.Type=="Glia","Data.ID"],"value"],
-                     meanMeth_ch$NnotG[meanMeth_ch$NnotG$Var2 %in% pd[pd$Cell.Type=="Neuron","Data.ID"],"value"])
-ct = data.frame(Tstat = GnotN.NnotG$statistic, mean1 = GnotN.NnotG$estimate[1], mean2 = GnotN.NnotG$estimate[2], pval = GnotN.NnotG$p.value, comps = "GnotN.NnotG")
-
-names(meanMeth_ch)[29:46] = paste0(names(meanMeth_ch)[29:46],".G")
-tstat.N = list(InotC.CnotI = t.test(meanMeth_ch$InotC[meanMeth_ch$InotC$Var2 %in% pd[pd$Age<=1 & pd$Cell.Type=="Neuron","Data.ID"],"value"],
-                                    meanMeth_ch$CnotI[meanMeth_ch$CnotI$Var2 %in% pd[pd$Age>1 & pd$Age<=12 & pd$Cell.Type=="Neuron","Data.ID"],"value"]),
-               InotT.TnotI = t.test(meanMeth_ch$InotT[meanMeth_ch$InotT$Var2 %in% pd[pd$Age<=1 & pd$Cell.Type=="Neuron","Data.ID"],"value"],
-                                    meanMeth_ch$TnotI[meanMeth_ch$TnotI$Var2 %in% pd[pd$Age>12 & pd$Age<=17 & pd$Cell.Type=="Neuron","Data.ID"],"value"]),
-               InotA.AnotI = t.test(meanMeth_ch$InotA[meanMeth_ch$InotA$Var2 %in% pd[pd$Age<=1 & pd$Cell.Type=="Neuron","Data.ID"],"value"],
-                                    meanMeth_ch$AnotI[meanMeth_ch$AnotI$Var2 %in% pd[pd$Age>17 & pd$Cell.Type=="Neuron","Data.ID"],"value"]),
-               CnotT.TnotC = t.test(meanMeth_ch$CnotT[meanMeth_ch$CnotT$Var2 %in% pd[pd$Age>1 & pd$Age<=12 & pd$Cell.Type=="Neuron","Data.ID"],"value"],
-                                    meanMeth_ch$TnotC[meanMeth_ch$TnotC$Var2 %in% pd[pd$Age>12 & pd$Age<=17 & pd$Cell.Type=="Neuron","Data.ID"],"value"]),
-               CnotA.AnotC = t.test(meanMeth_ch$CnotA[meanMeth_ch$CnotA$Var2 %in% pd[pd$Age>1 & pd$Age<=12 & pd$Cell.Type=="Neuron","Data.ID"],"value"],
-                                    meanMeth_ch$AnotC[meanMeth_ch$AnotC$Var2 %in% pd[pd$Age>17 & pd$Cell.Type=="Neuron","Data.ID"],"value"]),
-               TnotA.AnotT = t.test(meanMeth_ch$TnotA[meanMeth_ch$TnotA$Var2 %in% pd[pd$Age>12 & pd$Age<=17 & pd$Cell.Type=="Neuron","Data.ID"],"value"],
-                                    meanMeth_ch$AnotT[meanMeth_ch$AnotT$Var2 %in% pd[pd$Age>17 & pd$Cell.Type=="Neuron","Data.ID"],"value"]))
-neuro = data.frame(Tstat = unlist(lapply(tstat.N, function(x) x$statistic)), mean1 = unlist(lapply(tstat.N, function(x) x$estimate[1])),
-                   mean2 = unlist(lapply(tstat.N, function(x) x$estimate[2])), pval = unlist(lapply(tstat.N, function(x) x$p.value)), comps = names(tstat.N), row.names = NULL)
-
-tstat.G = list(InotC.CnotI = t.test(meanMeth_ch$InotC.G[meanMeth_ch$InotC.G$Var2 %in% pd[pd$Age<=1 & pd$Cell.Type=="Glia","Data.ID"],"value"],
-                                    meanMeth_ch$CnotI.G[meanMeth_ch$CnotI.G$Var2 %in% pd[pd$Age>1 & pd$Age<=12 & pd$Cell.Type=="Glia","Data.ID"],"value"]),
-               InotT.TnotI = t.test(meanMeth_ch$InotT.G[meanMeth_ch$InotT.G$Var2 %in% pd[pd$Age<=1 & pd$Cell.Type=="Glia","Data.ID"],"value"],
-                                    meanMeth_ch$TnotI.G[meanMeth_ch$TnotI.G$Var2 %in% pd[pd$Age>12 & pd$Age<=17 & pd$Cell.Type=="Glia","Data.ID"],"value"]),
-               InotA.AnotI = t.test(meanMeth_ch$InotA.G[meanMeth_ch$InotA.G$Var2 %in% pd[pd$Age<=1 & pd$Cell.Type=="Glia","Data.ID"],"value"],
-                                    meanMeth_ch$AnotI.G[meanMeth_ch$AnotI.G$Var2 %in% pd[pd$Age>17 & pd$Cell.Type=="Glia","Data.ID"],"value"]),
-               CnotT.TnotC = t.test(meanMeth_ch$CnotT.G[meanMeth_ch$CnotT.G$Var2 %in% pd[pd$Age>1 & pd$Age<=12 & pd$Cell.Type=="Glia","Data.ID"],"value"],
-                                    meanMeth_ch$TnotC.G[meanMeth_ch$TnotC.G$Var2 %in% pd[pd$Age>12 & pd$Age<=17 & pd$Cell.Type=="Glia","Data.ID"],"value"]),
-               CnotA.AnotC = t.test(meanMeth_ch$CnotA.G[meanMeth_ch$CnotA.G$Var2 %in% pd[pd$Age>1 & pd$Age<=12 & pd$Cell.Type=="Glia","Data.ID"],"value"],
-                                    meanMeth_ch$AnotC.G[meanMeth_ch$AnotC.G$Var2 %in% pd[pd$Age>17 & pd$Cell.Type=="Glia","Data.ID"],"value"]),
-               TnotA.AnotT = t.test(meanMeth_ch$TnotA.G[meanMeth_ch$TnotA.G$Var2 %in% pd[pd$Age>12 & pd$Age<=17 & pd$Cell.Type=="Glia","Data.ID"],"value"],
-                                    meanMeth_ch$AnotT.G[meanMeth_ch$AnotT.G$Var2 %in% pd[pd$Age>17 & pd$Cell.Type=="Glia","Data.ID"],"value"]))
-gli = data.frame(Tstat = unlist(lapply(tstat.G, function(x) x$statistic)), mean1 = unlist(lapply(tstat.G, function(x) x$estimate[1])),
-                 mean2 = unlist(lapply(tstat.G, function(x) x$estimate[2])), pval = unlist(lapply(tstat.G, function(x) x$p.value)), comps = names(tstat.G), row.names = NULL)
-
-
-dfmeth = rbind(cbind(dfCG[,-1], Context = "CpG"), cbind(rbind(cbind(neuro, Comp = "Neurons Age"), cbind(gli, Comp = "Glia Age"), cbind(ct, Comp = "Cell Type")), Context = "CpH"))
-dfmeth$FDR = p.adjust(dfmeth$pval, method = "fdr")
-
-write.csv(dfmeth, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/t.test_DMV_gene_methylation.csv")
+calculate.overlap(inttargets)
 
 
 ## Which ones are TFs, and what are they doing in terms of our TF analysis? 
