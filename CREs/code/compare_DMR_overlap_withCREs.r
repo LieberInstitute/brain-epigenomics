@@ -63,6 +63,7 @@ df$celltype = factor(df$celltype, levels = c("Prenatal","Glia","Neuron"))
 write.csv(df, quote=F,file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/methFeatures_Overlap_withDMRs.csv")
 
 df = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/methFeatures_Overlap_withDMRs.csv")
+df$feature = factor(df$feature, levels = c("UMR","LMR","DMV","PMD"))
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/methFeatures_Overlap_withDMRs.pdf", width = 12, height = 8)
 ggplot(df[which(df$group %in% c("Cell Type (11179)","Age (129)")),], aes(x = celltype, y = perc.dmrHits)) + geom_boxplot() +
