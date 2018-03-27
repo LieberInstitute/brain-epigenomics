@@ -16,6 +16,7 @@ load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/PMD_gene_comps.rda")
 ## Prepare DMRs
 
 cdDmrs = split(dmrs, dmrs$k6cluster_label)
+cdDmrs$All = dmrs
 dmrsList = endoapply(cdDmrs, granges)
 
 ageDMRs = makeGRangesFromDataFrame(DMR$Age[DMR$Age$sig=="FWER < 0.05",])
@@ -105,14 +106,46 @@ save(enrichmentsList, allList, dat, compress=TRUE,
 # make plots ##
 ###############
 
-# long, pgc
-pgcLong = data.frame(State = rep(colnames(statTab_pgc)[-1],each=nrow(statTab_pgc)),
-	Enrichment = as.numeric(as.matrix(statTab_pgc[,-1])),
-	Sample = rep(rownames(statTab_pgc), times= ncol(statTab_pgc)-1))
-	
-pgcLong$log2Enrich = log2(pgcLong$Enrichment)
-pgcLong$State = factor(pgcLong$State, levels=unique(pgcLong$State))
-pgcLong$inBrain = as.numeric(pgcLong$Sample %in% dat$EID[brainIDs])+1
+# for the roadmap state analysis, I'd like 
+# 1) comparison of cell type, overall age, and interaction DMRs in brain (adult DLPFC?) to other tissues
+# 2) in adult DLPFC and fetal cortex samples, enrichment of UMR, LMR, PMD, and DMV states
+
+# long stats
+enrichListLong = lapply(enrichmentsList, function(x) {
+	y = data.frame(State = rep(colnames(x)[-1],each=nrow(x)),
+			Enrichment = as.numeric(as.matrix(x[,-1])),
+			Sample = rep(rownames(x), times= ncol(x)-1),
+			stringsAsFactors=FALSE)
+			
+	y$log2Enrich = log2(y$Enrichment+0.001) # use offset
+	y$State = factor(y$State, levels=unique(y$State))
+	y$isBrain = y$Sample %in% dat$EID[brainIDs]
+	y$isDLPFC = y$Sample == "E073"
+	return(y)
+})
+
+## comparison of cell type, overall age, and interaction DMRs in brain (adult DLPFC?) to other tissues
+enrichDMRs = enrichListLong[1:9]
+names(enrichDMRs)[7] = "All_cdDMRs")
+# plot
+pdf("../plots/DMRs_roadmap_enrichments.pdf",h=5,w=10,useDingbats=FALSE)
+for(i in seq(along=enrichDMRs)) {
+	x = enrichDMRs[[i]]
+	par(mar=c(10,6,2,2),cex.axis=1.6,cex.lab=1.6,cex.main=1.6)
+	boxplot(log2Enrich ~ State, data = x, las=3, outline=FALSE,
+		main = names(enrichDMRs)[i],ylim=c(-10,10),
+		ylab = "Coverage Ratio (log2)")
+	points(log2Enrich ~ jitter(as.numeric(State), amount=0.15), 
+		data = x, pch = ifelse(isDLPFC, 22, 21), 
+		bg = ifelse(isBrain, "red", "grey"),
+		cex = ifelse(!isBrain, 0.5, ifelse(!isDLPFC, 1,1.5)))
+	abline(h=0,lty=2,col="blue")
+}
+dev.off()
+
+
+
+
 
 # long, all
 allLong = data.frame(State = rep(colnames(statTab_all)[-1],each=nrow(statTab_all)),
@@ -123,16 +156,6 @@ allLong$log2Enrich = log2(allLong$Enrichment)
 allLong$State = factor(allLong$State, levels=unique(allLong$State))
 allLong$inBrain = as.numeric(allLong$Sample %in% dat$EID[brainIDs])+1
 
-# plot
-pdf("GWAS_unannotated_roadmap_enrichments.pdf",h=5,w=10,useDingbats=FALSE)
-par(mar=c(10,6,2,2),cex.axis=1.6,cex.lab=1.6,cex.main=1.6)
-boxplot(log2Enrich ~ State, data = pgcLong, las=3, outline=FALSE,
-	main = "SCZD GWAS",ylim=c(-4,4),
-	ylab = "Coverage Ratio (log2)")
-points(log2Enrich ~ jitter(as.numeric(State), amount=0.15), 
-	data = pgcLong, 
-	pch = 21, bg = ifelse(inBrain == 2, "red", "grey"),
-	cex = ifelse(inBrain == 2, 1, 0.5))
 abline(h=0,lty=2,col="blue")
 legend("topright", "Brain", col = "red", pch =15,cex=1.6)
 boxplot(log2Enrich ~ State, data = allLong, las=3, outline=FALSE,
