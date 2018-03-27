@@ -78,7 +78,12 @@ print(files)
 ## Load and filter:
 load_filt <- function(f) {
     message(paste(Sys.time(), 'loading', f))
-    load(f, verbose = TRUE)    
+    load(f, verbose = TRUE)
+    
+    ## Coerce to matrix obj
+    assays(BSobj)$M <- as.matrix(assays(BSobj)$M)
+    assays(BSobj)$Cov <- as.matrix(assays(BSobj)$Cov)
+    
     return(BSobj)
 }
 
