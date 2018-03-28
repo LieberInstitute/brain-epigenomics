@@ -78,10 +78,10 @@ if(opt$chr != 'all') {
     
     ## Reproducibility information
     print('Reproducibility information:')
-    Sys.time()
-    proc.time()
+    print(Sys.time())
+    print(proc.time())
     options(width = 120)
-    session_info()
+    print(session_info())
     
     q('no')
 }
@@ -102,7 +102,9 @@ print(files)
 load_filt <- function(f) {
     message(paste(Sys.time(), 'loading', f))
     load(f, verbose = TRUE)
-    return(BSobj)
+    
+    ## Seems to be needed
+    return(updateObject(BSobj))
 }
 
 f_filt <- paste0('allChrs_cleaned_CX_Homogenate_', opt$type, '.Rdata')
