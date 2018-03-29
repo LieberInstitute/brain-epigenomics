@@ -6,6 +6,8 @@ library(clusterProfiler)
 require(org.Hs.eg.db)
 library(GenomicRanges)
 library(data.table)
+library(VennDiagram)
+
 
 
 ## Load data
@@ -346,6 +348,22 @@ plot(AgecompareBP, colorBy="p.adjust", showCategory = 1400, title= "non-CpG Biol
 plot(AgecompareMF, colorBy="p.adjust", showCategory = 1400, title= "non-CpG Molecular Function GO Enrichment by Age in Neurons")
 plot(AgecompareCC, colorBy="p.adjust", showCategory = 1400, title= "non-CpG Cellular Compartment GO Enrichment by Age in Neurons")
 plot(AgecompareDO, colorBy="p.adjust", showCategory = 1400, title= "non-CpG Disease Ontology Enrichment by Age in Neurons")
+dev.off()
+
+
+comp = as.data.frame(AgecompareBP)
+comp = comp[grep("Overlap", comp$Cluster),]
+comp = split(comp$Description, comp$Cluster)
+comp = comp[elementNROWS(comp)>0]
+ov = calculate.overlap(comp)
+
+plotExample = AgecompareBP # clusterProfiler output
+plotExample@compareClusterResult = plotExample@compareClusterResult[which(plotExample@compareClusterResult$Description %in% 
+                                                                            unlist(ov[names(ov) %in% c("a9","a14","a1","a3")])),]   
+plotExample@compareClusterResult = plotExample@compareClusterResult[grep("Overlap",plotExample@compareClusterResult$Cluster),] 
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/nonCG_BP_filtered_plots_byAgeinNeurons_byC_Context.pdf", height = 14, width = 12)
+plot(plotExample, colorBy="p.adjust", showCategory = 10, title= "non-CpG BP Enrichment by Age in Neurons")
 dev.off()
 
 
