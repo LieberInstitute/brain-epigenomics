@@ -46,6 +46,14 @@ ggplot(auto_long, aes(x = lag, y = abs(acf_neuron))) + geom_boxplot() + facet_gr
 ggplot(auto_long, aes(x = lag, y = abs(acf_glia))) + geom_boxplot() + facet_grid(model ~ context) + theme_bw(base_size = 30) + ggtitle('Glia') + ylab('Absolute auto correlation') + ylim(c(0, 1))
 dev.off()
 
+pdf('pdf/autocorrelation_by_context_and_model_int_subset.pdf', width = 7, height = 7, useDingbats = FALSE)
+sub <- subset(auto_long, context %in% c('all', 'CG', 'nonCG') & model == 'interaction')
+sub$context <- c('all' = 'C', 'CG' = 'CpG', 'nonCG' = 'CpH')[sub$context]
+
+ggplot(sub, aes(x = lag, y = acf_neuron)) + geom_boxplot() + facet_grid(~ context) + theme_bw(base_size = 30) + ggtitle('Neuron') + ylab('Auto correlation') + ylim(c(0, 1))
+ggplot(sub, aes(x = lag, y = acf_glia)) + geom_boxplot() + facet_grid(~ context) + theme_bw(base_size = 30) + ggtitle('Glia') + ylab('Auto correlation') + ylim(c(0, 1))
+dev.off()
+
 ## Reproducibility information
 print('Reproducibility information:')
 Sys.time()
