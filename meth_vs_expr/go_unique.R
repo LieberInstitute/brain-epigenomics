@@ -32,7 +32,7 @@ go_all <- lapply(names(go), function(feat) {
 
         gos@compareClusterResult$Cluster <- gsub('nonCpG', 'CpH', gos@compareClusterResult$Cluster)
 
-        gos@compareClusterResult = gos@compareClusterResult[which(as.character(gos@compareClusterResult$Cluster) %in% keep),]
+        # gos@compareClusterResult = gos@compareClusterResult[which(as.character(gos@compareClusterResult$Cluster) %in% keep),]
 
         gos@compareClusterResult = gos@compareClusterResult[which(gos@compareClusterResult$Description %in% ov_uniq),]
         if(any(gos@compareClusterResult$Cluster == 'CpG:CpH:CpGmarg')) {
