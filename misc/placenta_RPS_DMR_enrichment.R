@@ -76,31 +76,33 @@ lapply(oo, function(x) length(unique(queryHits(x))))
 
 df.clusters$regionID = paste0(df.clusters$seqnames,":",df.clusters$start,"-",df.clusters$end)
 df.clusters$rnum = 1:length(gr.clusters)
-df.clusters$CellType = ifelse(df.clusters$rnum %in% queryHits(oo$CellType), "CellType","no")
-df.clusters$"CellType.N+" = ifelse(df.clusters$rnum %in% queryHits(oo$"CellType.N+"), "CellType","no")
-df.clusters$"CellType.N-" = ifelse(df.clusters$rnum %in% queryHits(oo$"CellType.N-"), "CellType","no")
-df.clusters$Age = ifelse(df.clusters$rnum %in% queryHits(oo$Age), "Age","no")
-df.clusters$Interaction = ifelse(df.clusters$rnum %in% queryHits(oo$Interaction), "Interaction","no")
-df.clusters$Gr1 = ifelse(df.clusters$rnum %in% queryHits(oo$Gr1), "Gr1","no")
-df.clusters$Gr2 = ifelse(df.clusters$rnum %in% queryHits(oo$Gr2), "Gr2","no")
-df.clusters$Gr3 = ifelse(df.clusters$rnum %in% queryHits(oo$Gr3), "Gr3","no")
-df.clusters$Gr4 = ifelse(df.clusters$rnum %in% queryHits(oo$Gr4), "Gr4","no")
-df.clusters$Gr5 = ifelse(df.clusters$rnum %in% queryHits(oo$Gr5), "Gr5","no")
-df.clusters$Gr6 = ifelse(df.clusters$rnum %in% queryHits(oo$Gr6), "Gr6","no")
+df.clusters$CellType = ifelse(df.clusters$rnum %in% queryHits(oo$CellType), 1,0)
+df.clusters$"CellType.N+" = ifelse(df.clusters$rnum %in% queryHits(oo$"CellType.N+"), 1,0)
+df.clusters$"CellType.N-" = ifelse(df.clusters$rnum %in% queryHits(oo$"CellType.N-"), 1,0)
+df.clusters$Age = ifelse(df.clusters$rnum %in% queryHits(oo$Age), 1,0)
+df.clusters$Interaction = ifelse(df.clusters$rnum %in% queryHits(oo$Interaction), 1,0)
+df.clusters$Gr1 = ifelse(df.clusters$rnum %in% queryHits(oo$Gr1), 1,0)
+df.clusters$Gr2 = ifelse(df.clusters$rnum %in% queryHits(oo$Gr2), 1,0)
+df.clusters$Gr3 = ifelse(df.clusters$rnum %in% queryHits(oo$Gr3), 1,0)
+df.clusters$Gr4 = ifelse(df.clusters$rnum %in% queryHits(oo$Gr4), 1,0)
+df.clusters$Gr5 = ifelse(df.clusters$rnum %in% queryHits(oo$Gr5), 1,0)
+df.clusters$Gr6 = ifelse(df.clusters$rnum %in% queryHits(oo$Gr6), 1,0)
 df.clusters$DMRs = paste(df.clusters$CellType, df.clusters$Age, df.clusters$Interaction,
                          df.clusters$Gr1,df.clusters$Gr2,df.clusters$Gr3,df.clusters$Gr4,df.clusters$Gr5,df.clusters$Gr6, sep=":")
 ooG = findOverlaps(gr.clusters, makeGRangesFromDataFrame(geneMap))
 df.clusters$Gene = ifelse(df.clusters$rnum %in% queryHits(ooG), 1,0)
+ooPC = findOverlaps(gr.clusters, makeGRangesFromDataFrame(geneMap[which(geneMap$gene_type=="protein_coding"),]))
+df.clusters$ProteinCoding = ifelse(df.clusters$rnum %in% queryHits(ooPC), 1,0)
 
 ooP = findOverlaps(plac1000, gr.clusters)
 ooNP = findOverlaps(nonplac1000, gr.clusters)
-df.clusters$plac1000 = ifelse(df.clusters$rnum %in% subjectHits(ooP), "plac1000","no")
-df.clusters$nonplac1000 = ifelse(df.clusters$rnum %in% subjectHits(ooNP), "nonplac1000","no")
+df.clusters$plac1000 = ifelse(df.clusters$rnum %in% subjectHits(ooP), 1,0)
+df.clusters$nonplac1000 = ifelse(df.clusters$rnum %in% subjectHits(ooNP), 1,0)
 
 ooP = findOverlaps(plac500, gr.clusters)
 ooNP = findOverlaps(nonplac500, gr.clusters)
-df.clusters$plac500 = ifelse(df.clusters$rnum %in% subjectHits(ooP), "plac500","no")
-df.clusters$nonplac500 = ifelse(df.clusters$rnum %in% subjectHits(ooNP), "nonplac500","no")
+df.clusters$plac500 = ifelse(df.clusters$rnum %in% subjectHits(ooP), 1,0)
+df.clusters$nonplac500 = ifelse(df.clusters$rnum %in% subjectHits(ooNP), 1,0)
 
 
 # make contingency tables
@@ -253,11 +255,116 @@ write.csv(DMRenrich, quote = F, "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas
 
 
 ## are there significantly more genes in the placenta loci?
-df.clusters$plac500 = ifelse(df.clusters$plac500=="plac500", 1,0)
-df.clusters$CellType = ifelse(df.clusters$CellType=="CellType", 1,0)
 
-f = glm(plac500 ~ CellType + Gene, family = "binomial", data=df.clusters)
-summary(f)
+cols = c("CellType","CellType.N+","CellType.N-","Age","Interaction","Gr1","Gr2","Gr3","Gr4","Gr5","Gr6")
+f = list(list(plac1000 = glm(plac1000 ~ CellType + Gene, family = "binomial", data=df.clusters),
+              nonplac1000 = glm(nonplac1000 ~ CellType + Gene, family = "binomial", data=df.clusters),
+              plac500 = glm(plac500 ~ CellType + Gene, family = "binomial", data=df.clusters),
+              nonplac500 = glm(nonplac500 ~ CellType + Gene, family = "binomial", data=df.clusters)),
+         list(plac1000 = glm(plac1000 ~ CellType.N + Gene, family = "binomial", data=df.clusters),
+              nonplac1000 = glm(nonplac1000 ~ CellType.N + Gene, family = "binomial", data=df.clusters),
+              plac500 = glm(plac500 ~ CellType.N + Gene, family = "binomial", data=df.clusters),
+              nonplac500 = glm(nonplac500 ~ CellType.N + Gene, family = "binomial", data=df.clusters)),
+         list(plac1000 = glm(plac1000 ~ CellType.G + Gene, family = "binomial", data=df.clusters),
+              nonplac1000 = glm(nonplac1000 ~ CellType.G + Gene, family = "binomial", data=df.clusters),
+              plac500 = glm(plac500 ~ CellType.G + Gene, family = "binomial", data=df.clusters),
+              nonplac500 = glm(nonplac500 ~ CellType.G + Gene, family = "binomial", data=df.clusters)),
+         list(plac1000 = glm(plac1000 ~ Age + Gene, family = "binomial", data=df.clusters),
+              nonplac1000 = glm(nonplac1000 ~ Age + Gene, family = "binomial", data=df.clusters),
+              plac500 = glm(plac500 ~ Age + Gene, family = "binomial", data=df.clusters),
+              nonplac500 = glm(nonplac500 ~ Age + Gene, family = "binomial", data=df.clusters)),
+         list(plac1000 = glm(plac1000 ~ Interaction + Gene, family = "binomial", data=df.clusters),
+              nonplac1000 = glm(nonplac1000 ~ Interaction + Gene, family = "binomial", data=df.clusters),
+              plac500 = glm(plac500 ~ Interaction + Gene, family = "binomial", data=df.clusters),
+              nonplac500 = glm(nonplac500 ~ Interaction + Gene, family = "binomial", data=df.clusters)),
+         list(plac1000 = glm(plac1000 ~ Gr1 + Gene, family = "binomial", data=df.clusters),
+              nonplac1000 = glm(nonplac1000 ~ Gr1 + Gene, family = "binomial", data=df.clusters),
+              plac500 = glm(plac500 ~ Gr1 + Gene, family = "binomial", data=df.clusters),
+              nonplac500 = glm(nonplac500 ~ Gr1 + Gene, family = "binomial", data=df.clusters)),
+         list(plac1000 = glm(plac1000 ~ Gr2 + Gene, family = "binomial", data=df.clusters),
+              nonplac1000 = glm(nonplac1000 ~ Gr2 + Gene, family = "binomial", data=df.clusters),
+              plac500 = glm(plac500 ~ Gr2 + Gene, family = "binomial", data=df.clusters),
+              nonplac500 = glm(nonplac500 ~ Gr2 + Gene, family = "binomial", data=df.clusters)),
+         list(plac1000 = glm(plac1000 ~ Gr3 + Gene, family = "binomial", data=df.clusters),
+              nonplac1000 = glm(nonplac1000 ~ Gr3 + Gene, family = "binomial", data=df.clusters),
+              plac500 = glm(plac500 ~ Gr3 + Gene, family = "binomial", data=df.clusters),
+              nonplac500 = glm(nonplac500 ~ Gr3 + Gene, family = "binomial", data=df.clusters)),
+         list(plac1000 = glm(plac1000 ~ Gr4 + Gene, family = "binomial", data=df.clusters),
+              nonplac1000 = glm(nonplac1000 ~ Gr4 + Gene, family = "binomial", data=df.clusters),
+              plac500 = glm(plac500 ~ Gr4 + Gene, family = "binomial", data=df.clusters),
+              nonplac500 = glm(nonplac500 ~ Gr4 + Gene, family = "binomial", data=df.clusters)),
+         list(plac1000 = glm(plac1000 ~ Gr5 + Gene, family = "binomial", data=df.clusters),
+              nonplac1000 = glm(nonplac1000 ~ Gr5 + Gene, family = "binomial", data=df.clusters),
+              plac500 = glm(plac500 ~ Gr5 + Gene, family = "binomial", data=df.clusters),
+              nonplac500 = glm(nonplac500 ~ Gr5 + Gene, family = "binomial", data=df.clusters)),
+         list(plac1000 = glm(plac1000 ~ Gr6 + Gene, family = "binomial", data=df.clusters),
+              nonplac1000 = glm(nonplac1000 ~ Gr6 + Gene, family = "binomial", data=df.clusters),
+              plac500 = glm(plac500 ~ Gr6 + Gene, family = "binomial", data=df.clusters),
+              nonplac500 = glm(nonplac500 ~ Gr6 + Gene, family = "binomial", data=df.clusters)))
+df = do.call(rbind, Map(cbind, lapply(f, function(x) data.frame(AdjustedOdds = unlist(lapply(x, function(y) exp(y$coef[2]))), SNPgroup = names(x))), SigGroup = as.list(cols)))
+rownames(df) = NULL
+df$SigGroup = gsub("Gr1", "G-:N+", df$SigGroup)
+df$SigGroup = gsub("Gr2", "G0:N+", df$SigGroup)
+df$SigGroup = gsub("Gr3", "G0:N-", df$SigGroup)
+df$SigGroup = gsub("Gr4", "G+:N0", df$SigGroup)
+df$SigGroup = gsub("Gr5", "G+:N-", df$SigGroup)
+df$SigGroup = gsub("Gr6", "G-:N0", df$SigGroup)
+write.csv(df,file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/placenta_SNPregions_enrichment_DMRs_geneAdjusted.csv",quote=F)
+
+
+f.proteincoding = list(list(plac1000 = glm(plac1000 ~ CellType + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac1000 = glm(nonplac1000 ~ CellType + ProteinCoding, family = "binomial", data=df.clusters),
+                            plac500 = glm(plac500 ~ CellType + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac500 = glm(nonplac500 ~ CellType + ProteinCoding, family = "binomial", data=df.clusters)),
+                       list(plac1000 = glm(plac1000 ~ CellType.N + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac1000 = glm(nonplac1000 ~ CellType.N + ProteinCoding, family = "binomial", data=df.clusters),
+                            plac500 = glm(plac500 ~ CellType.N + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac500 = glm(nonplac500 ~ CellType.N + ProteinCoding, family = "binomial", data=df.clusters)),
+                       list(plac1000 = glm(plac1000 ~ CellType.G + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac1000 = glm(nonplac1000 ~ CellType.G + ProteinCoding, family = "binomial", data=df.clusters),
+                            plac500 = glm(plac500 ~ CellType.G + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac500 = glm(nonplac500 ~ CellType.G + ProteinCoding, family = "binomial", data=df.clusters)),
+                       list(plac1000 = glm(plac1000 ~ Age + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac1000 = glm(nonplac1000 ~ Age + ProteinCoding, family = "binomial", data=df.clusters),
+                            plac500 = glm(plac500 ~ Age + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac500 = glm(nonplac500 ~ Age + ProteinCoding, family = "binomial", data=df.clusters)),
+                       list(plac1000 = glm(plac1000 ~ Interaction + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac1000 = glm(nonplac1000 ~ Interaction + ProteinCoding, family = "binomial", data=df.clusters),
+                            plac500 = glm(plac500 ~ Interaction + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac500 = glm(nonplac500 ~ Interaction + ProteinCoding, family = "binomial", data=df.clusters)),
+                       list(plac1000 = glm(plac1000 ~ Gr1 + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac1000 = glm(nonplac1000 ~ Gr1 + ProteinCoding, family = "binomial", data=df.clusters),
+                            plac500 = glm(plac500 ~ Gr1 + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac500 = glm(nonplac500 ~ Gr1 + ProteinCoding, family = "binomial", data=df.clusters)),
+                       list(plac1000 = glm(plac1000 ~ Gr2 + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac1000 = glm(nonplac1000 ~ Gr2 + ProteinCoding, family = "binomial", data=df.clusters),
+                            plac500 = glm(plac500 ~ Gr2 + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac500 = glm(nonplac500 ~ Gr2 + ProteinCoding, family = "binomial", data=df.clusters)),
+                       list(plac1000 = glm(plac1000 ~ Gr3 + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac1000 = glm(nonplac1000 ~ Gr3 + ProteinCoding, family = "binomial", data=df.clusters),
+                            plac500 = glm(plac500 ~ Gr3 + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac500 = glm(nonplac500 ~ Gr3 + ProteinCoding, family = "binomial", data=df.clusters)),
+                       list(plac1000 = glm(plac1000 ~ Gr4 + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac1000 = glm(nonplac1000 ~ Gr4 + ProteinCoding, family = "binomial", data=df.clusters),
+                            plac500 = glm(plac500 ~ Gr4 + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac500 = glm(nonplac500 ~ Gr4 + ProteinCoding, family = "binomial", data=df.clusters)),
+                       list(plac1000 = glm(plac1000 ~ Gr5 + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac1000 = glm(nonplac1000 ~ Gr5 + ProteinCoding, family = "binomial", data=df.clusters),
+                            plac500 = glm(plac500 ~ Gr5 + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac500 = glm(nonplac500 ~ Gr5 + ProteinCoding, family = "binomial", data=df.clusters)),
+                       list(plac1000 = glm(plac1000 ~ Gr6 + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac1000 = glm(nonplac1000 ~ Gr6 + ProteinCoding, family = "binomial", data=df.clusters),
+                            plac500 = glm(plac500 ~ Gr6 + ProteinCoding, family = "binomial", data=df.clusters),
+                            nonplac500 = glm(nonplac500 ~ Gr6 + ProteinCoding, family = "binomial", data=df.clusters)))
+df = do.call(rbind, Map(cbind, lapply(f, function(x) data.frame(AdjustedOdds = unlist(lapply(x, function(y) exp(y$coef[2]))), SNPgroup = names(x))), SigGroup = as.list(cols)))
+rownames(df) = NULL
+df$SigGroup = gsub("Gr1", "G-:N+", df$SigGroup)
+df$SigGroup = gsub("Gr2", "G0:N+", df$SigGroup)
+df$SigGroup = gsub("Gr3", "G0:N-", df$SigGroup)
+df$SigGroup = gsub("Gr4", "G+:N0", df$SigGroup)
+df$SigGroup = gsub("Gr5", "G+:N-", df$SigGroup)
+df$SigGroup = gsub("Gr6", "G-:N0", df$SigGroup)
+write.csv(df,file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/placenta_SNPregions_enrichment_DMRs_proteincodinggeneAdjusted.csv",quote=F)
 
 
 ## Associate with LD blocks
