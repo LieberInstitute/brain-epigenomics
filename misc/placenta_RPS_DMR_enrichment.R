@@ -79,7 +79,6 @@ df.clusters$rnum = 1:length(gr.clusters)
 df.clusters$CellType = ifelse(df.clusters$rnum %in% queryHits(oo$CellType), "CellType","no")
 df.clusters$"CellType.N+" = ifelse(df.clusters$rnum %in% queryHits(oo$"CellType.N+"), "CellType","no")
 df.clusters$"CellType.N-" = ifelse(df.clusters$rnum %in% queryHits(oo$"CellType.N-"), "CellType","no")
-
 df.clusters$Age = ifelse(df.clusters$rnum %in% queryHits(oo$Age), "Age","no")
 df.clusters$Interaction = ifelse(df.clusters$rnum %in% queryHits(oo$Interaction), "Interaction","no")
 df.clusters$Gr1 = ifelse(df.clusters$rnum %in% queryHits(oo$Gr1), "Gr1","no")
@@ -90,6 +89,8 @@ df.clusters$Gr5 = ifelse(df.clusters$rnum %in% queryHits(oo$Gr5), "Gr5","no")
 df.clusters$Gr6 = ifelse(df.clusters$rnum %in% queryHits(oo$Gr6), "Gr6","no")
 df.clusters$DMRs = paste(df.clusters$CellType, df.clusters$Age, df.clusters$Interaction,
                          df.clusters$Gr1,df.clusters$Gr2,df.clusters$Gr3,df.clusters$Gr4,df.clusters$Gr5,df.clusters$Gr6, sep=":")
+ooG = findOverlaps(gr.clusters, makeGRangesFromDataFrame(geneMap))
+df.clusters$Gene = ifelse(df.clusters$rnum %in% queryHits(ooG), 1,0)
 
 ooP = findOverlaps(plac1000, gr.clusters)
 ooNP = findOverlaps(nonplac1000, gr.clusters)
@@ -139,6 +140,9 @@ for (i in 1:length(cols)) {
                                                    row.names = c("YesDMR","NoDMR")))
 }
 names(tables) = cols
+save(tables, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/placenta_SNPregions_enrichment_DMRs_tables.rda")
+lapply(tables, function(x) lapply(x, function(y) sum(rowSums(y))))
+
 
 fisher = lapply(tables, function(x) lapply(x,fisher.test))
 df = do.call(rbind, Map(cbind, SigGroup = as.list(names(fisher)), lapply(fisher, function(y) 
@@ -155,6 +159,105 @@ df$SigGroup = gsub("Gr6", "G-:N0", df$SigGroup)
 write.csv(df,file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/placenta_SNPregions_enrichment_DMRs.csv",quote=F)
 
 df[which(df$FDR<=0.05),]
+
+
+## How many genes fall in each category?
+
+length(unique(geneMap$gencodeID)) # 60252
+
+ooP5 = findOverlaps(plac500, makeGRangesListFromDataFrame(geneMap))
+ooP1 = findOverlaps(plac1000, makeGRangesListFromDataFrame(geneMap))
+ooNP5 = findOverlaps(nonplac500, makeGRangesListFromDataFrame(geneMap))
+ooNP1 = findOverlaps(nonplac1000, makeGRangesListFromDataFrame(geneMap))
+
+length(unique(subjectHits(ooP5))) # 1612
+length(unique(subjectHits(ooP1))) # 2769
+length(unique(subjectHits(ooNP5))) # 519
+length(unique(subjectHits(ooNP1))) # 1036
+
+
+## anchor in genes rather than clusters: nearest gene
+
+geneuniverse = na.omit(unique(geneMap$gencodeID))
+genes = list(plac500kb = geneMap[subjectHits(ooP5),], plac1Mb = geneMap[subjectHits(ooP1),], nonplac500kb = geneMap[subjectHits(ooNP5),], 
+             nonplac1Mb = geneMap[subjectHits(ooNP1),])
+genes = lapply(genes, function(x) unique(x$gencodeID))
+
+DMRgr = lapply(DMR, function(x) makeGRangesFromDataFrame(x[which(x$sig=="FWER < 0.05"),], keep.extra.columns = T))
+DMRgr = c(DMRgr, list("CellType.N+" = DMRgr$CellType[which(DMRgr$CellType$Dir=="pos" & DMRgr$CellType$sig=="FWER < 0.05"),],
+                      "CellType.N-" = DMRgr$CellType[which(DMRgr$CellType$Dir=="neg" & DMRgr$CellType$sig=="FWER < 0.05"),]),
+          lapply(dmrs, function(x) makeGRangesFromDataFrame(x[which(x$sig=="FWER < 0.05"),], keep.extra.columns = T)))
+sig = lapply(DMRgr, function(x) unique(as.character(x$nearestID)))
+notsig = lapply(sig, function(y) geneuniverse[!(geneuniverse %in% y)])
+
+DMRenrich = mapply(function(sig,notsig) lapply(genes, function(x) {
+  DE_OVERLAP = c( sum( sig %in% x),sum(!(sig %in% x)))
+  NOT_DE_OVERLAP= c(sum(notsig %in% x), sum(!(notsig %in% x)))
+  enrich_table = cbind(DE_OVERLAP, NOT_DE_OVERLAP)
+  res = fisher.test(enrich_table)
+  dat=c(res$p.value, res$estimate)
+  names(dat) <- c("P.Value","Odds.Ratio")
+  return(dat)
+}), sig, notsig,SIMPLIFY =F) 
+
+tog = lapply(sig, function(s) list(placVSnonplac500kb = fisher.test(data.frame(c(sum( s %in% genes$plac500kb),sum(!(s %in% genes$plac500kb))),
+                                                                   c(sum( s %in% genes$nonplac500kb),sum(!(s %in% genes$nonplac500kb))))),
+                                   placVSnonplac1Mb = fisher.test(data.frame(c(sum( s %in% genes$plac1Mb),sum(!(s %in% genes$plac1Mb))),
+                                                                 c(sum( s %in% genes$nonplac1Mb),sum(!(s %in% genes$nonplac1Mb)))))))
+tog = lapply(tog, function(x) lapply(x, function(y) data.frame("P.Value"=y$p.value,"Odds.Ratio"=y$estimate)))
+DMRenrich = mapply(function(d,t) c(d,t), DMRenrich, tog, SIMPLIFY = F)
+
+DMRenrich = do.call(rbind, Map(cbind, lapply(DMRenrich, function(x) do.call(rbind, Map(cbind, lapply(x, function(y) data.frame(P.Value = y["P.Value"], Odds.Ratio = y["Odds.Ratio"])), 
+                                                                                       GeneSet = as.list(names(x))))), Model = as.list(names(DMRenrich))))
+DMRenrich$FDR = p.adjust(DMRenrich$P.Value, method = "fdr")
+rownames(DMRenrich) = NULL
+write.csv(DMRenrich, quote = F, "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/placenta_SNPregions_enrichment_DMRs_nearestGenes.csv")
+
+
+## anchor in genes rather than clusters: overlapping genes only
+
+geneuniverse = na.omit(unique(geneMap$gencodeID))
+genes = list(plac500kb = geneMap[subjectHits(ooP5),], plac1Mb = geneMap[subjectHits(ooP1),], nonplac500kb = geneMap[subjectHits(ooNP5),], 
+             nonplac1Mb = geneMap[subjectHits(ooNP1),])
+genes = lapply(genes, function(x) unique(x$gencodeID))
+
+DMRgr = lapply(DMR, function(x) makeGRangesFromDataFrame(x[which(x$sig=="FWER < 0.05" & x$distToGene==0),], keep.extra.columns = T))
+DMRgr = c(DMRgr, list("CellType.N+" = DMRgr$CellType[which(DMRgr$CellType$Dir=="pos" & DMRgr$CellType$sig=="FWER < 0.05" & DMRgr$CellType$distToGene==0),],
+                      "CellType.N-" = DMRgr$CellType[which(DMRgr$CellType$Dir=="neg" & DMRgr$CellType$sig=="FWER < 0.05" & DMRgr$CellType$distToGene==0),]),
+          lapply(dmrs, function(x) makeGRangesFromDataFrame(x[which(x$sig=="FWER < 0.05" & x$distToGene==0),], keep.extra.columns = T)))
+sig = lapply(DMRgr, function(x) unique(as.character(x$nearestID)))
+notsig = lapply(sig, function(y) geneuniverse[!(geneuniverse %in% y)])
+
+DMRenrich = mapply(function(sig,notsig) lapply(genes, function(x) {
+  DE_OVERLAP = c( sum( sig %in% x),sum(!(sig %in% x)))
+  NOT_DE_OVERLAP= c(sum(notsig %in% x), sum(!(notsig %in% x)))
+  enrich_table = cbind(DE_OVERLAP, NOT_DE_OVERLAP)
+  res = fisher.test(enrich_table)
+  dat=c(res$p.value, res$estimate)
+  names(dat) <- c("P.Value","Odds.Ratio")
+  return(dat)
+}), sig, notsig,SIMPLIFY =F) 
+
+tog = lapply(sig, function(s) list(placVSnonplac500kb = fisher.test(data.frame(c(sum( s %in% genes$plac500kb),sum(!(s %in% genes$plac500kb))),
+                                                                               c(sum( s %in% genes$nonplac500kb),sum(!(s %in% genes$nonplac500kb))))),
+                                   placVSnonplac1Mb = fisher.test(data.frame(c(sum( s %in% genes$plac1Mb),sum(!(s %in% genes$plac1Mb))),
+                                                                             c(sum( s %in% genes$nonplac1Mb),sum(!(s %in% genes$nonplac1Mb)))))))
+tog = lapply(tog, function(x) lapply(x, function(y) data.frame("P.Value"=y$p.value,"Odds.Ratio"=y$estimate)))
+DMRenrich = mapply(function(d,t) c(d,t), DMRenrich, tog, SIMPLIFY = F)
+
+DMRenrich = do.call(rbind, Map(cbind, lapply(DMRenrich, function(x) do.call(rbind, Map(cbind, lapply(x, function(y) data.frame(P.Value = y["P.Value"], Odds.Ratio = y["Odds.Ratio"])), 
+                                                                                       GeneSet = as.list(names(x))))), Model = as.list(names(DMRenrich))))
+DMRenrich$FDR = p.adjust(DMRenrich$P.Value, method = "fdr")
+rownames(DMRenrich) = NULL
+write.csv(DMRenrich, quote = F, "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/placenta_SNPregions_enrichment_DMRs_overlappingGenes.csv")
+
+
+## are there significantly more genes in the placenta loci?
+df.clusters$plac500 = ifelse(df.clusters$plac500=="plac500", 1,0)
+df.clusters$CellType = ifelse(df.clusters$CellType=="CellType", 1,0)
+
+f = glm(plac500 ~ CellType + Gene, family = "binomial", data=df.clusters)
+summary(f)
 
 
 ## Associate with LD blocks
