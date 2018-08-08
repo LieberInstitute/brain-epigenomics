@@ -36,6 +36,7 @@ echo "Job name: \${JOB_NAME}"
 echo "Hostname: \${HOSTNAME}"
 echo "Task id: \${TASK_ID}"
 
+module load conda_R/3.4.x
 Rscript create_bsobj_by_chr.R -c ${chr} -t 2
 
 echo "**** Job ends ****"

@@ -93,7 +93,7 @@ rownames(pd) <- pd$Data.ID
 pData(BSobj) <- DataFrame(pd)
 dir.create('rda', showWarnings = FALSE)
 save(BSobj, file = paste0('rda/', opt$chr,
-    '_cleaned_CX_Homogenate.Rdata'))
+    '_cleaned_CX_Prenatal.Rdata'))
 
 ## Reproducibility information
 print('Reproducibility information:')

@@ -29,9 +29,9 @@ if(FALSE) {
 if(opt$chr != 'all') {
     
     filt_cpg <- paste0('rda/', opt$chr,
-        '_cleaned_CX_Homogenate_filtered_CpG.Rdata')
+        '_cleaned_CX_Prenatal_filtered_CpG.Rdata')
     filt_cph <- paste0('rda/', opt$chr, 
-        '_cleaned_CX_Homogenate_filtered_CpH.Rdata')
+        '_cleaned_CX_Prenatal_filtered_CpH.Rdata')
     
     if(!all(file.exists(c(filt_cpg, filt_cph)))) {
         load('../lister/gr_all_highCov.Rdata', verbose = TRUE)
@@ -40,7 +40,7 @@ if(opt$chr != 'all') {
         gr_cpgs$trinucleotide_context <- Rle(NA)
         gr_all <- c(gr_all_highCov, gr_cpgs)
     
-        f <- paste0('rda/', opt$chr, '_cleaned_CX_Homogenate.Rdata')
+        f <- paste0('rda/', opt$chr, '_cleaned_CX_Prenatal.Rdata')
         message(paste(Sys.time(), 'loading', f))
         load(f, verbose = TRUE)
     
@@ -90,7 +90,7 @@ stopifnot(opt$type %in% c('CpG', 'CpH'))
 
 
 message(paste(Sys.time(), 'Combining results for the chrs'))
-patt <- paste0('_cleaned_CX_Homogenate_filtered_', ifelse(opt$type == 'CpG', 'CpG', 'CpH'), '_coerced.Rdata')
+patt <- paste0('_cleaned_CX_Prenatal_filtered_', ifelse(opt$type == 'CpG', 'CpG', 'CpH'), '_coerced.Rdata')
 
 files <- dir('rda', pattern = patt, full.names = TRUE)
 message(paste(Sys.time(), 'files to combine:'))
@@ -107,7 +107,7 @@ load_filt <- function(f) {
     return(updateObject(BSobj))
 }
 
-f_filt <- paste0('allChrs_cleaned_CX_Homogenate_', opt$type, '.Rdata')
+f_filt <- paste0('allChrs_cleaned_CX_Prenatal_', opt$type, '.Rdata')
 if(!file.exists(f_filt)) {
     BSobj <- do.call(rbind, lapply(files, load_filt))
 
@@ -136,8 +136,8 @@ if(opt$type == 'CpG') {
     Cov[queryHits(ov), ] <- assays(BSobj)$Cov[subjectHits(ov), ]
 
     BSobj <- BSseq(M = M, Cov = Cov, gr = gr_all_highCov, pData = colData(BSobj))
-    message(paste(Sys.time(), 'saving allChrs_matched_cleaned_CX_Homogenate_nonCG_highCov.Rdata'))
-    save(BSobj, file = 'allChrs_matched_cleaned_CX_Homogenate_nonCG_highCov.Rdata')
+    message(paste(Sys.time(), 'saving allChrs_matched_cleaned_CX_Prenatal_nonCG_highCov.Rdata'))
+    save(BSobj, file = 'allChrs_matched_cleaned_CX_Prenatal_nonCG_highCov.Rdata')
 } else {
     ## CG next
     message(paste(Sys.time(), 'loading our GR'))
@@ -153,8 +153,8 @@ if(opt$type == 'CpG') {
     Cov[queryHits(ov), ] <- assays(BSobj)$Cov[subjectHits(ov), ]
 
     BSobj <- BSseq(M = M, Cov = Cov, gr = gr_cpgs, pData = colData(BSobj))
-    message(paste(Sys.time(), 'saving BSobj_matched_cleaned_CX_Homogenate_minCov_3.Rdata'))
-    save(BSobj, file = 'BSobj_matched_cleaned_CX_Homogenate_minCov_3.Rdata')
+    message(paste(Sys.time(), 'saving BSobj_matched_cleaned_CX_Prenatal_minCov_3.Rdata'))
+    save(BSobj, file = 'BSobj_matched_cleaned_CX_Prenatal_minCov_3.Rdata')
 }
 
 ## Reproducibility information

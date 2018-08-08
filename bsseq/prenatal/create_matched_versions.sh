@@ -32,6 +32,7 @@ echo "Job name: \${JOB_NAME}"
 echo "Hostname: \${HOSTNAME}"
 echo "Task id: \${TASK_ID}"
 
+module load conda_R/3.4.x
 Rscript create_matched_versions.R -c ${chr}
 
 echo "**** Job ends ****"
@@ -69,6 +70,7 @@ echo "Job name: \${JOB_NAME}"
 echo "Hostname: \${HOSTNAME}"
 echo "Task id: \${TASK_ID}"
 
+module load conda_R/3.4.x
 Rscript create_matched_versions.R -c "all" -t ${type}
 
 echo "**** Job ends ****"
