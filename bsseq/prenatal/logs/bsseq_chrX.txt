@@ -1,0 +1,387 @@
+**** Job starts ****
+Thu Aug  9 01:04:53 EDT 2018
+**** JHPCE info ****
+User: lcollado
+Job id: 5402058
+Job name: bsseq_chrX
+Hostname: compute-050
+Task id: 
+Unloading conda_R/3.5
+Loading conda_R/3.4.x
+Using the following user library: ~/R/x86_64-pc-linux-gnu-library/3.4.x
+Loading required package: methods
+Loading required package: BiocGenerics
+Loading required package: parallel
+
+Attaching package: ‘BiocGenerics’
+
+The following objects are masked from ‘package:parallel’:
+
+    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+    clusterExport, clusterMap, parApply, parCapply, parLapply,
+    parLapplyLB, parRapply, parSapply, parSapplyLB
+
+The following objects are masked from ‘package:stats’:
+
+    IQR, mad, sd, var, xtabs
+
+The following objects are masked from ‘package:base’:
+
+    anyDuplicated, append, as.data.frame, cbind, colMeans, colnames,
+    colSums, do.call, duplicated, eval, evalq, Filter, Find, get, grep,
+    grepl, intersect, is.unsorted, lapply, lengths, Map, mapply, match,
+    mget, order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+    rbind, Reduce, rowMeans, rownames, rowSums, sapply, setdiff, sort,
+    table, tapply, union, unique, unsplit, which, which.max, which.min
+
+Loading required package: GenomicRanges
+Loading required package: stats4
+Loading required package: S4Vectors
+
+Attaching package: ‘S4Vectors’
+
+The following object is masked from ‘package:base’:
+
+    expand.grid
+
+Loading required package: IRanges
+Loading required package: GenomeInfoDb
+Loading required package: SummarizedExperiment
+Loading required package: Biobase
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+Loading required package: DelayedArray
+Loading required package: matrixStats
+
+Attaching package: ‘matrixStats’
+
+The following objects are masked from ‘package:Biobase’:
+
+    anyMissing, rowMedians
+
+
+Attaching package: ‘DelayedArray’
+
+The following objects are masked from ‘package:matrixStats’:
+
+    colMaxs, colMins, colRanges, rowMaxs, rowMins, rowRanges
+
+The following object is masked from ‘package:base’:
+
+    apply
+
+
+Attaching package: ‘data.table’
+
+The following object is masked from ‘package:SummarizedExperiment’:
+
+    shift
+
+The following object is masked from ‘package:GenomicRanges’:
+
+    shift
+
+The following object is masked from ‘package:IRanges’:
+
+    shift
+
+The following objects are masked from ‘package:S4Vectors’:
+
+    first, second
+
+[1] "before filtering"
+         Cell.Type
+postnatal Glia Homogenate Neuron
+    FALSE    0         20      0
+    TRUE     8         22     29
+[1] "after filtering"
+         Cell.Type
+postnatal Homogenate
+    FALSE         20
+Using the following user library: ~/R/x86_64-pc-linux-gnu-library/3.4.x
+Using the following user library: ~/R/x86_64-pc-linux-gnu-library/3.4.x
+Loading required package: BiocGenerics
+Loading required package: parallel
+
+Attaching package: ‘BiocGenerics’
+
+The following objects are masked from ‘package:parallel’:
+
+    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+    clusterExport, clusterMap, parApply, parCapply, parLapply,
+    parLapplyLB, parRapply, parSapply, parSapplyLB
+
+The following objects are masked from ‘package:stats’:
+
+    IQR, mad, sd, var, xtabs
+
+The following objects are masked from ‘package:base’:
+
+    anyDuplicated, append, as.data.frame, cbind, colMeans, colnames,
+    colSums, do.call, duplicated, eval, evalq, Filter, Find, get, grep,
+    grepl, intersect, is.unsorted, lapply, lengths, Map, mapply, match,
+    mget, order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+    rbind, Reduce, rowMeans, rownames, rowSums, sapply, setdiff, sort,
+    table, tapply, union, unique, unsplit, which, which.max, which.min
+
+Loading required package: GenomicRanges
+Loading required package: stats4
+Loading required package: S4Vectors
+
+Attaching package: ‘S4Vectors’
+
+The following object is masked from ‘package:base’:
+
+    expand.grid
+
+Loading required package: IRanges
+Loading required package: GenomeInfoDb
+Loading required package: SummarizedExperiment
+Loading required package: Biobase
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+Loading required package: DelayedArray
+Loading required package: matrixStats
+
+Attaching package: ‘matrixStats’
+
+The following objects are masked from ‘package:Biobase’:
+
+    anyMissing, rowMedians
+
+
+Attaching package: ‘DelayedArray’
+
+The following objects are masked from ‘package:matrixStats’:
+
+    colMaxs, colMins, colRanges, rowMaxs, rowMins, rowRanges
+
+The following object is masked from ‘package:base’:
+
+    apply
+
+Assuming file type is cytosineReport
+[read.bismark] Reading file '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports/WGC052296L/WGC052296L.concatenated.sorted.duplicatesRemoved.CX_reportchrchrX.txt' ... Read 0.0% of 59679184 rowsRead 2.2% of 59679184 rowsRead 4.4% of 59679184 rowsRead 6.7% of 59679184 rowsRead 8.9% of 59679184 rowsRead 11.0% of 59679184 rowsRead 13.2% of 59679184 rowsRead 15.3% of 59679184 rowsRead 17.4% of 59679184 rowsRead 19.5% of 59679184 rowsRead 21.4% of 59679184 rowsRead 23.2% of 59679184 rowsRead 25.1% of 59679184 rowsRead 27.2% of 59679184 rowsRead 29.3% of 59679184 rowsRead 31.5% of 59679184 rowsRead 33.4% of 59679184 rowsRead 35.5% of 59679184 rowsRead 37.7% of 59679184 rowsRead 39.7% of 59679184 rowsRead 41.9% of 59679184 rowsRead 44.0% of 59679184 rowsRead 46.0% of 59679184 rowsRead 47.6% of 59679184 rowsRead 49.3% of 59679184 rowsRead 51.1% of 59679184 rowsRead 53.2% of 59679184 rowsRead 55.1% of 59679184 rowsRead 57.2% of 59679184 rowsRead 59.3% of 59679184 rowsRead 61.3% of 59679184 rowsRead 63.5% of 59679184 rowsRead 65.6% of 59679184 rowsRead 67.8% of 59679184 rowsRead 70.2% of 59679184 rowsRead 72.3% of 59679184 rowsRead 74.5% of 59679184 rowsRead 76.6% of 59679184 rowsRead 78.6% of 59679184 rowsRead 80.8% of 59679184 rowsRead 83.1% of 59679184 rowsRead 85.4% of 59679184 rowsRead 87.6% of 59679184 rowsRead 89.8% of 59679184 rowsRead 92.1% of 59679184 rowsRead 94.3% of 59679184 rowsRead 96.5% of 59679184 rowsRead 98.7% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.570 GB file in 00:01:13
+done in 433.2 secs
+[read.bismark] Joining samples ... done in 187.3 secs
+Assuming file type is cytosineReport
+[read.bismark] Reading file '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports/WGC052297L/WGC052297L.concatenated.sorted.duplicatesRemoved.CX_reportchrchrX.txt' ... Read 0.0% of 59679184 rowsRead 2.2% of 59679184 rowsRead 4.6% of 59679184 rowsRead 7.0% of 59679184 rowsRead 9.3% of 59679184 rowsRead 11.6% of 59679184 rowsRead 13.9% of 59679184 rowsRead 16.2% of 59679184 rowsRead 18.5% of 59679184 rowsRead 20.7% of 59679184 rowsRead 22.9% of 59679184 rowsRead 25.0% of 59679184 rowsRead 27.2% of 59679184 rowsRead 29.4% of 59679184 rowsRead 31.7% of 59679184 rowsRead 33.8% of 59679184 rowsRead 36.0% of 59679184 rowsRead 38.2% of 59679184 rowsRead 40.4% of 59679184 rowsRead 42.6% of 59679184 rowsRead 44.8% of 59679184 rowsRead 47.1% of 59679184 rowsRead 49.3% of 59679184 rowsRead 51.5% of 59679184 rowsRead 53.7% of 59679184 rowsRead 56.1% of 59679184 rowsRead 58.4% of 59679184 rowsRead 60.6% of 59679184 rowsRead 62.9% of 59679184 rowsRead 65.3% of 59679184 rowsRead 67.6% of 59679184 rowsRead 69.9% of 59679184 rowsRead 72.3% of 59679184 rowsRead 74.6% of 59679184 rowsRead 77.0% of 59679184 rowsRead 79.4% of 59679184 rowsRead 81.8% of 59679184 rowsRead 84.1% of 59679184 rowsRead 86.4% of 59679184 rowsRead 88.8% of 59679184 rowsRead 91.1% of 59679184 rowsRead 93.5% of 59679184 rowsRead 95.6% of 59679184 rowsRead 97.7% of 59679184 rowsRead 99.9% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.570 GB file in 00:01:05
+done in 417.7 secs
+[read.bismark] Joining samples ... done in 208.4 secs
+Assuming file type is cytosineReport
+[read.bismark] Reading file '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports/WGC052298L/WGC052298L.concatenated.sorted.duplicatesRemoved.CX_reportchrchrX.txt' ... Read 0.0% of 59679184 rowsRead 1.8% of 59679184 rowsRead 3.6% of 59679184 rowsRead 5.4% of 59679184 rowsRead 7.1% of 59679184 rowsRead 8.8% of 59679184 rowsRead 10.5% of 59679184 rowsRead 12.2% of 59679184 rowsRead 13.9% of 59679184 rowsRead 15.6% of 59679184 rowsRead 17.3% of 59679184 rowsRead 19.3% of 59679184 rowsRead 21.4% of 59679184 rowsRead 23.7% of 59679184 rowsRead 25.9% of 59679184 rowsRead 28.1% of 59679184 rowsRead 30.3% of 59679184 rowsRead 32.6% of 59679184 rowsRead 34.9% of 59679184 rowsRead 37.1% of 59679184 rowsRead 39.4% of 59679184 rowsRead 41.6% of 59679184 rowsRead 43.9% of 59679184 rowsRead 46.2% of 59679184 rowsRead 48.4% of 59679184 rowsRead 50.6% of 59679184 rowsRead 52.7% of 59679184 rowsRead 54.9% of 59679184 rowsRead 57.1% of 59679184 rowsRead 59.2% of 59679184 rowsRead 61.3% of 59679184 rowsRead 63.5% of 59679184 rowsRead 65.7% of 59679184 rowsRead 67.8% of 59679184 rowsRead 70.0% of 59679184 rowsRead 72.1% of 59679184 rowsRead 74.1% of 59679184 rowsRead 76.1% of 59679184 rowsRead 78.1% of 59679184 rowsRead 80.0% of 59679184 rowsRead 82.1% of 59679184 rowsRead 84.2% of 59679184 rowsRead 86.3% of 59679184 rowsRead 88.5% of 59679184 rowsRead 90.7% of 59679184 rowsRead 92.8% of 59679184 rowsRead 95.0% of 59679184 rowsRead 97.2% of 59679184 rowsRead 99.3% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.570 GB file in 00:01:12
+done in 365.6 secs
+[read.bismark] Joining samples ... done in 157.8 secs
+Assuming file type is cytosineReport
+[read.bismark] Reading file '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports/WGC052299L/WGC052299L.concatenated.sorted.duplicatesRemoved.CX_reportchrchrX.txt' ... Read 0.0% of 59679184 rowsRead 2.0% of 59679184 rowsRead 4.1% of 59679184 rowsRead 6.0% of 59679184 rowsRead 8.1% of 59679184 rowsRead 10.1% of 59679184 rowsRead 12.3% of 59679184 rowsRead 14.3% of 59679184 rowsRead 16.3% of 59679184 rowsRead 18.2% of 59679184 rowsRead 20.2% of 59679184 rowsRead 22.1% of 59679184 rowsRead 24.0% of 59679184 rowsRead 25.8% of 59679184 rowsRead 27.5% of 59679184 rowsRead 29.3% of 59679184 rowsRead 31.1% of 59679184 rowsRead 33.1% of 59679184 rowsRead 35.2% of 59679184 rowsRead 37.5% of 59679184 rowsRead 39.7% of 59679184 rowsRead 42.0% of 59679184 rowsRead 44.3% of 59679184 rowsRead 46.6% of 59679184 rowsRead 48.9% of 59679184 rowsRead 51.3% of 59679184 rowsRead 53.6% of 59679184 rowsRead 55.9% of 59679184 rowsRead 58.3% of 59679184 rowsRead 60.7% of 59679184 rowsRead 63.2% of 59679184 rowsRead 65.7% of 59679184 rowsRead 68.1% of 59679184 rowsRead 70.5% of 59679184 rowsRead 73.0% of 59679184 rowsRead 75.3% of 59679184 rowsRead 77.7% of 59679184 rowsRead 80.1% of 59679184 rowsRead 82.5% of 59679184 rowsRead 84.9% of 59679184 rowsRead 87.3% of 59679184 rowsRead 89.7% of 59679184 rowsRead 92.1% of 59679184 rowsRead 94.5% of 59679184 rowsRead 96.9% of 59679184 rowsRead 99.3% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.570 GB file in 00:01:05
+done in 357.5 secs
+[read.bismark] Joining samples ... done in 187.5 secs
+Assuming file type is cytosineReport
+[read.bismark] Reading file '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports/WGC052300L/WGC052300L.concatenated.sorted.duplicatesRemoved.CX_reportchrchrX.txt' ... Read 0.0% of 59679184 rowsRead 2.4% of 59679184 rowsRead 4.7% of 59679184 rowsRead 7.1% of 59679184 rowsRead 9.4% of 59679184 rowsRead 11.8% of 59679184 rowsRead 14.2% of 59679184 rowsRead 16.6% of 59679184 rowsRead 19.0% of 59679184 rowsRead 21.4% of 59679184 rowsRead 23.9% of 59679184 rowsRead 26.3% of 59679184 rowsRead 28.7% of 59679184 rowsRead 31.0% of 59679184 rowsRead 33.5% of 59679184 rowsRead 35.9% of 59679184 rowsRead 38.3% of 59679184 rowsRead 40.6% of 59679184 rowsRead 42.9% of 59679184 rowsRead 45.3% of 59679184 rowsRead 47.5% of 59679184 rowsRead 49.8% of 59679184 rowsRead 52.2% of 59679184 rowsRead 54.5% of 59679184 rowsRead 56.9% of 59679184 rowsRead 59.3% of 59679184 rowsRead 61.5% of 59679184 rowsRead 64.0% of 59679184 rowsRead 66.4% of 59679184 rowsRead 69.3% of 59679184 rowsRead 72.2% of 59679184 rowsRead 74.6% of 59679184 rowsRead 76.9% of 59679184 rowsRead 79.2% of 59679184 rowsRead 81.5% of 59679184 rowsRead 83.8% of 59679184 rowsRead 86.5% of 59679184 rowsRead 88.9% of 59679184 rowsRead 91.5% of 59679184 rowsRead 94.0% of 59679184 rowsRead 96.4% of 59679184 rowsRead 98.8% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.570 GB file in 00:00:57
+done in 280.0 secs
+[read.bismark] Joining samples ... done in 121.8 secs
+Assuming file type is cytosineReport
+[read.bismark] Reading file '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports/WGC052301L/WGC052301L.concatenated.sorted.duplicatesRemoved.CX_reportchrchrX.txt' ... Read 0.0% of 59679184 rowsRead 2.3% of 59679184 rowsRead 4.6% of 59679184 rowsRead 6.8% of 59679184 rowsRead 9.0% of 59679184 rowsRead 11.2% of 59679184 rowsRead 13.5% of 59679184 rowsRead 15.8% of 59679184 rowsRead 18.0% of 59679184 rowsRead 20.2% of 59679184 rowsRead 22.5% of 59679184 rowsRead 24.7% of 59679184 rowsRead 27.0% of 59679184 rowsRead 29.2% of 59679184 rowsRead 31.5% of 59679184 rowsRead 33.7% of 59679184 rowsRead 36.0% of 59679184 rowsRead 38.3% of 59679184 rowsRead 40.5% of 59679184 rowsRead 42.8% of 59679184 rowsRead 45.0% of 59679184 rowsRead 47.2% of 59679184 rowsRead 49.4% of 59679184 rowsRead 51.7% of 59679184 rowsRead 53.9% of 59679184 rowsRead 56.0% of 59679184 rowsRead 58.2% of 59679184 rowsRead 60.4% of 59679184 rowsRead 62.7% of 59679184 rowsRead 64.8% of 59679184 rowsRead 67.0% of 59679184 rowsRead 69.2% of 59679184 rowsRead 71.4% of 59679184 rowsRead 73.6% of 59679184 rowsRead 75.8% of 59679184 rowsRead 78.0% of 59679184 rowsRead 80.3% of 59679184 rowsRead 82.5% of 59679184 rowsRead 84.8% of 59679184 rowsRead 87.0% of 59679184 rowsRead 89.3% of 59679184 rowsRead 91.5% of 59679184 rowsRead 93.8% of 59679184 rowsRead 96.0% of 59679184 rowsRead 98.2% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.570 GB file in 00:01:02
+done in 326.0 secs
+[read.bismark] Joining samples ... done in 151.8 secs
+Assuming file type is cytosineReport
+[read.bismark] Reading file '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports/WGC052302L/WGC052302L.concatenated.sorted.duplicatesRemoved.CX_reportchrchrX.txt' ... Read 0.0% of 59679184 rowsRead 2.4% of 59679184 rowsRead 4.8% of 59679184 rowsRead 7.2% of 59679184 rowsRead 9.5% of 59679184 rowsRead 11.9% of 59679184 rowsRead 14.3% of 59679184 rowsRead 16.6% of 59679184 rowsRead 18.9% of 59679184 rowsRead 21.3% of 59679184 rowsRead 23.7% of 59679184 rowsRead 26.1% of 59679184 rowsRead 28.5% of 59679184 rowsRead 30.8% of 59679184 rowsRead 33.2% of 59679184 rowsRead 35.6% of 59679184 rowsRead 38.0% of 59679184 rowsRead 40.3% of 59679184 rowsRead 42.7% of 59679184 rowsRead 45.1% of 59679184 rowsRead 47.4% of 59679184 rowsRead 49.8% of 59679184 rowsRead 52.1% of 59679184 rowsRead 54.6% of 59679184 rowsRead 57.0% of 59679184 rowsRead 59.3% of 59679184 rowsRead 61.8% of 59679184 rowsRead 64.1% of 59679184 rowsRead 66.5% of 59679184 rowsRead 68.9% of 59679184 rowsRead 71.2% of 59679184 rowsRead 73.5% of 59679184 rowsRead 75.9% of 59679184 rowsRead 78.3% of 59679184 rowsRead 80.6% of 59679184 rowsRead 82.9% of 59679184 rowsRead 85.3% of 59679184 rowsRead 87.6% of 59679184 rowsRead 89.9% of 59679184 rowsRead 92.3% of 59679184 rowsRead 94.7% of 59679184 rowsRead 97.0% of 59679184 rowsRead 99.4% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.570 GB file in 00:00:57
+done in 327.6 secs
+[read.bismark] Joining samples ... done in 174.4 secs
+Assuming file type is cytosineReport
+[read.bismark] Reading file '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports/WGC052303L/WGC052303L.concatenated.sorted.duplicatesRemoved.CX_reportchrchrX.txt' ... Read 0.0% of 59679184 rowsRead 1.7% of 59679184 rowsRead 3.4% of 59679184 rowsRead 5.1% of 59679184 rowsRead 6.8% of 59679184 rowsRead 8.5% of 59679184 rowsRead 10.2% of 59679184 rowsRead 11.9% of 59679184 rowsRead 13.7% of 59679184 rowsRead 15.4% of 59679184 rowsRead 17.0% of 59679184 rowsRead 18.6% of 59679184 rowsRead 20.6% of 59679184 rowsRead 22.4% of 59679184 rowsRead 24.0% of 59679184 rowsRead 25.9% of 59679184 rowsRead 28.0% of 59679184 rowsRead 30.2% of 59679184 rowsRead 32.3% of 59679184 rowsRead 34.3% of 59679184 rowsRead 36.3% of 59679184 rowsRead 38.3% of 59679184 rowsRead 40.4% of 59679184 rowsRead 42.5% of 59679184 rowsRead 44.5% of 59679184 rowsRead 46.5% of 59679184 rowsRead 48.5% of 59679184 rowsRead 50.5% of 59679184 rowsRead 52.6% of 59679184 rowsRead 54.6% of 59679184 rowsRead 56.4% of 59679184 rowsRead 57.9% of 59679184 rowsRead 59.5% of 59679184 rowsRead 61.1% of 59679184 rowsRead 62.7% of 59679184 rowsRead 64.3% of 59679184 rowsRead 65.9% of 59679184 rowsRead 67.6% of 59679184 rowsRead 69.3% of 59679184 rowsRead 70.9% of 59679184 rowsRead 72.6% of 59679184 rowsRead 74.2% of 59679184 rowsRead 75.8% of 59679184 rowsRead 77.4% of 59679184 rowsRead 79.1% of 59679184 rowsRead 80.7% of 59679184 rowsRead 82.4% of 59679184 rowsRead 84.2% of 59679184 rowsRead 86.0% of 59679184 rowsRead 87.6% of 59679184 rowsRead 89.3% of 59679184 rowsRead 90.9% of 59679184 rowsRead 92.5% of 59679184 rowsRead 94.1% of 59679184 rowsRead 95.8% of 59679184 rowsRead 97.8% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.570 GB file in 00:01:16
+done in 465.8 secs
+[read.bismark] Joining samples ... done in 228.4 secs
+Assuming file type is cytosineReport
+[read.bismark] Reading file '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports/WGC052304L/WGC052304L.concatenated.sorted.duplicatesRemoved.CX_reportchrchrX.txt' ... Read 0.0% of 59679184 rowsRead 1.7% of 59679184 rowsRead 3.5% of 59679184 rowsRead 5.2% of 59679184 rowsRead 6.9% of 59679184 rowsRead 8.5% of 59679184 rowsRead 10.3% of 59679184 rowsRead 12.2% of 59679184 rowsRead 13.9% of 59679184 rowsRead 15.6% of 59679184 rowsRead 17.3% of 59679184 rowsRead 19.0% of 59679184 rowsRead 20.6% of 59679184 rowsRead 22.3% of 59679184 rowsRead 24.0% of 59679184 rowsRead 25.7% of 59679184 rowsRead 27.5% of 59679184 rowsRead 29.1% of 59679184 rowsRead 31.1% of 59679184 rowsRead 33.1% of 59679184 rowsRead 35.1% of 59679184 rowsRead 37.1% of 59679184 rowsRead 39.2% of 59679184 rowsRead 41.0% of 59679184 rowsRead 43.0% of 59679184 rowsRead 45.0% of 59679184 rowsRead 47.0% of 59679184 rowsRead 49.0% of 59679184 rowsRead 51.0% of 59679184 rowsRead 52.8% of 59679184 rowsRead 54.9% of 59679184 rowsRead 56.8% of 59679184 rowsRead 58.8% of 59679184 rowsRead 60.8% of 59679184 rowsRead 62.8% of 59679184 rowsRead 64.9% of 59679184 rowsRead 66.8% of 59679184 rowsRead 68.6% of 59679184 rowsRead 70.2% of 59679184 rowsRead 71.9% of 59679184 rowsRead 73.5% of 59679184 rowsRead 75.1% of 59679184 rowsRead 76.7% of 59679184 rowsRead 78.4% of 59679184 rowsRead 80.1% of 59679184 rowsRead 81.8% of 59679184 rowsRead 83.5% of 59679184 rowsRead 85.2% of 59679184 rowsRead 86.9% of 59679184 rowsRead 88.7% of 59679184 rowsRead 90.5% of 59679184 rowsRead 92.2% of 59679184 rowsRead 94.0% of 59679184 rowsRead 95.7% of 59679184 rowsRead 97.3% of 59679184 rowsRead 98.8% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.570 GB file in 00:01:13
+done in 444.3 secs
+[read.bismark] Joining samples ... done in 216.5 secs
+Assuming file type is cytosineReport
+[read.bismark] Reading file '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports/WGC052305L/WGC052305L.concatenated.sorted.duplicatesRemoved.CX_reportchrchrX.txt' ... Read 0.0% of 59679184 rowsRead 2.1% of 59679184 rowsRead 4.2% of 59679184 rowsRead 6.2% of 59679184 rowsRead 8.2% of 59679184 rowsRead 10.2% of 59679184 rowsRead 12.1% of 59679184 rowsRead 14.1% of 59679184 rowsRead 16.1% of 59679184 rowsRead 18.1% of 59679184 rowsRead 20.2% of 59679184 rowsRead 22.1% of 59679184 rowsRead 24.0% of 59679184 rowsRead 26.1% of 59679184 rowsRead 28.2% of 59679184 rowsRead 30.2% of 59679184 rowsRead 32.3% of 59679184 rowsRead 34.3% of 59679184 rowsRead 36.3% of 59679184 rowsRead 38.4% of 59679184 rowsRead 40.4% of 59679184 rowsRead 42.4% of 59679184 rowsRead 44.4% of 59679184 rowsRead 46.5% of 59679184 rowsRead 48.5% of 59679184 rowsRead 50.5% of 59679184 rowsRead 52.7% of 59679184 rowsRead 54.8% of 59679184 rowsRead 56.9% of 59679184 rowsRead 59.0% of 59679184 rowsRead 61.1% of 59679184 rowsRead 63.2% of 59679184 rowsRead 65.3% of 59679184 rowsRead 67.4% of 59679184 rowsRead 69.5% of 59679184 rowsRead 71.5% of 59679184 rowsRead 73.5% of 59679184 rowsRead 75.5% of 59679184 rowsRead 77.5% of 59679184 rowsRead 79.5% of 59679184 rowsRead 81.6% of 59679184 rowsRead 83.7% of 59679184 rowsRead 85.7% of 59679184 rowsRead 87.9% of 59679184 rowsRead 90.0% of 59679184 rowsRead 92.0% of 59679184 rowsRead 94.0% of 59679184 rowsRead 96.0% of 59679184 rowsRead 98.1% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.570 GB file in 00:01:05
+done in 361.3 secs
+[read.bismark] Joining samples ... done in 173.5 secs
+Loading required package: BiocGenerics
+Loading required package: parallel
+
+Attaching package: ‘BiocGenerics’
+
+The following objects are masked from ‘package:parallel’:
+
+    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+    clusterExport, clusterMap, parApply, parCapply, parLapply,
+    parLapplyLB, parRapply, parSapply, parSapplyLB
+
+The following objects are masked from ‘package:stats’:
+
+    IQR, mad, sd, var, xtabs
+
+The following objects are masked from ‘package:base’:
+
+    anyDuplicated, append, as.data.frame, cbind, colMeans, colnames,
+    colSums, do.call, duplicated, eval, evalq, Filter, Find, get, grep,
+    grepl, intersect, is.unsorted, lapply, lengths, Map, mapply, match,
+    mget, order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+    rbind, Reduce, rowMeans, rownames, rowSums, sapply, setdiff, sort,
+    table, tapply, union, unique, unsplit, which, which.max, which.min
+
+Loading required package: GenomicRanges
+Loading required package: stats4
+Loading required package: S4Vectors
+
+Attaching package: ‘S4Vectors’
+
+The following object is masked from ‘package:base’:
+
+    expand.grid
+
+Loading required package: IRanges
+Loading required package: GenomeInfoDb
+Loading required package: SummarizedExperiment
+Loading required package: Biobase
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+Loading required package: DelayedArray
+Loading required package: matrixStats
+
+Attaching package: ‘matrixStats’
+
+The following objects are masked from ‘package:Biobase’:
+
+    anyMissing, rowMedians
+
+
+Attaching package: ‘DelayedArray’
+
+The following objects are masked from ‘package:matrixStats’:
+
+    colMaxs, colMins, colRanges, rowMaxs, rowMins, rowRanges
+
+The following object is masked from ‘package:base’:
+
+    apply
+
+Assuming file type is cytosineReport
+[read.bismark] Reading file '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports/WGC059582L/WGC059582L.concatenated.sorted.duplicatesRemoved.CX_reportchrchrX.txt' ... Read 0.0% of 59679184 rowsRead 2.0% of 59679184 rowsRead 4.2% of 59679184 rowsRead 6.2% of 59679184 rowsRead 8.0% of 59679184 rowsRead 9.9% of 59679184 rowsRead 11.8% of 59679184 rowsRead 13.9% of 59679184 rowsRead 15.8% of 59679184 rowsRead 17.3% of 59679184 rowsRead 19.0% of 59679184 rowsRead 20.7% of 59679184 rowsRead 22.3% of 59679184 rowsRead 24.1% of 59679184 rowsRead 25.9% of 59679184 rowsRead 27.8% of 59679184 rowsRead 29.8% of 59679184 rowsRead 31.4% of 59679184 rowsRead 33.0% of 59679184 rowsRead 34.9% of 59679184 rowsRead 36.8% of 59679184 rowsRead 38.9% of 59679184 rowsRead 41.0% of 59679184 rowsRead 42.9% of 59679184 rowsRead 45.0% of 59679184 rowsRead 47.1% of 59679184 rowsRead 49.1% of 59679184 rowsRead 51.2% of 59679184 rowsRead 53.3% of 59679184 rowsRead 55.4% of 59679184 rowsRead 57.5% of 59679184 rowsRead 59.7% of 59679184 rowsRead 61.7% of 59679184 rowsRead 63.8% of 59679184 rowsRead 65.6% of 59679184 rowsRead 67.6% of 59679184 rowsRead 69.5% of 59679184 rowsRead 71.2% of 59679184 rowsRead 72.9% of 59679184 rowsRead 74.7% of 59679184 rowsRead 76.6% of 59679184 rowsRead 78.5% of 59679184 rowsRead 80.6% of 59679184 rowsRead 82.8% of 59679184 rowsRead 84.9% of 59679184 rowsRead 87.0% of 59679184 rowsRead 89.2% of 59679184 rowsRead 91.3% of 59679184 rowsRead 93.4% of 59679184 rowsRead 95.4% of 59679184 rowsRead 97.3% of 59679184 rowsRead 99.2% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.570 GB file in 00:01:27
+done in 621.7 secs
+[read.bismark] Joining samples ... done in 274.2 secs
+Assuming file type is cytosineReport
+[read.bismark] Reading file '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports/WGC059583L/WGC059583L.concatenated.sorted.duplicatesRemoved.CX_reportchrchrX.txt' ... Read 0.0% of 59679184 rowsRead 2.3% of 59679184 rowsRead 4.8% of 59679184 rowsRead 7.1% of 59679184 rowsRead 9.3% of 59679184 rowsRead 11.6% of 59679184 rowsRead 14.0% of 59679184 rowsRead 16.2% of 59679184 rowsRead 18.4% of 59679184 rowsRead 20.8% of 59679184 rowsRead 23.1% of 59679184 rowsRead 25.4% of 59679184 rowsRead 27.6% of 59679184 rowsRead 29.9% of 59679184 rowsRead 32.1% of 59679184 rowsRead 34.4% of 59679184 rowsRead 36.8% of 59679184 rowsRead 39.2% of 59679184 rowsRead 41.6% of 59679184 rowsRead 44.0% of 59679184 rowsRead 46.3% of 59679184 rowsRead 48.7% of 59679184 rowsRead 51.1% of 59679184 rowsRead 53.5% of 59679184 rowsRead 55.8% of 59679184 rowsRead 58.3% of 59679184 rowsRead 60.6% of 59679184 rowsRead 63.1% of 59679184 rowsRead 65.5% of 59679184 rowsRead 67.9% of 59679184 rowsRead 70.3% of 59679184 rowsRead 72.7% of 59679184 rowsRead 75.1% of 59679184 rowsRead 77.6% of 59679184 rowsRead 80.0% of 59679184 rowsRead 82.5% of 59679184 rowsRead 85.0% of 59679184 rowsRead 87.5% of 59679184 rowsRead 89.9% of 59679184 rowsRead 92.4% of 59679184 rowsRead 94.9% of 59679184 rowsRead 97.4% of 59679184 rowsRead 99.8% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.570 GB file in 00:01:00
+done in 293.3 secs
+[read.bismark] Joining samples ... done in 121.9 secs
+Assuming file type is cytosineReport
+[read.bismark] Reading file '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports/WGC059584L/WGC059584L.concatenated.sorted.duplicatesRemoved.CX_reportchrchrX.txt' ... Read 0.0% of 59679184 rowsRead 2.4% of 59679184 rowsRead 4.9% of 59679184 rowsRead 7.4% of 59679184 rowsRead 9.9% of 59679184 rowsRead 12.2% of 59679184 rowsRead 14.6% of 59679184 rowsRead 17.0% of 59679184 rowsRead 19.5% of 59679184 rowsRead 21.9% of 59679184 rowsRead 24.3% of 59679184 rowsRead 26.7% of 59679184 rowsRead 29.1% of 59679184 rowsRead 31.4% of 59679184 rowsRead 33.7% of 59679184 rowsRead 36.1% of 59679184 rowsRead 38.5% of 59679184 rowsRead 40.8% of 59679184 rowsRead 43.2% of 59679184 rowsRead 45.5% of 59679184 rowsRead 47.9% of 59679184 rowsRead 50.3% of 59679184 rowsRead 52.5% of 59679184 rowsRead 54.8% of 59679184 rowsRead 57.1% of 59679184 rowsRead 59.5% of 59679184 rowsRead 61.8% of 59679184 rowsRead 64.2% of 59679184 rowsRead 66.6% of 59679184 rowsRead 69.0% of 59679184 rowsRead 71.4% of 59679184 rowsRead 73.8% of 59679184 rowsRead 76.2% of 59679184 rowsRead 78.5% of 59679184 rowsRead 80.9% of 59679184 rowsRead 83.3% of 59679184 rowsRead 85.7% of 59679184 rowsRead 88.1% of 59679184 rowsRead 90.5% of 59679184 rowsRead 92.8% of 59679184 rowsRead 95.2% of 59679184 rowsRead 97.7% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.570 GB file in 00:00:59
+done in 295.4 secs
+[read.bismark] Joining samples ... done in 174.7 secs
+Assuming file type is cytosineReport
+[read.bismark] Reading file '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports/WGC059585L/WGC059585L.concatenated.sorted.duplicatesRemoved.CX_reportchrchrX.txt' ... Read 0.0% of 59679184 rowsRead 2.4% of 59679184 rowsRead 5.0% of 59679184 rowsRead 7.5% of 59679184 rowsRead 10.0% of 59679184 rowsRead 12.4% of 59679184 rowsRead 14.9% of 59679184 rowsRead 17.4% of 59679184 rowsRead 19.9% of 59679184 rowsRead 22.3% of 59679184 rowsRead 24.7% of 59679184 rowsRead 27.2% of 59679184 rowsRead 29.6% of 59679184 rowsRead 31.9% of 59679184 rowsRead 34.2% of 59679184 rowsRead 36.4% of 59679184 rowsRead 38.7% of 59679184 rowsRead 41.0% of 59679184 rowsRead 43.2% of 59679184 rowsRead 45.6% of 59679184 rowsRead 47.9% of 59679184 rowsRead 50.2% of 59679184 rowsRead 52.5% of 59679184 rowsRead 54.8% of 59679184 rowsRead 57.1% of 59679184 rowsRead 59.3% of 59679184 rowsRead 61.5% of 59679184 rowsRead 63.8% of 59679184 rowsRead 66.1% of 59679184 rowsRead 68.3% of 59679184 rowsRead 70.6% of 59679184 rowsRead 72.9% of 59679184 rowsRead 75.2% of 59679184 rowsRead 77.5% of 59679184 rowsRead 79.8% of 59679184 rowsRead 82.1% of 59679184 rowsRead 84.4% of 59679184 rowsRead 86.7% of 59679184 rowsRead 89.1% of 59679184 rowsRead 91.4% of 59679184 rowsRead 93.7% of 59679184 rowsRead 96.1% of 59679184 rowsRead 98.4% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.570 GB file in 00:00:59
+done in 291.8 secs
+[read.bismark] Joining samples ... done in 128.5 secs
+Assuming file type is cytosineReport
+[read.bismark] Reading file '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports/WGC059586L/WGC059586L.concatenated.sorted.duplicatesRemoved.CX_reportchrchrX.txt' ... Read 0.0% of 59679184 rowsRead 2.4% of 59679184 rowsRead 4.7% of 59679184 rowsRead 7.1% of 59679184 rowsRead 9.5% of 59679184 rowsRead 11.8% of 59679184 rowsRead 14.2% of 59679184 rowsRead 16.6% of 59679184 rowsRead 19.0% of 59679184 rowsRead 21.4% of 59679184 rowsRead 23.7% of 59679184 rowsRead 26.2% of 59679184 rowsRead 28.6% of 59679184 rowsRead 30.9% of 59679184 rowsRead 33.4% of 59679184 rowsRead 35.9% of 59679184 rowsRead 38.3% of 59679184 rowsRead 40.7% of 59679184 rowsRead 43.1% of 59679184 rowsRead 45.5% of 59679184 rowsRead 47.9% of 59679184 rowsRead 50.3% of 59679184 rowsRead 52.6% of 59679184 rowsRead 55.0% of 59679184 rowsRead 57.4% of 59679184 rowsRead 59.8% of 59679184 rowsRead 62.2% of 59679184 rowsRead 64.6% of 59679184 rowsRead 66.9% of 59679184 rowsRead 69.3% of 59679184 rowsRead 71.6% of 59679184 rowsRead 73.9% of 59679184 rowsRead 76.2% of 59679184 rowsRead 78.5% of 59679184 rowsRead 80.9% of 59679184 rowsRead 83.2% of 59679184 rowsRead 85.6% of 59679184 rowsRead 88.0% of 59679184 rowsRead 90.4% of 59679184 rowsRead 92.8% of 59679184 rowsRead 95.2% of 59679184 rowsRead 97.7% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.570 GB file in 00:00:58
+done in 281.0 secs
+[read.bismark] Joining samples ... done in 130.2 secs
+Assuming file type is cytosineReport
+[read.bismark] Reading file '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports/WGC059615L/WGC059615L.concatenated.sorted.duplicatesRemoved.CX_reportchrchrX.txt' ... Read 0.0% of 59679184 rowsRead 2.4% of 59679184 rowsRead 4.9% of 59679184 rowsRead 7.3% of 59679184 rowsRead 9.7% of 59679184 rowsRead 12.1% of 59679184 rowsRead 14.5% of 59679184 rowsRead 16.9% of 59679184 rowsRead 19.3% of 59679184 rowsRead 21.6% of 59679184 rowsRead 24.0% of 59679184 rowsRead 26.4% of 59679184 rowsRead 28.8% of 59679184 rowsRead 31.2% of 59679184 rowsRead 33.6% of 59679184 rowsRead 36.1% of 59679184 rowsRead 38.5% of 59679184 rowsRead 40.8% of 59679184 rowsRead 43.1% of 59679184 rowsRead 45.6% of 59679184 rowsRead 48.0% of 59679184 rowsRead 50.4% of 59679184 rowsRead 52.7% of 59679184 rowsRead 55.1% of 59679184 rowsRead 57.7% of 59679184 rowsRead 60.1% of 59679184 rowsRead 62.8% of 59679184 rowsRead 65.3% of 59679184 rowsRead 68.0% of 59679184 rowsRead 70.4% of 59679184 rowsRead 73.0% of 59679184 rowsRead 75.5% of 59679184 rowsRead 77.9% of 59679184 rowsRead 80.3% of 59679184 rowsRead 82.9% of 59679184 rowsRead 85.3% of 59679184 rowsRead 88.0% of 59679184 rowsRead 90.2% of 59679184 rowsRead 92.7% of 59679184 rowsRead 95.2% of 59679184 rowsRead 97.8% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.570 GB file in 00:00:58
+done in 307.9 secs
+[read.bismark] Joining samples ... done in 153.4 secs
+Assuming file type is cytosineReport
+[read.bismark] Reading file '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports/WGC059616L/WGC059616L.concatenated.sorted.duplicatesRemoved.CX_reportchrchrX.txt' ... Read 0.0% of 59679184 rowsRead 2.2% of 59679184 rowsRead 4.4% of 59679184 rowsRead 6.7% of 59679184 rowsRead 8.9% of 59679184 rowsRead 11.1% of 59679184 rowsRead 13.2% of 59679184 rowsRead 15.5% of 59679184 rowsRead 17.7% of 59679184 rowsRead 20.0% of 59679184 rowsRead 22.1% of 59679184 rowsRead 24.2% of 59679184 rowsRead 26.4% of 59679184 rowsRead 28.5% of 59679184 rowsRead 30.7% of 59679184 rowsRead 32.9% of 59679184 rowsRead 35.1% of 59679184 rowsRead 37.3% of 59679184 rowsRead 39.5% of 59679184 rowsRead 41.8% of 59679184 rowsRead 44.1% of 59679184 rowsRead 46.4% of 59679184 rowsRead 48.7% of 59679184 rowsRead 51.0% of 59679184 rowsRead 53.4% of 59679184 rowsRead 55.7% of 59679184 rowsRead 58.0% of 59679184 rowsRead 60.4% of 59679184 rowsRead 62.7% of 59679184 rowsRead 65.0% of 59679184 rowsRead 67.3% of 59679184 rowsRead 69.6% of 59679184 rowsRead 71.9% of 59679184 rowsRead 74.2% of 59679184 rowsRead 76.5% of 59679184 rowsRead 78.8% of 59679184 rowsRead 81.0% of 59679184 rowsRead 83.3% of 59679184 rowsRead 85.6% of 59679184 rowsRead 87.9% of 59679184 rowsRead 90.2% of 59679184 rowsRead 92.5% of 59679184 rowsRead 94.8% of 59679184 rowsRead 97.1% of 59679184 rowsRead 99.4% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.573 GB file in 00:01:01
+done in 356.4 secs
+[read.bismark] Joining samples ... done in 173.9 secs
+Assuming file type is cytosineReport
+[read.bismark] Reading file '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports/WGC059617L/WGC059617L.concatenated.sorted.duplicatesRemoved.CX_reportchrchrX.txt' ... Read 0.0% of 59679184 rowsRead 1.8% of 59679184 rowsRead 3.5% of 59679184 rowsRead 5.3% of 59679184 rowsRead 7.2% of 59679184 rowsRead 9.2% of 59679184 rowsRead 11.1% of 59679184 rowsRead 12.8% of 59679184 rowsRead 14.4% of 59679184 rowsRead 16.2% of 59679184 rowsRead 18.3% of 59679184 rowsRead 20.2% of 59679184 rowsRead 21.9% of 59679184 rowsRead 23.5% of 59679184 rowsRead 25.2% of 59679184 rowsRead 26.9% of 59679184 rowsRead 28.7% of 59679184 rowsRead 30.7% of 59679184 rowsRead 32.7% of 59679184 rowsRead 34.7% of 59679184 rowsRead 36.8% of 59679184 rowsRead 38.9% of 59679184 rowsRead 41.0% of 59679184 rowsRead 43.1% of 59679184 rowsRead 45.0% of 59679184 rowsRead 47.1% of 59679184 rowsRead 49.1% of 59679184 rowsRead 51.0% of 59679184 rowsRead 52.9% of 59679184 rowsRead 54.8% of 59679184 rowsRead 56.7% of 59679184 rowsRead 58.5% of 59679184 rowsRead 60.4% of 59679184 rowsRead 62.3% of 59679184 rowsRead 64.2% of 59679184 rowsRead 66.1% of 59679184 rowsRead 67.8% of 59679184 rowsRead 69.4% of 59679184 rowsRead 71.0% of 59679184 rowsRead 72.6% of 59679184 rowsRead 74.1% of 59679184 rowsRead 75.6% of 59679184 rowsRead 77.3% of 59679184 rowsRead 79.0% of 59679184 rowsRead 80.6% of 59679184 rowsRead 82.5% of 59679184 rowsRead 84.5% of 59679184 rowsRead 86.3% of 59679184 rowsRead 87.9% of 59679184 rowsRead 89.7% of 59679184 rowsRead 91.7% of 59679184 rowsRead 93.6% of 59679184 rowsRead 95.4% of 59679184 rowsRead 97.2% of 59679184 rowsRead 98.9% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.570 GB file in 00:01:18
+done in 467.6 secs
+[read.bismark] Joining samples ... done in 267.2 secs
+Assuming file type is cytosineReport
+[read.bismark] Reading file '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports/WGC059618L/WGC059618L.concatenated.sorted.duplicatesRemoved.CX_reportchrchrX.txt' ... Read 0.0% of 59679184 rowsRead 1.5% of 59679184 rowsRead 3.0% of 59679184 rowsRead 4.4% of 59679184 rowsRead 6.0% of 59679184 rowsRead 7.8% of 59679184 rowsRead 9.8% of 59679184 rowsRead 12.0% of 59679184 rowsRead 14.1% of 59679184 rowsRead 16.3% of 59679184 rowsRead 18.5% of 59679184 rowsRead 20.8% of 59679184 rowsRead 22.9% of 59679184 rowsRead 25.0% of 59679184 rowsRead 27.1% of 59679184 rowsRead 29.2% of 59679184 rowsRead 31.2% of 59679184 rowsRead 33.3% of 59679184 rowsRead 35.3% of 59679184 rowsRead 37.3% of 59679184 rowsRead 39.0% of 59679184 rowsRead 40.7% of 59679184 rowsRead 42.3% of 59679184 rowsRead 44.0% of 59679184 rowsRead 45.7% of 59679184 rowsRead 47.4% of 59679184 rowsRead 49.0% of 59679184 rowsRead 50.8% of 59679184 rowsRead 52.5% of 59679184 rowsRead 54.1% of 59679184 rowsRead 55.6% of 59679184 rowsRead 57.4% of 59679184 rowsRead 59.2% of 59679184 rowsRead 60.8% of 59679184 rowsRead 62.5% of 59679184 rowsRead 64.1% of 59679184 rowsRead 65.7% of 59679184 rowsRead 67.1% of 59679184 rowsRead 68.5% of 59679184 rowsRead 70.1% of 59679184 rowsRead 71.8% of 59679184 rowsRead 73.5% of 59679184 rowsRead 75.2% of 59679184 rowsRead 76.8% of 59679184 rowsRead 78.5% of 59679184 rowsRead 80.4% of 59679184 rowsRead 82.2% of 59679184 rowsRead 83.9% of 59679184 rowsRead 85.6% of 59679184 rowsRead 87.2% of 59679184 rowsRead 88.9% of 59679184 rowsRead 90.6% of 59679184 rowsRead 92.4% of 59679184 rowsRead 94.1% of 59679184 rowsRead 95.8% of 59679184 rowsRead 97.5% of 59679184 rowsRead 99.3% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.570 GB file in 00:01:25
+done in 450.6 secs
+[read.bismark] Joining samples ... done in 215.5 secs
+Assuming file type is cytosineReport
+[read.bismark] Reading file '/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/bsobj_by_chr/Reports/WGC059619L/WGC059619L.concatenated.sorted.duplicatesRemoved.CX_reportchrchrX.txt' ... Read 0.0% of 59679184 rowsRead 1.5% of 59679184 rowsRead 3.1% of 59679184 rowsRead 4.7% of 59679184 rowsRead 6.3% of 59679184 rowsRead 7.9% of 59679184 rowsRead 9.6% of 59679184 rowsRead 11.1% of 59679184 rowsRead 12.8% of 59679184 rowsRead 14.5% of 59679184 rowsRead 16.1% of 59679184 rowsRead 17.6% of 59679184 rowsRead 19.2% of 59679184 rowsRead 20.9% of 59679184 rowsRead 22.7% of 59679184 rowsRead 24.7% of 59679184 rowsRead 26.5% of 59679184 rowsRead 28.2% of 59679184 rowsRead 30.0% of 59679184 rowsRead 31.7% of 59679184 rowsRead 33.5% of 59679184 rowsRead 35.7% of 59679184 rowsRead 37.9% of 59679184 rowsRead 40.1% of 59679184 rowsRead 42.3% of 59679184 rowsRead 44.4% of 59679184 rowsRead 46.5% of 59679184 rowsRead 48.7% of 59679184 rowsRead 50.8% of 59679184 rowsRead 53.0% of 59679184 rowsRead 55.1% of 59679184 rowsRead 57.3% of 59679184 rowsRead 59.4% of 59679184 rowsRead 61.5% of 59679184 rowsRead 63.5% of 59679184 rowsRead 65.3% of 59679184 rowsRead 66.9% of 59679184 rowsRead 68.5% of 59679184 rowsRead 70.1% of 59679184 rowsRead 71.6% of 59679184 rowsRead 73.2% of 59679184 rowsRead 74.8% of 59679184 rowsRead 76.3% of 59679184 rowsRead 77.9% of 59679184 rowsRead 79.5% of 59679184 rowsRead 81.2% of 59679184 rowsRead 82.9% of 59679184 rowsRead 84.6% of 59679184 rowsRead 86.3% of 59679184 rowsRead 88.1% of 59679184 rowsRead 89.9% of 59679184 rowsRead 91.6% of 59679184 rowsRead 93.5% of 59679184 rowsRead 95.3% of 59679184 rowsRead 97.1% of 59679184 rowsRead 99.0% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.572 GB file in 00:01:21
+done in 431.2 secs
+[read.bismark] Joining samples ... done in 207.7 secs
+Read 0.0% of 59679184 rowsRead 1.7% of 59679184 rowsRead 3.3% of 59679184 rowsRead 4.9% of 59679184 rowsRead 6.6% of 59679184 rowsRead 8.2% of 59679184 rowsRead 9.9% of 59679184 rowsRead 11.6% of 59679184 rowsRead 13.3% of 59679184 rowsRead 15.0% of 59679184 rowsRead 16.7% of 59679184 rowsRead 18.4% of 59679184 rowsRead 20.1% of 59679184 rowsRead 21.9% of 59679184 rowsRead 23.6% of 59679184 rowsRead 25.3% of 59679184 rowsRead 27.0% of 59679184 rowsRead 28.6% of 59679184 rowsRead 30.2% of 59679184 rowsRead 31.8% of 59679184 rowsRead 33.5% of 59679184 rowsRead 35.2% of 59679184 rowsRead 36.9% of 59679184 rowsRead 38.7% of 59679184 rowsRead 40.6% of 59679184 rowsRead 42.5% of 59679184 rowsRead 44.3% of 59679184 rowsRead 46.2% of 59679184 rowsRead 48.1% of 59679184 rowsRead 49.9% of 59679184 rowsRead 51.8% of 59679184 rowsRead 53.6% of 59679184 rowsRead 55.5% of 59679184 rowsRead 57.5% of 59679184 rowsRead 59.4% of 59679184 rowsRead 61.3% of 59679184 rowsRead 63.3% of 59679184 rowsRead 65.0% of 59679184 rowsRead 67.0% of 59679184 rowsRead 69.3% of 59679184 rowsRead 71.1% of 59679184 rowsRead 72.6% of 59679184 rowsRead 73.6% of 59679184 rowsRead 75.6% of 59679184 rowsRead 77.7% of 59679184 rowsRead 78.9% of 59679184 rowsRead 80.1% of 59679184 rowsRead 82.0% of 59679184 rowsRead 83.8% of 59679184 rowsRead 85.1% of 59679184 rowsRead 86.0% of 59679184 rowsRead 87.7% of 59679184 rowsRead 89.8% of 59679184 rowsRead 92.1% of 59679184 rowsRead 93.3% of 59679184 rowsRead 94.9% of 59679184 rowsRead 96.9% of 59679184 rowsRead 99.0% of 59679184 rowsRead 59679184 rows and 7 (of 7) columns from 1.570 GB file in 00:01:12
+[1] "Reproducibility information:"
+[1] "2018-08-09 11:53:54 EDT"
+     user    system   elapsed 
+26566.966   326.768 38934.329 
+Session info ----------------------------------------------------------------------------------------------------------
+ setting  value                                      
+ version  R version 3.4.3 Patched (2018-01-20 r74142)
+ system   x86_64, linux-gnu                          
+ ui       X11                                        
+ language (EN)                                       
+ collate  en_US.UTF-8                                
+ tz       US/Eastern                                 
+ date     2018-08-09                                 
+
+Packages --------------------------------------------------------------------------------------------------------------
+ package              * version   date       source        
+ base                 * 3.4.3     2018-01-20 local         
+ Biobase              * 2.38.0    2017-11-07 Bioconductor  
+ BiocGenerics         * 0.24.0    2017-11-29 Bioconductor  
+ BiocParallel         * 1.12.0    2017-11-29 Bioconductor  
+ bitops                 1.0-6     2013-08-17 CRAN (R 3.4.1)
+ bsseq                * 1.14.0    2018-03-28 Bioconductor  
+ cellranger             1.1.0     2016-07-27 CRAN (R 3.4.1)
+ colorspace             1.3-2     2016-12-14 CRAN (R 3.4.1)
+ compiler               3.4.3     2018-01-20 local         
+ data.table           * 1.10.4-3  2017-10-27 CRAN (R 3.4.2)
+ datasets             * 3.4.3     2018-01-20 local         
+ DelayedArray         * 0.4.1     2017-11-07 Bioconductor  
+ devtools             * 1.13.5    2018-02-18 CRAN (R 3.4.3)
+ digest                 0.6.15    2018-01-28 cran (@0.6.15)
+ GenomeInfoDb         * 1.14.0    2017-11-29 Bioconductor  
+ GenomeInfoDbData       1.0.0     2018-01-09 Bioconductor  
+ GenomicRanges        * 1.30.3    2018-04-18 Bioconductor  
+ getopt               * 1.20.2    2018-02-16 CRAN (R 3.4.3)
+ graphics             * 3.4.3     2018-01-20 local         
+ grDevices            * 3.4.3     2018-01-20 local         
+ grid                   3.4.3     2018-01-20 local         
+ gtools                 3.5.0     2015-05-29 CRAN (R 3.4.1)
+ IRanges              * 2.12.0    2017-11-29 Bioconductor  
+ lattice                0.20-35   2017-03-25 CRAN (R 3.4.3)
+ limma                  3.34.9    2018-04-18 Bioconductor  
+ locfit                 1.5-9.1   2013-04-20 CRAN (R 3.4.1)
+ Matrix                 1.2-12    2017-11-30 CRAN (R 3.4.3)
+ matrixStats          * 0.53.1    2018-02-11 CRAN (R 3.4.3)
+ memoise                1.1.0     2017-04-21 CRAN (R 3.4.1)
+ methods              * 3.4.3     2018-01-20 local         
+ munsell                0.4.3     2016-02-13 CRAN (R 3.4.1)
+ parallel             * 3.4.3     2018-01-20 local         
+ permute                0.9-4     2016-09-09 CRAN (R 3.4.1)
+ pillar                 1.2.1     2018-02-27 CRAN (R 3.4.3)
+ plyr                   1.8.4     2016-06-08 CRAN (R 3.4.1)
+ R.methodsS3            1.7.1     2016-02-16 CRAN (R 3.4.1)
+ R.oo                   1.22.0    2018-04-22 CRAN (R 3.4.3)
+ R.utils                2.6.0     2017-11-05 CRAN (R 3.4.2)
+ Rcpp                   0.12.16   2018-03-13 CRAN (R 3.4.3)
+ RCurl                  1.95-4.10 2018-01-04 CRAN (R 3.4.2)
+ readxl               * 1.1.0     2018-04-20 CRAN (R 3.4.3)
+ rlang                  0.2.0     2018-02-20 CRAN (R 3.4.3)
+ S4Vectors            * 0.16.0    2017-11-29 Bioconductor  
+ scales                 0.5.0     2017-08-24 CRAN (R 3.4.1)
+ snow                   0.4-2     2016-10-14 CRAN (R 3.4.1)
+ stats                * 3.4.3     2018-01-20 local         
+ stats4               * 3.4.3     2018-01-20 local         
+ SummarizedExperiment * 1.8.1     2018-01-09 Bioconductor  
+ tibble                 1.4.2     2018-01-22 CRAN (R 3.4.3)
+ tools                  3.4.3     2018-01-20 local         
+ utils                * 3.4.3     2018-01-20 local         
+ withr                  2.1.2     2018-03-15 CRAN (R 3.4.3)
+ XVector                0.18.0    2017-11-29 Bioconductor  
+ zlibbioc               1.24.0    2017-11-07 Bioconductor  
+**** Job ends ****
+Thu Aug  9 11:53:55 EDT 2018

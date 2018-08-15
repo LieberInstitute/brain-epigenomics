@@ -57,25 +57,25 @@ if(opt$chr != 'all') {
         BSobj <- BSobj_all[subjectHits(findOverlaps(gr_all_highCov, rowRanges(BSobj_all))), ]
         message(paste(Sys.time(), 'saving filtered version'))
         save(BSobj, file = filt_cph)
-    } else {
-        message(paste(Sys.time(), 'loading', filt_cpg))
-        load(filt_cpg, verbose = TRUE)
-        message(paste(Sys.time(), 'coercing to matrix'))
-        assays(BSobj)$M <- as.matrix(assays(BSobj)$M)
-        assays(BSobj)$Cov <- as.matrix(assays(BSobj)$Cov)
-        message(paste(Sys.time(), 'saving filtered & coerced version'))
-        save(BSobj, file = gsub('.Rdata', '_coerced.Rdata', filt_cpg))
-        
-        
-        message(paste(Sys.time(), 'loading', filt_cph))
-        load(filt_cph, verbose = TRUE)
-        message(paste(Sys.time(), 'coercing to matrix'))
-        assays(BSobj)$M <- as.matrix(assays(BSobj)$M)
-        assays(BSobj)$Cov <- as.matrix(assays(BSobj)$Cov)
-        message(paste(Sys.time(), 'saving filtered & coerced version'))
-        save(BSobj, file = gsub('.Rdata', '_coerced.Rdata', filt_cph))
     }
     
+    message(paste(Sys.time(), 'loading', filt_cpg))
+    load(filt_cpg, verbose = TRUE)
+    message(paste(Sys.time(), 'coercing to matrix'))
+    assays(BSobj)$M <- as.matrix(assays(BSobj)$M)
+    assays(BSobj)$Cov <- as.matrix(assays(BSobj)$Cov)
+    message(paste(Sys.time(), 'saving filtered & coerced version'))
+    save(BSobj, file = gsub('.Rdata', '_coerced.Rdata', filt_cpg))
+        
+        
+    message(paste(Sys.time(), 'loading', filt_cph))
+    load(filt_cph, verbose = TRUE)
+    message(paste(Sys.time(), 'coercing to matrix'))
+    assays(BSobj)$M <- as.matrix(assays(BSobj)$M)
+    assays(BSobj)$Cov <- as.matrix(assays(BSobj)$Cov)
+    message(paste(Sys.time(), 'saving filtered & coerced version'))
+    save(BSobj, file = gsub('.Rdata', '_coerced.Rdata', filt_cph))
+
     ## Reproducibility information
     print('Reproducibility information:')
     print(Sys.time())
