@@ -1,0 +1,408 @@
+Path to Bowtie 2 specified as: bowtie2
+Bowtie seems to be working fine (tested command 'bowtie2 --version' [2.2.5])
+Output format is BAM (default)
+Alignments will be written out in BAM format. Samtools found here: '/jhpce/shared/community/core/samtools/1.1/bin/samtools'
+Reference genome folder provided is /dcl01/lieber/ajaffe/Emily/RNAseq-pipeline/Annotation/GENCODE/GRCm38_mm10/	(absolute path is '/dcl01/lieber/ajaffe/Emily/RNAseq-pipeline/Annotation/GENCODE/GRCm38_mm10/)'
+
+Input files to be analysed (in current folder '/dcl01/lieber/ajaffe/Amanda/WGBS/wgbs'):
+/dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_1.fastq.gz
+/dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_2.fastq.gz
+Library is assumed to be strand-specific (directional), alignments to strands complementary to the original top or bottom strands will be ignored (i.e. not performed!)
+Output will be written into the directory: /dcl02/lieber/WGBS/PublicData/Stroud_Greenberg_Cell_2017/BAMS/WGBS/
+Running Bismark Parallel version. Number of parallel instances to be spawned: 4
+
+Current working directory is: /dcl01/lieber/ajaffe/Amanda/WGBS/wgbs
+
+Now reading in and storing sequence information of the genome specified in: /dcl01/lieber/ajaffe/Emily/RNAseq-pipeline/Annotation/GENCODE/GRCm38_mm10/
+
+
+Paired-end alignments will be performed
+=======================================
+
+The provided filenames for paired-end alignments are /dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_1.fastq.gz and /dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_2.fastq.gz
+
+Paired-end alignments will be performed
+=======================================
+
+The provided filenames for paired-end alignments are /dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_1.fastq.gz and /dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_2.fastq.gz
+
+Paired-end alignments will be performed
+=======================================
+
+
+Paired-end alignments will be performed
+=======================================
+
+The provided filenames for paired-end alignments are /dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_1.fastq.gz and /dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_2.fastq.gz
+The provided filenames for paired-end alignments are /dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_1.fastq.gz and /dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_2.fastq.gz
+Finished subdividing /dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_1.fastq.gz for PID: 0 and offset 1
+
+Finished subdividing /dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_1.fastq.gz for PID: 0 and offset 3
+
+Using the subset file >SRR5986792_1.fastq.gz.temp.1< as new in-file 1 (instead of >/dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_1.fastq.gz<)
+Using the subset file >SRR5986792_1.fastq.gz.temp.3< as new in-file 1 (instead of >/dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_1.fastq.gz<)
+Finished subdividing /dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_1.fastq.gz for PID: 13566 and offset 4
+
+Using the subset file >SRR5986792_1.fastq.gz.temp.4< as new in-file 1 (instead of >/dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_1.fastq.gz<)
+Finished subdividing /dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_1.fastq.gz for PID: 0 and offset 2
+
+Using the subset file >SRR5986792_1.fastq.gz.temp.2< as new in-file 1 (instead of >/dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_1.fastq.gz<)
+Finished subdividing /dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_2.fastq.gz for PID: 0 and offset 2
+
+Using the subset file >SRR5986792_2.fastq.gz.temp.2< as new in-file 2 (instead of >/dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_2.fastq.gz<)
+Input files are in FastQ format
+Writing a C -> T converted version of the input file SRR5986792_1.fastq.gz.temp.2 to SRR5986792_1.fastq.gz.temp.2_C_to_T.fastq
+Finished subdividing /dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_2.fastq.gz for PID: 0 and offset 1
+
+Using the subset file >SRR5986792_2.fastq.gz.temp.1< as new in-file 2 (instead of >/dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_2.fastq.gz<)
+Input files are in FastQ format
+Writing a C -> T converted version of the input file SRR5986792_1.fastq.gz.temp.1 to SRR5986792_1.fastq.gz.temp.1_C_to_T.fastq
+Finished subdividing /dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_2.fastq.gz for PID: 13566 and offset 4
+
+Using the subset file >SRR5986792_2.fastq.gz.temp.4< as new in-file 2 (instead of >/dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_2.fastq.gz<)
+Input files are in FastQ format
+Writing a C -> T converted version of the input file SRR5986792_1.fastq.gz.temp.4 to SRR5986792_1.fastq.gz.temp.4_C_to_T.fastq
+Finished subdividing /dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_2.fastq.gz for PID: 0 and offset 3
+
+Using the subset file >SRR5986792_2.fastq.gz.temp.3< as new in-file 2 (instead of >/dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/SRR5986792_2.fastq.gz<)
+Input files are in FastQ format
+Writing a C -> T converted version of the input file SRR5986792_1.fastq.gz.temp.3 to SRR5986792_1.fastq.gz.temp.3_C_to_T.fastq
+
+Created C -> T converted version of the FastQ file SRR5986792_1.fastq.gz.temp.4 (100773442 sequences in total)
+
+Writing a G -> A converted version of the input file SRR5986792_2.fastq.gz.temp.4 to SRR5986792_2.fastq.gz.temp.4_G_to_A.fastq
+
+Created C -> T converted version of the FastQ file SRR5986792_1.fastq.gz.temp.1 (100773443 sequences in total)
+
+Writing a G -> A converted version of the input file SRR5986792_2.fastq.gz.temp.1 to SRR5986792_2.fastq.gz.temp.1_G_to_A.fastq
+
+Created C -> T converted version of the FastQ file SRR5986792_1.fastq.gz.temp.2 (100773443 sequences in total)
+
+Writing a G -> A converted version of the input file SRR5986792_2.fastq.gz.temp.2 to SRR5986792_2.fastq.gz.temp.2_G_to_A.fastq
+
+Created C -> T converted version of the FastQ file SRR5986792_1.fastq.gz.temp.3 (100773443 sequences in total)
+
+Writing a G -> A converted version of the input file SRR5986792_2.fastq.gz.temp.3 to SRR5986792_2.fastq.gz.temp.3_G_to_A.fastq
+
+Created G -> A converted version of the FastQ file SRR5986792_2.fastq.gz.temp.4 (100773442 sequences in total)
+
+Input files are SRR5986792_1.fastq.gz.temp.4_C_to_T.fastq and SRR5986792_2.fastq.gz.temp.4_G_to_A.fastq (FastQ)
+Now running 2 instances of Bowtie 2 against the bisulfite genome of /dcl01/lieber/ajaffe/Emily/RNAseq-pipeline/Annotation/GENCODE/GRCm38_mm10/ with the specified options: -q --score-min L,0,-0.2 --ignore-quals --no-mixed --no-discordant --dovetail --maxins 500
+
+Now starting a Bowtie 2 paired-end alignment for CTread1GAread2CTgenome (reading in sequences from SRR5986792_1.fastq.gz.temp.4_C_to_T.fastq and SRR5986792_2.fastq.gz.temp.4_G_to_A.fastq, with the options: -q --score-min L,0,-0.2 --ignore-quals --no-mixed --no-discordant --dovetail --maxins 500 --norc))
+
+Created G -> A converted version of the FastQ file SRR5986792_2.fastq.gz.temp.1 (100773443 sequences in total)
+
+Input files are SRR5986792_1.fastq.gz.temp.1_C_to_T.fastq and SRR5986792_2.fastq.gz.temp.1_G_to_A.fastq (FastQ)
+Now running 2 instances of Bowtie 2 against the bisulfite genome of /dcl01/lieber/ajaffe/Emily/RNAseq-pipeline/Annotation/GENCODE/GRCm38_mm10/ with the specified options: -q --score-min L,0,-0.2 --ignore-quals --no-mixed --no-discordant --dovetail --maxins 500
+
+Now starting a Bowtie 2 paired-end alignment for CTread1GAread2CTgenome (reading in sequences from SRR5986792_1.fastq.gz.temp.1_C_to_T.fastq and SRR5986792_2.fastq.gz.temp.1_G_to_A.fastq, with the options: -q --score-min L,0,-0.2 --ignore-quals --no-mixed --no-discordant --dovetail --maxins 500 --norc))
+
+Created G -> A converted version of the FastQ file SRR5986792_2.fastq.gz.temp.2 (100773443 sequences in total)
+
+Input files are SRR5986792_1.fastq.gz.temp.2_C_to_T.fastq and SRR5986792_2.fastq.gz.temp.2_G_to_A.fastq (FastQ)
+Now running 2 instances of Bowtie 2 against the bisulfite genome of /dcl01/lieber/ajaffe/Emily/RNAseq-pipeline/Annotation/GENCODE/GRCm38_mm10/ with the specified options: -q --score-min L,0,-0.2 --ignore-quals --no-mixed --no-discordant --dovetail --maxins 500
+
+Now starting a Bowtie 2 paired-end alignment for CTread1GAread2CTgenome (reading in sequences from SRR5986792_1.fastq.gz.temp.2_C_to_T.fastq and SRR5986792_2.fastq.gz.temp.2_G_to_A.fastq, with the options: -q --score-min L,0,-0.2 --ignore-quals --no-mixed --no-discordant --dovetail --maxins 500 --norc))
+
+Created G -> A converted version of the FastQ file SRR5986792_2.fastq.gz.temp.3 (100773443 sequences in total)
+
+Input files are SRR5986792_1.fastq.gz.temp.3_C_to_T.fastq and SRR5986792_2.fastq.gz.temp.3_G_to_A.fastq (FastQ)
+Now running 2 instances of Bowtie 2 against the bisulfite genome of /dcl01/lieber/ajaffe/Emily/RNAseq-pipeline/Annotation/GENCODE/GRCm38_mm10/ with the specified options: -q --score-min L,0,-0.2 --ignore-quals --no-mixed --no-discordant --dovetail --maxins 500
+
+Now starting a Bowtie 2 paired-end alignment for CTread1GAread2CTgenome (reading in sequences from SRR5986792_1.fastq.gz.temp.3_C_to_T.fastq and SRR5986792_2.fastq.gz.temp.3_G_to_A.fastq, with the options: -q --score-min L,0,-0.2 --ignore-quals --no-mixed --no-discordant --dovetail --maxins 500 --norc))
+Found first alignment:
+SRR5986792.1_1_length=75/1	77	*	0	0	*	*	0	0	GGGGTNGGTTGGGGGGGGTGGGGGGGGGGGGGGGTGTGTGGGGGGGGGGGGGTGGGGGTGTGGTGTTGTTGTTTT	AAAA/#EEEEEEAEEEAEEEAEEEAEEEEEEEEEEEEAAEAEEEEEEEAEEEEEEEEEEEEAEEAAE/EE/EAEE	YT:Z:UP
+SRR5986792.1_1_length=35/2	141	*	0	0	*	*	0	0	NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN	###################################	YT:Z:UP	YF:Z:NS
+Now starting a Bowtie 2 paired-end alignment for CTread1GAread2GAgenome (reading in sequences from SRR5986792_1.fastq.gz.temp.1_C_to_T.fastq and SRR5986792_2.fastq.gz.temp.1_G_to_A.fastq, with the options: -q --score-min L,0,-0.2 --ignore-quals --no-mixed --no-discordant --dovetail --maxins 500 --nofw))
+Found first alignment:
+SRR5986792.4_4_length=75/1	77	*	0	0	*	*	0	0	GGGGTNGGGTGGTGTTGTGGGGGTGGTTGGGGGTGTGTGTGGTTTGTGGTGGTGGTTTGGGTTGTGGTGTGTGTG	/AAAA#AEEEEEEEEEEEEEAEEEEEEEEEAEEEEEEEEEEEEEEAEAA/EEEEEEEEEEEEEEEEEEAEAEEEE	YT:Z:UP
+SRR5986792.4_4_length=75/2	141	*	0	0	*	*	0	0	NAAAAANNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN	#AA/AE#####################################################################	YT:Z:UP	YF:Z:NS
+Now starting a Bowtie 2 paired-end alignment for CTread1GAread2GAgenome (reading in sequences from SRR5986792_1.fastq.gz.temp.4_C_to_T.fastq and SRR5986792_2.fastq.gz.temp.4_G_to_A.fastq, with the options: -q --score-min L,0,-0.2 --ignore-quals --no-mixed --no-discordant --dovetail --maxins 500 --nofw))
+Found first alignment:
+SRR5986792.3_3_length=75/1	77	*	0	0	*	*	0	0	GGGTTNGGGGGTGGTGTTGTGTGGTGTTGGTTGGGGGTGTGTGTTTGGGTGGTGGGTTTGTGGTTTTTGTTGTTG	AAAAA#EEEEEEEEEEEEEEEAEEEEEEEEEEEEEAEEEEEEEEEEEEEE/EAEEAAEEEEEEE6E/6/AAEE/E	YT:Z:UP
+SRR5986792.3_3_length=75/2	141	*	0	0	*	*	0	0	NAAAAANNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN	#AAA/A#####################################################################	YT:Z:UP	YF:Z:NS
+Now starting a Bowtie 2 paired-end alignment for CTread1GAread2GAgenome (reading in sequences from SRR5986792_1.fastq.gz.temp.3_C_to_T.fastq and SRR5986792_2.fastq.gz.temp.3_G_to_A.fastq, with the options: -q --score-min L,0,-0.2 --ignore-quals --no-mixed --no-discordant --dovetail --maxins 500 --nofw))
+Found first alignment:
+SRR5986792.2_2_length=75/1	77	*	0	0	*	*	0	0	GTGGGNGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG	AAAAA#EEEEEEEEEEEEE/EEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEEAEEEEEEEEEEEEEEE/EEEEE	YT:Z:UP
+SRR5986792.2_2_length=35/2	141	*	0	0	*	*	0	0	NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN	###################################	YT:Z:UP	YF:Z:NS
+Now starting a Bowtie 2 paired-end alignment for CTread1GAread2GAgenome (reading in sequences from SRR5986792_1.fastq.gz.temp.2_C_to_T.fastq and SRR5986792_2.fastq.gz.temp.2_G_to_A.fastq, with the options: -q --score-min L,0,-0.2 --ignore-quals --no-mixed --no-discordant --dovetail --maxins 500 --nofw))
+Found first alignment:
+SRR5986792.4_4_length=75/1	77	*	0	0	*	*	0	0	GGGGTNGGGTGGTGTTGTGGGGGTGGTTGGGGGTGTGTGTGGTTTGTGGTGGTGGTTTGGGTTGTGGTGTGTGTG	/AAAA#AEEEEEEEEEEEEEAEEEEEEEEEAEEEEEEEEEEEEEEAEAA/EEEEEEEEEEEEEEEEEEAEAEEEE	YT:Z:UP
+SRR5986792.4_4_length=75/2	141	*	0	0	*	*	0	0	NAAAAANNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN	#AA/AE#####################################################################	YT:Z:UP	YF:Z:NS
+Found first alignment:
+SRR5986792.1_1_length=75/1	77	*	0	0	*	*	0	0	GGGGTNGGTTGGGGGGGGTGGGGGGGGGGGGGGGTGTGTGGGGGGGGGGGGGTGGGGGTGTGGTGTTGTTGTTTT	AAAA/#EEEEEEAEEEAEEEAEEEAEEEEEEEEEEEEAAEAEEEEEEEAEEEEEEEEEEEEAEEAAE/EE/EAEE	YT:Z:UP
+SRR5986792.1_1_length=35/2	141	*	0	0	*	*	0	0	NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN	###################################	YT:Z:UP	YF:Z:NS
+
+>>> Writing bisulfite mapping results to SRR5986792_1.fastq.gz.temp.4_bismark_bt2_pe.bam <<<
+
+
+>>> Writing bisulfite mapping results to SRR5986792_1.fastq.gz.temp.1_bismark_bt2_pe.bam <<<
+
+Found first alignment:
+SRR5986792.2_2_length=75/1	77	*	0	0	*	*	0	0	GTGGGNGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG	AAAAA#EEEEEEEEEEEEE/EEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEEAEEEEEEEEEEEEEEE/EEEEE	YT:Z:UP
+SRR5986792.2_2_length=35/2	141	*	0	0	*	*	0	0	NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN	###################################	YT:Z:UP	YF:Z:NS
+
+>>> Writing bisulfite mapping results to SRR5986792_1.fastq.gz.temp.2_bismark_bt2_pe.bam <<<
+
+Found first alignment:
+SRR5986792.3_3_length=75/1	77	*	0	0	*	*	0	0	GGGTTNGGGGGTGGTGTTGTGTGGTGTTGGTTGGGGGTGTGTGTTTGGGTGGTGGGTTTGTGGTTTTTGTTGTTG	AAAAA#EEEEEEEEEEEEEEEAEEEEEEEEEEEEEAEEEEEEEEEEEEEE/EAEEAAEEEEEEE6E/6/AAEE/E	YT:Z:UP
+SRR5986792.3_3_length=75/2	141	*	0	0	*	*	0	0	NAAAAANNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN	#AAA/A#####################################################################	YT:Z:UP	YF:Z:NS
+
+>>> Writing bisulfite mapping results to SRR5986792_1.fastq.gz.temp.3_bismark_bt2_pe.bam <<<
+
+
+Reading in the sequence files SRR5986792_1.fastq.gz.temp.4 and SRR5986792_2.fastq.gz.temp.4
+
+Reading in the sequence files SRR5986792_1.fastq.gz.temp.1 and SRR5986792_2.fastq.gz.temp.1
+
+Reading in the sequence files SRR5986792_1.fastq.gz.temp.2 and SRR5986792_2.fastq.gz.temp.2
+
+Reading in the sequence files SRR5986792_1.fastq.gz.temp.3 and SRR5986792_2.fastq.gz.temp.3
+Processed 1000000 sequence pairs so far
+Processed 1000000 sequence pairs so far
+Processed 1000000 sequence pairs so far
+Processed 1000000 sequence pairs so far
+Processed 2000000 sequence pairs so far
+Processed 2000000 sequence pairs so far
+Processed 2000000 sequence pairs so far
+Processed 2000000 sequence pairs so far
+Chromosomal sequence could not be extracted for	SRR5986792.10250200_10250200_length=75	chrM	1
+Processed 3000000 sequence pairs so far
+Processed 3000000 sequence pairs so far
+Processed 3000000 sequence pairs so far
+Processed 3000000 sequence pairs so far
+Processed 4000000 sequence pairs so far
+Processed 4000000 sequence pairs so far
+Processed 4000000 sequence pairs so far
+Processed 4000000 sequence pairs so far
+Processed 5000000 sequence pairs so far
+Processed 5000000 sequence pairs so far
+Processed 5000000 sequence pairs so far
+Processed 5000000 sequence pairs so far
+Chromosomal sequence could not be extracted for	SRR5986792.23548596_23548596_length=75	GL456383.1	38585
+Processed 6000000 sequence pairs so far
+Processed 6000000 sequence pairs so far
+Processed 6000000 sequence pairs so far
+Processed 6000000 sequence pairs so far
+Processed 7000000 sequence pairs so far
+Processed 7000000 sequence pairs so far
+Processed 7000000 sequence pairs so far
+Processed 7000000 sequence pairs so far
+Processed 8000000 sequence pairs so far
+Processed 8000000 sequence pairs so far
+Processed 8000000 sequence pairs so far
+Processed 8000000 sequence pairs so far
+Processed 9000000 sequence pairs so far
+Processed 9000000 sequence pairs so far
+Processed 9000000 sequence pairs so far
+Processed 9000000 sequence pairs so far
+Processed 10000000 sequence pairs so far
+Processed 10000000 sequence pairs so far
+Processed 10000000 sequence pairs so far
+Processed 10000000 sequence pairs so far
+Processed 11000000 sequence pairs so far
+Processed 11000000 sequence pairs so far
+Processed 11000000 sequence pairs so far
+Processed 11000000 sequence pairs so far
+Processed 12000000 sequence pairs so far
+Chromosomal sequence could not be extracted for	SRR5986792.48048840_48048840_length=75	GL456210.1	169651
+Processed 12000000 sequence pairs so far
+Processed 12000000 sequence pairs so far
+Processed 12000000 sequence pairs so far
+Processed 13000000 sequence pairs so far
+Processed 13000000 sequence pairs so far
+Processed 13000000 sequence pairs so far
+Processed 13000000 sequence pairs so far
+Processed 14000000 sequence pairs so far
+Processed 14000000 sequence pairs so far
+Processed 14000000 sequence pairs so far
+Chromosomal sequence could not be extracted for	SRR5986792.56190381_56190381_length=75	chrM	1
+Processed 14000000 sequence pairs so far
+Processed 15000000 sequence pairs so far
+Processed 15000000 sequence pairs so far
+Processed 15000000 sequence pairs so far
+Processed 15000000 sequence pairs so far
+Chromosomal sequence could not be extracted for	SRR5986792.61922260_61922260_length=75	chrM	16224
+Chromosomal sequence could not be extracted for	SRR5986792.61929882_61929882_length=75	chrM	2
+Processed 16000000 sequence pairs so far
+Processed 16000000 sequence pairs so far
+Chromosomal sequence could not be extracted for	SRR5986792.64288936_64288936_length=75	JH584304.1	2
+Processed 16000000 sequence pairs so far
+Processed 16000000 sequence pairs so far
+Processed 17000000 sequence pairs so far
+Processed 17000000 sequence pairs so far
+Processed 17000000 sequence pairs so far
+Processed 17000000 sequence pairs so far
+Processed 18000000 sequence pairs so far
+Processed 18000000 sequence pairs so far
+Processed 18000000 sequence pairs so far
+Processed 18000000 sequence pairs so far
+Processed 19000000 sequence pairs so far
+Processed 19000000 sequence pairs so far
+Processed 19000000 sequence pairs so far
+Processed 19000000 sequence pairs so far
+Processed 20000000 sequence pairs so far
+Processed 20000000 sequence pairs so far
+Processed 20000000 sequence pairs so far
+Processed 20000000 sequence pairs so far
+Processed 21000000 sequence pairs so far
+Processed 21000000 sequence pairs so far
+Processed 21000000 sequence pairs so far
+Processed 21000000 sequence pairs so far
+Processed 22000000 sequence pairs so far
+Processed 22000000 sequence pairs so far
+Processed 22000000 sequence pairs so far
+Processed 22000000 sequence pairs so far
+Processed 23000000 sequence pairs so far
+Chromosomal sequence could not be extracted for	SRR5986792.91757526_91757526_length=74	chrM	2
+Processed 23000000 sequence pairs so far
+Processed 23000000 sequence pairs so far
+Processed 23000000 sequence pairs so far
+Processed 24000000 sequence pairs so far
+Processed 24000000 sequence pairs so far
+Processed 24000000 sequence pairs so far
+Processed 24000000 sequence pairs so far
+Processed 25000000 sequence pairs so far
+Processed 25000000 sequence pairs so far
+Processed 25000000 sequence pairs so far
+Chromosomal sequence could not be extracted for	SRR5986792.99865387_99865387_length=75	chrM	16224
+Processed 25000000 sequence pairs so far
+Chromosomal sequence could not be extracted for	SRR5986792.100703315_100703315_length=74	chrM	2
+Processed 26000000 sequence pairs so far
+Processed 26000000 sequence pairs so far
+Processed 26000000 sequence pairs so far
+Processed 26000000 sequence pairs so far
+Processed 27000000 sequence pairs so far
+Processed 27000000 sequence pairs so far
+Processed 27000000 sequence pairs so far
+Chromosomal sequence could not be extracted for	SRR5986792.108630530_108630530_length=75	chrM	2
+Processed 27000000 sequence pairs so far
+Processed 28000000 sequence pairs so far
+Processed 28000000 sequence pairs so far
+Processed 28000000 sequence pairs so far
+Processed 28000000 sequence pairs so far
+Processed 29000000 sequence pairs so far
+Processed 29000000 sequence pairs so far
+Processed 29000000 sequence pairs so far
+Processed 29000000 sequence pairs so far
+Processed 30000000 sequence pairs so far
+Processed 30000000 sequence pairs so far
+Processed 30000000 sequence pairs so far
+Processed 30000000 sequence pairs so far
+Processed 31000000 sequence pairs so far
+Processed 31000000 sequence pairs so far
+Processed 31000000 sequence pairs so far
+Processed 31000000 sequence pairs so far
+Processed 32000000 sequence pairs so far
+Chromosomal sequence could not be extracted for	SRR5986792.125782078_125782078_length=75	chrM	1
+Processed 32000000 sequence pairs so far
+Processed 32000000 sequence pairs so far
+Processed 32000000 sequence pairs so far
+Processed 33000000 sequence pairs so far
+Processed 33000000 sequence pairs so far
+Processed 33000000 sequence pairs so far
+Processed 33000000 sequence pairs so far
+Processed 34000000 sequence pairs so far
+Chromosomal sequence could not be extracted for	SRR5986792.132906581_132906581_length=75	chrM	16224
+Processed 34000000 sequence pairs so far
+Processed 34000000 sequence pairs so far
+Processed 34000000 sequence pairs so far
+Processed 35000000 sequence pairs so far
+Processed 35000000 sequence pairs so far
+Processed 35000000 sequence pairs so far
+Processed 35000000 sequence pairs so far
+Processed 36000000 sequence pairs so far
+Chromosomal sequence could not be extracted for	SRR5986792.142555130_142555130_length=75	chrM	16224
+Processed 36000000 sequence pairs so far
+Processed 36000000 sequence pairs so far
+Processed 37000000 sequence pairs so far
+Processed 36000000 sequence pairs so far
+Processed 37000000 sequence pairs so far
+Processed 38000000 sequence pairs so far
+Processed 37000000 sequence pairs so far
+Processed 37000000 sequence pairs so far
+Processed 38000000 sequence pairs so far
+Processed 39000000 sequence pairs so far
+Processed 38000000 sequence pairs so far
+Processed 38000000 sequence pairs so far
+Chromosomal sequence could not be extracted for	SRR5986792.159750296_159750296_length=75	chrM	16224
+Processed 39000000 sequence pairs so far
+Processed 40000000 sequence pairs so far
+Processed 39000000 sequence pairs so far
+Processed 39000000 sequence pairs so far
+Processed 41000000 sequence pairs so far
+Processed 40000000 sequence pairs so far
+Processed 40000000 sequence pairs so far
+Processed 40000000 sequence pairs so far
+Processed 42000000 sequence pairs so far
+Processed 41000000 sequence pairs so far
+Processed 41000000 sequence pairs so far
+Processed 41000000 sequence pairs so far
+Processed 43000000 sequence pairs so far
+Processed 42000000 sequence pairs so far
+Processed 42000000 sequence pairs so far
+Processed 42000000 sequence pairs so far
+Processed 44000000 sequence pairs so far
+Processed 43000000 sequence pairs so far
+Processed 43000000 sequence pairs so far
+Processed 43000000 sequence pairs so far
+Processed 45000000 sequence pairs so far
+Processed 44000000 sequence pairs so far
+Processed 44000000 sequence pairs so far
+Processed 44000000 sequence pairs so far
+Processed 46000000 sequence pairs so far
+Processed 45000000 sequence pairs so far
+Processed 45000000 sequence pairs so far
+Processed 45000000 sequence pairs so far
+Processed 47000000 sequence pairs so far
+Processed 46000000 sequence pairs so far
+Processed 46000000 sequence pairs so far
+Processed 46000000 sequence pairs so far
+Processed 48000000 sequence pairs so far
+Processed 47000000 sequence pairs so far
+Processed 47000000 sequence pairs so far
+Processed 47000000 sequence pairs so far
+Processed 49000000 sequence pairs so far
+Processed 48000000 sequence pairs so far
+Processed 48000000 sequence pairs so far
+Processed 48000000 sequence pairs so far
+Processed 50000000 sequence pairs so far
+Processed 49000000 sequence pairs so far
+Processed 49000000 sequence pairs so far
+Processed 49000000 sequence pairs so far
+Chromosomal sequence could not be extracted for	SRR5986792.203732944_203732944_length=74	GL456368.1	20134
+Processed 51000000 sequence pairs so far
+Processed 50000000 sequence pairs so far
+Processed 50000000 sequence pairs so far
+Processed 50000000 sequence pairs so far
+Processed 52000000 sequence pairs so far
+Processed 51000000 sequence pairs so far
+Processed 51000000 sequence pairs so far
+Processed 51000000 sequence pairs so far
+Processed 53000000 sequence pairs so far
+Processed 52000000 sequence pairs so far
+Processed 52000000 sequence pairs so far
+Processed 52000000 sequence pairs so far
+Processed 54000000 sequence pairs so far
+Processed 53000000 sequence pairs so far
+Processed 53000000 sequence pairs so far
+Processed 53000000 sequence pairs so far
+Chromosomal sequence could not be extracted for	SRR5986792.213743554_213743554_length=74	chrM	16225
+Processed 55000000 sequence pairs so far
+Processed 54000000 sequence pairs so far
+Processed 54000000 sequence pairs so far
+Processed 54000000 sequence pairs so far
+Processed 56000000 sequence pairs so far
+Processed 55000000 sequence pairs so far
+Processed 55000000 sequence pairs so far
+Processed 55000000 sequence pairs so far
+Processed 57000000 sequence pairs so far
+Processed 56000000 sequence pairs so far
+Processed 56000000 sequence pairs so far
+Chromosomal sequence could not be extracted for	SRR5986792.230396112_230396112_length=75	JH584304.1	114378
+Processed 56000000 sequence pairs so far
+Processed 58000000 sequence pairs so far
+Processed 57000000 sequence pairs so far
+Processed 57000000 sequence pairs so far
+Processed 57000000 sequence pairs so far

@@ -1,0 +1,841 @@
+
+ *** Bismark methylation extractor version v0.19.0 ***
+
+
+Summarising Bismark methylation extractor parameters:
+===============================================================
+Bismark single-end SAM format specified (default)
+Number of cores to be used: 4
+Output path specified as: /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/
+
+
+Summarising bedGraph parameters:
+===============================================================
+Generating additional output in bedGraph and coverage format
+bedGraph format:	<Chromosome> <Start Position> <End Position> <Methylation Percentage>
+coverage format:	<Chromosome> <Start Position> <End Position> <Methylation Percentage> <count methylated> <count non-methylated>
+
+Using a cutoff of 1 read(s) to report cytosine positions
+Reporting and sorting methylation information for all cytosine context (sorting may take a long time, you have been warned ...)
+The bedGraph UNIX sort command will use the following memory setting:	'2G'. Temporary directory used for sorting is the output directory
+
+
+Summarising genome-wide cytosine methylation report parameters:
+===============================================================
+Generating comprehensive genome-wide cytosine report
+(output format: <Chromosome> <Position> <Strand> <count methylated> <count non-methylated>  <C-context>  <trinucleotide context> )
+Reporting methylation for all cytosine contexts. Be aware that this will generate enormous files
+Splitting the cytosine report output up into individual files for each chromosome
+Using 1-based genomic coordinates (default)
+Genome folder was specified as /dcl01/lieber/ajaffe/Emily/RNAseq-pipeline/Annotation/GENCODE/GRCm38_mm10/
+
+Checking file >>SRR1536122_bismark_bt2.bam<< for signs of file truncation...
+
+Writing result file containing methylation information for C in CpG context from the original top strand to /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CpG_OT_SRR1536122_bismark_bt2.txt.gz
+Writing result file containing methylation information for C in CpG context from the complementary to original top strand to /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CpG_CTOT_SRR1536122_bismark_bt2.txt.gz
+Writing result file containing methylation information for C in CpG context from the complementary to original bottom strand to /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CpG_CTOB_SRR1536122_bismark_bt2.txt.gz
+Writing result file containing methylation information for C in CpG context from the original bottom strand to /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CpG_OB_SRR1536122_bismark_bt2.txt.gz
+
+Writing result file containing methylation information for C in CHG context from the original top strand to /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CHG_OT_SRR1536122_bismark_bt2.txt.gz
+Writing result file containing methylation information for C in CHG context from the complementary to original top strand to /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CHG_CTOT_SRR1536122_bismark_bt2.txt.gz
+Writing result file containing methylation information for C in CHG context from the complementary to original bottom strand to /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CHG_CTOB_SRR1536122_bismark_bt2.txt.gz
+Writing result file containing methylation information for C in CHG context from the original bottom strand to /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CHG_OB_SRR1536122_bismark_bt2.txt.gz
+
+Writing result file containing methylation information for C in CHH context from the original top strand to /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CHH_OT_SRR1536122_bismark_bt2.txt.gz
+Writing result file containing methylation information for C in CHH context from the complementary to original top strand to /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CHH_CTOT_SRR1536122_bismark_bt2.txt.gz
+Writing result file containing methylation information for C in CHH context from the complementary to original bottom strand to /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CHH_CTOB_SRR1536122_bismark_bt2.txt.gz
+Writing result file containing methylation information for C in CHH context from the original bottom strand to /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CHH_OB_SRR1536122_bismark_bt2.txt.gz
+
+
+Now reading in Bismark result file SRR1536122_bismark_bt2.bam
+
+Now reading in Bismark result file SRR1536122_bismark_bt2.bam
+
+Now reading in Bismark result file SRR1536122_bismark_bt2.bam
+
+
+Now reading in Bismark result file SRR1536122_bismark_bt2.bam
+
+skipping SAM header line:	@HD	VN:1.0	SO:unsorted
+skipping SAM header line:	@SQ	SN:chr1	LN:195471971
+skipping SAM header line:	@SQ	SN:chr2	LN:182113224
+skipping SAM header line:	@SQ	SN:chr3	LN:160039680
+skipping SAM header line:	@SQ	SN:chr4	LN:156508116
+skipping SAM header line:	@SQ	SN:chr5	LN:151834684
+skipping SAM header line:	@SQ	SN:chr6	LN:149736546
+skipping SAM header line:	@SQ	SN:chr7	LN:145441459
+skipping SAM header line:	@SQ	SN:chr8	LN:129401213
+skipping SAM header line:	@SQ	SN:chr9	LN:124595110
+skipping SAM header line:	@SQ	SN:chr10	LN:130694993
+skipping SAM header line:	@SQ	SN:chr11	LN:122082543
+skipping SAM header line:	@SQ	SN:chr12	LN:120129022
+skipping SAM header line:	@SQ	SN:chr13	LN:120421639
+skipping SAM header line:	@SQ	SN:chr14	LN:124902244
+skipping SAM header line:	@SQ	SN:chr15	LN:104043685
+skipping SAM header line:	@SQ	SN:chr16	LN:98207768
+skipping SAM header line:	@SQ	SN:chr17	LN:94987271
+skipping SAM header line:	@SQ	SN:chr18	LN:90702639
+skipping SAM header line:	@SQ	SN:chr19	LN:61431566
+skipping SAM header line:	@SQ	SN:chrX	LN:171031299
+skipping SAM header line:	@SQ	SN:chrY	LN:91744698
+skipping SAM header line:	@SQ	SN:chrM	LN:16299
+skipping SAM header line:	@SQ	SN:GL456210.1	LN:169725
+skipping SAM header line:	@SQ	SN:GL456211.1	LN:241735
+skipping SAM header line:	@SQ	SN:GL456212.1	LN:153618
+skipping SAM header line:	@SQ	SN:GL456213.1	LN:39340
+skipping SAM header line:	@SQ	SN:GL456216.1	LN:66673
+skipping SAM header line:	@SQ	SN:GL456219.1	LN:175968
+skipping SAM header line:	@SQ	SN:GL456221.1	LN:206961
+skipping SAM header line:	@SQ	SN:GL456233.1	LN:336933
+skipping SAM header line:	@SQ	SN:GL456239.1	LN:40056
+skipping SAM header line:	@SQ	SN:GL456350.1	LN:227966
+skipping SAM header line:	@SQ	SN:GL456354.1	LN:195993
+skipping SAM header line:	@SQ	SN:GL456359.1	LN:22974
+skipping SAM header line:	@SQ	SN:GL456360.1	LN:31704
+skipping SAM header line:	@SQ	SN:GL456366.1	LN:47073
+skipping SAM header line:	@SQ	SN:GL456367.1	LN:42057
+skipping SAM header line:	@SQ	SN:GL456368.1	LN:20208
+skipping SAM header line:	@SQ	SN:GL456370.1	LN:26764
+skipping SAM header line:	@SQ	SN:GL456372.1	LN:28664
+skipping SAM header line:	@SQ	SN:GL456378.1	LN:31602
+skipping SAM header line:	@SQ	SN:GL456379.1	LN:72385
+skipping SAM header line:	@SQ	SN:GL456381.1	LN:25871
+skipping SAM header line:	@SQ	SN:GL456382.1	LN:23158
+skipping SAM header line:	@SQ	SN:GL456383.1	LN:38659
+skipping SAM header line:	@SQ	SN:GL456385.1	LN:35240
+skipping SAM header line:	@SQ	SN:GL456387.1	LN:24685
+skipping SAM header line:	@SQ	SN:GL456389.1	LN:28772
+skipping SAM header line:	@SQ	SN:GL456390.1	LN:24668
+skipping SAM header line:	@SQ	SN:GL456392.1	LN:23629
+skipping SAM header line:	@SQ	SN:GL456393.1	LN:55711
+skipping SAM header line:	@SQ	SN:GL456394.1	LN:24323
+skipping SAM header line:	@SQ	SN:GL456396.1	LN:21240
+skipping SAM header line:	@SQ	SN:JH584292.1	LN:14945
+skipping SAM header line:	@SQ	SN:JH584293.1	LN:207968
+skipping SAM header line:	@SQ	SN:JH584294.1	LN:191905
+skipping SAM header line:	@SQ	SN:JH584295.1	LN:1976
+skipping SAM header line:	@SQ	SN:JH584296.1	LN:199368
+skipping SAM header line:	@SQ	SN:JH584297.1	LN:205776
+skipping SAM header line:	@SQ	SN:JH584298.1	LN:184189
+skipping SAM header line:	@SQ	SN:JH584299.1	LN:953012
+skipping SAM header line:	@SQ	SN:JH584300.1	LN:182347
+skipping SAM header line:	@SQ	SN:JH584301.1	LN:259875
+skipping SAM header line:	@SQ	SN:JH584302.1	LN:155838
+skipping SAM header line:	@SQ	SN:JH584303.1	LN:158099
+skipping SAM header line:	@SQ	SN:JH584304.1	LN:114452
+skipping SAM header line:	@PG	ID:Bismark	VN:v0.19.0	CL:"bismark --multicore 4 -o /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/single /dcl01/lieber/ajaffe/Emily/RNAseq-pipeline/Annotation/GENCODE/GRCm38_mm10 /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/FASTQ/WGBS/SRR1536122.fastq.gz"
+Processed lines: 500000
+Processed lines: 500000
+Processed lines: 500000
+Processed lines: 500000
+Processed lines: 1000000
+Processed lines: 1000000
+Processed lines: 1000000
+Processed lines: 1000000
+Processed lines: 1500000
+Processed lines: 1500000
+Processed lines: 1500000
+Processed lines: 1500000
+Processed lines: 2000000
+Processed lines: 2000000
+Processed lines: 2000000
+Processed lines: 2000000
+Processed lines: 2500000
+Processed lines: 2500000
+Processed lines: 2500000
+Processed lines: 2500000
+Processed lines: 3000000
+Processed lines: 3000000
+Processed lines: 3000000
+Processed lines: 3000000
+Processed lines: 3500000
+Processed lines: 3500000
+Processed lines: 3500000
+Processed lines: 3500000
+Processed lines: 4000000
+Processed lines: 4000000
+Processed lines: 4000000
+Processed lines: 4000000
+Processed lines: 4500000
+Processed lines: 4500000
+Processed lines: 4500000
+Processed lines: 4500000
+Processed lines: 5000000
+Processed lines: 5000000
+Processed lines: 5000000
+Processed lines: 5000000
+Processed lines: 5500000
+Processed lines: 5500000
+Processed lines: 5500000
+Processed lines: 5500000
+Processed lines: 6000000
+Processed lines: 6000000
+Processed lines: 6000000
+Processed lines: 6000000
+Processed lines: 6500000
+Processed lines: 6500000
+Processed lines: 6500000
+Processed lines: 6500000
+Processed lines: 7000000
+Processed lines: 7000000
+Processed lines: 7000000
+Processed lines: 7000000
+Processed lines: 7500000
+Processed lines: 7500000
+Processed lines: 7500000
+Processed lines: 7500000
+Processed lines: 8000000
+Processed lines: 8000000
+Processed lines: 8000000
+Processed lines: 8000000
+Processed lines: 8500000
+Processed lines: 8500000
+Processed lines: 8500000
+Processed lines: 8500000
+Processed lines: 9000000
+Processed lines: 9000000
+Processed lines: 9000000
+Processed lines: 9000000
+Processed lines: 9500000
+Processed lines: 9500000
+Processed lines: 9500000
+Processed lines: 9500000
+Processed lines: 10000000
+Processed lines: 10000000
+Processed lines: 10000000
+Processed lines: 10000000
+Finished processing child process. Exiting..
+Finished processing child process. Exiting..
+Now waiting for all child processes to complete
+Finished processing child process. Exiting..
+
+Merging individual splitting reports into overall report: '/dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/SRR1536122_bismark_bt2_splitting_report.txt'
+Merging from these individual files:
+
+Processed 10348006 lines in total
+Total number of methylation call strings processed: 10348006
+
+Final Cytosine Methylation Report
+=================================
+Total number of C's analysed:	201411365
+
+Total methylated C's in CpG context:	6684887
+Total methylated C's in CHG context:	390092
+Total methylated C's in CHH context:	1664363
+
+Total C to T conversions in CpG context:	2048531
+Total C to T conversions in CHG context:	42464928
+Total C to T conversions in CHH context:	148158564
+
+C methylated in CpG context:	76.5%
+C methylated in CHG context:	0.9%
+C methylated in CHH context:	1.1%
+
+
+
+Merging individual M-bias reports into overall M-bias statistics from these 4 individual files:
+Determining maximum read length for M-Bias plot
+Maximum read length of Read 1: 100
+
+Perl module GD::Graph::lines is not installed, skipping drawing M-bias plots (only writing out M-bias plot table)
+Determining maximum read length for M-Bias plot
+Maximum read length of Read 1: 100
+
+Perl module GD::Graph::lines is not installed, skipping drawing M-bias plots (only writing out M-bias plot table)
+Deleting unused files ...
+
+/dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CpG_OT_SRR1536122_bismark_bt2.txt.gz contains data ->	kept
+/dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CpG_CTOT_SRR1536122_bismark_bt2.txt.gz was empty ->	deleted
+/dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CpG_CTOB_SRR1536122_bismark_bt2.txt.gz was empty ->	deleted
+/dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CpG_OB_SRR1536122_bismark_bt2.txt.gz contains data ->	kept
+/dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CHG_OT_SRR1536122_bismark_bt2.txt.gz contains data ->	kept
+/dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CHG_CTOT_SRR1536122_bismark_bt2.txt.gz was empty ->	deleted
+/dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CHG_CTOB_SRR1536122_bismark_bt2.txt.gz was empty ->	deleted
+/dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CHG_OB_SRR1536122_bismark_bt2.txt.gz contains data ->	kept
+/dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CHH_OT_SRR1536122_bismark_bt2.txt.gz contains data ->	kept
+/dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CHH_CTOT_SRR1536122_bismark_bt2.txt.gz was empty ->	deleted
+/dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CHH_CTOB_SRR1536122_bismark_bt2.txt.gz was empty ->	deleted
+/dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CHH_OB_SRR1536122_bismark_bt2.txt.gz contains data ->	kept
+
+
+Using these input files: /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CpG_OT_SRR1536122_bismark_bt2.txt.gz /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CpG_OB_SRR1536122_bismark_bt2.txt.gz /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CHG_OT_SRR1536122_bismark_bt2.txt.gz /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CHG_OB_SRR1536122_bismark_bt2.txt.gz /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CHH_OT_SRR1536122_bismark_bt2.txt.gz /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/CHH_OB_SRR1536122_bismark_bt2.txt.gz
+
+Summary of parameters for bismark2bedGraph conversion:
+======================================================
+bedGraph output:		SRR1536122_bismark_bt2.bedGraph.gz
+output directory:		>/dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/<
+remove whitespaces:		no
+CX context:			yes
+No-header selected:		no
+Sorting method:			Unix sort-based (smaller memory footprint, but slower)
+Sort buffer size:		2G
+Coverage threshold:		1
+=============================================================================
+Methylation information will now be written into a bedGraph and coverage file
+=============================================================================
+
+Using the following files as Input:
+Writing bedGraph to file: SRR1536122_bismark_bt2.bedGraph.gz
+Also writing out a coverage file including counts methylated and unmethylated residues to file: SRR1536122_bismark_bt2.bismark.cov.gz
+
+Changed directory to /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/
+Now writing methylation information for file >>CpG_OT_SRR1536122_bismark_bt2.txt.gz<< to individual files for each chromosome
+Finished writing out individual chromosome files for CpG_OT_SRR1536122_bismark_bt2.txt.gz
+Now writing methylation information for file >>CpG_OB_SRR1536122_bismark_bt2.txt.gz<< to individual files for each chromosome
+Finished writing out individual chromosome files for CpG_OB_SRR1536122_bismark_bt2.txt.gz
+Now writing methylation information for file >>CHG_OT_SRR1536122_bismark_bt2.txt.gz<< to individual files for each chromosome
+Finished writing out individual chromosome files for CHG_OT_SRR1536122_bismark_bt2.txt.gz
+Now writing methylation information for file >>CHG_OB_SRR1536122_bismark_bt2.txt.gz<< to individual files for each chromosome
+Finished writing out individual chromosome files for CHG_OB_SRR1536122_bismark_bt2.txt.gz
+Now writing methylation information for file >>CHH_OT_SRR1536122_bismark_bt2.txt.gz<< to individual files for each chromosome
+Finished writing out individual chromosome files for CHH_OT_SRR1536122_bismark_bt2.txt.gz
+Now writing methylation information for file >>CHH_OB_SRR1536122_bismark_bt2.txt.gz<< to individual files for each chromosome
+Finished writing out individual chromosome files for CHH_OB_SRR1536122_bismark_bt2.txt.gz
+
+Collecting temporary chromosome file information... Processing the following input file(s):
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr5.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr2.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr6.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr4.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr13.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr16.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr9.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr12.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr10.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr11.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr3.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr7.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr19.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr14.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr15.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchrX.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr17.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr8.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr18.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchrY.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584304.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456392.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456366.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456221.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456393.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchrM.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456389.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456239.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456368.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456212.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456390.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456383.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456370.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456378.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456354.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456216.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456396.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456359.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456379.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456211.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456210.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456381.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456360.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456394.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456233.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584299.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456385.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456372.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456387.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584296.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456367.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584292.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584297.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584303.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456219.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456382.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584295.1.methXtractor.temp
+CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456350.1.methXtractor.temp
+CpG_OB_SRR1536122_bismark_bt2.txt.gz.chrJH584301.1.methXtractor.temp
+CHG_OB_SRR1536122_bismark_bt2.txt.gz.chrJH584300.1.methXtractor.temp
+CHG_OB_SRR1536122_bismark_bt2.txt.gz.chrGL456213.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr5.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr5.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr2.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr2.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr6.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr6.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr4.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr4.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr13.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr13.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr16.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr16.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr9.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr9.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr12.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr12.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr10.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr10.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr11.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr11.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr3.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr3.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr7.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr7.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr19.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr19.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr14.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr14.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr15.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr15.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchrX.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchrX.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr17.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr17.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr8.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr8.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr18.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchr18.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchrY.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchrY.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584304.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584304.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456392.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456392.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456366.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456366.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456221.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456221.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456393.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456393.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchrM.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrchrM.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456389.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456389.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456239.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456239.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456368.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456368.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456212.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456212.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456390.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456390.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456383.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456383.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456370.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456370.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456378.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456378.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456354.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456354.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456216.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456216.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456396.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456396.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456359.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456359.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456379.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456379.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456211.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456211.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456210.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456210.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456381.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456381.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456360.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456360.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456394.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456394.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456233.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456233.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584299.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584299.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456385.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456385.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456372.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456372.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456387.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456387.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584296.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584296.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456367.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456367.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584292.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584292.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584297.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584297.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584303.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584303.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456219.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456219.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456382.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456382.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584295.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrJH584295.1.methXtractor.temp
+
+Sorting input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456350.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OT_SRR1536122_bismark_bt2.txt.gz.chrGL456350.1.methXtractor.temp
+
+Sorting input file CpG_OB_SRR1536122_bismark_bt2.txt.gz.chrJH584301.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CpG_OB_SRR1536122_bismark_bt2.txt.gz.chrJH584301.1.methXtractor.temp
+
+Sorting input file CHG_OB_SRR1536122_bismark_bt2.txt.gz.chrJH584300.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CHG_OB_SRR1536122_bismark_bt2.txt.gz.chrJH584300.1.methXtractor.temp
+
+Sorting input file CHG_OB_SRR1536122_bismark_bt2.txt.gz.chrGL456213.1.methXtractor.temp by positions (using -S of 2G)
+Successfully deleted the temporary input file CHG_OB_SRR1536122_bismark_bt2.txt.gz.chrGL456213.1.methXtractor.temp
+
+Finished BedGraph conversion ...
+
+Output will be written into the directory: /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/
+Summary of parameters for genome-wide cytosine report:
+==============================================================================
+Coverage infile:				SRR1536122_bismark_bt2.bismark.cov.gz
+Output directory:				>/dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/reports/<
+Parent directory:				>/dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/WGBS/single/<
+Genome directory:				>/dcl01/lieber/ajaffe/Emily/RNAseq-pipeline/Annotation/GENCODE/GRCm38_mm10/<
+CX context:					yes
+Genome coordinates used:			1-based (default)
+GZIP compression:				yes
+Split by chromosome:				yes
+
+
+Now reading in and storing sequence information of the genome specified in: /dcl01/lieber/ajaffe/Emily/RNAseq-pipeline/Annotation/GENCODE/GRCm38_mm10/
+
+chr chr1 (195471971 bp)
+chr chr2 (182113224 bp)
+chr chr3 (160039680 bp)
+chr chr4 (156508116 bp)
+chr chr5 (151834684 bp)
+chr chr6 (149736546 bp)
+chr chr7 (145441459 bp)
+chr chr8 (129401213 bp)
+chr chr9 (124595110 bp)
+chr chr10 (130694993 bp)
+chr chr11 (122082543 bp)
+chr chr12 (120129022 bp)
+chr chr13 (120421639 bp)
+chr chr14 (124902244 bp)
+chr chr15 (104043685 bp)
+chr chr16 (98207768 bp)
+chr chr17 (94987271 bp)
+chr chr18 (90702639 bp)
+chr chr19 (61431566 bp)
+chr chrX (171031299 bp)
+chr chrY (91744698 bp)
+chr chrM (16299 bp)
+chr GL456210.1 (169725 bp)
+chr GL456211.1 (241735 bp)
+chr GL456212.1 (153618 bp)
+chr GL456213.1 (39340 bp)
+chr GL456216.1 (66673 bp)
+chr GL456219.1 (175968 bp)
+chr GL456221.1 (206961 bp)
+chr GL456233.1 (336933 bp)
+chr GL456239.1 (40056 bp)
+chr GL456350.1 (227966 bp)
+chr GL456354.1 (195993 bp)
+chr GL456359.1 (22974 bp)
+chr GL456360.1 (31704 bp)
+chr GL456366.1 (47073 bp)
+chr GL456367.1 (42057 bp)
+chr GL456368.1 (20208 bp)
+chr GL456370.1 (26764 bp)
+chr GL456372.1 (28664 bp)
+chr GL456378.1 (31602 bp)
+chr GL456379.1 (72385 bp)
+chr GL456381.1 (25871 bp)
+chr GL456382.1 (23158 bp)
+chr GL456383.1 (38659 bp)
+chr GL456385.1 (35240 bp)
+chr GL456387.1 (24685 bp)
+chr GL456389.1 (28772 bp)
+chr GL456390.1 (24668 bp)
+chr GL456392.1 (23629 bp)
+chr GL456393.1 (55711 bp)
+chr GL456394.1 (24323 bp)
+chr GL456396.1 (21240 bp)
+chr JH584292.1 (14945 bp)
+chr JH584293.1 (207968 bp)
+chr JH584294.1 (191905 bp)
+chr JH584295.1 (1976 bp)
+chr JH584296.1 (199368 bp)
+chr JH584297.1 (205776 bp)
+chr JH584298.1 (184189 bp)
+chr JH584299.1 (953012 bp)
+chr JH584300.1 (182347 bp)
+chr JH584301.1 (259875 bp)
+chr JH584302.1 (155838 bp)
+chr JH584303.1 (158099 bp)
+chr JH584304.1 (114452 bp)
+
+Stored sequence information of 66 chromosomes/scaffolds in total
+
+==============================================================================
+Methylation information will now be written into a genome-wide cytosine report
+==============================================================================
+
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchr5.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chr5 (stored 10339482 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchr2.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chr2 (stored 12627181 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchr6.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chr6 (stored 10289751 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchr4.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chr4 (stored 10585036 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchr13.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chr13 (stored 8122304 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchr16.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chr16 (stored 6747436 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchr9.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chr9 (stored 8767718 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchr1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chr1 (stored 13563853 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchr12.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chr12 (stored 8020222 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchr10.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chr10 (stored 9016809 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchr11.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chr11 (stored 8667531 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchr3.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chr3 (stored 10924174 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchr7.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chr7 (stored 9354675 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchr19.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chr19 (stored 4168411 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchr14.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chr14 (stored 8064434 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchr15.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chr15 (stored 7166952 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchrX.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chrX (stored 5344370 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchr17.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chr17 (stored 6452544 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchr8.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chr8 (stored 8839346 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchr18.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chr18 (stored 6241868 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchrY.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chrY (stored 355897 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrJH584304.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome JH584304.1 (stored 33391 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456392.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456392.1 (stored 2103 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456366.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456366.1 (stored 2206 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456221.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456221.1 (stored 5137 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456393.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456393.1 (stored 3679 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrchrM.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome chrM (stored 4209 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456389.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456389.1 (stored 922 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456239.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456239.1 (stored 6956 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456368.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456368.1 (stored 1174 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456212.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456212.1 (stored 5755 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456390.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456390.1 (stored 669 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456383.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456383.1 (stored 1828 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456370.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456370.1 (stored 2791 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456378.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456378.1 (stored 2271 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456354.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456354.1 (stored 859 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456216.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456216.1 (stored 4039 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456396.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456396.1 (stored 669 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456359.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456359.1 (stored 1668 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456379.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456379.1 (stored 1822 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456211.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456211.1 (stored 7775 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456210.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456210.1 (stored 5454 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456381.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456381.1 (stored 810 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456360.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456360.1 (stored 1975 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456394.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456394.1 (stored 1084 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456233.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456233.1 (stored 11501 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrJH584299.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome JH584299.1 (stored 5832 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456385.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456385.1 (stored 1682 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456372.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456372.1 (stored 1096 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456387.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456387.1 (stored 1434 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrJH584296.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome JH584296.1 (stored 235 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456367.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456367.1 (stored 1402 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrJH584292.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome JH584292.1 (stored 847 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrJH584297.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome JH584297.1 (stored 335 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrJH584303.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome JH584303.1 (stored 101 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456219.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456219.1 (stored 72 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456382.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456382.1 (stored 653 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrJH584295.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome JH584295.1 (stored 58 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456350.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome GL456350.1 (stored 82 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrJH584301.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome JH584301.1 (stored 63 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrJH584300.1.CX_report.txt.gz <<<
+
+Writing cytosine report for chromosome JH584300.1 (stored 9 different covered positions)
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrGL456213.1.CX_report.txt.gz <<<
+
+Writing cytosine report for last chromosome GL456213.1 (stored 29 different covered positions)
+Finished writing out cytosine report for covered chromosomes (processed 62 chromosomes/scaffolds in total)
+
+Now processing chromosomes that were not covered by any methylation calls in the coverage file...
+Writing cytosine report for not covered chromosome JH584293.1
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrJH584293.1.CX_report.txt.gz <<<
+
+Writing cytosine report for not covered chromosome JH584294.1
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrJH584294.1.CX_report.txt.gz <<<
+
+Writing cytosine report for not covered chromosome JH584298.1
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrJH584298.1.CX_report.txt.gz <<<
+
+Writing cytosine report for not covered chromosome JH584302.1
+>>> Writing genome-wide cytosine report to: SRR1536122_bismark_bt2.CX_report.txt.chrJH584302.1.CX_report.txt.gz <<<
+
+Finished writing out cytosine report (processed 66 chromosomes/scaffolds in total). coverage2cytosine processing complete.
+
+
+
+Finished generating genome-wide cytosine report
+
