@@ -13,6 +13,8 @@ k6 <- kmeans(kdf, 6, nstart = 100)
 k8 <- kmeans(kdf, 8, nstart = 100)
 
 ## From https://stackoverflow.com/questions/15839774/how-to-calculate-bic-for-k-means-clustering-in-r
+## which refers to http://sherrytowers.com/2013/10/24/k-means-clustering/
+## and is also implemented in https://rdrr.io/rforge/kmeansstep/man/kmeansAIC.html
 kmeansAIC = function(fit){
 
 m = ncol(fit$centers)
