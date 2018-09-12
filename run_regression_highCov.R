@@ -89,6 +89,7 @@ dev.off()
 
 table(statsSig_homSig$dm_type_cell>0 ,  statsSig_homSig$dm_age_hom<0, dnn = c("Neuron>Glia", "AgeDecr"))
 fisher.test(table(statsSig_homSig$dm_type_cell>0 ,  statsSig_homSig$dm_age_hom<0))
+fisher.test(table(statsSig_homSig$dm_type_cell>0 ,  statsSig_homSig$dm_age_hom<0))$p.value
 # p-value < 2.2e-16
 # alternative hypothesis: true odds ratio is not equal to 1
 # 95 percent confidence interval:
@@ -103,6 +104,7 @@ fisher.test(table(statsSig_homSig$dm_type_cell>0 ,  statsSig_homSig$dm_age_hom<0
 pdf("plots/dm_totalAge_vs_homAge_highCov.pdf") # pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/single_CpGs/figures/dm_totalAge_vs_homAge_highCov.pdf")
 par(mar=c(5,6,2,2),cex.axis=2,cex.lab=2)
 statsSig$totalAge =(statsSig$dm_age_cell + statsSig$dm_int_cell)
+statsSig_homSig$totalAge =(statsSig_homSig$dm_age_cell + statsSig_homSig$dm_int_cell)
 plot(totalAge ~ dm_age_hom,data=statsSig,
 	subset = statsSig$qval_age_hom < 0.05,
 	pch=21,bg="grey",
@@ -114,6 +116,7 @@ dev.off()
 
 table(statsSig_homSig$totalAge<0 ,  statsSig_homSig$dm_age_hom<0, dnn = c("TotalAgeDecr", "HomAgeDecr"))
 fisher.test(table(statsSig_homSig$totalAge < 0 ,  statsSig_homSig$dm_age_hom<0))
+fisher.test(table(statsSig_homSig$totalAge < 0 ,  statsSig_homSig$dm_age_hom<0))$p.value
 
 # p-value < 2.2e-16
 # alternative hypothesis: true odds ratio is not equal to 1
@@ -125,6 +128,7 @@ fisher.test(table(statsSig_homSig$totalAge < 0 ,  statsSig_homSig$dm_age_hom<0))
 
 
 cor.test(statsSig_homSig$totalAge,  statsSig_homSig$dm_age_hom)
+cor.test(statsSig_homSig$totalAge,  statsSig_homSig$dm_age_hom)$p.value
 # t = 82.68, df = 5776, p-value < 2.2e-16
 # alternative hypothesis: true correlation is not equal to 0
 # 95 percent confidence interval:
@@ -147,6 +151,7 @@ abline(h=0,v=0,lty=3)
 
 table(statsSig_homSig$dm_age_cell<0 ,  statsSig_homSig$dm_age_hom<0, dnn = c("CellAgeDecr", "HomAgeDecr"))
 fisher.test(table(statsSig_homSig$dm_age_cell < 0 ,  statsSig_homSig$dm_age_hom<0))
+fisher.test(table(statsSig_homSig$dm_age_cell < 0 ,  statsSig_homSig$dm_age_hom<0))$p.value
 
 # p-value < 2.2e-16
 # alternative hypothesis: true odds ratio is not equal to 1
@@ -169,7 +174,7 @@ cor.test(statsSig_homSig$dm_age_cell, statsSig_homSig$dm_age_hom)
 
 # interaction
 plot(dm_int_cell ~ dm_age_hom,data=statsSig,
-	subset = pval_age_hom < 1e-4,pch=21,bg="grey",
+	subset = statsSig$qval_age_hom < 0.05,pch=21,bg="grey",
 	xlim=c(-0.05,0.05),ylim=c(-0.05,0.05),
 	xlab = "Age (Homogenate)",ylab="Specific Age (Cell)")
 abline(h=0,v=0,lty=3)

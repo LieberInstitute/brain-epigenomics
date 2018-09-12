@@ -9,8 +9,8 @@
 
 FILELIST=/dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/FASTQ/WGBS/SRR_PE.txt
 ID=$(awk "NR==$SGE_TASK_ID" $FILELIST)
-read1=/dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/${ID}_1.fastq.gz
-read2=/dcl01/lieber/ajaffe/Amanda/WGBS/wgbs/${ID}_2.fastq.gz
+read1=/dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/FASTQ/WGBS/${ID}_1.fastq.gz
+read2=/dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/FASTQ/WGBS/${ID}_2.fastq.gz
 
 module load bowtie2/2.2.5
 module load samtools/1.1
