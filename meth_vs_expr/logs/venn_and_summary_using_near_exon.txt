@@ -1,0 +1,921 @@
+**** Job starts ****
+Fri Mar 16 16:56:08 EDT 2018
+**** JHPCE info ****
+User: lcollado
+Job id: 4741993
+Job name: venn_and_summary_using_near_exon
+Hostname: compute-093
+Task id: 
+Unloading conda_R/3.4.x
+Loading conda_R/3.4.x
+Using the following user library: ~/R/x86_64-pc-linux-gnu-library/3.4.x
+Loading required package: IRanges
+Loading required package: methods
+Loading required package: BiocGenerics
+Loading required package: parallel
+
+Attaching package: ‘BiocGenerics’
+
+The following objects are masked from ‘package:parallel’:
+
+    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+    clusterExport, clusterMap, parApply, parCapply, parLapply,
+    parLapplyLB, parRapply, parSapply, parSapplyLB
+
+The following objects are masked from ‘package:stats’:
+
+    IQR, mad, sd, var, xtabs
+
+The following objects are masked from ‘package:base’:
+
+    anyDuplicated, append, as.data.frame, cbind, colMeans, colnames,
+    colSums, do.call, duplicated, eval, evalq, Filter, Find, get, grep,
+    grepl, intersect, is.unsorted, lapply, lengths, Map, mapply, match,
+    mget, order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+    rbind, Reduce, rowMeans, rownames, rowSums, sapply, setdiff, sort,
+    table, tapply, union, unique, unsplit, which, which.max, which.min
+
+Loading required package: S4Vectors
+Loading required package: stats4
+
+Attaching package: ‘S4Vectors’
+
+The following object is masked from ‘package:base’:
+
+    expand.grid
+
+Loading required package: GenomicRanges
+Loading required package: GenomeInfoDb
+Loading required package: Rsamtools
+Loading required package: Biostrings
+Loading required package: XVector
+
+Attaching package: ‘Biostrings’
+
+The following object is masked from ‘package:base’:
+
+    strsplit
+
+Loading required package: SummarizedExperiment
+Loading required package: Biobase
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+Loading required package: DelayedArray
+Loading required package: matrixStats
+
+Attaching package: ‘matrixStats’
+
+The following objects are masked from ‘package:Biobase’:
+
+    anyMissing, rowMedians
+
+
+Attaching package: ‘DelayedArray’
+
+The following objects are masked from ‘package:matrixStats’:
+
+    colMaxs, colMins, colRanges, rowMaxs, rowMins, rowRanges
+
+The following object is masked from ‘package:Biostrings’:
+
+    type
+
+The following object is masked from ‘package:base’:
+
+    apply
+
+
+Attaching package: ‘limma’
+
+The following object is masked from ‘package:BiocGenerics’:
+
+    plotMA
+
+
+Attaching package: ‘gplots’
+
+The following object is masked from ‘package:IRanges’:
+
+    space
+
+The following object is masked from ‘package:S4Vectors’:
+
+    space
+
+The following object is masked from ‘package:stats’:
+
+    lowess
+
+Loading required package: grid
+Loading required package: futile.logger
+Loading required package: DOSE
+
+DOSE v3.4.0  For help: https://guangchuangyu.github.io/DOSE
+
+If you use DOSE in published research, please cite:
+Guangchuang Yu, Li-Gen Wang, Guang-Rong Yan, Qing-Yu He. DOSE: an R/Bioconductor package for Disease Ontology Semantic and Enrichment analysis. Bioinformatics 2015, 31(4):608-609
+
+
+Attaching package: ‘DOSE’
+
+The following object is masked from ‘package:SGSeq’:
+
+    geneID
+
+clusterProfiler v3.6.0  For help: https://guangchuangyu.github.io/clusterProfiler
+
+If you use clusterProfiler in published research, please cite:
+Guangchuang Yu., Li-Gen Wang, Yanyan Han, Qing-Yu He. clusterProfiler: an R package for comparing biological themes among gene clusters. OMICS: A Journal of Integrative Biology. 2012, 16(5):284-287.
+Loading required package: AnnotationDbi
+
+
+Attaching package: ‘ggplot2’
+
+The following object is masked from ‘package:SGSeq’:
+
+    annotate
+
+2018-03-16 16:56:26 loading the file rda/me_annotated_FDR5_CpG_exon_near_nonCpG_meQTLs.Rdata
+Loading objects:
+  me_annotated
+2018-03-16 16:56:28 computing the expression delta
+2018-03-16 16:56:29 loading the file rda/me_annotated_FDR5_nonCpG_exon.Rdata
+Loading objects:
+  me_annotated
+2018-03-16 16:56:31 computing the expression delta
+2018-03-16 16:56:31 loading the file rda/me_CpG_exon_near_nonCpG_meQTLs.Rdata
+Loading objects:
+  me
+2018-03-16 16:56:31 Keeping only those with finite statistics
+
+FALSE  TRUE 
+   20 78778 
+2018-03-16 16:56:32 computing the parts for meth_n
+Loading objects:
+  rse_exon
+  getRPKM
+Setting options('download.file.method.GEOquery'='auto')
+Setting options('GEOquery.inmemory.gpl'=FALSE)
+Loading objects:
+  me_annotated
+Loading objects:
+  BSobj
+2018-03-16 17:01:48 computing the expression delta
+2018-03-16 17:01:51 saving the mres object
+2018-03-16 17:02:13 Filtering by meth_n >= 11 and meth_all_n >= 11 and protein_coding genes for set CpG
+              meth_n >= 11 & meth_all_n >= 11
+protein coding FALSE  TRUE   Sum
+         FALSE   105  1541  1646
+         TRUE    479 10833 11312
+         Sum     584 12374 12958
+              meth_n >= 11 & meth_all_n >= 11
+protein coding  FALSE   TRUE    Sum
+         FALSE   0.81  11.89  12.70
+         TRUE    3.70  83.60  87.30
+         Sum     4.51  95.49 100.00
+2018-03-16 17:02:13 Filtering by meth_n >= 11 and meth_all_n >= 11 and protein_coding genes for set nonCpG
+              meth_n >= 11 & meth_all_n >= 11
+protein coding FALSE  TRUE   Sum
+         FALSE  2467   836  3303
+         TRUE   4086  9162 13248
+         Sum    6553  9998 16551
+              meth_n >= 11 & meth_all_n >= 11
+protein coding  FALSE   TRUE    Sum
+         FALSE  14.91   5.05  19.96
+         TRUE   24.69  55.36  80.04
+         Sum    39.59  60.41 100.00
+2018-03-16 17:02:13 Filtering by meth_n >= 11 and meth_all_n >= 11 and protein_coding genes for set CpGmarg
+              meth_n >= 11 & meth_all_n >= 11
+protein coding FALSE  TRUE   Sum
+         FALSE  4159  5810  9969
+         TRUE  17583 45249 62832
+         Sum   21742 51059 72801
+              meth_n >= 11 & meth_all_n >= 11
+protein coding  FALSE   TRUE    Sum
+         FALSE   5.71   7.98  13.69
+         TRUE   24.15  62.15  86.31
+         Sum    29.86  70.14 100.00
+Loading objects:
+  fit_gene_polya
+  fit_gene_ribo
+  fit_exon_polya
+  fit_exon_ribo
+  geneMap
+  metrics
+  fit_gene_combined
+  fit_exon_combined
+  nucRNAres
+  nucRNAexonres
+[1] "polya$CellTypeNeuron"
+Loading objects:
+  exonCounts
+  exonMap
+  geneCounts
+  geneMap
+  jCounts
+  jMap
+  metrics
+  txMap
+  txNumReads
+Loading objects:
+  rse_exon
+  getRPKM
+[1] "Number of DE features at FDR 5%"
+2018-03-16 17:03:20 summarizing the meQTL data by exon
+2018-03-16 17:03:20 processing CpG
+
+FALSE  TRUE 
+ 3134  1672 
+2018-03-16 17:03:20 creating typeres1
+2018-03-16 17:03:39 creating typeres2
+2018-03-16 17:04:24 creating typeres
+2018-03-16 17:04:24 processing nonCpG
+
+FALSE  TRUE 
+ 2804  1609 
+2018-03-16 17:04:24 creating typeres1
+2018-03-16 17:04:45 creating typeres2
+2018-03-16 17:05:49 creating typeres
+2018-03-16 17:05:50 processing CpGmarg
+
+FALSE  TRUE 
+ 7172  7206 
+2018-03-16 17:05:54 creating typeres1
+2018-03-16 17:06:03 creating typeres2
+2018-03-16 17:07:02 creating typeres
+2018-03-16 17:07:02 saving summary of the meQTL data by exon
+null device 
+          1 
+null device 
+          1 
+           delta    gene   nonCpG      CpG top5k top5kglia        snps i_nonCpG
+e948259 4.192525 e948259 6.415920 2.223395 FALSE     FALSE row17549581        8
+e191322 4.123313 e191322 5.597312 1.473999 FALSE     FALSE row34425524       18
+e948263 3.891185 e948263 5.632375 1.741190 FALSE     FALSE row17549581       15
+e648975 3.829103 e648975 8.180410 4.351306 FALSE     FALSE  row5930899        1
+e648973 3.821750 e648973 8.173056 4.351306 FALSE     FALSE  row5930899        2
+e648979 3.817179 e648979 8.168486 4.351306 FALSE     FALSE  row5930899        3
+$CpG
+
+  11   12   13   14   15   16   17   18   19   20   21   22 
+  25    8   10    6   15    7   16   14    7   28  100 4570 
+
+$CpGmarg
+
+   11    12    13    14    15    16    17    18    19    20    21    22 
+  168    94   114    67   131    66   123   102   111   184   466 12752 
+
+$nonCpG
+
+  11   12   13   14   15   16   17   18   19   20   21   22 
+  94   87   52   51   51   78   78  141  275  504  864 2138 
+
+$CpG
+x
+   11    12    13    14    15    16    17    18    19    20    21    22 
+ 0.52  0.17  0.21  0.12  0.31  0.15  0.33  0.29  0.15  0.58  2.08 95.09 
+
+$CpGmarg
+x
+   11    12    13    14    15    16    17    18    19    20    21    22 
+ 1.17  0.65  0.79  0.47  0.91  0.46  0.86  0.71  0.77  1.28  3.24 88.69 
+
+$nonCpG
+x
+   11    12    13    14    15    16    17    18    19    20    21    22 
+ 2.13  1.97  1.18  1.16  1.16  1.77  1.77  3.20  6.23 11.42 19.58 48.45 
+
+$CpG
+    11     12     13     14     15     16     17     18     19     20     21 
+  0.52   0.69   0.90   1.02   1.33   1.48   1.81   2.10   2.25   2.83   4.91 
+    22 
+100.00 
+
+$CpGmarg
+    11     12     13     14     15     16     17     18     19     20     21 
+  1.17   1.82   2.61   3.08   3.99   4.45   5.31   6.02   6.79   8.07  11.31 
+    22 
+100.00 
+
+$nonCpG
+    11     12     13     14     15     16     17     18     19     20     21 
+  2.13   4.10   5.28   6.44   7.60   9.37  11.14  14.34  20.57  31.99  51.57 
+    22 
+100.02 
+
+$CpG
+
+  11   12   13   14   15   16   17   18   19   20   21   22 
+  25    8   10    6   15    7   16   14    7   28  100 4570 
+
+$CpGmarg
+
+  11   12   13   14   15   16   17   18   19   20   21   22 
+1319 1147 1134 1038  865  813  795  793  867  914 1051 3642 
+
+$nonCpG
+
+  11   12   13   14   15   16   17   18   19   20   21   22 
+  94   87   52   51   51   78   78  141  275  504  864 2138 
+
+$CpG
+x
+   11    12    13    14    15    16    17    18    19    20    21    22 
+ 0.52  0.17  0.21  0.12  0.31  0.15  0.33  0.29  0.15  0.58  2.08 95.09 
+
+$CpGmarg
+x
+   11    12    13    14    15    16    17    18    19    20    21    22 
+ 9.17  7.98  7.89  7.22  6.02  5.65  5.53  5.52  6.03  6.36  7.31 25.33 
+
+$nonCpG
+x
+   11    12    13    14    15    16    17    18    19    20    21    22 
+ 2.13  1.97  1.18  1.16  1.16  1.77  1.77  3.20  6.23 11.42 19.58 48.45 
+
+$CpG
+    11     12     13     14     15     16     17     18     19     20     21 
+  0.52   0.69   0.90   1.02   1.33   1.48   1.81   2.10   2.25   2.83   4.91 
+    22 
+100.00 
+
+$CpGmarg
+    11     12     13     14     15     16     17     18     19     20     21 
+  9.17  17.15  25.04  32.26  38.28  43.93  49.46  54.98  61.01  67.37  74.68 
+    22 
+100.01 
+
+$nonCpG
+    11     12     13     14     15     16     17     18     19     20     21 
+  2.13   4.10   5.28   6.44   7.60   9.37  11.14  14.34  20.57  31.99  51.57 
+    22 
+100.02 
+
+$CpG
+    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+0.001669 0.249470 0.900125 1.168799 1.770037 8.305661 
+
+$CpGmarg
+    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+0.000833 0.322119 1.047949 1.219063 1.799717 9.261366 
+
+$nonCpG
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+0.00396 0.73101 1.38588 1.58318 2.12398 8.30566 
+
+null device 
+          1 
+null device 
+          1 
+null device 
+          1 
+null device 
+          1 
+null device 
+          1 
+null device 
+          1 
+Loading objects:
+  rse_exon
+  getRPKM
+2018-03-16 17:30:21 processing CpG
+2018-03-16 17:30:47 processing nonCpG
+2018-03-16 17:31:04 processing CpGmarg
+null device 
+          1 
+2018-03-16 17:32:31 processing CpG
+2018-03-16 17:34:53 processing nonCpG
+2018-03-16 17:36:52 processing CpGmarg
+$CpG
+FDR < 0.05 after adjusting for age
+FALSE  TRUE   Sum 
+ 1238  9595 10833 
+
+$nonCpG
+FDR < 0.05 after adjusting for age
+FALSE  TRUE   Sum 
+  781  8381  9162 
+
+$CpGmarg
+FDR < 0.05 after adjusting for age
+FALSE  TRUE   Sum 
+23277 21972 45249 
+
+$CpG
+FDR < 0.05 after adjusting for age
+ FALSE   TRUE    Sum 
+ 11.43  88.57 100.00 
+
+$nonCpG
+FDR < 0.05 after adjusting for age
+ FALSE   TRUE    Sum 
+  8.52  91.48 100.00 
+
+$CpGmarg
+FDR < 0.05 after adjusting for age
+ FALSE   TRUE    Sum 
+ 51.44  48.56 100.00 
+
+Loading objects:
+  gene_section
+2018-03-16 17:47:29 processing CpG
+2018-03-16 17:47:29 processing promoter
+2018-03-16 17:47:30 processing body
+2018-03-16 17:47:34 processing flanking
+2018-03-16 17:47:37 processing nonCpG
+2018-03-16 17:47:37 processing promoter
+2018-03-16 17:47:37 processing body
+2018-03-16 17:47:39 processing flanking
+2018-03-16 17:47:42 processing CpGmarg
+2018-03-16 17:47:42 processing promoter
+2018-03-16 17:47:44 processing body
+2018-03-16 17:47:59 processing flanking
+2018-03-16 17:48:17 processing reference nonCpG
+2018-03-16 17:48:17 processing venn set CpG:nonCpG
+2018-03-16 17:48:17 processing venn set nonCpG:CpGmarg
+2018-03-16 17:48:17 processing venn set CpG:nonCpG:CpGmarg
+2018-03-16 17:48:17 processing venn set nonCpG
+2018-03-16 17:48:17 processing reference CpGmarg
+2018-03-16 17:48:17 processing venn set CpG:CpGmarg
+2018-03-16 17:48:17 processing venn set nonCpG:CpGmarg
+2018-03-16 17:48:18 processing venn set CpG:nonCpG:CpGmarg
+2018-03-16 17:48:18 processing venn set CpGmarg
+       promoter_present
+noage   FALSE  TRUE   Sum
+  FALSE 20629  3429 24058
+  TRUE  25810  4543 30353
+  Sum   46439  7972 54411
+       body_present
+noage   FALSE  TRUE   Sum
+  FALSE  2101 21957 24058
+  TRUE   6003 24350 30353
+  Sum    8104 46307 54411
+       flanking_present
+noage   FALSE  TRUE   Sum
+  FALSE   279 23779 24058
+  TRUE    827 29526 30353
+  Sum    1106 53305 54411
+       promoter_present
+noage    FALSE   TRUE    Sum
+  FALSE  37.91   6.30  44.22
+  TRUE   47.44   8.35  55.78
+  Sum    85.35  14.65 100.00
+       body_present
+noage    FALSE   TRUE    Sum
+  FALSE   3.86  40.35  44.22
+  TRUE   11.03  44.75  55.78
+  Sum    14.89  85.11 100.00
+       flanking_present
+noage    FALSE   TRUE    Sum
+  FALSE   0.51  43.70  44.22
+  TRUE    1.52  54.26  55.78
+  Sum     2.03  97.97 100.00
+NULL
+null device 
+          1 
+NULL
+null device 
+          1 
+NULL
+null device 
+          1 
+[1] 18791    30
+DataFrame with 6 rows and 30 columns
+                              beta_mean beta_median beta_prop_pos
+                              <numeric>   <numeric>     <numeric>
+CpGmarg_CpG:CpGmarg_e1000024  1.6827065   1.4841953     1.0000000
+CpGmarg_CpG:CpGmarg_e1000051  1.7017203   1.4888777     1.0000000
+CpGmarg_CpG:CpGmarg_e1001405 -0.4086666   0.6274853     0.5172414
+CpGmarg_CpG:CpGmarg_e1001628 -0.6342004  -0.3484104     0.0000000
+CpGmarg_CpG:CpGmarg_e1002303 -0.5851258  -0.5851258     0.0000000
+CpGmarg_CpG:CpGmarg_e1002395  1.5962109   1.6823566     1.0000000
+                             beta_sign_mean agebeta_mean agebeta_median
+                                  <numeric>    <numeric>      <numeric>
+CpGmarg_CpG:CpGmarg_e1000024     1.00000000    -27.26684     -25.197599
+CpGmarg_CpG:CpGmarg_e1000051     1.00000000    -26.94574     -23.384724
+CpGmarg_CpG:CpGmarg_e1001405     0.03448276     14.72739      -7.714028
+CpGmarg_CpG:CpGmarg_e1001628    -1.00000000     43.28217      32.600006
+CpGmarg_CpG:CpGmarg_e1002303    -1.00000000    -33.41248     -33.412480
+CpGmarg_CpG:CpGmarg_e1002395     1.00000000     60.89696      62.603781
+                             agebeta_prop_pos agebeta_sign_mean
+                                    <numeric>         <numeric>
+CpGmarg_CpG:CpGmarg_e1000024        0.0000000       -1.00000000
+CpGmarg_CpG:CpGmarg_e1000051        0.0000000       -1.00000000
+CpGmarg_CpG:CpGmarg_e1001405        0.4827586       -0.03448276
+CpGmarg_CpG:CpGmarg_e1001628        1.0000000        1.00000000
+CpGmarg_CpG:CpGmarg_e1002303        0.0000000       -1.00000000
+CpGmarg_CpG:CpGmarg_e1002395        1.0000000        1.00000000
+                             beta_neglog10FDR_mean beta_neglog10FDR_median
+                                         <numeric>               <numeric>
+CpGmarg_CpG:CpGmarg_e1000024             0.9908039               0.9495897
+CpGmarg_CpG:CpGmarg_e1000051             0.8915531               0.8706990
+CpGmarg_CpG:CpGmarg_e1001405             1.1949751               0.9603461
+CpGmarg_CpG:CpGmarg_e1001628             0.7830465               0.6119107
+CpGmarg_CpG:CpGmarg_e1002303             0.9718012               0.9718012
+CpGmarg_CpG:CpGmarg_e1002395             0.8980843               0.5920732
+                             beta_neglog10pval_mean beta_neglog10pval_median
+                                          <numeric>                <numeric>
+CpGmarg_CpG:CpGmarg_e1000024              0.9908039                0.9495897
+CpGmarg_CpG:CpGmarg_e1000051              0.8915531                0.8706990
+CpGmarg_CpG:CpGmarg_e1001405              1.1949751                0.9603461
+CpGmarg_CpG:CpGmarg_e1001628              0.7830465                0.6119107
+CpGmarg_CpG:CpGmarg_e1002303              0.9718012                0.9718012
+CpGmarg_CpG:CpGmarg_e1002395              0.8980843                0.5920732
+                             agebeta_neglog10FDR_mean
+                                            <numeric>
+CpGmarg_CpG:CpGmarg_e1000024                 1.617208
+CpGmarg_CpG:CpGmarg_e1000051                 1.620360
+CpGmarg_CpG:CpGmarg_e1001405                 1.715581
+CpGmarg_CpG:CpGmarg_e1001628                 1.970990
+CpGmarg_CpG:CpGmarg_e1002303                 1.975211
+CpGmarg_CpG:CpGmarg_e1002395                 1.794947
+                             agebeta_neglog10FDR_median
+                                              <numeric>
+CpGmarg_CpG:CpGmarg_e1000024                   1.640010
+CpGmarg_CpG:CpGmarg_e1000051                   1.664492
+CpGmarg_CpG:CpGmarg_e1001405                   1.601799
+CpGmarg_CpG:CpGmarg_e1001628                   1.857468
+CpGmarg_CpG:CpGmarg_e1002303                   1.975211
+CpGmarg_CpG:CpGmarg_e1002395                   1.670164
+                             agebeta_neglog10pval_mean
+                                             <numeric>
+CpGmarg_CpG:CpGmarg_e1000024                  1.899666
+CpGmarg_CpG:CpGmarg_e1000051                  1.901652
+CpGmarg_CpG:CpGmarg_e1001405                  2.100744
+CpGmarg_CpG:CpGmarg_e1001628                  2.408905
+CpGmarg_CpG:CpGmarg_e1002303                  2.337900
+CpGmarg_CpG:CpGmarg_e1002395                  2.106716
+                             agebeta_neglog10pval_median meth_n_mean
+                                               <numeric>   <numeric>
+CpGmarg_CpG:CpGmarg_e1000024                    1.898325    21.92857
+CpGmarg_CpG:CpGmarg_e1000051                    1.929466    21.93333
+CpGmarg_CpG:CpGmarg_e1001405                    1.850102    21.96552
+CpGmarg_CpG:CpGmarg_e1001628                    2.180396    21.85714
+CpGmarg_CpG:CpGmarg_e1002303                    2.337900    21.50000
+CpGmarg_CpG:CpGmarg_e1002395                    1.936161    22.00000
+                             meth_n_median meth_all_n_mean meth_all_n_median
+                                 <numeric>       <numeric>         <numeric>
+CpGmarg_CpG:CpGmarg_e1000024          22.0        20.50000              22.0
+CpGmarg_CpG:CpGmarg_e1000051          22.0        20.60000              22.0
+CpGmarg_CpG:CpGmarg_e1001405          22.0        19.55172              22.0
+CpGmarg_CpG:CpGmarg_e1001628          22.0        16.57143              17.0
+CpGmarg_CpG:CpGmarg_e1002303          21.5        20.50000              20.5
+CpGmarg_CpG:CpGmarg_e1002395          22.0        14.33333              11.0
+                             beta_t_mean beta_t_median agebeta_t_mean
+                               <numeric>     <numeric>      <numeric>
+CpGmarg_CpG:CpGmarg_e1000024   3.8313935      3.776864     -2.6963810
+CpGmarg_CpG:CpGmarg_e1000051   3.6439148      3.631738     -2.7014194
+CpGmarg_CpG:CpGmarg_e1001405   0.5357329      2.958997      0.4272555
+CpGmarg_CpG:CpGmarg_e1001628  -3.4379313     -3.122174      3.1971874
+CpGmarg_CpG:CpGmarg_e1002303  -3.7745897     -3.774590     -3.1887442
+CpGmarg_CpG:CpGmarg_e1002395   3.6301308      3.080628      2.9489563
+                             agebeta_t_median  n_meqtls     typeref        vset
+                                    <numeric> <integer> <character> <character>
+CpGmarg_CpG:CpGmarg_e1000024        -2.739205        14      nonCpG  CpG:nonCpG
+CpGmarg_CpG:CpGmarg_e1000051        -2.771958        15      nonCpG  CpG:nonCpG
+CpGmarg_CpG:CpGmarg_e1001405        -1.105165        29      nonCpG  CpG:nonCpG
+CpGmarg_CpG:CpGmarg_e1001628         3.030833         7      nonCpG  CpG:nonCpG
+CpGmarg_CpG:CpGmarg_e1002303        -3.188744         2      nonCpG  CpG:nonCpG
+CpGmarg_CpG:CpGmarg_e1002395         2.778946         3      nonCpG  CpG:nonCpG
+                                    gene       gtype distance_diag
+                             <character> <character>     <numeric>
+CpGmarg_CpG:CpGmarg_e1000024     e948290        none             0
+CpGmarg_CpG:CpGmarg_e1000051     e209631        none             0
+CpGmarg_CpG:CpGmarg_e1001405     e599334        none             0
+CpGmarg_CpG:CpGmarg_e1001628    e1127703        none             0
+CpGmarg_CpG:CpGmarg_e1002303      e87981        none             0
+CpGmarg_CpG:CpGmarg_e1002395     e539032        none             0
+   beta_mean          beta_median        beta_prop_pos    beta_sign_mean   
+ Min.   :-24.39964   Min.   :-24.39964   Min.   :0.0000   Min.   :-1.0000  
+ 1st Qu.: -2.11447   1st Qu.: -2.07734   1st Qu.:0.0000   1st Qu.:-1.0000  
+ Median : -0.75813   Median : -0.75910   Median :0.0000   Median :-1.0000  
+ Mean   : -0.82757   Mean   : -0.80871   Mean   :0.2651   Mean   :-0.4699  
+ 3rd Qu.:  0.05211   3rd Qu.:  0.06593   3rd Qu.:0.6000   3rd Qu.: 0.2000  
+ Max.   : 29.56953   Max.   : 29.56953   Max.   :1.0000   Max.   : 1.0000  
+  agebeta_mean     agebeta_median    agebeta_prop_pos agebeta_sign_mean
+ Min.   :-141.62   Min.   :-141.62   Min.   :0.0000   Min.   :-1.000   
+ 1st Qu.:  14.19   1st Qu.:  14.90   1st Qu.:1.0000   1st Qu.: 1.000   
+ Median :  28.79   Median :  28.62   Median :1.0000   Median : 1.000   
+ Mean   :  26.94   Mean   :  26.55   Mean   :0.8255   Mean   : 0.651   
+ 3rd Qu.:  42.27   3rd Qu.:  41.49   3rd Qu.:1.0000   3rd Qu.: 1.000   
+ Max.   : 317.12   Max.   : 317.12   Max.   :1.0000   Max.   : 1.000   
+ beta_neglog10FDR_mean beta_neglog10FDR_median beta_neglog10pval_mean
+ Min.   :0.4825        Min.   :0.4825          Min.   :0.4825        
+ 1st Qu.:0.6459        1st Qu.:0.6291          1st Qu.:0.6459        
+ Median :0.8617        Median :0.8240          Median :0.8617        
+ Mean   :1.0610        Mean   :1.0353          Mean   :1.0610        
+ 3rd Qu.:1.3918        3rd Qu.:1.3788          3rd Qu.:1.3918        
+ Max.   :7.0433        Max.   :7.0433          Max.   :7.0433        
+ beta_neglog10pval_median agebeta_neglog10FDR_mean agebeta_neglog10FDR_median
+ Min.   :0.4825           Min.   :0.000065         Min.   :0.000065          
+ 1st Qu.:0.6291           1st Qu.:0.785906         1st Qu.:0.770750          
+ Median :0.8240           Median :1.717487         Median :1.704897          
+ Mean   :1.0353           Mean   :1.775120         Mean   :1.773043          
+ 3rd Qu.:1.3788           3rd Qu.:2.576595         3rd Qu.:2.603857          
+ Max.   :7.0433           Max.   :5.305011         Max.   :5.305011          
+ agebeta_neglog10pval_mean agebeta_neglog10pval_median  meth_n_mean   
+ Min.   :0.000065          Min.   :0.000065            Min.   :11.00  
+ 1st Qu.:0.878799          1st Qu.:0.861772            1st Qu.:21.50  
+ Median :2.003318          Median :1.969453            Median :22.00  
+ Mean   :2.090314          Mean   :2.070328            Mean   :21.17  
+ 3rd Qu.:3.097351          3rd Qu.:3.078288            3rd Qu.:22.00  
+ Max.   :7.718682          Max.   :7.718682            Max.   :22.00  
+ meth_n_median   meth_all_n_mean meth_all_n_median  beta_t_mean      
+ Min.   :11.00   Min.   :11.00   Min.   :11.00     Min.   :-14.4504  
+ 1st Qu.:22.00   1st Qu.:15.00   1st Qu.:15.00     1st Qu.: -4.2870  
+ Median :22.00   Median :19.00   Median :19.00     Median : -3.3103  
+ Mean   :21.22   Mean   :17.98   Mean   :18.06     Mean   : -2.0412  
+ 3rd Qu.:22.00   3rd Qu.:21.45   3rd Qu.:22.00     3rd Qu.:  0.7794  
+ Max.   :22.00   Max.   :22.00   Max.   :22.00     Max.   : 11.8636  
+ beta_t_median     agebeta_t_mean    agebeta_t_median     n_meqtls      
+ Min.   :-14.450   Min.   :-6.3197   Min.   :-6.3197   Min.   :  1.000  
+ 1st Qu.: -4.208   1st Qu.: 0.7771   1st Qu.: 0.7838   1st Qu.:  1.000  
+ Median : -3.283   Median : 2.6233   Median : 2.6402   Median :  1.000  
+ Mean   : -2.013   Mean   : 2.2732   Mean   : 2.2651   Mean   :  2.896  
+ 3rd Qu.:  2.849   3rd Qu.: 3.8986   3rd Qu.: 3.8941   3rd Qu.:  3.000  
+ Max.   : 11.864   Max.   : 8.9680   Max.   : 8.9680   Max.   :129.000  
+   typeref              vset               gene              gtype          
+ Length:18791       Length:18791       Length:18791       Length:18791      
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+ distance_diag   
+ Min.   :0.0000  
+ 1st Qu.:0.0000  
+ Median :0.0000  
+ Mean   :0.0141  
+ 3rd Qu.:0.0000  
+ Max.   :0.7071  
+
+  glia neuron   none 
+   311    509  17971 
+NULL
+null device 
+          1 
+NULL
+Warning messages:
+1: In x + params$x :
+  longer object length is not a multiple of shorter object length
+2: In y + params$y :
+  longer object length is not a multiple of shorter object length
+3: In x + params$x :
+  longer object length is not a multiple of shorter object length
+4: In y + params$y :
+  longer object length is not a multiple of shorter object length
+null device 
+          1 
+NULL
+Warning messages:
+1: In x + params$x :
+  longer object length is not a multiple of shorter object length
+2: In y + params$y :
+  longer object length is not a multiple of shorter object length
+3: In x + params$x :
+  longer object length is not a multiple of shorter object length
+4: In y + params$y :
+  longer object length is not a multiple of shorter object length
+null device 
+          1 
+NULL
+Warning messages:
+1: In x + params$x :
+  longer object length is not a multiple of shorter object length
+2: In y + params$y :
+  longer object length is not a multiple of shorter object length
+3: In x + params$x :
+  longer object length is not a multiple of shorter object length
+4: In y + params$y :
+  longer object length is not a multiple of shorter object length
+null device 
+          1 
+NULL
+Warning messages:
+1: In x + params$x :
+  longer object length is not a multiple of shorter object length
+2: In y + params$y :
+  longer object length is not a multiple of shorter object length
+3: In x + params$x :
+  longer object length is not a multiple of shorter object length
+4: In y + params$y :
+  longer object length is not a multiple of shorter object length
+null device 
+          1 
+NULL
+null device 
+          1 
+NULL
+Warning messages:
+1: In x + params$x :
+  longer object length is not a multiple of shorter object length
+2: In y + params$y :
+  longer object length is not a multiple of shorter object length
+3: In x + params$x :
+  longer object length is not a multiple of shorter object length
+4: In y + params$y :
+  longer object length is not a multiple of shorter object length
+null device 
+          1 
+    user   system  elapsed 
+3216.578  132.833 3360.224 
+2018-03-16 17:52:11
+Session info ----------------------------------------------------------------------------------------------------------
+ setting  value                                      
+ version  R version 3.4.3 Patched (2018-01-20 r74142)
+ system   x86_64, linux-gnu                          
+ ui       X11                                        
+ language (EN)                                       
+ collate  en_US.UTF-8                                
+ tz       US/Eastern                                 
+ date     2018-03-16                                 
+
+Packages --------------------------------------------------------------------------------------------------------------
+ package              * version   date       source        
+ acepack                1.4.1     2016-10-29 CRAN (R 3.4.1)
+ AnnotationDbi        * 1.40.0    2017-11-29 Bioconductor  
+ assertthat             0.2.0     2017-04-11 CRAN (R 3.4.1)
+ backports              1.1.2     2017-12-13 CRAN (R 3.4.2)
+ base                 * 3.4.3     2018-01-20 local         
+ base64enc              0.1-3     2015-07-28 CRAN (R 3.4.1)
+ bindr                  0.1       2016-11-13 CRAN (R 3.4.1)
+ bindrcpp               0.2       2017-06-17 CRAN (R 3.4.1)
+ Biobase              * 2.38.0    2017-11-07 Bioconductor  
+ BiocGenerics         * 0.24.0    2017-11-29 Bioconductor  
+ BiocParallel           1.12.0    2017-11-29 Bioconductor  
+ biomaRt                2.34.2    2018-02-17 Bioconductor  
+ Biostrings           * 2.46.0    2017-11-29 Bioconductor  
+ bit                    1.1-12    2014-04-09 CRAN (R 3.4.1)
+ bit64                  0.9-7     2017-05-08 CRAN (R 3.4.1)
+ bitops                 1.0-6     2013-08-17 CRAN (R 3.4.1)
+ blob                   1.1.0     2017-06-17 CRAN (R 3.4.1)
+ BSgenome               1.46.0    2017-11-29 Bioconductor  
+ bsseq                * 1.14.0    2017-11-07 Bioconductor  
+ bumphunter             1.20.0    2017-11-29 Bioconductor  
+ caTools                1.17.1    2014-09-10 CRAN (R 3.4.1)
+ checkmate              1.8.5     2017-10-24 CRAN (R 3.4.2)
+ cluster                2.0.6     2017-03-10 CRAN (R 3.4.3)
+ clusterProfiler      * 3.6.0     2017-11-29 Bioconductor  
+ codetools              0.2-15    2016-10-05 CRAN (R 3.4.3)
+ colorspace             1.3-2     2016-12-14 CRAN (R 3.4.1)
+ compiler               3.4.3     2018-01-20 local         
+ data.table             1.10.4-3  2017-10-27 CRAN (R 3.4.2)
+ datasets             * 3.4.3     2018-01-20 local         
+ DBI                    0.8       2018-03-02 CRAN (R 3.4.3)
+ DelayedArray         * 0.4.1     2017-11-07 Bioconductor  
+ derfinder              1.12.6    2018-02-17 Bioconductor  
+ derfinderHelper        1.12.0    2017-11-29 Bioconductor  
+ devtools             * 1.13.4    2017-11-09 CRAN (R 3.4.2)
+ digest                 0.6.15    2018-01-28 cran (@0.6.15)
+ DO.db                  2.9       2017-08-10 Bioconductor  
+ doRNG                  1.6.6     2017-04-10 CRAN (R 3.4.1)
+ DOSE                 * 3.4.0     2017-11-29 Bioconductor  
+ downloader             0.4       2015-07-09 CRAN (R 3.4.1)
+ dplyr                  0.7.4     2017-09-28 CRAN (R 3.4.1)
+ fastmatch              1.1-0     2017-01-28 CRAN (R 3.4.1)
+ fgsea                  1.4.1     2018-02-17 Bioconductor  
+ foreach                1.4.4     2017-12-12 CRAN (R 3.4.2)
+ foreign                0.8-69    2017-06-22 CRAN (R 3.4.3)
+ Formula                1.2-2     2017-07-10 CRAN (R 3.4.1)
+ futile.logger        * 1.4.3     2016-07-10 CRAN (R 3.4.1)
+ futile.options         1.0.0     2010-04-06 CRAN (R 3.4.1)
+ gdata                  2.18.0    2017-06-06 CRAN (R 3.4.1)
+ GenomeInfoDb         * 1.14.0    2017-11-29 Bioconductor  
+ GenomeInfoDbData       1.0.0     2018-01-09 Bioconductor  
+ GenomicAlignments      1.14.1    2017-11-29 Bioconductor  
+ GenomicFeatures        1.30.3    2018-02-17 Bioconductor  
+ GenomicFiles           1.14.0    2017-11-29 Bioconductor  
+ GenomicRanges        * 1.30.2    2018-02-17 Bioconductor  
+ GEOquery               2.46.15   2018-03-06 Bioconductor  
+ getopt               * 1.20.2    2018-02-16 CRAN (R 3.4.3)
+ ggplot2              * 2.2.1     2016-12-30 CRAN (R 3.4.1)
+ glue                   1.2.0     2017-10-29 CRAN (R 3.4.2)
+ GO.db                  3.5.0     2017-11-29 Bioconductor  
+ GOSemSim               2.4.1     2018-02-17 Bioconductor  
+ gplots               * 3.0.1     2016-03-30 CRAN (R 3.4.1)
+ graphics             * 3.4.3     2018-01-20 local         
+ grDevices            * 3.4.3     2018-01-20 local         
+ grid                 * 3.4.3     2018-01-20 local         
+ gridExtra              2.3       2017-09-09 CRAN (R 3.4.1)
+ gtable                 0.2.0     2016-02-26 CRAN (R 3.4.1)
+ gtools                 3.5.0     2015-05-29 CRAN (R 3.4.1)
+ Hmisc                  4.1-1     2018-01-03 CRAN (R 3.4.2)
+ hms                    0.4.1     2018-01-24 CRAN (R 3.4.3)
+ htmlTable              1.11.2    2018-01-20 CRAN (R 3.4.3)
+ htmltools              0.3.6     2017-04-28 CRAN (R 3.4.1)
+ htmlwidgets            0.9       2017-07-10 CRAN (R 3.4.1)
+ httr                   1.3.1     2017-08-20 CRAN (R 3.4.1)
+ igraph                 1.1.2     2017-07-21 CRAN (R 3.4.1)
+ IRanges              * 2.12.0    2017-11-29 Bioconductor  
+ iterators              1.0.9     2017-12-12 CRAN (R 3.4.2)
+ jsonlite               1.5       2017-06-01 CRAN (R 3.4.1)
+ KernSmooth             2.23-15   2015-06-29 CRAN (R 3.4.3)
+ knitr                  1.20      2018-02-20 CRAN (R 3.4.3)
+ labeling               0.3       2014-08-23 CRAN (R 3.4.1)
+ lambda.r               1.2       2017-09-16 CRAN (R 3.4.1)
+ lattice                0.20-35   2017-03-25 CRAN (R 3.4.3)
+ latticeExtra           0.6-28    2016-02-09 CRAN (R 3.4.1)
+ lazyeval               0.2.1     2017-10-29 CRAN (R 3.4.2)
+ limma                * 3.34.8    2018-02-17 Bioconductor  
+ locfit                 1.5-9.1   2013-04-20 CRAN (R 3.4.1)
+ magrittr               1.5       2014-11-22 CRAN (R 3.4.1)
+ MASS                   7.3-48    2017-12-25 CRAN (R 3.4.3)
+ Matrix                 1.2-12    2017-11-30 CRAN (R 3.4.3)
+ matrixStats          * 0.53.1    2018-02-11 CRAN (R 3.4.3)
+ memoise                1.1.0     2017-04-21 CRAN (R 3.4.1)
+ methods              * 3.4.3     2018-01-20 local         
+ munsell                0.4.3     2016-02-13 CRAN (R 3.4.1)
+ nnet                   7.3-12    2016-02-02 CRAN (R 3.4.3)
+ org.Hs.eg.db         * 3.5.0     2017-11-29 Bioconductor  
+ parallel             * 3.4.3     2018-01-20 local         
+ permute                0.9-4     2016-09-09 CRAN (R 3.4.1)
+ pillar                 1.1.0     2018-01-14 CRAN (R 3.4.2)
+ pkgconfig              2.0.1     2017-03-21 CRAN (R 3.4.1)
+ pkgmaker               0.22      2014-05-14 CRAN (R 3.4.1)
+ plyr                   1.8.4     2016-06-08 CRAN (R 3.4.1)
+ prettyunits            1.0.2     2015-07-13 CRAN (R 3.4.1)
+ progress               1.1.2     2016-12-14 CRAN (R 3.4.1)
+ purrr                  0.2.4     2017-10-18 CRAN (R 3.4.2)
+ qvalue                 2.10.0    2017-11-29 Bioconductor  
+ R.methodsS3            1.7.1     2016-02-16 CRAN (R 3.4.1)
+ R.oo                   1.21.0    2016-11-01 CRAN (R 3.4.1)
+ R.utils                2.6.0     2017-11-05 CRAN (R 3.4.2)
+ R6                     2.2.2     2017-06-17 CRAN (R 3.4.1)
+ RColorBrewer         * 1.1-2     2014-12-07 CRAN (R 3.4.1)
+ Rcpp                   0.12.14   2017-11-23 CRAN (R 3.4.2)
+ RCurl                  1.95-4.10 2018-01-04 CRAN (R 3.4.2)
+ readr                  1.1.1     2017-05-16 CRAN (R 3.4.1)
+ recount                1.4.4     2018-02-17 Bioconductor  
+ registry               0.5       2017-12-03 CRAN (R 3.4.2)
+ rentrez                1.2.0     2018-02-12 CRAN (R 3.4.3)
+ reshape2               1.4.3     2017-12-11 CRAN (R 3.4.2)
+ rlang                  0.1.6     2017-12-21 CRAN (R 3.4.2)
+ RMySQL                 0.10.14   2018-02-26 CRAN (R 3.4.3)
+ rngtools               1.2.4     2014-03-06 CRAN (R 3.4.1)
+ rpart                  4.1-12    2018-01-12 CRAN (R 3.4.3)
+ Rsamtools            * 1.30.0    2017-11-29 Bioconductor  
+ RSQLite                2.0       2017-06-19 CRAN (R 3.4.1)
+ rstudioapi             0.7       2017-09-07 CRAN (R 3.4.1)
+ rtracklayer            1.38.3    2018-02-17 Bioconductor  
+ RUnit                  0.4.31    2015-11-06 CRAN (R 3.4.1)
+ rvcheck                0.0.9     2017-07-10 CRAN (R 3.4.2)
+ S4Vectors            * 0.16.0    2017-11-29 Bioconductor  
+ scales                 0.5.0     2017-08-24 CRAN (R 3.4.1)
+ SGSeq                * 1.12.0    2018-01-16 Bioconductor  
+ splines                3.4.3     2018-01-20 local         
+ stats                * 3.4.3     2018-01-20 local         
+ stats4               * 3.4.3     2018-01-20 local         
+ stringi                1.1.6     2017-11-17 CRAN (R 3.4.2)
+ stringr                1.2.0     2017-02-18 CRAN (R 3.4.1)
+ SummarizedExperiment * 1.8.1     2018-01-09 Bioconductor  
+ survival               2.41-3    2017-04-04 CRAN (R 3.4.3)
+ tibble                 1.4.1     2017-12-25 CRAN (R 3.4.2)
+ tidyr                  0.8.0     2018-01-29 CRAN (R 3.4.3)
+ tools                  3.4.3     2018-01-20 local         
+ utils                * 3.4.3     2018-01-20 local         
+ VariantAnnotation      1.24.5    2018-01-16 Bioconductor  
+ VennDiagram          * 1.6.18    2017-11-21 CRAN (R 3.4.2)
+ withr                  2.1.1     2017-12-19 CRAN (R 3.4.2)
+ XML                    3.98-1.10 2018-02-19 CRAN (R 3.4.3)
+ xml2                   1.2.0     2018-01-24 CRAN (R 3.4.3)
+ xtable                 1.8-2     2016-02-05 CRAN (R 3.4.1)
+ XVector              * 0.18.0    2017-11-29 Bioconductor  
+ zlibbioc               1.24.0    2017-11-07 Bioconductor  
+Loading objects:
+  mres
+Loading objects:
+  vennres
+  vennres5k
+  vennres5kglia
+  top
+  top5k
+  top5kglia
+  v
+  v5k
+  v5kglia
+Loading objects:
+  m_summary
+Loading objects:
+  delta_pval
+  common
+Loading objects:
+  go_venn_res
+  go_cluster_comp
+  uni
+  v_symb
+Loading objects:
+  age_coef
+Loading objects:
+  data_by_venn
+Loading objects:
+  data_venn_summ
+Loading objects:
+  gene_section
+Loading objects:
+  c_by_gene
+**** Job ends ****
+Fri Mar 16 17:52:29 EDT 2018
