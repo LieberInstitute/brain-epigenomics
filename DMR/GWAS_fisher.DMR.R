@@ -34,12 +34,12 @@ df.clusters = as.data.frame(gr.clusters)
 # Find overlaps with DMRS in all three models
 
 dmrs = split(dmrs, dmrs$k6cluster_label)
-names(dmrs) = c("Group 1 (G-,N+)","Group 2 (G0,N+)","Group 3 (G0,N-)","Group 4 (G+,N0)","Group 5 (G+,N-)","Group 6 (G-,N0)")
+names(dmrs) = c("Group 1 (G-N+)","Group 2 (G0N+)","Group 3 (G0N-)","Group 4 (G+N0)","Group 5 (G+N-)","Group 6 (G-N0)")
 oo = lapply(dmrs, function(x) findOverlaps(x, makeGRangesFromDataFrame(DMR$Interaction)))
 dmrs = lapply(oo, function(x) DMR$Interaction[subjectHits(x),])
-
-DMRgr = lapply(c(DMR, dmrs), function(x) makeGRangesFromDataFrame(x[which(x$fwer<=0.05),], keep.extra.columns=T))
-
+CT = split(DMR$CellType, DMR$CellType$Dir)
+names(CT) = c("Hypomethylated in Neurons", "Hypomethylated in Glia")
+DMRgr = lapply(c(CT, DMR[names(DMR)!="CellType"], dmrs), function(x) makeGRangesFromDataFrame(x[which(x$fwer<=0.05),], keep.extra.columns = T))
 
 oo = lapply(DMRgr, function(x) findOverlaps(gr.clusters, x))
 lapply(oo, function(x) length(unique(queryHits(x))))
@@ -48,15 +48,16 @@ Overlap = lapply(gwas, function(x) findOverlaps(x, gr.clusters))
 
 df.clusters$regionID = paste0(df.clusters$seqnames,":",df.clusters$start,"-",df.clusters$end)
 df.clusters$rnum = 1:length(gr.clusters)
-df.clusters$CellType = ifelse(df.clusters$rnum %in% queryHits(oo$CellType), "yes","no")
+df.clusters$"Hypomethylated in Neurons" = ifelse(df.clusters$rnum %in% queryHits(oo$"Hypomethylated in Neurons"), "yes","no")
+df.clusters$"Hypomethylated in Glia" = ifelse(df.clusters$rnum %in% queryHits(oo$"Hypomethylated in Glia"), "yes","no")
 df.clusters$Age = ifelse(df.clusters$rnum %in% queryHits(oo$Age), "yes","no")
 df.clusters$Interaction = ifelse(df.clusters$rnum %in% queryHits(oo$Interaction), "yes","no")
-df.clusters$`Group 1 (G-,N+)` = ifelse(df.clusters$rnum %in% queryHits(oo$`Group 1 (G-,N+)`), "yes","no")
-df.clusters$`Group 2 (G0,N+)` = ifelse(df.clusters$rnum %in% queryHits(oo$`Group 2 (G0,N+)`), "yes","no")
-df.clusters$`Group 3 (G0,N-)` = ifelse(df.clusters$rnum %in% queryHits(oo$`Group 3 (G0,N-)`), "yes","no")
-df.clusters$`Group 4 (G+,N0)` = ifelse(df.clusters$rnum %in% queryHits(oo$`Group 4 (G+,N0)`), "yes","no")
-df.clusters$`Group 5 (G+,N-)` = ifelse(df.clusters$rnum %in% queryHits(oo$`Group 5 (G+,N-)`), "yes","no")
-df.clusters$`Group 6 (G-,N0)` = ifelse(df.clusters$rnum %in% queryHits(oo$`Group 6 (G-,N0)`), "yes","no")
+df.clusters$`Group 1 (G-N+)` = ifelse(df.clusters$rnum %in% queryHits(oo$`Group 1 (G-N+)`), "yes","no")
+df.clusters$`Group 2 (G0N+)` = ifelse(df.clusters$rnum %in% queryHits(oo$`Group 2 (G0N+)`), "yes","no")
+df.clusters$`Group 3 (G0N-)` = ifelse(df.clusters$rnum %in% queryHits(oo$`Group 3 (G0N-)`), "yes","no")
+df.clusters$`Group 4 (G+N0)` = ifelse(df.clusters$rnum %in% queryHits(oo$`Group 4 (G+N0)`), "yes","no")
+df.clusters$`Group 5 (G+N-)` = ifelse(df.clusters$rnum %in% queryHits(oo$`Group 5 (G+N-)`), "yes","no")
+df.clusters$`Group 6 (G-N0)` = ifelse(df.clusters$rnum %in% queryHits(oo$`Group 6 (G-N0)`), "yes","no")
 
 df.clusters$Alz  = ifelse(df.clusters$rnum %in% subjectHits(Overlap$Alz), "yes","no")
 df.clusters$Park = ifelse(df.clusters$rnum %in% subjectHits(Overlap$Park), "yes","no")
@@ -87,37 +88,39 @@ rownames(df) = NULL
 write.csv(df, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/GWAS_fisher_DMR_results.csv")
 
 df[df$fdr<=0.05,]
-#   GWAS           Model        OR         pval          fdr
-#10 Park        CellType  2.264214 1.087124e-03 3.913646e-03
-#11 Park             Age 14.327692 9.131028e-03 2.528592e-02
-#12 Park     Interaction  5.468792 9.786045e-06 5.871627e-05
-#15 Park Group 3 (G0,N-) 18.489768 1.364264e-06 9.822698e-06
-#18 Park Group 6 (G-,N0)  8.619130 3.549918e-04 1.597463e-03
-
-#19  T2D        CellType  3.555008 1.134421e-08 1.913923e-07
-#21  T2D     Interaction  4.045316 1.078727e-03 3.913646e-03
-#25  T2D Group 4 (G+,N0) 32.255689 1.351645e-04 6.951319e-04
-
-#28  SCZ        CellType  1.817179 1.594936e-08 1.913923e-07
-#29  SCZ             Age  4.222380 1.686004e-02 4.335438e-02
-#30  SCZ     Interaction  2.684525 2.125739e-07 1.913165e-06
-#33  SCZ Group 3 (G0,N-)  7.867389 2.841518e-10 1.022947e-08
-#35  SCZ Group 5 (G+,N-)  4.951127 1.736070e-03 5.681683e-03
-#36  SCZ Group 6 (G-,N0)  2.770898 2.871673e-03 8.615018e-03
+#   GWAS                     Model        OR         pval          fdr
+#1   Alz Hypomethylated in Neurons  3.606411 6.724181e-04 2.988525e-03
+#11 Park Hypomethylated in Neurons  2.984641 1.034783e-03 3.595757e-03
+#12 Park    Hypomethylated in Glia  2.654812 8.673454e-04 3.469382e-03
+#13 Park                       Age 14.327692 9.131028e-03 2.282757e-02
+#14 Park               Interaction  5.468792 9.786045e-06 6.524030e-05
+#17 Park           Group 3 (G0,N-) 18.489768 1.364264e-06 1.091411e-05
+#20 Park           Group 6 (G-,N0)  8.619130 3.549918e-04 1.774959e-03
+#21  T2D Hypomethylated in Neurons  2.537779 7.750956e-03 2.066922e-02
+#22  T2D    Hypomethylated in Glia  4.438351 5.302595e-09 7.070127e-08
+#24  T2D               Interaction  4.045316 1.078727e-03 3.595757e-03
+#28  T2D           Group 4 (G+,N0) 32.255689 1.351645e-04 7.723688e-04
+#31  SCZ Hypomethylated in Neurons  2.908269 1.116321e-15 4.465282e-14
+#32  SCZ    Hypomethylated in Glia  1.407507 1.553310e-02 3.654848e-02
+#33  SCZ                       Age  4.222380 1.686004e-02 3.746675e-02
+#34  SCZ               Interaction  2.684525 2.125739e-07 2.125739e-06
+#37  SCZ           Group 3 (G0,N-)  7.867389 2.841518e-10 5.683037e-09
+#39  SCZ           Group 5 (G+,N-)  4.951127 1.736070e-03 5.341753e-03
+#40  SCZ           Group 6 (G-,N0)  2.770898 2.871673e-03 8.204779e-03
 
 ## Test the genes within these loci
 
 geneMapGR = makeGRangesFromDataFrame(geneMap, keep.extra.columns = T)
 genes = lapply(gwas, function(x) findOverlaps(geneMapGR, x))
 genes = lapply(genes, function(x) geneMapGR[queryHits(x)])
-DMRgenes = lapply(DMRgr, function(x) unique(as.character(x[x$distToGene==0]$nearestID)))
 
 
 ## Enrichment in DMRs by cell type, age and interaction
 
-geneuniverse = na.omit(unique(geneMap$gencodeID))
-gwasGenes = lapply(genes, function(x) unique(as.character(x[which(x$gencodeID %in% geneuniverse)]$gencodeID))) # drop genes that are not present in the test set
-sig = lapply(DMRgr, function(x) unique(as.character(x[x$distToGene==0]$nearestID)))
+geneuniverse = na.omit(unique(geneMap$EntrezID))
+gwasGenes = lapply(genes, function(x) unique(as.character(x$EntrezID)))
+sig = lapply(DMRgr, function(x) unique(as.character(x[x$distToGene==0]$EntrezID)))
+sig = lapply(sig, na.omit)
 notsig = lapply(sig, function(y) geneuniverse[!(geneuniverse %in% y)])
 
 DMRenrich = mapply(function(sig,notsig) lapply(gwasGenes, function(x) {
@@ -141,20 +144,17 @@ write.csv(DMRenrich, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics
 
 DMRenrich[DMRenrich$FDR<=0.05,]
 
-#             Model GWAS Odds.Ratio      P.Value          FDR
-#10     Interaction Park   2.744962 1.188121e-02 4.752485e-02
-#22 Group 3 (G0,N-) Park   6.010057 5.264312e-03 2.707360e-02
-#3         CellType  T2D   3.568781 2.225193e-09 4.005347e-08
-#11     Interaction  T2D   2.740540 7.972642e-03 3.587689e-02
-#27 Group 4 (G+,N0)  T2D  21.701037 5.633151e-06 6.759781e-05
-#4         CellType  SCZ   2.179325 1.027636e-12 3.699490e-11
-#8              Age  SCZ   3.717664 1.326620e-02 4.775831e-02
-#12     Interaction  SCZ   2.290865 2.198304e-05 1.978474e-04
-#16 Group 1 (G-,N+)  SCZ   3.414708 1.236026e-04 7.416157e-04
-#24 Group 3 (G0,N-)  SCZ   3.941949 2.864395e-05 2.062364e-04
-
-
-
-
-
-
+#                       Model GWAS Odds.Ratio      P.Value          FDR
+#2  Hypomethylated in Neurons Park   2.214807 1.539965e-02 4.738353e-02
+#14               Interaction Park   2.744962 1.188121e-02 4.320441e-02
+#26           Group 3 (G0,N-) Park   6.010057 5.264312e-03 2.339694e-02
+#3  Hypomethylated in Neurons  T2D   4.106108 1.217342e-07 2.434684e-06
+#7     Hypomethylated in Glia  T2D   3.133085 9.052546e-06 9.052546e-05
+#15               Interaction  T2D   2.740540 7.972642e-03 3.189057e-02
+#31           Group 4 (G+,N0)  T2D  21.701037 5.633151e-06 7.510868e-05
+#4  Hypomethylated in Neurons  SCZ   3.077028 5.005744e-17 2.002298e-15
+#8     Hypomethylated in Glia  SCZ   1.624898 6.919659e-04 3.459829e-03
+#12                       Age  SCZ   3.717664 1.326620e-02 4.422065e-02
+#16               Interaction  SCZ   2.290865 2.198304e-05 1.758643e-04
+#20           Group 1 (G-,N+)  SCZ   3.414708 1.236026e-04 7.063006e-04
+#28           Group 3 (G0,N-)  SCZ   3.941949 2.864395e-05 1.909597e-04
