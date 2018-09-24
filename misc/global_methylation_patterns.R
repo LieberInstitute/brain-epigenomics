@@ -108,6 +108,41 @@ round(table(Mean>0.8)/length(Mean)*100,1)
 #29.4  70.6
 
 
+# load methylation matrix for prenatal non-CpGs
+
+load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/bsseq/prenatal/allChrs_cleaned_CX_Prenatal_CpH.Rdata')
+
+pd <- read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/prenatal.WGBS.pheno.info.csv")
+BSobj <- updateObject(BSobj, verbose=TRUE)
+Pmeth <- getMeth(BSobj, type = 'raw')
+rm(BSobj)
+dim(Pmeth) # 58109566 CpHs measured
+Pmeth = as.matrix(Pmeth)
+
+mean1 = rowMeans(Pmeth[1:9684929,], na.rm = T)
+mean2 = rowMeans(Pmeth[9684930:19369856,], na.rm = T)
+mean3 = rowMeans(Pmeth[19369857:29054784,], na.rm = T)
+mean4 = rowMeans(Pmeth[29054785:38739712,], na.rm = T)
+mean5 = rowMeans(Pmeth[38739713:48424640,], na.rm = T)
+mean6 = rowMeans(Pmeth[48424641:nrow(Pmeth),], na.rm = T)
+
+Mean = c(mean1,mean2,mean3,mean4,mean5,mean6)
+length(na.omit(Mean)) # 58109566
+
+
+## Get stats: prenatal CpHs
+
+round(table(Mean<0.2)/length(Mean)*100,2)
+#FALSE  TRUE 
+# 0.25 99.75 
+round(table(Mean>=0.2 & Mean<=0.8)/length(Mean)*100,2)
+#FALSE  TRUE 
+#99.83  0.17 
+round(table(Mean>0.8)/length(Mean)*100,2)
+#FALSE  TRUE 
+#99.93  0.07 
+
+
 # load methylation matrix for homogenate postnatal CpGs
 
 load("/dcl01/lieber/WGBS/LIBD_Data/bsseqObj/bsseqObj_postNatal_cleaned_CpGonly.rda")

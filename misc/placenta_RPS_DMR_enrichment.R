@@ -356,7 +356,7 @@ f.proteincoding = list(list(plac1000 = glm(plac1000 ~ CellType + ProteinCoding, 
                             nonplac1000 = glm(nonplac1000 ~ Gr6 + ProteinCoding, family = "binomial", data=df.clusters),
                             plac500 = glm(plac500 ~ Gr6 + ProteinCoding, family = "binomial", data=df.clusters),
                             nonplac500 = glm(nonplac500 ~ Gr6 + ProteinCoding, family = "binomial", data=df.clusters)))
-df = do.call(rbind, Map(cbind, lapply(f, function(x) data.frame(AdjustedOdds = unlist(lapply(x, function(y) exp(y$coef[2]))), SNPgroup = names(x))), SigGroup = as.list(cols)))
+df = do.call(rbind, Map(cbind, lapply(f.proteincoding, function(x) data.frame(AdjustedOdds = unlist(lapply(x, function(y) exp(y$coef[2]))), SNPgroup = names(x))), SigGroup = as.list(cols)))
 rownames(df) = NULL
 df$SigGroup = gsub("Gr1", "G-:N+", df$SigGroup)
 df$SigGroup = gsub("Gr2", "G0:N+", df$SigGroup)

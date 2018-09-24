@@ -209,6 +209,19 @@ fisher.test(data.frame(c(36439,2248093),c(42800,5354743)))
 #2.02797 
 # mCH that is enriched in glia is more likely to be CHG than CHH
 
+table(data.frame(CHdt[CT.sig=="FDR < 0.05" & trinucleotide_context %in% c("CAG","CAC"),,])[,"CT.dir"],data.frame(CHdt[CT.sig=="FDR < 0.05" & trinucleotide_context %in% c("CAG","CAC"),,])[,"c_context"])
+#         CG     CHG     CHH
+#neg       0   12500    3454
+#pos       0 2072603 2365368
+fisher.test(data.frame(c(12500,2072603),c(3454,2365368)))
+#p-value < 2.2e-16
+#alternative hypothesis: true odds ratio is not equal to 1
+#95 percent confidence interval:
+#  3.976673 4.290161
+#sample estimates:
+#  odds ratio 
+#4.130595 
+
 
 ## Are the GO terms for glial mCH-enriched genes affected by trinucleotide context?
 
@@ -317,6 +330,21 @@ fisher.test(data.frame(c(14567,1120570),c(15800,2869434)))
 #2.360879 
 ## mCH that is enriched in younger neurons is more likely to be CHG than CHH
 
+table(data.frame(CHneuronsdt[sig=="FDR < 0.05" & trinucleotide_context %in% c("CAG","CAC"),,])[,"Dir"],
+      data.frame(CHneuronsdt[sig=="FDR < 0.05" & trinucleotide_context %in% c("CAG","CAC"),,])[,"c_context"])
+#         CG     CHG     CHH
+#neg       0    5901    1338
+#pos       0 1045294 1394793
+fisher.test(data.frame(c(5901,1045294),c(1338,1394793)))
+#p-value < 2.2e-16
+#alternative hypothesis: true odds ratio is not equal to 1
+#95 percent confidence interval:
+#  5.545168 6.250295
+#sample estimates:
+#  odds ratio 
+#5.88395 
+
+
 
 ## Are the GO terms for younger mCH-enriched genes affected by trinucleotide context?
 
@@ -364,6 +392,61 @@ plotExample@compareClusterResult = plotExample@compareClusterResult[grep("Overla
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/nonCG_BP_filtered_plots_byAgeinNeurons_byC_Context.pdf", height = 14, width = 12)
 plot(plotExample, colorBy="p.adjust", showCategory = 10, title= "non-CpG BP Enrichment by Age in Neurons")
+dev.off()
+
+
+## Limit to CAG adn CAC context only: GO terms for younger mCH-enriched genes affected by trinucleotide context?
+
+Ageentrez = list("Decreasing\nmCAG" = CHneuronsdt[sig=="FDR < 0.05" & Dir=="neg" & trinucleotide_context=="CAG",list(na.omit(EntrezID)),], 
+                 "Decreasing\nmCAC" = CHneuronsdt[sig=="FDR < 0.05" & Dir=="neg" & trinucleotide_context=="CAC",list(na.omit(EntrezID)),],
+                 "Increasing\nmCAG" = CHneuronsdt[sig=="FDR < 0.05" & Dir=="pos" & trinucleotide_context=="CAG",list(na.omit(EntrezID)),], 
+                 "Increasing\nmCAC" = CHneuronsdt[sig=="FDR < 0.05" & Dir=="pos" & trinucleotide_context=="CAC",list(na.omit(EntrezID)),],
+                 "Decreasing\n(Overlapping Genes)\nmCAG" = CHneuronsdt[sig=="FDR < 0.05" & Dir=="neg" & trinucleotide_context=="CAG" & distToGene==0,list(na.omit(EntrezID)),], 
+                 "Decreasing\n(Overlapping Genes)\nmCAC" = CHneuronsdt[sig=="FDR < 0.05" & Dir=="neg" & trinucleotide_context=="CAC" & distToGene==0,list(na.omit(EntrezID)),],
+                 "Increasing\n(Overlapping Genes)\nmCAG" = CHneuronsdt[sig=="FDR < 0.05" & Dir=="pos" & trinucleotide_context=="CAG" & distToGene==0,list(na.omit(EntrezID)),], 
+                 "Increasing\n(Overlapping Genes)\nmCAC" = CHneuronsdt[sig=="FDR < 0.05" & Dir=="pos" & trinucleotide_context=="CAC" & distToGene==0,list(na.omit(EntrezID)),])
+Ageentrez = lapply(Ageentrez, function(x) as.character(unique(x$V1)))              
+
+# Compare the enriched terms between 7 groups
+AgecompareKegg = compareCluster(Ageentrez, fun="enrichKEGG", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+AgecompareBP = compareCluster(Ageentrez, fun="enrichGO", ont = "BP", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+AgecompareMF = compareCluster(Ageentrez, fun="enrichGO",  ont = "MF", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+AgecompareCC = compareCluster(Ageentrez, fun="enrichGO",  ont = "CC", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+AgecompareDO = compareCluster(Ageentrez, fun="enrichDO",  ont = "DO", qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+
+# save
+save(AgecompareKegg, AgecompareMF, AgecompareCC, AgecompareDO, AgecompareBP,
+     file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/non-CpG/nonCG_KEGG_GO_DO_objects_byAgeinNeurons_byCAG_orCAC.rda")
+
+# plot compared results
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/nonCG_KEGG_GO_DO_plots_byAgeinNeurons_byCAG_orCAC.pdf", height = 80, width = 25)
+dotplot(AgecompareKegg, showCategory = 1400, title= "non-CpG KEGG Pathway Enrichment by Age in Neurons")
+dotplot(AgecompareMF, showCategory = 1400, title= "non-CpG Molecular Function GO Enrichment by Age in Neurons")
+dotplot(AgecompareCC, showCategory = 1400, title= "non-CpG Cellular Compartment GO Enrichment by Age in Neurons")
+dotplot(AgecompareDO, showCategory = 1400, title= "non-CpG Disease Ontology Enrichment by Age in Neurons")
+dev.off()
+
+
+comp = as.data.frame(AgecompareBP)
+comp = comp[grep("Overlap", comp$Cluster),]
+comp = split(comp$Description, comp$Cluster)
+comp = comp[elementNROWS(comp)>0]
+ov = calculate.overlap(comp)
+elementNROWS(ov)
+
+plotExample = AgecompareBP # clusterProfiler output
+plotExample@compareClusterResult = plotExample@compareClusterResult[which(plotExample@compareClusterResult$Description %in% 
+                                                                            unlist(ov[names(ov) %in% c("a9","a14","a1","a3")])),]  
+plotExample@compareClusterResult = plotExample@compareClusterResult[grep("Overlap",plotExample@compareClusterResult$Cluster),]
+plotExample@compareClusterResult$Description = gsub("positive regulation of adaptive immune response based on somatic recombination of immune receptors built from immunoglobulin superfamily domains",
+                                                    "positive regulation of adaptive immune response based on\nsomatic recombination of immune receptors built from immunoglobulin superfamily domains",plotExample@compareClusterResult$Description)
+
+plotExample2 = AgecompareBP
+plotExample2@compareClusterResult = plotExample2@compareClusterResult[grep("Overlap",plotExample2@compareClusterResult$Cluster),]
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/nonCG_BP_filtered_plots_byAgeinNeurons_byC_Context.pdf", height = 14, width = 14)
+dotplot(plotExample, showCategory = 10, title= "non-CpG BP Enrichment by Age in Neurons")
+dotplot(plotExample2, showCategory = 10, title= "non-CpG BP Enrichment by Age in Neurons")
 dev.off()
 
 

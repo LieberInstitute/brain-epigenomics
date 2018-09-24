@@ -75,7 +75,7 @@ range(num$num[which(num$category=="LMR" & num$celltype=="Glia")])
 
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/UMR_LMR_number_byAge_postnatal.pdf")
-w = unum[which(unum$celltype %in% c("Neuron", "Glia")),]
+w = num[which(num$celltype %in% c("Neuron", "Glia") & num$category=="UMR"),]
 w = cbind(w, Age = pd[match(w$id, pd$Data.ID), "Age"])
 cor.test(x = w[which(w$celltype=="Neuron"),"Age"], y = w[which(w$celltype=="Neuron"),"num"])
 # t = -1.6681, df = 22, p-value = 0.1095
@@ -103,7 +103,7 @@ ggplot(w, aes(x = Age, y = num, colour = celltype)) + geom_point() +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
 
-w = lnum[which(lnum$celltype %in% c("Neuron", "Glia")),]
+w = num[which(num$celltype %in% c("Neuron", "Glia") & num$category=="LMR"),]
 w = cbind(w, Age = pd[match(w$id, pd$Data.ID), "Age"])
 cor.test(x = w[which(w$celltype=="Neuron"),"Age"], y = w[which(w$celltype=="Neuron"),"num"])
 # t = -7.6017, df = 22, p-value = 1.364e-07
@@ -126,7 +126,7 @@ cor.test(x = w[which(w$celltype=="Glia"),"Age"], y = w[which(w$celltype=="Glia")
 ggplot(w, aes(x = Age, y = num, colour = celltype)) + geom_point() +
   geom_smooth(method=lm, se=T, fullrange=TRUE) + scale_colour_brewer(8, palette="Dark2") + 
   labs(fill="") +  theme_classic() +
-  ylab("Number") + xlab("Age (Years)") +
+  ylab("Number") + xlab("Age (Years)") + ylim(0,100000) +
   ggtitle("Number of LMRs Identified by Age") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
@@ -318,9 +318,10 @@ lgenome[which(lgenome$id %in% pd[pd$Cell.Type=="Glia","Data.ID"]),"celltype"] = 
 write.csv(rbind(data.frame(ugenome, category = "UMR"),data.frame(lgenome, category = "LMR")), quote=F,
           file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_genomeCoverage.csv")
 
+genome = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/UMR_LMR_genomeCoverage.csv")
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/UMR_LMR_percentGenome_byAge_postnatal.pdf")
-w = ugenome[which(ugenome$celltype %in% c("Neuron", "Glia")),]
+w = genome[which(genome$celltype %in% c("Neuron", "Glia") & genome$category=="UMR"),]
 w = cbind(w, Age = pd[match(w$id, pd$Data.ID), "Age"])
 cor.test(x = w[which(w$celltype=="Neuron"),"Age"], y = w[which(w$celltype=="Neuron"),"percent"])
 #t = -2.2398, df = 22, p-value = 0.03554
@@ -346,7 +347,7 @@ ggplot(w, aes(x = Age, y = percent, colour = celltype)) + geom_point() +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
 
-w = lgenome[which(lgenome$celltype %in% c("Neuron", "Glia")),]
+w = genome[which(genome$celltype %in% c("Neuron", "Glia") & genome$category=="LMR"),]
 w = cbind(w, Age = pd[match(w$id, pd$Data.ID), "Age"])
 cor.test(x = w[which(w$celltype=="Neuron"),"Age"], y = w[which(w$celltype=="Neuron"),"percent"])
 #data:  w[which(w$celltype == "Neuron"), "Age"] and w[which(w$celltype == "Neuron"), "percent"]
@@ -369,7 +370,7 @@ cor.test(x = w[which(w$celltype=="Glia"),"Age"], y = w[which(w$celltype=="Glia")
 ggplot(w, aes(x = Age, y = percent, colour = celltype)) + geom_point() +
   geom_smooth(method=lm, se=T, fullrange=TRUE) + scale_colour_brewer(8, palette="Dark2") + 
   labs(fill="") +  theme_classic() +
-  ylab("Percent") + xlab("Age (Years)") +
+  ylab("Percent") + xlab("Age (Years)") + ylim(0,2) +
   ggtitle("Percent of Genome that is LMR by Age") +
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")

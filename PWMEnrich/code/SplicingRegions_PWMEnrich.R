@@ -780,5 +780,5 @@ fisher = lapply(stat, fisher.test)
 df = data.frame(comp = names(fisher), Odds.Ratio = unlist(lapply(fisher, function(y) y$estimate)), pval = unlist(lapply(fisher, function(y) y$p.value)))
 df$FDR = p.adjust(df$pval, method = "fdr")
 rownames(df) = NULL
-
+write.csv(df, quote = F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/PWMEnrich/CTCF.MECP2.fishertest.2cutoff.csv")
 

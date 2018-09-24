@@ -154,9 +154,7 @@ res$Feature = gsub("enhancers","All Enhancers", res$Feature)
 res$Feature = gsub("assignment","assigned", res$Feature)
 res$Feature = factor(res$Feature, levels=c("All Enhancers","No age assigned","Vertebrata","Gnathostomata","Tetrapoda",     
                                            "Amniota","Mammalia","Theria","Eutheria","Primate","Human"))     
-                      
-[5]            "Mammalia"                
-[9] "Tetrapoda"                                                                               
+
                                                     
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/figures/HARs_DMR_oddsRatios.pdf", height = 4)
 ggplot(df[which(df$Model %in% c("CellType", "Age", "Interaction")),], aes(Model, OR, fill = Model)) + 
