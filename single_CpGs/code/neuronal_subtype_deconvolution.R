@@ -68,6 +68,12 @@ pd = cbind(pd, as.data.frame(counts[match(rownames(pd), rownames(counts)),]) )
 pd = as.data.frame(pd)
 write.csv(pd, file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/estimated_NeuronalSubtype_proportions.csv", quote = F)
 
+colnames(pd)
+
+cor.test(pd[pd$Cell.Type=="Neuron","GABAergic"], pd[pd$Cell.Type=="Neuron","Age"])
+
+
+cor.test(pd[pd$Cell.Type=="Neuron","Glutamateric"], pd[pd$Cell.Type=="Neuron","Age"])
 
 ### Plot results
 
@@ -87,6 +93,7 @@ ggplot(pd, aes(x = Age, y = GABAergic, colour = Cell.Type)) + geom_point() +
   theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
 
 dev.off()
+
 
 
 

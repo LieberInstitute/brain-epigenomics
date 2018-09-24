@@ -4,6 +4,8 @@ library(ggplot2)
 
 load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/BSobj_bsseqSmooth_Neuron_minCov_3.Rdata')
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/rda/limma_Neuron_CpGs_minCov_3_ageInfo_dmrs.Rdata")
+
 
 # load dmCs by neuronal subtype
 gabglu.450K = openxlsx::read.xlsx('/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/Kozlenkov_Dracheva_NucAcidsRes_2016_CpGmeth_450K.xlsx')
@@ -20,17 +22,24 @@ colnames(gabglu.CHrrbs) = gabglu.CHrrbs[1,]
 gabglu.CHrrbs = gabglu.CHrrbs[-1,]
 gabglu.CHrrbs$qvalue = as.numeric(gabglu.CHrrbs$qvalue)
 
-gabglu = list("450K" = makeGRangesFromDataFrame(gabglu.450K[which(gabglu.450K$FDR.GABA.GLU<=0.05),], seqnames.field="CHR",start.field="POSITION", end.field="POSITION", keep.extra.columns=T),
-			  "rrbs" = makeGRangesFromDataFrame(gabglu.rrbs[which(gabglu.rrbs$qvalue<=0.05),], seqnames.field="CHR",start.field="POSITION", end.field="POSITION", keep.extra.columns=T),
-			  "CHrrbs" = makeGRangesFromDataFrame(gabglu.CHrrbs[which(gabglu.CHrrbs$qvalue<=0.05),], seqnames.field="CHR",start.field="POSITION", end.field="POSITION", strand.field="STRAND", keep.extra.columns=T),
-			  "450K.upGABA" = makeGRangesFromDataFrame(gabglu.450K[which(gabglu.450K$FDR.GABA.GLU<=0.05 & gabglu.450K$delta.GABA.GLU < 0),], seqnames.field="CHR",start.field="POSITION", end.field="POSITION", keep.extra.columns=T),
-			  "rrbs.upGABA" = makeGRangesFromDataFrame(gabglu.rrbs[which(gabglu.rrbs$qvalue<=0.05 & gabglu.rrbs$DiffMeth=="DM.GABA"),], seqnames.field="CHR",start.field="POSITION", end.field="POSITION", keep.extra.columns=T),
-			  "CHrrbs.upGABA" = makeGRangesFromDataFrame(gabglu.CHrrbs[which(gabglu.CHrrbs$qvalue<=0.05 & gabglu.CHrrbs$DiffMeth=="GABA.DM"),], 
-			  											 seqnames.field="CHR",start.field="POSITION", end.field="POSITION", strand.field="STRAND", keep.extra.columns=T),
-			  "450K.upGlut" = makeGRangesFromDataFrame(gabglu.450K[which(gabglu.450K$FDR.GABA.GLU<=0.05 & gabglu.450K$delta.GABA.GLU > 0),], seqnames.field="CHR",start.field="POSITION", end.field="POSITION", keep.extra.columns=T),
-			  "rrbs.upGlut" = makeGRangesFromDataFrame(gabglu.rrbs[which(gabglu.rrbs$qvalue<=0.05 & gabglu.rrbs$DiffMeth=="DM.GLU"),], seqnames.field="CHR",start.field="POSITION", end.field="POSITION", keep.extra.columns=T),
-			  "CHrrbs.upGlut" = makeGRangesFromDataFrame(gabglu.CHrrbs[which(gabglu.CHrrbs$qvalue<=0.05 & gabglu.CHrrbs$DiffMeth=="GLU.DM"),], seqnames.field="CHR",start.field="POSITION", end.field="POSITION", 				
-			  											 strand.field="STRAND", keep.extra.columns=T))
+gabglu = list("450K" = makeGRangesFromDataFrame(gabglu.450K[which(gabglu.450K$FDR.GABA.GLU<=0.05),], 
+                                                seqnames.field="CHR",start.field="POSITION", end.field="POSITION", keep.extra.columns=T),
+              "rrbs" = makeGRangesFromDataFrame(gabglu.rrbs[which(gabglu.rrbs$qvalue<=0.05),], 
+                                                seqnames.field="CHR",start.field="POSITION", end.field="POSITION", keep.extra.columns=T),
+              "CHrrbs" = makeGRangesFromDataFrame(gabglu.CHrrbs[which(gabglu.CHrrbs$qvalue<=0.05),], 
+                                                  seqnames.field="CHR",start.field="POSITION", end.field="POSITION", strand.field="STRAND", keep.extra.columns=T),
+              "450K.upGABA" = makeGRangesFromDataFrame(gabglu.450K[which(gabglu.450K$FDR.GABA.GLU<=0.05 & gabglu.450K$delta.GABA.GLU < 0),], 
+                                                       seqnames.field="CHR",start.field="POSITION", end.field="POSITION", keep.extra.columns=T),
+              "rrbs.upGABA" = makeGRangesFromDataFrame(gabglu.rrbs[which(gabglu.rrbs$qvalue<=0.05 & gabglu.rrbs$DiffMeth=="DM.GABA"),], 
+                                                       seqnames.field="CHR",start.field="POSITION", end.field="POSITION", keep.extra.columns=T),
+              "CHrrbs.upGABA" = makeGRangesFromDataFrame(gabglu.CHrrbs[which(gabglu.CHrrbs$qvalue<=0.05 & gabglu.CHrrbs$DiffMeth=="GABA.DM"),],
+                                                         seqnames.field="CHR",start.field="POSITION", end.field="POSITION", strand.field="STRAND", keep.extra.columns=T),
+              "450K.upGlut" = makeGRangesFromDataFrame(gabglu.450K[which(gabglu.450K$FDR.GABA.GLU<=0.05 & gabglu.450K$delta.GABA.GLU > 0),], 
+                                                       seqnames.field="CHR",start.field="POSITION", end.field="POSITION", keep.extra.columns=T),
+              "rrbs.upGlut" = makeGRangesFromDataFrame(gabglu.rrbs[which(gabglu.rrbs$qvalue<=0.05 & gabglu.rrbs$DiffMeth=="DM.GLU"),], 
+                                                       seqnames.field="CHR",start.field="POSITION", end.field="POSITION", keep.extra.columns=T),
+              "CHrrbs.upGlut" = makeGRangesFromDataFrame(gabglu.CHrrbs[which(gabglu.CHrrbs$qvalue<=0.05 & gabglu.CHrrbs$DiffMeth=="GLU.DM"),], 
+                                                         seqnames.field="CHR",start.field="POSITION", end.field="POSITION", strand.field="STRAND", keep.extra.columns=T))
 
 
 # Identify all CpG clusters in the genome
@@ -42,26 +51,40 @@ gr.clusters = unlist(range(gr.clusters))
 df.clusters = as.data.frame(gr.clusters)
 
 # Find overlaps with DMRS in all three models
-DMRgr = lapply(DMR, function(x) makeGRangesFromDataFrame(x[which(x$fwer<=0.05),], keep.extra.columns=T))
+
+dmrs = split(dmrs, dmrs$k6cluster_label)
+names(dmrs) = c("Group 1 (G-N+)","Group 2 (G0N+)","Group 3 (G0N-)","Group 4 (G+N0)","Group 5 (G+N-)","Group 6 (G-N0)")
+oo = lapply(dmrs, function(x) findOverlaps(x, makeGRangesFromDataFrame(DMR$Interaction)))
+dmrs = lapply(oo, function(x) DMR$Interaction[subjectHits(x),])
+CT = split(DMR$CellType, DMR$CellType$Dir)
+names(CT) = c("Hypomethylated in Neurons", "Hypomethylated in Glia")
+DMRgr = lapply(c(CT, DMR[names(DMR)!="CellType"], dmrs), function(x) makeGRangesFromDataFrame(x[which(x$fwer<=0.05),], keep.extra.columns = T))
 
 ooDMR = lapply(DMRgr, function(x) findOverlaps(gr.clusters, x))
 ooGG = lapply(gabglu, function(x) findOverlaps(gr.clusters,x))
 
 df.clusters$regionID = paste0(df.clusters$seqnames,":",df.clusters$start,"-",df.clusters$end)
 df.clusters$rnum = 1:length(gr.clusters)
-df.clusters$CellType = ifelse(df.clusters$rnum %in% queryHits(ooDMR $CellType), "CellType","no")
-df.clusters$Age = ifelse(df.clusters$rnum %in% queryHits(ooDMR $Age), "Age","no")
-df.clusters$Interaction = ifelse(df.clusters$rnum %in% queryHits(ooDMR $Interaction), "Interaction","no")
-df.clusters$DMRs = paste(df.clusters$CellType, df.clusters$Age, df.clusters$Interaction, sep=":")
-df.clusters$"450K" = ifelse(df.clusters$rnum %in% queryHits(ooGG$"450K"), "450K","no")
-df.clusters$rrbs = ifelse(df.clusters$rnum %in% queryHits(ooGG$"rrbs"), "rrbs","no")
-df.clusters$CHrrbs = ifelse(df.clusters$rnum %in% queryHits(ooGG$"CHrrbs"), "CHrrbs","no")
-df.clusters$"450K.upGABA" = ifelse(df.clusters$rnum %in% queryHits(ooGG$"450K.upGABA"), "450K.upGABA","no")
-df.clusters$rrbs.upGABA = ifelse(df.clusters$rnum %in% queryHits(ooGG$"rrbs.upGABA"), "rrbs.upGABA","no")
-df.clusters$CHrrbs.upGABA = ifelse(df.clusters$rnum %in% queryHits(ooGG$"CHrrbs.upGABA"), "CHrrbs.upGABA","no")
-df.clusters$"450K.upGlut" = ifelse(df.clusters$rnum %in% queryHits(ooGG$"450K.upGlut"), "450K.upGlut","no")
-df.clusters$rrbs.upGlut = ifelse(df.clusters$rnum %in% queryHits(ooGG$"rrbs.upGlut"), "rrbs.upGlut","no")
-df.clusters$CHrrbs.upGlut = ifelse(df.clusters$rnum %in% queryHits(ooGG$"CHrrbs.upGlut"), "CHrrbs.upGlut","no")
+df.clusters$Age = ifelse(df.clusters$rnum %in% queryHits(ooDMR$Age), "yes","no")
+df.clusters$Interaction = ifelse(df.clusters$rnum %in% queryHits(ooDMR$Interaction), "yes","no")
+df.clusters$"Hypomethylated in Neurons" = ifelse(df.clusters$rnum %in% queryHits(ooDMR$"Hypomethylated in Neurons"), "yes","no")
+df.clusters$"Hypomethylated in Glia" = ifelse(df.clusters$rnum %in% queryHits(ooDMR$"Hypomethylated in Glia"), "yes","no")
+df.clusters$"Group 1 (G-N+)" = ifelse(df.clusters$rnum %in% queryHits(ooDMR$"Group 1 (G-N+)"), "yes","no")
+df.clusters$"Group 2 (G0N+)" = ifelse(df.clusters$rnum %in% queryHits(ooDMR$"Group 2 (G0N+)"), "yes","no")
+df.clusters$"Group 3 (G0N-)" = ifelse(df.clusters$rnum %in% queryHits(ooDMR$"Group 3 (G0N-)"), "yes","no")
+df.clusters$"Group 4 (G+N0)" = ifelse(df.clusters$rnum %in% queryHits(ooDMR$"Group 4 (G+N0)"), "yes","no")
+df.clusters$"Group 5 (G+N-)" = ifelse(df.clusters$rnum %in% queryHits(ooDMR$"Group 5 (G+N-)"), "yes","no")
+df.clusters$"Group 6 (G-N0)" = ifelse(df.clusters$rnum %in% queryHits(ooDMR$"Group 6 (G-N0)"), "yes","no")
+
+df.clusters$"450K" = ifelse(df.clusters$rnum %in% queryHits(ooGG$"450K"), "yes","no")
+df.clusters$rrbs = ifelse(df.clusters$rnum %in% queryHits(ooGG$"rrbs"), "yes","no")
+df.clusters$CHrrbs = ifelse(df.clusters$rnum %in% queryHits(ooGG$"CHrrbs"), "yes","no")
+df.clusters$"450K.upGABA" = ifelse(df.clusters$rnum %in% queryHits(ooGG$"450K.upGABA"), "yes","no")
+df.clusters$rrbs.upGABA = ifelse(df.clusters$rnum %in% queryHits(ooGG$"rrbs.upGABA"), "yes","no")
+df.clusters$CHrrbs.upGABA = ifelse(df.clusters$rnum %in% queryHits(ooGG$"CHrrbs.upGABA"), "yes","no")
+df.clusters$"450K.upGlut" = ifelse(df.clusters$rnum %in% queryHits(ooGG$"450K.upGlut"), "yes","no")
+df.clusters$rrbs.upGlut = ifelse(df.clusters$rnum %in% queryHits(ooGG$"rrbs.upGlut"), "yes","no")
+df.clusters$CHrrbs.upGlut = ifelse(df.clusters$rnum %in% queryHits(ooGG$"CHrrbs.upGlut"), "yes","no")
 
 
 ## make contingency tables
