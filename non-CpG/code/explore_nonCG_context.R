@@ -395,7 +395,7 @@ plot(plotExample, colorBy="p.adjust", showCategory = 10, title= "non-CpG BP Enri
 dev.off()
 
 
-## Limit to CAG adn CAC context only: GO terms for younger mCH-enriched genes affected by trinucleotide context?
+## Limit to CAG and CAC context only: GO terms for younger mCH-enriched genes affected by trinucleotide context?
 
 Ageentrez = list("Decreasing\nmCAG" = CHneuronsdt[sig=="FDR < 0.05" & Dir=="neg" & trinucleotide_context=="CAG",list(na.omit(EntrezID)),], 
                  "Decreasing\nmCAC" = CHneuronsdt[sig=="FDR < 0.05" & Dir=="neg" & trinucleotide_context=="CAC",list(na.omit(EntrezID)),],
@@ -448,6 +448,26 @@ pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/nonCG_BP_filtere
 dotplot(plotExample, showCategory = 10, title= "non-CpG BP Enrichment by Age in Neurons")
 dotplot(plotExample2, showCategory = 10, title= "non-CpG BP Enrichment by Age in Neurons")
 dev.off()
+
+
+## now in only the genes that are either CAG or CAC but not both
+
+ent = list("Decreasing\nmCAG" = Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAG"[-which(Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAG" %in% Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAC")], 
+           "Decreasing\nmCAC" = Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAC"[-which(Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAG" %in% Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAC")],
+           "Increasing\nmCAG" = Ageentrez$"Increasing\n(Overlapping Genes)\nmCAG"[-which(Ageentrez$"Increasing\n(Overlapping Genes)\nmCAG" %in% Ageentrez$"Increasing\n(Overlapping Genes)\nmCAC")],
+           "Increasing\nmCAC" = Ageentrez$"Increasing\n(Overlapping Genes)\nmCAC"[-which(Ageentrez$"Increasing\n(Overlapping Genes)\nmCAG" %in% Ageentrez$"Increasing\n(Overlapping Genes)\nmCAC")])
+AgecompareBP = compareCluster(ent, fun="enrichGO", ont = "BP", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+
+plotExample = AgecompareBP
+plotExample@compareClusterResult = plotExample@compareClusterResult[plotExample@compareClusterResult$p.adjust<=0.01,]
+ 
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/nonCG_BP_plots_byAgeinNeurons_CAG_or_CAC_only.pdf", height = 14, width = 12)
+dotplot(AgecompareBP, showCategory = 20, title= "non-CpG BP Enrichment by Age in Neurons")
+dev.off()
+
+elementNROWS(ent)
+# Decreasing\nmCAG Decreasing\nmCAC Increasing\nmCAG Increasing\nmCAC 
+# 1406              338              870             2416 
 
 
 ## Compare Age-associated nonCGs in neurons by C context and overlap with genomic features
