@@ -1,6 +1,0 @@
-
-qrsh
-
-## run this command in /dcl02/lieber/WGBS/PublicData/Gabel_Greenberg_Nature_2015/BAMS/RNAseq
-
-bash /dcl01/lieber/ajaffe/Emily/RNAseq-pipeline/sh/rnaseq-run-all.sh --experiment "Gabel_Greenberg_2015" --prefix "Aug212018" --stranded "reverse" --reference "mm10"
