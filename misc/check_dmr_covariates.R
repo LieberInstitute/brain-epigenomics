@@ -97,11 +97,7 @@ lapply(covs, function(cov) {
         
         plot(x = rank(rowRanges(rse_mean_meth[[model]])$value), y = rank(rawBeta[, 1]))
         
-        r1 <- rank(rowRanges(rse_mean_meth[[model]])$value)
-        r2 <- rank(rawBeta[, 1])
-        hmm <- sapply(seq_len(length(r1)), function(i) { sum(r2[seq_len(i)] <= r1[i] )})
-        
-        plot(x = seq_len(length(r1)), y = hmm)
+
     })
 })
 
