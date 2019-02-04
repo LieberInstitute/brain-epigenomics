@@ -56,7 +56,7 @@ names(rse_mean_meth) <- models
 save(rse_mean_meth, file = 'rdas/rse_mean_meth.Rdata')
 
 
-
+pd <- colData(rse_mean_meth[[1]])
 covs <- c('Race', 'Sex', 'PMI', 'pH', 'avg.Cov', 'Percent.Duplication', 'alignment.efficiency', 'total_num_trimmed_reads', 'total_num_untrimmed_reads', 'ratio_trimmed', 'avg_conv_efficiency')
 
 dmr_cov <- lapply(models, function(model) {
@@ -146,17 +146,19 @@ dmr_cov_ratio <- lapply(models, function(model) {
         perc_agree <- round(sum(diag(dat_tab)[-3]) / diag(dat_tab)[3] * 100, 2)
         # print(dat_tab)
         
-        plot(x = dat_or, y = dat_or,
+        plot(x = dat_or, y = dat_cov,
             xlab = paste('Original beta:', model, 'model'),
             ylab = paste('Adjusted beta for', cov),
             sub = paste0('Agreement by sign: ', perc_agree, '%'),
             pch = 20, col = scales::alpha('black', 1/5)
         )
+        abline(a = 0, b = 1, col = 'red')
         plot(x = dat_or, y = dat_ratio,
             xlab = paste('Original beta:', model, 'model'),
             ylab = paste('Ratio of betas:', cov, 'adj. / original'),
             pch = 20, col = scales::alpha('black', 1/5)
         )
+        abline(h = 1, col = 'red')
         
         res <- data.frame(dat_ratio)
         colnames(res) <- cov
