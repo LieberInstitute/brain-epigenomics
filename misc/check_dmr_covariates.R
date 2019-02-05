@@ -15,7 +15,7 @@ lambda <- read.csv('/dcl01/lieber/WGBS/LIBD_Data/lambda_alignment/MasterList_lam
 m_lambda <- match(pd$Data.ID, lambda$WGC.ID)
 stopifnot(!any(is.na(m_lambda)))
 pd$avg_conv_efficiency <- colData(BSobj)$avg_conv_efficiency <- lambda$avg_conv_efficiency[m_lambda]
-pd$ratio_trimmed <- colData(BSobj)$ratio_trimmed <- pd$total_num_trimmed_reads/pd$total_num_untrimmed_reads
+pd$ratio_trimmed <- colData(BSobj)$ratio_trimmed <- pd$total_num_trimmed_reads / (pd$total_num_trimmed_reads + pd$total_num_untrimmed_reads)
 
 models <- c('interaction', 'cell', 'age')
 # model <- models[2]
@@ -122,22 +122,23 @@ head(dmr_cov$interaction)
 # 19972         -0.01724533          -0.01681139             -0.01721672
 # 22563         -0.01620978          -0.01593187             -0.01595356
 #       total_num_untrimmed_reads ratio_trimmed avg_conv_efficiency    original
-# 8307                 0.01640517    0.01608386          0.01572145  0.01634005
-# 8306                 0.01641839    0.01624832          0.01557559  0.01637278
-# 5886                 0.01372937    0.01200527          0.01260341  0.01379249
-# 26011               -0.01509268   -0.01572078         -0.01432257 -0.01515396
-# 19972               -0.01726911   -0.01722871         -0.01641404 -0.01730097
-# 22563               -0.01603825   -0.01625742         -0.01593754 -0.01608374
+# 8307                 0.01640517    0.01607998          0.01572145  0.01634005
+# 8306                 0.01641839    0.01623972          0.01557559  0.01637278
+# 5886                 0.01372937    0.01200382          0.01260341  0.01379249
+# 26011               -0.01509268   -0.01571695         -0.01432257 -0.01515396
+# 19972               -0.01726911   -0.01722321         -0.01641404 -0.01730097
+# 22563               -0.01603825   -0.01626179         -0.01593754 -0.01608374
 
 ## Make all the plots
 dir.create('pdf', showWarnings = FALSE)
 dmr_cov_ratio <- lapply(models, function(model) {
     pdf(paste0('pdf/dmr_covariates_model_', model, '.pdf'), useDingbats = FALSE)
     par(cex.lab=1.2, cex.axis=1.2)
-    result <- do.call(cbind, lapply(covs, function(cov) {
+    result <- lapply(covs, function(cov) {
         dat_or <- dmr_cov[[model]][, 'original']
         dat_cov <- dmr_cov[[model]][, cov]
         dat_ratio <- dat_cov / dat_or
+        dat_bias <- abs(dat_cov - dat_or) / abs(dat_or) * 100
         dat_tab <- addmargins(table(
             sign(dat_or),
             sign(dat_cov),
@@ -159,23 +160,70 @@ dmr_cov_ratio <- lapply(models, function(model) {
             pch = 20, col = scales::alpha('black', 1/5)
         )
         abline(h = 1, col = 'red')
+        plot(x = dat_or, y = dat_bias,
+            xlab = paste('Original beta:', model, 'model'),
+            ylab = paste('Absolute relative bias in percent for', cov),
+            pch = 20, col = scales::alpha('black', 1/5)
+        )
         
-        res <- data.frame(dat_ratio)
-        colnames(res) <- cov
-        return(res)
-    }))
+        res_ratio <- data.frame(dat_ratio)
+        colnames(res_ratio) <- cov
+        
+        res_bias <- data.frame(dat_bias)
+        colnames(res_bias) <- cov
+        
+        return(list('ratio' = res_ratio, 'bias' = res_bias))
+    })
     
-    par(mar=c(16, 5, 5, 2), cex.main = 1.3, cex.lab=1.2, cex.axis=1.2)
-    boxplot(result, las = 2,
+    result_ratio <- do.call(cbind, lapply(result, '[[', 'ratio'))
+    result_bias <- do.call(cbind, lapply(result, '[[', 'bias'))
+    
+    par(mar=c(14, 5, 5, 2), cex.main = 1.3, cex.lab=1.2, cex.axis=1.2)
+    boxplot(result_ratio, las = 2,
         ylab = 'Ratio of betas: adjusted / original',
         main = paste('Model:', model))
     abline(h = 1, col = 'red')
     
+    par(mar=c(14, 5, 5, 2), cex.main = 1.3, cex.lab=1.2, cex.axis=1.2)
+    boxplot(result_bias, las = 2,
+        ylab = 'Absolute relative bias in percent',
+        main = paste('Model:', model))
+    
     dev.off()
-    return(result)
+    return(list('ratio' = result_ratio, 'bias' = result_bias))
 })
 names(dmr_cov_ratio) <- models
 save(dmr_cov_ratio, file = 'rdas/dmr_cov_ratio.Rdata')
+
+pdf('pdf/dmr_covariates_acrossmodels.pdf', useDingbats = FALSE)
+cols <- c('deeppink', 'orangered', 'forestgreen')
+for(var in c('bias', 'ratio')) {
+    
+    info <- lapply(dmr_cov_ratio, '[[', var)
+    ylab <- ifelse(var == 'bias', 'Absolute relative bias in percent', 'Ratio of betas: adjusted / original')
+    
+    boxinfo <- lapply(info, boxplot, plot = FALSE)
+    n <- ncol(info[[1]])
+    ylim <- range(unlist( lapply(boxinfo, '[[', 'stats') ))
+        
+    par(mar=c(14, 5, 5, 2), cex.main = 1.3, cex.lab=1.2, cex.axis=1.2)
+    xx <- mapply(function(box_info, xadj = 0, boxcol = 'blue', add = FALSE) {
+        
+        bxp(box_info, ylim = ylim, at = seq_len(n) + xadj,
+            las = 2, boxcol = boxcol, outline = FALSE,
+            boxwex = 0.2, add = add, show.names = !add,
+            ylab = ylab
+        )
+    }, boxinfo, xadj = c(-0.25, 0, 0.25), boxcol = cols,
+        add = c(FALSE, TRUE, TRUE))
+    legend(ifelse(var == 'bias', 'top', 'bottom'),
+        legend = names(info), col = cols, lwd = 2, bty = 'n')
+    abline(h = ifelse(var == 'bias', 0, 1), col = 'dodgerblue', lty = 2)
+    
+}
+dev.off()
+
+
 
 ## Reproducibility information
 print('Reproducibility information:')
@@ -194,7 +242,7 @@ session_info()
 #  collate  en_US.UTF-8
 #  ctype    en_US.UTF-8
 #  tz       US/Eastern
-#  date     2019-02-04
+#  date     2019-02-05
 #
 # ─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────
 #  package              * version   date       lib source
@@ -254,7 +302,6 @@ session_info()
 #  Matrix                 1.2-15    2018-11-01 [3] CRAN (R 3.5.1)
 #  matrixStats          * 0.54.0    2018-07-23 [1] CRAN (R 3.5.1)
 #  memoise                1.1.0     2017-04-21 [2] CRAN (R 3.5.0)
-#  mime                   0.6       2018-10-05 [1] CRAN (R 3.5.1)
 #  munsell                0.5.0     2018-06-12 [2] CRAN (R 3.5.0)
 #  permute                0.9-4     2016-09-09 [2] CRAN (R 3.5.0)
 #  pillar                 1.3.1     2018-12-15 [1] CRAN (R 3.5.1)
