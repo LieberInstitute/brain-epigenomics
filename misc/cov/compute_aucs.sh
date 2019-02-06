@@ -20,11 +20,11 @@ do
     cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l mem_free=10G,h_vmem=10G,h_fsize=100G
+#$ -l mem_free=3G,h_vmem=3G,h_fsize=100G
 #$ -pe local ${CORES}
 #$ -N ${SHORT}
-#$ -o ./logs/${SHORT}.txt
-#$ -e ./logs/${SHORT}.txt
+#$ -o ./logs/${SHORT}.\$TASK_ID.txt
+#$ -e ./logs/${SHORT}.\$TASK_ID.txt
 #$ -m e
 #$ -t 1-${NUM}
 
