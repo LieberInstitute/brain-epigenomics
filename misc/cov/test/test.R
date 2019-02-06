@@ -40,6 +40,100 @@ stopifnot(identical(
 n_bamcount / hg19.size
 
 
+qcData <- c('/dcl02/lieber/WGBS/LIBD_Data/FastQC/Untrimmed/WGC052296L/WGC052296L_combined_R1_fastqc/fastqc_data.txt', '/dcl02/lieber/WGBS/LIBD_Data/FastQC/Untrimmed/WGC052296L/WGC052296L_combined_R2_fastqc/fastqc_data.txt', '/dcl02/lieber/WGBS/LIBD_Data/FastQC/Trimmed/WGC052296L/WGC052296L_flashOutput.extendedFrags_fastqc/fastqc_data.txt')
+
+
+            
+## Code adapted from https://github.com/LieberInstitute/RNAseq-pipeline/blob/master/sh/create_count_objects-human.R#L209-L217
+splitAt <- function(x, pos) unname(split(x, cumsum(seq_along(x) %in% pos)))
+
+compute_fastqc_seqdist <- function(qcData) {
+    R <- lapply(qcData, function(x) scan(x, what = "character", sep= "\n", 
+    		quiet = TRUE, strip=TRUE) )
+    ## Split list into sublists of metric categories
+    zz <- lapply(R, function(x) splitAt(x, which(x==">>END_MODULE")+1))
+
+    ## Extract the sequence length distribution
+    seqlen <- lapply(zz, function(x) {
+        ## access the sequence distribution part of the report
+        y <- x[[8]]
+        ## Drop header and module separating lines
+        y[-c(1:2, length(y))]
+    })
+
+    seqdist <- lapply(seqlen, function(dat) {
+    
+        ## Process the read length section
+        len <- ss(dat, "\t", 1)
+    
+        ## Sometimes there's a range of read lengths
+        res <- do.call(rbind, mapply(function(x, hasdash) {
+            if(!hasdash) {
+                x <- as.numeric(x)
+                result <- data.frame(
+                    start = x,
+                    end = x,
+                    stringsAsFactors = FALSE
+                )
+            } else {
+                ## Get the start/end of the range
+                result <- data.frame(
+                    start = as.numeric(ss(x, '-', 1)),
+                    end = as.numeric(ss(x, '-', 2)),
+                    stringsAsFactors = FALSE
+                )
+            }
+            ## Compute the median read length based on the range info
+            result$median <- median(c(result$start, result$end))
+            return(result)
+        }, len, grepl('-', len), SIMPLIFY = FALSE))
+    
+        res$n <- as.numeric(ss(dat, "\t", 2))
+    
+        return(res)
+    })
+    return(seqdist)
+}
+compute_fastqc_auc <- function(qcData) {
+    auc <- sapply(compute_fastqc_seqdist(qcData), function(dat) {
+        sum(dat$median * dat$n)
+    })
+    return(auc)
+}
+
+auc <- compute_fastqc_auc(qcData)
+
+auc / hg19.size
+
+sum(auc[1:2]) / hg19.size
+
+qcData_dir <- dir(c('/dcl02/lieber/WGBS/LIBD_Data/FastQC/Untrimmed/WGC052296L', '/dcl02/lieber/WGBS/LIBD_Data/FastQC/Trimmed/WGC052296L'), pattern = 'data.txt$', recursive = TRUE, full.names = TRUE)
+qcData_dir
+
+names(qcData_dir) <- gsub('^[[:alnum:]]*_|_fastqc', '', ss(qcData_dir, '/', 9))
+
+auc_dir <- compute_fastqc_auc(qcData_dir)
+auc_dir / hg19.size
+
+dir('/dcl02/lieber/WGBS/LIBD_Data/BAM/', pattern = 'WGC052296L.*bam', full.names = TRUE)
+# bamcount /dcl02/lieber/WGBS/LIBD_Data/BAM/WGC052296L.concatenated.sorted.duplicatesRemoved.bam --threads 4 --no-head --auc test_auc
+# bamcount /dcl02/lieber/WGBS/LIBD_Data/BAM//WGC052296L_concatenated_Marked_duplicates.bam --threads 4 --no_head --auc test_auc_all
+
+read_bamcount <- function(f) {
+    readr::read_tsv(f, col_names = c('cat', 'n'))$n
+}
+auc_files <- dir(pattern = 'auc.tsv$')
+auc_bam <- sapply(auc_files, read_bamcount)
+auc_bam
+
+c(auc_dir, auc_bam) / hg19.size
+# flashOutput.extendedFrags flashOutput.notCombined_1 flashOutput.notCombined_2
+#                 3.4392450                 0.6976701                 0.6253410
+#   output_forward_unpaired   output_reverse_unpaired               combined_R1
+#                 8.3080693                 0.1219993                19.3254085
+#               combined_R2      test_auc_all.auc.tsv          test_auc.auc.tsv
+#                19.3254085                 9.7240339                 1.4792738
+
 ## Reproducibility information
 print('Reproducibility information:')
 Sys.time()
