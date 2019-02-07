@@ -48,7 +48,7 @@ module list
 
 ## compute aucs
 ls -lh /dcl02/lieber/WGBS/LIBD_Data/BAM/\${ID}*${bamtype}.bam
-bamcount /dcl02/lieber/WGBS/LIBD_Data/BAM/\${ID}*${bamtype}.bam --threads 4 --no_head --auc auc_files/\${ID}_${bamtype}
+bamcount /dcl02/lieber/WGBS/LIBD_Data/BAM/\${ID}*${bamtype}.bam --threads ${CORES} --no_head --auc auc_files/\${ID}_${bamtype}
 
 echo "**** Job ends ****"
 date
