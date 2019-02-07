@@ -170,20 +170,17 @@ get_bamcount_data <- function(id) {
 }
 
 cov_bamcount <- do.call(rbind, lapply(ids, get_bamcount_data))
-# cov_bamcount <- do.call(rbind, lapply(ids[-c(6, 23)], get_bamcount_data))
 save(cov_bamcount, file = 'rda/cov_bamcount.Rdata')
 
 ## Merge both types
 cov_merged <- rbind(cov_fastqc, cov_bamcount)
 cov_merged$stage <- 'raw'
 
-# cov_merged <- subset(cov_merged, sample %in% ids[-c(6, 23)])
-
 cov_summarized <- do.call(rbind, lapply(split(cov_merged, cov_merged$sample), function(dat) {
     
     types <- c('initial', 'post-trim', 'mapped', 'no-dups')
     res <- data.frame(
-        sample = id,
+        sample = unique(dat$sample),
         type = factor(types, levels = types),
         auc = c(
             sum(dat$auc[dat$type %in% c('combined_R1', 'combined_R2')]),
@@ -198,6 +195,30 @@ cov_summarized <- do.call(rbind, lapply(split(cov_merged, cov_merged$sample), fu
 }))
 rownames(cov_summarized) <- NULL
 
+subset(cov_summarized, auc == 0)
+#             sample    type auc      stage
+# 1 WGC052309L_reseq initial   0 summarized
+
+subset(cov_fastqc, sample == 'WGC052309L_reseq')
+#              sample                            type         auc
+# 85 WGC052309L_reseq reseq_flashOutput.extendedFrags 39919651703
+# 86 WGC052309L_reseq reseq_flashOutput.notCombined_1  5273155607
+# 87 WGC052309L_reseq reseq_flashOutput.notCombined_2  4929507357
+# 88 WGC052309L_reseq   reseq_output_forward_unpaired 20942023974
+# 89 WGC052309L_reseq   reseq_output_reverse_unpaired   303701690
+# 90 WGC052309L_reseq               reseq_combined_R1 66313886100
+# 91 WGC052309L_reseq               reseq_combined_R2 66313886100
+subset(cov_merged, sample == 'WGC052309L_reseq')
+#               sample                            type         auc stage
+# 85  WGC052309L_reseq reseq_flashOutput.extendedFrags 39919651703   raw
+# 86  WGC052309L_reseq reseq_flashOutput.notCombined_1  5273155607   raw
+# 87  WGC052309L_reseq reseq_flashOutput.notCombined_2  4929507357   raw
+# 88  WGC052309L_reseq   reseq_output_forward_unpaired 20942023974   raw
+# 89  WGC052309L_reseq   reseq_output_reverse_unpaired   303701690   raw
+# 90  WGC052309L_reseq               reseq_combined_R1 66313886100   raw
+# 91  WGC052309L_reseq               reseq_combined_R2 66313886100   raw
+# 249 WGC052309L_reseq               duplicatesRemoved 28863207514   raw
+# 250 WGC052309L_reseq               Marked_duplicates 59246876569   raw
 
 cov_merged$coverage <- cov_merged$auc / hg19.size
 cov_summarized$coverage <- cov_summarized$auc / hg19.size
