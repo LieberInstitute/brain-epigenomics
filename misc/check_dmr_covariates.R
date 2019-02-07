@@ -162,7 +162,7 @@ dmr_cov_ratio <- lapply(models, function(model) {
         abline(h = 1, col = 'red')
         plot(x = dat_or, y = dat_bias,
             xlab = paste('Original beta:', model, 'model'),
-            ylab = paste('Absolute relative bias in percent for', cov),
+            ylab = paste('Percent absolute bias for', cov),
             pch = 20, col = scales::alpha('black', 1/5)
         )
         
@@ -186,7 +186,7 @@ dmr_cov_ratio <- lapply(models, function(model) {
     
     par(mar=c(14, 5, 5, 2), cex.main = 1.3, cex.lab=1.2, cex.axis=1.2)
     boxplot(result_bias, las = 2,
-        ylab = 'Absolute relative bias in percent',
+        ylab = 'Percent absolute bias',
         main = paste('Model:', model))
     
     dev.off()
@@ -200,7 +200,7 @@ cols <- c('deeppink', 'orangered', 'forestgreen')
 for(var in c('bias', 'ratio')) {
     
     info <- lapply(dmr_cov_ratio, '[[', var)
-    ylab <- ifelse(var == 'bias', 'Absolute relative bias in percent', 'Ratio of betas: adjusted / original')
+    ylab <- ifelse(var == 'bias', 'Percent absolute bias', 'Ratio of betas: adjusted / original')
     
     boxinfo <- lapply(info, boxplot, plot = FALSE)
     n <- ncol(info[[1]])
