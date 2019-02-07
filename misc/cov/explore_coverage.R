@@ -94,7 +94,7 @@ get_fastqc_data <- function(id) {
     fastqc_files <- dir(id_dirs, pattern = 'data.txt$', recursive = TRUE, full.names = TRUE)
     stopifnot(length(fastqc_files) == 7)
     
-    names(fastqc_files) <- gsub('^[[:alnum:]]*_|_fastqc', '', ss(fastqc_files, '/', 9))
+    names(fastqc_files) <- gsub(paste0('^', id, '_|_fastqc'), '', ss(fastqc_files, '/', 9))
 
     auc_dir <- compute_fastqc_auc(fastqc_files)
     
@@ -219,6 +219,8 @@ subset(cov_merged, sample == 'WGC052309L_reseq')
 # 91  WGC052309L_reseq               reseq_combined_R2 66313886100   raw
 # 249 WGC052309L_reseq               duplicatesRemoved 28863207514   raw
 # 250 WGC052309L_reseq               Marked_duplicates 59246876569   raw
+
+subset(cov_fastqc, sample == 'WGC052309L_reseq')
 
 cov_merged$coverage <- cov_merged$auc / hg19.size
 cov_summarized$coverage <- cov_summarized$auc / hg19.size
