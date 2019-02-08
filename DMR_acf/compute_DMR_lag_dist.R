@@ -138,7 +138,36 @@ compute_mean_d_lags <- function(g, max.lag = 4) {
 # res <- do.call(rbind, lapply(gg, compute_mean_d_lags))
 # boxplot(res)
 
+start_list <- start(gr_list)
+
+
+compute_lag_dist <- function(ss, max.lag = 4) {
+    i_list <- lapply(seq_len(max.lag), function(lag) {
+        IntegerList(lapply(elementNROWS(ss), function(x) {
+            seq_len(x - lag)
+        }))
+    })
+
+    result <- mapply(function(i, lag) {
+        mean(ss[i + lag] - ss[i])
+    }, i_list, seq_len(max.lag))
+    colnames(result) <- seq_len(max.lag)
+    return(result)
+}
+
+
+res2 <- compute_lag_dist(start_list[1:10])
+stopifnot(identical(res2, res))
+
+
+
 lag_dist <- do.call(rbind, bplapply(gr_list, compute_mean_d_lags, BPPARAM = bpparam))
+
+Sys.time()
+lag_dist2 <- compute_lag_dist(start_list)
+Sys.time()
+
+stopifnot(identical(lag_dist, lag_dist2))
 
 compute_mean_d_lags(g)
 
