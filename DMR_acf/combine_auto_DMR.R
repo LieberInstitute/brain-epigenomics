@@ -21,6 +21,16 @@ if(!file.exists('rda/auto_long_combined.Rdata')) {
     load('rda/auto_long_combined.Rdata')
 }
 dim(auto_long)
+# [1] 234584      9
+
+head(auto_long)
+#   acf_neuron  acf_glia lag clus clus_n clus_range context model avg_distance
+# 1  0.4220721 0.4926867   1    1   1513      19172     all   age     12.67923
+# 2  0.3547252 0.4194819   2    1   1513      19172     all   age     25.36664
+# 3  0.3060108 0.3613006   3    1   1513      19172     all   age     38.06821
+# 4  0.2283096 0.2979926   4    1   1513      19172     all   age     50.78396
+# 5  0.5084426 0.4796444   1    2    638       9007     all   age     14.13815
+# 6  0.3721603 0.3722272   2    2    638       9007     all   age     28.11321
 
 ## This never finished running:
 # mod_context_summary <- lapply(unique(auto_long)$model, function(model) {
@@ -53,6 +63,22 @@ sub$context <- c('all' = 'C', 'CG' = 'CpG', 'nonCG' = 'CpH')[sub$context]
 ggplot(sub, aes(x = lag, y = acf_neuron)) + geom_boxplot() + facet_grid(~ context) + theme_bw(base_size = 30) + ggtitle('Neuron') + ylab('Auto correlation') + ylim(c(-1, 1))
 ggplot(sub, aes(x = lag, y = acf_glia)) + geom_boxplot() + facet_grid(~ context) + theme_bw(base_size = 30) + ggtitle('Glia') + ylab('Auto correlation') + ylim(c(-1, 1))
 dev.off()
+
+
+
+ggplot(auto_long, aes(x = lag, y = avg_distance)) + geom_boxplot() + facet_grid(model ~ context) + theme_bw(base_size = 30) + ylab('Avg base-pair distance')
+
+
+ggplot(auto_long, aes(x = lag, y = log10(avg_distance + 1))) + geom_boxplot() + facet_grid(model ~ context) + theme_bw(base_size = 30) + ylab('Avg base-pair distance')
+ggplot(auto_long, aes(x = lag, y = avg_distance)) + geom_boxplot() + facet_grid(model ~ context) + theme_bw(base_size = 30) + ylab('Avg base-pair distance') + scale_y_log10()
+
+summary(auto_long$avg_distance)
+#     Min.  1st Qu.   Median     Mean  3rd Qu.     Max.
+# -2236.00    22.42    50.77    94.67   116.08  4538.00
+
+ggplot(sub, aes(x = lag, y = avg_distance)) + geom_boxplot() + facet_grid(~ context) + theme_bw(base_size = 30) + ylab('Avg base-pair distance')
+
+ggplot(sub, aes(x = lag, y = avg_distance)) + geom_boxplot() + facet_grid(~ context) + theme_bw(base_size = 30) + ylab('Avg base-pair distance')  + scale_y_log10()
 
 ## Reproducibility information
 print('Reproducibility information:')
