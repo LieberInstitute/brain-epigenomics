@@ -66,16 +66,6 @@ rm(cov, cov.ge5.cph, cov.ge3.cpg, cov.filt)
 print('Final number of bases of interest')
 nrow(BSobj)
 
-# > gr <- rowRanges(BSobj)
-# > gr2 <- sort(gr, ignore.strand = TRUE)
-# > identical(start(gr), start(gr2))
-# [1] FALSE
-# > identical(start(gr2[strand(gr2) == '+']), start(gr[strand(gr) == '+']))
-# [1] TRUE
-# >
-# > identical(start(gr2[strand(gr2) == '-']), start(gr[strand(gr) == '-']))
-# [1] TRUE
-
 ## Sort by chr position ignoring the strand
 message(paste(Sys.time(), 'sorting by chr position'))
 BSobj <- sort(BSobj, ignore.strand = TRUE)
