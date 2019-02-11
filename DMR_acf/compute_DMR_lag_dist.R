@@ -82,17 +82,6 @@ if(opt$context != 'all') {
 message(paste(Sys.time(), 'sorting by chr position'))
 DMR <- sort(DMR, ignore.strand = TRUE)
 
-## Just checking...
-stopifnot(
-    identical(
-        start(sort(rowRanges(DMR), ignore.strand = TRUE)),
-        start(rowRanges(DMR))
-    )
-)
-
-
-
-
 ## Load the bumphunting results
 load(paste0('/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/', 
     'bumps_bsseqSmooth_Neuron_', opt$model, '_250_perm.Rdata'), verbose = TRUE) 
