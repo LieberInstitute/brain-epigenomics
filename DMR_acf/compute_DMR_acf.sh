@@ -8,8 +8,7 @@ mkdir -p logs
 
 for model in age cell interaction
 do
-    #for context in nonCG CG CHG CHH
-    for context in all
+    for context in all nonCG CG CHG CHH
     do
 
 SHORT="compute_DMR_acf_${model}_${context}"
