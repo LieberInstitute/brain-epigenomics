@@ -32,6 +32,22 @@ head(auto_long)
 # 5  0.5084426 0.4796444   1    2    638       9007     all   age     14.13815
 # 6  0.3721603 0.3722272   2    2    638       9007     all   age     28.11321
 
+auto_long[head(which(auto_long$avg_distance < 0)), ]
+#          acf_neuron    acf_glia lag clus clus_n clus_range context model
+# 101732 -0.003217755 -0.06663796   4   10     15       1216     CHG   age
+# 101761 -0.012045398 -0.05505406   1   18     36        945     CHG   age
+# 101762  0.119849050  0.07904448   2   18     36        945     CHG   age
+# 101763 -0.047964536 -0.04692480   3   18     36        945     CHG   age
+# 101764 -0.021825900 -0.02983349   4   18     36        945     CHG   age
+# 101837 -0.068108113 -0.02281280   1   37     13       1145     CHG   age
+#        avg_distance
+# 101732    -4.090909
+# 101761    -2.114286
+# 101762    -5.911765
+# 101763   -19.090909
+# 101764   -34.437500
+# 101837   -12.000000
+
 ## This never finished running:
 # mod_context_summary <- lapply(unique(auto_long)$model, function(model) {
 #     lapply(unique(auto_long)$context, function(context) {

@@ -25,6 +25,7 @@ if (!is.null(opt$help)) {
 ## For testing
 if(FALSE) {
     opt <- list(chr = 'chr21', cores = 1, context = 'CG')
+    opt <- list(chr = 'chr21', cores = 1, context = 'all')
 }
 
 stopifnot(opt$context %in% c('all', 'nonCG', 'CG', 'CHG', 'CHH'))
@@ -33,10 +34,18 @@ message(paste(Sys.time(), 'loading the data'))
 load(paste0('rda/', opt$chr, '_postNatal_cleaned_CX_noHomogenate.Rdata'))
 
 ## Original bases in each context
-gr <- rowRanges(BSobj)
 context <- c(
-    'trinucleotide_context' = sort(table(gr$trinucleotide_context)),
-    'c_context' = sort(table(gr$c_context)))
+    'trinucleotide_context' = sort(table(rowRanges(BSobj)$trinucleotide_context)),
+    'c_context' = sort(table(rowRanges(BSobj)$c_context)))
+    
+## Subset by context
+if(opt$context != 'all') {
+    if(opt$context == 'nonCG') {
+        BSobj <- BSobj[rowRanges(BSobj)$c_context != 'CG', ]
+    } else {
+        BSobj <- BSobj[rowRanges(BSobj)$c_context == opt$context, ]
+    }
+}
 
 ## Filter low coverage bases
 cov <- getCoverage(BSobj, type = 'Cov')
@@ -54,17 +63,22 @@ round(addmargins(table('Passing the cutoff' = cov.filt, 'CpG' = as.vector(rowRan
 BSobj <- BSobj[cov.filt, ]
 rm(cov, cov.ge5.cph, cov.ge3.cpg, cov.filt)
 
-
-## Subset by context
-if(opt$context != 'all') {
-    if(opt$context == 'nonCG') {
-        BSobj <- BSobj[rowRanges(BSobj)$c_context != 'CG', ]
-    } else {
-        BSobj <- BSobj[rowRanges(BSobj)$c_context == opt$context, ]
-    }
-}
 print('Final number of bases of interest')
 nrow(BSobj)
+
+# > gr <- rowRanges(BSobj)
+# > gr2 <- sort(gr, ignore.strand = TRUE)
+# > identical(start(gr), start(gr2))
+# [1] FALSE
+# > identical(start(gr2[strand(gr2) == '+']), start(gr[strand(gr) == '+']))
+# [1] TRUE
+# >
+# > identical(start(gr2[strand(gr2) == '-']), start(gr[strand(gr) == '-']))
+# [1] TRUE
+
+## Sort by chr position ignoring the strand
+message(paste(Sys.time(), 'sorting by chr position'))
+BSobj <- sort(BSobj, ignore.strand = TRUE)
 
 gr <- rowRanges(BSobj)
 

@@ -14,6 +14,19 @@ do
 
     chr="chr${chrnum}"
     
+    if [[ "$chrnum" == "1" ]]
+    then
+        MEM=90
+    elif [[ "$chrnum" == "2" ]] || [[ "$chrnum" == "3" ]]
+    then
+        MEM=80
+    elif [[ "$chrnum" == "4" ]]
+    then
+        MEM=70
+    else
+        MEM=60
+    fi
+    
     for context in nonCG CG CHG CHH
     do
 
@@ -21,11 +34,11 @@ do
     SHORT="acf_${chr}_context_${context}"
 
     # Construct shell file
-    echo "Creating script for chromosome ${chr}"
+    echo "Creating script for chromosome ${chr} with ${MEM}G of RAM"
     cat > .${SHORT}.sh <<EOF
 #!/bin/bash
 #$ -cwd
-#$ -l bluejay,mem_free=70G,h_vmem=70G,h_fsize=100G
+#$ -l bluejay,mem_free=${MEM}G,h_vmem=${MEM}G,h_fsize=100G
 #$ -N ${SHORT}
 #$ -o ./logs/${SHORT}.txt
 #$ -e ./logs/${SHORT}.txt
