@@ -16,15 +16,12 @@ do
     
     if [[ "$chrnum" == "1" ]]
     then
-        MEM=90
+        MEM=80
     elif [[ "$chrnum" == "2" ]] || [[ "$chrnum" == "3" ]]
     then
-        MEM=80
-    elif [[ "$chrnum" == "4" ]]
-    then
-        MEM=70
+        MEM=75
     else
-        MEM=60
+        MEM=55
     fi
     
     for context in nonCG CG CHG CHH
