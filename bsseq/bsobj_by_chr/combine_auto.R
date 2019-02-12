@@ -2,6 +2,7 @@ library('devtools')
 library('ggplot2')
 
 files <- dir('rda', pattern = '^auto_long_chr')
+stopifnot(length(files) == 100)
 
 load_auto <- function(f) {
     chr <- gsub('_.*', '', gsub('auto_long_', '', f))
