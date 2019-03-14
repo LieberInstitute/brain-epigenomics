@@ -1,5 +1,6 @@
 # Download data for use with LDSC (https://github.com/bulik/ldsc)
 # Code adapted from Peter Hickey (https://github.com/hansenlab/BrainEpigenomeNN/blob/master/SLDSR/scripts/download-and-munge.sh)
+# Using the older MDD and bipolar GWAS data to be directly comparable to their Nat Neuro (2019) results
 
 # qsub -cwd -l bluejay,mem_free=10G,h_vmem=10G,h_fsize=50G -o ./logs/ -e ./logs/ download-and-munge.sh
 
@@ -319,32 +320,38 @@ tar xvfz ${PHASE1}/baseline_bedfiles.tgz -C ${PHASE1}
 # ------------------------------------------------------------------------------
 # Psychiatric disorders
 #
+LDSC="/users/aprice26/biotools/ldsc"
+
+PHASE1="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1"
+GWASSS="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats"
+MUNGEDSS="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats"
+
 
 # ADHD - PGC-ADD2 (June 2017)
 # NOTE: --N-cas/--N-con based on Table 1 of Anttila et al. (2017)
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/adhd_jul2017 \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/ADHD \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/adhd_jul2017 \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/ADHD \
   --N-cas 12645 \
   --N-con 84435 \
   --a1-inc
 
 # Anorexia nervosa - PGC-ED
 # NOTE: --N-cas/--N-con based on Table 1 of Anttila et al. (2017)
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/pgc.ed.freeze1.summarystatistics.July2017.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Anorexia_nervosa \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/pgc.ed.freeze1.summarystatistics.July2017.txt \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Anorexia_nervosa \
   --N-cas 3495 \
   --N-con 11105
 
 # Anxiety disorder - ANGST
 # NOTE: --N-cas/--N-con based on Table 1 of Anttila et al. (2017)
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/anxiety.meta.full.cc.tbl \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Anxiety_disorder \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/anxiety.meta.full.cc.tbl \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Anxiety_disorder \
   --N-cas 5761  \
   --N-con 11765
 
@@ -352,12 +359,12 @@ python ${LDSC}/munge_sumstats.py \
 # NOTE: --N-cas/--N-con based on Table 1 of Anttila et al. (2017)
 # NOTE: Inferred column names from data-release_Jun2017.readme
 echo -e "chr\tbp_hg19\tsnp\ta1\ta2\tor\tlb95\tub95\teffect\tse\tp\tfrq_a1\tinfo\tN\tdirection" | \
-    cat - ${GWASSS}/daner_AUT_meta14_CEU_all.hg19.Mar2016_info_0.60_maf_0.05_release_Jun2017.tsv > \
+    cat - /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/daner_AUT_meta14_CEU_all.hg19.Mar2016_info_0.60_maf_0.05_release_Jun2017.tsv > \
     tmp.tsv
-python ${LDSC}/munge_sumstats.py \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
   --sumstats tmp.tsv \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Autism_spectrum_disorder \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Autism_spectrum_disorder \
   --N-cas 6197  \
   --N-con 7377 \
   --signed-sumstats or,1
@@ -365,36 +372,36 @@ rm tmp.tsv
 
 # Bipolar disorder (older version)
 # NOTE: --N 16731 based on Supplementary Table 3 of Finucane et al.
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/pgc.bip.full.2012-04.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Bipolar_disorder \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/pgc.bip.full.2012-04.txt \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Bipolar_disorder \
   --N 16731
 
 # Major depressive disorder (older)
 # NOTE: --N-cas/--N-con based on abstract of doi: 10.1038/mp.2012.21
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/pgc.mdd.full.2012-04.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Major_depressive_disorder \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/pgc.mdd.full.2012-04.txt \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Major_depressive_disorder \
   --N-cas 9240 \
   --N-con 9519
 
 # PTSD - PGC-PTSD
 # NOTE: --N-cas/--N-con based on Table 1 of Anttila et al. (2017)
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/SORTED_PTSD_EA9_AA7_LA1_SA2_ALL_study_specific_PCs1.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/PTSD \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/SORTED_PTSD_EA9_AA7_LA1_SA2_ALL_study_specific_PCs1.txt \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/PTSD \
   --N-cas 2424 \
   --N-con 7113
 
 # Schizophrenia - PGC-SCZ2
 # NOTE: --N-cas/--N-con based on Table 1 of Anttila et al. (2017)
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/ckqny.scz2snpres \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Schizophrenia \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/ckqny.scz2snpres \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Schizophrenia \
   --N-cas 33640 \
   --N-con 43456
 
@@ -404,67 +411,67 @@ python ${LDSC}/munge_sumstats.py \
 
 # Alzheimer's disease
 # NOTE: --N-cas/--N-con based on Table 1 of Anttila et al. (2017)
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/IGAP_stage_1.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Alzheimers_disease \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/IGAP_stage_1.txt \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Alzheimers_disease \
   --N-cas 17008 \
   --N-con 37154
 
 # Epilepsy and subtypes, focal and generalized - ILAE
 # NOTE: --N-cas/--N-con based on Table 1 of Anttila et al. (2017)
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/ILAE_All_Epi_11.8.14.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Epilepsy \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/ILAE_All_Epi_11.8.14.txt \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Epilepsy \
   --N-cas 7779 \
   --N-con 20439
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/ILAE_Focal_5.8.14.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Focal_epilepsy \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/ILAE_Focal_5.8.14.txt \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Focal_epilepsy \
   --N-cas 4601 \
   --N-con 17985
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/ILAE_GGE_5.8.14.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Generalized_epilepsy \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/ILAE_GGE_5.8.14.txt \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Generalized_epilepsy \
   --N-cas 2525 \
   --N-con 16244
 
 # Intracerebral hemorrhage
 # NOTE: --N-cas/--N-con based on Table 1 of Anttila et al. (2017)
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/ICH_GWAS_phase1_finalresults_allICH \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Intracarebral_hemorrhage \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/ICH_GWAS_phase1_finalresults_allICH \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Intracarebral_hemorrhage \
   --N-cas 1545 \
   --N-con 1481
 
 # Ischemic stroke and subtypes (cardioembolic, early-onset, small-vessel and large-vessel)
 # NOTE: --N-cas/--N-con based on Table 1 of Anttila et al. (2017)
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/metastroke.all.chr.bp \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Ischemic_stroke \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/METAANALYSIS1_IS.TBL \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Ischemic_stroke \
   --N-cas 10307 \
   --N-con 19326
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/metastroke.ce.chr.bp \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Cardioembolic_stroke \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/METAANALYSIS1_CE.TBL \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Cardioembolic_stroke \
   --N-cas 1859 \
   --N-con 17708
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/metastroke.lvd.chr.bp \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Large-vessel_disease \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/METAANALYSIS1_LVD.TBL \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Large-vessel_disease \
   --N-cas 1817 \
   --N-con 17708
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/metastroke.svd.chr.bp \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Small-vessel_disease \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/METAANALYSIS1_SVD.TBL \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Small-vessel_disease \
   --N-cas 1349 \
   --N-con 19326
 
@@ -474,23 +481,23 @@ python ${LDSC}/munge_sumstats.py \
 
 # College attainment, years of education - SSGAC
 # NOTE: --N based on Table 2 of Anttila et al. (2017)
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/SSGAC_College_Rietveld2013_publicrelease.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/College_attainment \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/SSGAC_College_Rietveld2013_publicrelease.txt \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/College_attainment \
   --N 120917
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/SSGAC_EduYears_Rietveld2013_publicrelease.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Years_of_education \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/SSGAC_EduYears_Rietveld2013_publicrelease.txt \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Years_of_education \
   --N 293723
 
 # Childhood cognitive performance - SSGAC
 # NOTE: --N based on Table 2 of Anttila et al. (2017)
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/CHIC_Summary_Benyamin2014.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Childhood_cognitive_performance \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/CHIC_Summary_Benyamin2014.txt \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Childhood_cognitive_performance \
   --N 17989 \
   --signed-sumstats EFFECT_A1,0 \
   --frq FREQ_A1
@@ -499,48 +506,48 @@ python ${LDSC}/munge_sumstats.py \
 # NOTE: --N based on Table 2 of Anttila et al. (2017)
 # NOTE: Inferred column names from ReadmeGPC-1.pdf
 echo -e "SNPID\tCHR\tBP\tA1\tA2\tBETA\tSE\tPVALUE\tINFO\tNCOH\tMAF" | \
-    cat - ${GWASSS}/GPC-1.NEO-EXTRAVERSION.full.txt > \
+    cat - /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/GPC-1.NEO-EXTRAVERSION.full.txt > \
     tmp.txt
-python ${LDSC}/munge_sumstats.py \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
   --sumstats tmp.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Extraversion \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Extraversion \
   --N 63030
 rm tmp.txt
 echo -e "SNPID\tCHR\tBP\tA1\tA2\tBETA\tSE\tPVALUE\tINFO\tNCOH\tMAF" | \
-    cat - ${GWASSS}/GPC-1.NEO-AGREEABLENESS.full.txt > \
+    cat - /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/GPC-1.NEO-AGREEABLENESS.full.txt > \
     tmp.txt
-python ${LDSC}/munge_sumstats.py \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
   --sumstats tmp.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Agreeableness \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Agreeableness \
   --N 17375
 rm tmp.txt
 echo -e "SNPID\tCHR\tBP\tA1\tA2\tBETA\tSE\tPVALUE\tINFO\tNCOH\tMAF" | \
-    cat - ${GWASSS}/GPC-1.NEO-CONSCIENTIOUSNESS.full.txt > \
+    cat - /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/GPC-1.NEO-CONSCIENTIOUSNESS.full.txt > \
     tmp.txt
-python ${LDSC}/munge_sumstats.py \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
   --sumstats tmp.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Conscientiousness \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Conscientiousness \
   --N 17375
 rm tmp.txt
 echo -e "SNPID\tCHR\tBP\tA1\tA2\tBETA\tSE\tPVALUE\tINFO\tNCOH\tMAF" | \
-    cat - ${GWASSS}/GPC-1.NEO-OPENNESS.full.txt > \
+    cat - /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/GPC-1.NEO-OPENNESS.full.txt > \
     tmp.txt
-python ${LDSC}/munge_sumstats.py \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
   --sumstats tmp.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Openness \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Openness \
   --N 17375
 rm tmp.txt
 
 # IQ - CTG
 # NOTE: --N based on Table 2 of Anttila et al. (2017)
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/sumstats.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/IQ \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/sumstats.txt \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/IQ \
   --N 78308 \
   --signed-sumstats Beta,0 \
   --a1 ref \
@@ -548,34 +555,34 @@ python ${LDSC}/munge_sumstats.py \
 
 # Neuroticism, depressive symptoms and subjective well-being - SSGAC
 # NOTE: --N based on Table 2 of Anttila et al. (2017)
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/Neuroticism_Full.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Neuroticism \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/Neuroticism_Full.txt \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Neuroticism \
   --N 170911
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/DS_Full.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Depressive_symptoms \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/DS_Full.txt \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Depressive_symptoms \
   --N 161460
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/SWB_Full.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Subjective_well-being \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/SWB_Full.txt \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Subjective_well-being \
   --N 298420
 
 # Never/ever smoked, cigarettes per day - TAG
 # NOTE: --N based on Table 2 of Anttila et al. (2017)
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/tag.evrsmk.tbl \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Ever_smoked \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/tag.evrsmk.tbl \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Ever_smoked \
   --N 74035 \
   --signed-sumstats OR,0
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/tag.cpd.tbl \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Cigarettes_per_day \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/tag.cpd.tbl \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Cigarettes_per_day \
   --N 38617 \
   --signed-sumstats OR,0
 
@@ -585,30 +592,30 @@ python ${LDSC}/munge_sumstats.py \
 
 # BMI - GIANT
 # NOTE: --N based on Table 2 of Anttila et al. (2017)
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/All_ancestries_SNP_gwas_mc_merge_nogc.tbl.uniq \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/BMI \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/All_ancestries_SNP_gwas_mc_merge_nogc.tbl.uniq \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/BMI \
   --N 339224
 
 # Height - GIANT
 # NOTE: --N based on Table 2 of Anttila et al. (2017)
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Height \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Height \
   --N 253288
 
 # Crohn’s disease - IIBDGC
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/EUR.CD.gwas_info03_filtered.assoc \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Crohns_disease \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/EUR.CD.gwas_info03_filtered.assoc \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Crohns_disease \
   --N 20883
 
 # Coronary artery disease - Cardiogram
-python ${LDSC}/munge_sumstats.py \
-  --sumstats ${GWASSS}/CARDIoGRAM_GWAS_RESULTS.txt \
-  --merge-alleles ${PHASE1}/w_hm3.snplist \
-  --out ${MUNGEDSS}/Coronary_artery_disease \
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/CARDIoGRAM_GWAS_RESULTS.txt \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Coronary_artery_disease \
   --N 86995
