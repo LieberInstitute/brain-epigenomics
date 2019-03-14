@@ -8,7 +8,7 @@
 #
 
 # NOTE: Need to manually specify path to ldsc directory
-LDSC="/users/aprice26/software/ldsc"
+LDSC="/users/aprice26/biotools/ldsc"
 
 PHASE1="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1"
 mkdir -p ${PHASE1}
