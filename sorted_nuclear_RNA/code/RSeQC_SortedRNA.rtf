@@ -1,0 +1,350 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf130
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 Menlo-Regular;\f2\fmodern\fcharset0 Courier;
+\f3\fnil\fcharset0 Menlo-Bold;\f4\fnil\fcharset0 Calibri;}
+{\colortbl;\red255\green255\blue255;\red26\green26\blue26;\red64\green11\blue217;}
+\margl1440\margr1440\vieww24200\viewh13980\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b\fs24 \cf0 # RSeQC: Calculate read mapping statistics
+\b0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf0 \CocoaLigature0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \CocoaLigature1 < NucleusVSCytosol/nuclearpilot/
+\f1\fs22 \CocoaLigature0 sortedBAMs.txt
+\f0\fs24 \CocoaLigature1  parallel -P12 bam_stat.py -i NucleusVSCytosol/nuclearpilot/\{\}.bam\
+\
+
+\b # RSeQC: Calculate gene body coverage
+\b0 \CocoaLigature0 \
+\pard\pardeftab720\sl316\partightenfactor0
+\cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf0 #For nuclear RNA pilot samples:
+\f0\fs24 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \CocoaLigature1 Index bam files:\
+< NucleusVSCytosol/nuclearpilot/
+\f1\fs22 \CocoaLigature0 sortedBAMs.txt
+\f0\fs24 \CocoaLigature1  parallel -P12 samtools index NucleusVSCytosol/nuclearpilot/\{\}.bam\
+\
+Gene Body Calculation:\
+\pard\pardeftab720\sl316\partightenfactor0
+\cf0 \expnd0\expndtw0\kerning0
+geneBody_coverage.py -r \kerning1\expnd0\expndtw0 \CocoaLigature0 hg19.RefSeq_gene.bed\expnd0\expndtw0\kerning0
+\CocoaLigature1  -i \kerning1\expnd0\expndtw0 NucleusVSCytosol/nuclearpilot/
+\f1\fs22 \CocoaLigature0 bampaths.txt
+\f0\fs24 \expnd0\expndtw0\kerning0
+\CocoaLigature1  -o 
+\f1\fs22 \kerning1\expnd0\expndtw0 \CocoaLigature0 rseqc_out/geneBody_coverage/NucVSCyt/
+\f0\fs24 NucRNAPilot\
+\
+#For merged BAMS from nuclear RNA Pilot:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \CocoaLigature1 Index bam files:\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf0 \CocoaLigature0 < NucleusVSCytosol/nuclearpilot/mergedBAMS.txt parallel -P6 
+\f0\fs24 \CocoaLigature1 samtools index
+\f1\fs22 \CocoaLigature0  NucleusVSCytosol/nuclearpilot/\{\}.bam\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \CocoaLigature1 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 Gene Body Calculation:\
+\pard\pardeftab720\sl316\partightenfactor0
+\cf0 \expnd0\expndtw0\kerning0
+geneBody_coverage.py -r \kerning1\expnd0\expndtw0 \CocoaLigature0 hg19.RefSeq_gene.bed\expnd0\expndtw0\kerning0
+\CocoaLigature1  -i \kerning1\expnd0\expndtw0 NucleusVSCytosol/nuclearpilot/merged\CocoaLigature0 Paths.txt\expnd0\expndtw0\kerning0
+\CocoaLigature1   -o 
+\f1\fs22 \kerning1\expnd0\expndtw0 \CocoaLigature0 rseqc_out/geneBody_coverage/NucVSCyt/
+\f0\fs24 NucRNAPilot\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\b \cf0 \CocoaLigature1 # RSeQC: Estimate how many reads are originated from ribosomal RNA\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\b0\fs22 \cf0 \CocoaLigature0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \CocoaLigature1 < NucleusVSCytosol/nuclearpilot/
+\f1\fs22 \CocoaLigature0 sortedBAMs.txt
+\f0\fs24 \CocoaLigature1  parallel -P12 
+\f2\fs26 \cf2 \expnd0\expndtw0\kerning0
+split_bam.py -i 
+\f0\fs24 \cf0 \kerning1\expnd0\expndtw0 NucleusVSCytosol/nuclearpilot/\{\}.bam 
+\f2\fs26 \cf2 \expnd0\expndtw0\kerning0
+-r 
+\f1\fs22 \cf0 \kerning1\expnd0\expndtw0 \CocoaLigature0 hg19_rRNA.bed
+\f2\fs26 \cf2 \expnd0\expndtw0\kerning0
+\CocoaLigature1  -o 
+\f1\fs22 \cf0 \kerning1\expnd0\expndtw0 \CocoaLigature0 rseqc_out/split_bam/NucVSCyt/\{\}
+\f0\b\fs24 \CocoaLigature1 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 # RSeQC: Calculate junction annotation\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\b0\fs22 \cf0 \CocoaLigature0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \CocoaLigature1 < NucleusVSCytosol/nuclearpilot/
+\f1\fs22 \CocoaLigature0 sortedBAMs.txt
+\f0\fs24 \CocoaLigature1  parallel -P12 
+\f2\fs26 \cf2 \expnd0\expndtw0\kerning0
+junction_annotation.py -i 
+\f0\fs24 \cf0 \kerning1\expnd0\expndtw0 NucleusVSCytosol/nuclearpilot/\{\}.bam -r 
+\f1\fs22 \CocoaLigature0 hg19.RefSeq_gene.bed -o rseqc_out/junction_annotation/NucVSCyt/\{\}
+\f2\fs26 \cf2 \expnd0\expndtw0\kerning0
+\CocoaLigature1 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \kerning1\expnd0\expndtw0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\b \cf0 # RSeQC: Calculate junction saturation\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\b0\fs22 \cf0 \CocoaLigature0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \CocoaLigature1 < NucleusVSCytosol/nuclearpilot/
+\f1\fs22 \CocoaLigature0 sortedBAMs.txt
+\f0\fs24 \CocoaLigature1  parallel -P12 
+\f2\fs26 \cf2 \expnd0\expndtw0\kerning0
+junction_saturation.py -i 
+\f0\fs24 \cf0 \kerning1\expnd0\expndtw0 NucleusVSCytosol/nuclearpilot/\{\}.bam -r 
+\f1\fs22 \CocoaLigature0 hg19.RefSeq_gene.bed -o rseqc_out/junction_saturation/NucVSCyt/\{\}
+\f2\fs26 \cf2 \expnd0\expndtw0\kerning0
+\CocoaLigature1 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \kerning1\expnd0\expndtw0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\b \cf0 # RSeQC: Calculate read duplication\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\b0 \cf0 < NucleusVSCytosol/nuclearpilot/
+\f1\fs22 \CocoaLigature0 sortedBAMs.txt
+\f0\fs24 \CocoaLigature1  parallel -P12 
+\f2\fs26 \cf2 \expnd0\expndtw0\kerning0
+read_duplication.py -i 
+\f0\fs24 \cf0 \kerning1\expnd0\expndtw0 NucleusVSCytosol/nuclearpilot/\{\}.bam 
+\f1\fs22 \CocoaLigature0 -o rseqc_out/
+\f3\b \cf3 read_duplication
+\f1\b0 \cf0 /NucVSCyt/\{\}
+\f0\b\fs24 \CocoaLigature1 \
+\
+# RSeQC: Calculate read GC content\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\b0 \cf0 < NucleusVSCytosol/nuclearpilot/
+\f1\fs22 \CocoaLigature0 sortedBAMs.txt
+\f0\fs24 \CocoaLigature1  parallel -P12 
+\f2\fs26 \cf2 \expnd0\expndtw0\kerning0
+read_GC.py -i 
+\f0\fs24 \cf0 \kerning1\expnd0\expndtw0 NucleusVSCytosol/nuclearpilot/\{\}.bam 
+\f1\fs22 \CocoaLigature0 -o rseqc_out/read_GC/NucVSCyt/\{\}
+\f0\b\fs24 \CocoaLigature1 \
+\
+# RSeQC: Calculate Transcript Integrity Number (TIN)\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f2\b0\fs26 \cf2 \expnd0\expndtw0\kerning0
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \kerning1\expnd0\expndtw0 < NucleusVSCytosol/nuclearpilot/
+\f1\fs22 \CocoaLigature0 sortedBAMs.txt
+\f0\fs24 \CocoaLigature1  parallel -P12 
+\f2\fs26 \cf2 \expnd0\expndtw0\kerning0
+tin.py -i 
+\f0\fs24 \cf0 \kerning1\expnd0\expndtw0 NucleusVSCytosol/nuclearpilot/\{\}.bam -r 
+\f1\fs22 \CocoaLigature0 hg19.RefSeq_gene.bed \
+
+\f0\b\fs24 \CocoaLigature1 \
+#RSeQC: Calculate Read Distribution\
+\
+
+\b0 < NucleusVSCytosol/nuclearpilot/
+\f1\fs22 \CocoaLigature0 sortedBAMs.txt
+\f0\fs24 \CocoaLigature1  parallel -P12 
+\f2\fs26 \cf2 \expnd0\expndtw0\kerning0
+read_distribution.py  -i 
+\f0\fs24 \cf0 \kerning1\expnd0\expndtw0 NucleusVSCytosol/nuclearpilot/\{\}.bam
+\f2\fs26 \cf2 \expnd0\expndtw0\kerning0
+ -r 
+\f1\fs22 \cf0 \kerning1\expnd0\expndtw0 \CocoaLigature0 hg19.RefSeq_gene.bed 
+\f4\fs26 \expnd0\expndtw0\kerning0
+\CocoaLigature1 ">" 
+\f1\fs22 \kerning1\expnd0\expndtw0 \CocoaLigature0 rseqc_out/read_distribution/NucVSCyt/NucRNAPilot/\{\}.dist.txt
+\f2\fs26 \cf2 \expnd0\expndtw0\kerning0
+\CocoaLigature1 \
+
+\f0\b\fs24 \cf0 \kerning1\expnd0\expndtw0 \
+
+\b0 < NucleusVSCytosol/nuclearpilot/
+\f1\fs22 \CocoaLigature0 mergedBAMS.txt
+\f0\fs24 \CocoaLigature1  parallel -P6 
+\f2\fs26 \cf2 \expnd0\expndtw0\kerning0
+read_distribution.py  -i 
+\f0\fs24 \cf0 \kerning1\expnd0\expndtw0 NucleusVSCytosol/nuclearpilot/\{\}.bam
+\f2\fs26 \cf2 \expnd0\expndtw0\kerning0
+ -r 
+\f1\fs22 \cf0 \kerning1\expnd0\expndtw0 \CocoaLigature0 hg19.RefSeq_gene.bed 
+\f4\fs26 \expnd0\expndtw0\kerning0
+\CocoaLigature1 ">" 
+\f1\fs22 \kerning1\expnd0\expndtw0 \CocoaLigature0 rseqc_out/read_distribution/NucVSCyt/NucRNAPilot/\{\}.dist.txt
+\f0\b\fs24 \CocoaLigature1 \
+\
+# RSeQC: Calculate RNA Fragment Size\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\b0 \cf0 < NucleusVSCytosol/nuclearpilot/
+\f1\fs22 \CocoaLigature0 sortedBAMs.txt
+\f0\fs24 \CocoaLigature1  parallel -P12 
+\f2\fs26 \cf2 \expnd0\expndtw0\kerning0
+RNA_fragment_size.py -i 
+\f0\fs24 \cf0 \kerning1\expnd0\expndtw0 NucleusVSCytosol/nuclearpilot/\{\}.bam 
+\f2\fs26 \cf2 \expnd0\expndtw0\kerning0
+-r 
+\f1\fs22 \cf0 \kerning1\expnd0\expndtw0 \CocoaLigature0 hg19.RefSeq_gene.bed
+\f2\fs26 \cf2 \expnd0\expndtw0\kerning0
+\CocoaLigature1  \'93>\'94 
+\f1\fs22 \cf0 \kerning1\expnd0\expndtw0 \CocoaLigature0 rseqc_out/RNA_fragment_size/NucRNAPilot
+\f2\fs26 \cf2 \expnd0\expndtw0\kerning0
+\CocoaLigature1 \{\}.fragSize
+\f0\b\fs24 \cf0 \kerning1\expnd0\expndtw0 \
+\
+# Use Samtools to merge bam files\
+\
+
+\b0 samtools merge 12_NeuN_Minus.bam \CocoaLigature0 Sample12_NeuN_Minus_PolyA.bam Sample12_NeuN_Minus_RiboGone.bam\CocoaLigature1  &
+\b \
+
+\b0 samtools merge 12_NeuN_Plus.bam \CocoaLigature0 Sample12_NeuN_\CocoaLigature1 Plus\CocoaLigature0 _PolyA.bam Sample12_NeuN_\CocoaLigature1 Plus\CocoaLigature0 _RiboGone.bam\CocoaLigature1  &\
+samtools merge 13_NeuN_Minus.bam \CocoaLigature0 Sample13_NeuN_Minus_PolyA.bam Sample13_NeuN_Minus_RiboGone.bam\CocoaLigature1  &\
+samtools merge 13_NeuN_Plus.bam \CocoaLigature0 Sample13_NeuN_\CocoaLigature1 Plus\CocoaLigature0 _PolyA.bam Sample13_NeuN_\CocoaLigature1 Plus\CocoaLigature0 _RiboGone.bam\CocoaLigature1  &\
+samtools merge 14_NeuN_Minus.bam \CocoaLigature0 Sample14_NeuN_Minus_PolyA.bam Sample14_NeuN_Minus_RiboGone.bam\CocoaLigature1  &\
+samtools merge 14_NeuN_Plus.bam \CocoaLigature0 Sample14_NeuN_\CocoaLigature1 Plus\CocoaLigature0 _PolyA.bam Sample14_NeuN_\CocoaLigature1 Plus\CocoaLigature0 _RiboGone.bam
+\b \CocoaLigature1 \
+\
+# Use Samtools to generate stats about bam files\
+
+\b0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf0 \CocoaLigature0 < NucleusVSCytosol/nuclearpilot/sortedBAMs.txt parallel -P12 samtools idxstats NucleusVSCytosol/nuclearpilot/\{\}.bam ">" \{\}.idxstats
+\f0\b\fs24 \CocoaLigature1 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\b0 \cf0 \
+For rRNA bams:\
+< NucleusVSCytosol/nuclearpilot/
+\f1\fs22 \CocoaLigature0 sortedBAMs.txt
+\f0\fs24 \CocoaLigature1  parallel -P12
+\f4\fs26 \expnd0\expndtw0\kerning0
+ samtools flagstat 
+\f1\fs22 \kerning1\expnd0\expndtw0 \CocoaLigature0 rseqc_out/split_bam/NucVSCyt/\{\}.in.bam
+\f4\fs26 \expnd0\expndtw0\kerning0
+\CocoaLigature1  ">" 
+\f1\fs22 \kerning1\expnd0\expndtw0 \CocoaLigature0 rseqc_out/samtools_flagstat/NucVSCyt/
+\f4\fs26 \expnd0\expndtw0\kerning0
+\CocoaLigature1 \{\}.in.flagstat\
+For 1-rRNA bams:
+\f0\fs24 \kerning1\expnd0\expndtw0 \
+< NucleusVSCytosol/nuclearpilot/
+\f1\fs22 \CocoaLigature0 sortedBAMs.txt
+\f0\fs24 \CocoaLigature1  parallel -P12
+\f4\fs26 \expnd0\expndtw0\kerning0
+ samtools flagstat 
+\f1\fs22 \kerning1\expnd0\expndtw0 \CocoaLigature0 rseqc_out/split_bam/NucVSCyt/\{\}.ex.bam
+\f4\fs26 \expnd0\expndtw0\kerning0
+\CocoaLigature1  ">" 
+\f1\fs22 \kerning1\expnd0\expndtw0 \CocoaLigature0 rseqc_out/samtools_flagstat/NucVSCyt/
+\f4\fs26 \expnd0\expndtw0\kerning0
+\CocoaLigature1 \{\}.ex.flagstat\
+For total, pre-split bam:
+\f0\b\fs24 \kerning1\expnd0\expndtw0 \
+
+\b0 < NucleusVSCytosol/nuclearpilot/
+\f1\fs22 \CocoaLigature0 sortedBAMs.txt
+\f0\fs24 \CocoaLigature1  parallel -P12
+\f4\fs26 \expnd0\expndtw0\kerning0
+ samtools flagstat 
+\f0\fs24 \kerning1\expnd0\expndtw0 NucleusVSCytosol/nuclearpilot/\{\}.bam
+\f4\fs26 \expnd0\expndtw0\kerning0
+ ">" 
+\f1\fs22 \kerning1\expnd0\expndtw0 \CocoaLigature0 rseqc_out/samtools_flagstat/NucVSCyt/
+\f4\fs26 \expnd0\expndtw0\kerning0
+\CocoaLigature1 \{\}.flagstat
+\f0\b\fs24 \kerning1\expnd0\expndtw0 \
+\
+
+\b0 Easier way to collate total reads from the flagstat output:
+\b \
+\pard\pardeftab720\partightenfactor0
+
+\f4\b0\fs26 \cf0 \expnd0\expndtw0\kerning0
+< 
+\f0\fs24 \kerning1\expnd0\expndtw0 NucleusVSCytosol/nuclearpilot/
+\f1\fs22 \CocoaLigature0 sortedBAMs.txt
+\f0\fs24 \CocoaLigature1  parallel -P12
+\f4\fs26 \expnd0\expndtw0\kerning0
+ more 
+\f1\fs22 \kerning1\expnd0\expndtw0 \CocoaLigature0 rseqc_out/samtools_flagstat/NucVSCyt/NucRNAPilot/
+\f4\fs26 \expnd0\expndtw0\kerning0
+\CocoaLigature1 \{\}.flagstat "|" grep total "|" cut -d'+' -f1 ">" 
+\f1\fs22 \kerning1\expnd0\expndtw0 \CocoaLigature0 rseqc_out/samtools_flagstat/NucVSCyt/NucRNAPilot/
+\f4\fs26 \expnd0\expndtw0\kerning0
+\CocoaLigature1 \{\}_total.txt;\
+< 
+\f0\fs24 \kerning1\expnd0\expndtw0 NucleusVSCytosol/nuclearpilot/
+\f1\fs22 \CocoaLigature0 sortedBAMs.txt
+\f0\fs24 \CocoaLigature1  parallel -P12
+\f4\fs26 \expnd0\expndtw0\kerning0
+ more 
+\f1\fs22 \kerning1\expnd0\expndtw0 \CocoaLigature0 rseqc_out/samtools_flagstat/NucVSCyt/NucRNAPilot/
+\f4\fs26 \expnd0\expndtw0\kerning0
+\CocoaLigature1 \{\}.in.flagstat "|" grep total "|" cut -d'+' -f1 ">" 
+\f1\fs22 \kerning1\expnd0\expndtw0 \CocoaLigature0 rseqc_out/samtools_flagstat/NucVSCyt/NucRNAPilot/
+\f4\fs26 \expnd0\expndtw0\kerning0
+\CocoaLigature1 \{\}.in_total.txt;\
+< 
+\f0\fs24 \kerning1\expnd0\expndtw0 NucleusVSCytosol/nuclearpilot/
+\f1\fs22 \CocoaLigature0 sortedBAMs.txt
+\f0\fs24 \CocoaLigature1  parallel -P12
+\f4\fs26 \expnd0\expndtw0\kerning0
+ more 
+\f1\fs22 \kerning1\expnd0\expndtw0 \CocoaLigature0 rseqc_out/samtools_flagstat/NucVSCyt/NucRNAPilot/
+\f4\fs26 \expnd0\expndtw0\kerning0
+\CocoaLigature1 \{\}.ex.flagstat "|" grep total "|" cut -d'+' -f1 ">" 
+\f1\fs22 \kerning1\expnd0\expndtw0 \CocoaLigature0 rseqc_out/samtools_flagstat/NucVSCyt/NucRNAPilot/
+\f4\fs26 \expnd0\expndtw0\kerning0
+\CocoaLigature1 \{\}.ex_total.txt
+\f0\b\fs24 \kerning1\expnd0\expndtw0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\b0\fs22 \cf0 \CocoaLigature0 paste *.txt > totalreads.txt\
+ls *.txt > samplenames.txt\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \CocoaLigature1 scp these files to desktop and put them together in the same excel file.
+\f1\fs22 \CocoaLigature0 \
+\
+< NucleusVSCytosol/sortedIDs.txt parallel -P12 more rseqc_out/read_duplication/NucVSCyt/\{\}.seq.DupRate.xls "|" grep -v Occurence "|" cut -f2 ">" rseqc_out/read_duplication/NucVSCyt/\{\}.seq.column.txt\
+paste *seq.column.txt > occurrence.seq.txt
+\f0\b\fs24 \CocoaLigature1 \
+}

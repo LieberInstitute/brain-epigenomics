@@ -30,9 +30,8 @@ elementNROWS(paperDMRs)
 
 ## Identify all CpG clusters in the genome
 
-gr <- granges(BSobj)
-cl = clusterMaker( chr = as.character(seqnames(gr)), 
-                   pos = start(gr),   maxGap = 1000)
+gr = granges(BSobj)
+cl = clusterMaker(chr = as.character(seqnames(gr)), pos = start(gr),   maxGap = 1000)
 gr.clusters = split(gr, cl)
 gr.clusters = unlist(range(gr.clusters))
 df.clusters = as.data.frame(gr.clusters)
@@ -110,9 +109,10 @@ df[grep(" mCG", df$PaperGroup), "PaperType"] = "mCG"
 df[grep("hmCG", df$PaperGroup), "PaperType"] = "hmCG"
 df$percentDMR = df$queryHits/df$queryLength * 100
 df$percentPaper = df$subjectHits/df$subjectLength * 100
-df[grep("GLU hypo GABA", df$PaperGroup), "PaperComparison"] = "GLU hypo GABA"
-df[grep("GABA hypo GLU", df$PaperGroup), "PaperComparison"] = "GABA hypo GLU"
-df[grep("OLIG hypo neuron", df$PaperGroup), "PaperComparison"] = "OLIG hypo neuron"
+df[grep("GLU hypo GABA", df$PaperGroup), "PaperComparison"] = "GLU < GABA"
+df[grep("GABA hypo GLU", df$PaperGroup), "PaperComparison"] = "GABA < GLU"
+df[grep("OLIG hypo neuron", df$PaperGroup), "PaperComparison"] = "OLIG < neuron"
+
 
 write.csv(df,file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_Kozlenkov_Dracheva_ScienceAdvances_2018_hydroxymeth_Overlap_Counts.csv", quote=F)
 
@@ -160,10 +160,11 @@ ggplot(df, aes(x = DMRgroup, y = percentDMR, fill=DMRgroup)) + geom_bar(stat = "
 dev.off()
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/figures/DMR_Kozlenkov_Dracheva_ScienceAdvances_2018_Overlap2.pdf",width=8,height=8)
-ggplot(df, aes(x = DMRgroup, y = percentDMR, fill=PaperType)) + geom_bar(stat = "identity",position="dodge") +
+ggplot(df, aes(x = DMRgroup, y = percentDMR, fill=PaperType)) + geom_bar(stat = "identity", position="dodge") +
   scale_fill_brewer(8, palette="Set1") + facet_grid(PaperComparison ~ .) +
-  labs(fill="") + ylab("Percent") + xlab("") +
+  labs(fill="") + ylab("Percent") + xlab("") + ylim(0,82) +
   ggtitle("Overlap with DMRs defined in Kozlenkov (2018)") +
+  geom_text(aes(label=queryHits), position=position_dodge(width=0.9), vjust=-0.25) +
   theme(title = element_text(size = 20), text = element_text(size = 20), legend.position = "bottom",
         legend.title = element_blank())
 dev.off()
