@@ -1,6 +1,7 @@
 # Download data for use with LDSC (https://github.com/bulik/ldsc)
 # Code adapted from Peter Hickey (https://github.com/hansenlab/BrainEpigenomeNN/blob/master/SLDSR/scripts/download-and-munge.sh)
 
+# qsub -cwd -l bluejay,mem_free=10G,h_vmem=10G,h_fsize=50G -o ./logs/ -e ./logs/ download-and-munge.sh
 
 # ------------------------------------------------------------------------------
 # Shell variables
