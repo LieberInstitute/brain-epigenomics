@@ -1,6 +1,6 @@
 # Run LDSC
-# Peter Hickey
-# 2017-11-21
+# code adapted from Peter Hickey
+
 
 ### =========================================================================
 ### SGE variables
@@ -9,19 +9,20 @@
 
 #$ -l mem_free=4G
 #$ -l h_vmem=4.1G
+#$ -l bluejay
 #$ -m n
 #$ -l h_fsize=500G
-#$ -l cegs
 #$ -pe local 10
 #$ -o ./logs/
 #$ -e ./logs/ 
+#$ -cwd
 
 ### =========================================================================
 ### Load modules
 ### -------------------------------------------------------------------------
 ###
 
-module load python/2.7.6
+source /users/aprice26/biotools/ENTER/bin/activate ldsc
 
 ### =========================================================================
 ### Run permutation script
