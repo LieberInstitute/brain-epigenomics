@@ -2,7 +2,6 @@
 # Code adapted from Peter Hickey (https://github.com/hansenlab/BrainEpigenomeNN/blob/master/SLDSR/scripts/run_LDScore_estimation.R)
 
 
-
 categories = readRDS("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/categories.rds")
 
 # NOTE: On JHPCE, requires `module load python/2.7.6`
@@ -23,14 +22,13 @@ message("category = ", names(categories)[i])
 ### LD Score estimation
 ###
 
-lapply(names(categories)[i], function(cn) {
+lapply(as.list(names(categories)), function(cn) {
   message(cn)
   mclapply(seqlevels, function(sl) {
     cmd <- paste0("python ",
                   "/users/aprice26/biotools/ldsc/ldsc.py ",
                   "--l2 ",
-                  "--bfile /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/1000G_plinkfiles/1000G.mac5eur.",
-                  sl, " ",
+                  "--bfile /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/1000G_plinkfiles/1000G.mac5eur.", sl, " ",
                   "--ld-wind-cm 1 ",
                   "--annot /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/annotation/", cn, ".Phase1.", sl, ".annot.gz ",
                   "--out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/", cn, ".Phase1.", sl, " ",
