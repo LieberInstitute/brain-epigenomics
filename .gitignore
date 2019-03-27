@@ -9,6 +9,7 @@ logs
 public_atacseq
 .Rproj.user
 ## Files to exclude now that the repo is public
+/misc/mCA_means_Ebert.R
 ATAC/
 CREs/DMV_results_summary.rtf
 CREs/PMD-results_summary.rtf
