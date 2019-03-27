@@ -47,24 +47,28 @@ df.clusters$regionID = paste0(df.clusters$seqnames,":",df.clusters$start,"-",df.
 df.clusters$rnum = 1:length(gr.clusters)
 
 DMRs <- c(list(
+  Celltype = unique(makeGRangesFromDataFrame(DMR$CellType[which(DMR$CellType$sig=="FWER < 0.05"),])),
+  Age = unique(makeGRangesFromDataFrame(DMR$Age[which(DMR$Age$sig=="FWER < 0.05"),])),
+  cdDMRs = dmrs,
   "Celltype_HypoNeuron" = unique(makeGRangesFromDataFrame(DMR$CellType[which(DMR$CellType$value<0 & DMR$CellType$sig=="FWER < 0.05"),])),
   "Celltype_HypoGlia" = unique(makeGRangesFromDataFrame(DMR$CellType[which(DMR$CellType$value>0 & DMR$CellType$sig=="FWER < 0.05"),])),
   "Age_Decreasing" = unique(makeGRangesFromDataFrame(DMR$Age[which(DMR$Age$value<0 & DMR$Age$sig=="FWER < 0.05"),])), 
   "Age_Increasing" = unique(makeGRangesFromDataFrame(DMR$Age[which(DMR$Age$value>0 & DMR$Age$sig=="FWER < 0.05"),]))),
   as.list(split(dmrs, dmrs$k6cluster_label)))
-names(DMRs)[5:10] = c("Gr1_cdDMRs", "Gr2_cdDMRs", "Gr3_cdDMRs", "Gr4_cdDMRs", "Gr5_cdDMRs", "Gr6_cdDMRs")
+names(DMRs)[8:13] = c("Gr1_cdDMRs", "Gr2_cdDMRs", "Gr3_cdDMRs", "Gr4_cdDMRs", "Gr5_cdDMRs", "Gr6_cdDMRs")
   
 non_DMRs <- subsetByOverlaps(gr.clusters, unlist(as(DMRs, "GRangesList")), invert = TRUE)
 
 set.seed(3000)
 
 nonDMR_subsets <- mclapply(
-  list(Celltype_HypoNeuron_nonDMRs = DMRs$Celltype_HypoNeuron, Celltype_HypoGlia_nonDMRs = DMRs$Celltype_HypoGlia, 
+  list(Celltype_nonDMRs = DMRs$Celltype, Age_nonDMRs = DMRs$Age, cdDMRs_nonDMRs = DMRs$cdDMRs, 
+       Celltype_HypoNeuron_nonDMRs = DMRs$Celltype_HypoNeuron, Celltype_HypoGlia_nonDMRs = DMRs$Celltype_HypoGlia, 
        Age_Decreasing_nonDMRs = DMRs$Age_Decreasing, Age_Increasing_nonDMR = DMRs$Age_Increasing,
        Gr1_nonDMRs = DMRs$Gr1_cdDMRs, Gr2_nonDMRs = DMRs$Gr2_cdDMRs, Gr3_nonDMRs = DMRs$Gr3_cdDMRs, 
        Gr4_nonDMRs = DMRs$Gr4_cdDMRs, Gr5_nonDMRs = DMRs$Gr5_cdDMRs, Gr6_nonDMRs = DMRs$Gr6_cdDMRs),
   function(drs) {
-    # Keep sampling until get non-DARs with about the same total width as DARs
+    # Keep sampling until get non-DMRs with about the same total width as DMRs
     tmp <- sample(non_DMRs, length(drs))
     while (sum(width(tmp)) < sum(width(drs))) {
       message(sum(width(drs)) - sum(width(tmp)))
@@ -101,6 +105,7 @@ LMRs <- list(Prenatal_LMRs = lapply(UMRLMRsegments.CG.100kb.pren, function(y) y[
 LMRs <- lapply(LMRs, function(x) reduce(unlist(as(x, "GRangesList"))))
 
 non_dLMRs <- lapply(LMRs, function(gr) subsetByOverlaps(gr, unlist(as(DMRs, "GRangesList")), invert = TRUE))
+names(LMRs) = c("Prenatal_LMRs_all", "Neuronal_LMRs_all", "Glial_LMRs_all")
 
 
 # Subset of chromHMM track with regulatory region-like states
@@ -123,8 +128,10 @@ chromHMM_regulatory_regions <- lapply(list_of_chromHMM, function(x) {
 chromHMM_regulatory_regions <- list(
   "chromHMM_union" = reduce(unlist(GRangesList(chromHMM_regulatory_regions))))
 
-non_differential_features <- c(non_dLMRs,
-                               chromHMM_regulatory_regions)
+chromHMM_union_reduced = list(chromHMM_union_reduced = subsetByOverlaps(chromHMM_regulatory_regions[[1]], unlist(as(DMRs, "GRangesList")), invert = TRUE))
+
+non_differential_features <- c(LMRs, non_dLMRs,
+                               chromHMM_regulatory_regions, chromHMM_union_reduced)
 
 
 # ------------------------------------------------------------------------------
@@ -148,24 +155,27 @@ CNS_BED <- unlist(GRangesList(mclapply(CNS_annot, function(x) {
                            x[["BP"]][e]))
 })))
 
+CNS_BED_red = list(CNS_reduced = subsetByOverlaps(CNS_BED, unlist(as(DMRs, "GRangesList")), invert = TRUE))
+
 # ------------------------------------------------------------------------------
 # List of all brain-derived features
 #
 
 categories <- c(our_differential_features,
                 non_differential_features,
-                list("CNS" = CNS_BED))
+                list("CNS" = CNS_BED), CNS_BED_red)
 stopifnot(all(sapply(categories, isDisjoint)))
 stopifnot(all(!grepl("\\.", names(categories))))
 
 saveRDS(categories, "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/categories.rds")
+write.table(data.frame(names(categories)), quote=F, row.names=F,col.names=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/LDSC/categories.txt")
 
 ### ============================================================================
 ### Make annotations
 ###
 
 # NOTE: Don't re-make the CNS annotation
-k <- grep("CNS", names(categories), invert = TRUE)
+k <- which(names(categories)!="CNS")
 mclapply(seqlevels, function(sl) {
   message(sl)
   cds <- read_tsv(
@@ -196,121 +206,3 @@ mclapply(seqlevels, function(sl) {
                           paste0("baseline.", sl, ".annot.gz")))
   write_tsv(x[, 1:5], paste0("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/annotation/base.Phase1.", sl, ".annot.gz"))
 }, mc.cores = getOption("mc.cores"))
-
-### ============================================================================
-### Complex set operation features
-###
-
-POS_CG_DMRs <- categories[["POS_CG-DMRs"]]
-chromHMM <- categories[["chromHMM_union"]]
-CNS <- categories[["CNS"]]
-H3K27ac <- categories[["H3K27ac"]]
-
-intersect <- GenomicRanges::intersect
-union <- GenomicRanges::union
-setdiff <- GenomicRanges::setdiff
-
-# Brain only
-chromHMM_only <- setdiff(chromHMM, CNS_H3K27ac)
-CNS_only <- setdiff(CNS, chromHMM_H3K27ac)
-H3K27ac_only <- setdiff(H3K27ac, CNS_chromHMM)
-
-# 2+
-two_plus <- setdiff(
-  setdiff(
-    setdiff(union(CNS, union(H3K27ac, chromHMM)), chromHMM_only),
-    CNS_only),
-  H3K27ac_only)
-
-# POS_CG-DMRs
-CG_only <- setdiff(POS_CG_DMRs, union(chromHMM, union(CNS, H3K27ac)))
-CG_shared <- intersect(POS_CG_DMRs, union(chromHMM, union(CNS, H3K27ac)))
-
-# 2+ without CG_shared
-two_plus_no_CG <- setdiff(two_plus, CG_shared)
-
-# Brain only without CG_shared
-chromHMM_only_no_CG <- setdiff(chromHMM_only, CG_shared)
-CNS_only_no_CG <- setdiff(CNS_only, CG_shared)
-H3K27ac_only_no_CG <- setdiff(H3K27ac_only, CG_shared)
-
-complex_set_op_features <- list(CG_only = CG_only,
-                                CG_shared = CG_shared,
-                                chromHMM_only = chromHMM_only,
-                                H3K27ac_only = H3K27ac_only,
-                                CNS_only = CNS_only,
-                                two_plus = two_plus,
-                                two_plus_no_CG = two_plus_no_CG,
-                                chromHMM_only_no_CG = chromHMM_only_no_CG,
-                                CNS_only_no_CG = CNS_only_no_CG,
-                                H3K27ac_only_no_CG = H3K27ac_only_no_CG)
-saveRDS(complex_set_op_features, "../objects/complex_set_op_features.rds")
-
-# Make annotations
-mclapply(seqlevels, function(sl) {
-  message(sl)
-  cds <- read_tsv(
-    paste0("../extdata/Phase1/cell_type_groups/CNS.", sl,
-           ".annot.gz"))
-  cds_gr <- GRanges(paste0("chr", cds$CHR), IRanges(cds$BP, width = 1L))
-  annot <- cds[, c("CHR", "BP", "SNP", "CM")]
-  annot[names(complex_set_op_features)] <-
-    mclapply(names(complex_set_op_features), function(cn) {
-      stopifnot(isDisjoint(complex_set_op_features[[cn]]))
-      as.integer(overlapsAny(cds_gr, complex_set_op_features[[cn]]))
-    }, mc.cores = 4)
-  # 'Marginal' annotation file
-  mclapply(names(complex_set_op_features), function(n) {
-    fl <- paste0("../output/ldsc/", n, ".Phase1.", sl, ".annot")
-    write_tsv(annot[, c("CHR", "BP", "SNP", "CM", n)], fl)
-    gzip(fl, overwrite = TRUE)
-  }, mc.cores = 4)
-}, mc.cores = 10)
-
-### ============================================================================
-### Non-differential features without each differential feature
-###
-
-differential_features <- categories[c("POS_CG-DMRs", "POSvsNEG_CG-DMRs",
-                                      "CH-DMRs",
-                                      "POS_DARs", "POSvsNEG_DARs",
-                                      "POS_bigDARs", "POSvsNEG_bigDARs")]
-non_differential_features <- categories[c("CNS", "H3K27ac", "chromHMM_union")]
-
-n_df <- names(differential_features)
-names(n_df) <- n_df
-n_ndf <- names(non_differential_features)
-names(n_ndf) <- n_ndf
-ndf_excluding_df <- unlist(lapply(n_ndf, function(n1) {
-  ndf <- non_differential_features[[n1]]
-  lapply(n_df, function(n2) {
-    df <- differential_features[[n2]]
-    setdiff(ndf, df)
-  })
-}))
-names(ndf_excluding_df) <- gsub("\\.", "_excluding_", names(ndf_excluding_df))
-
-saveRDS(
-  ndf_excluding_df,
-  "../objects/non-differential_features_excluding_differential_features.rds")
-
-# Make annotations
-mclapply(seqlevels, function(sl) {
-  message(sl)
-  cds <- read_tsv(
-    paste0("../extdata/Phase1/cell_type_groups/CNS.", sl,
-           ".annot.gz"))
-  cds_gr <- GRanges(paste0("chr", cds$CHR), IRanges(cds$BP, width = 1L))
-  annot <- cds[, c("CHR", "BP", "SNP", "CM")]
-  annot[names(ndf_excluding_df)] <-
-    mclapply(names(ndf_excluding_df), function(cn) {
-      stopifnot(isDisjoint(ndf_excluding_df[[cn]]))
-      as.integer(overlapsAny(cds_gr, ndf_excluding_df[[cn]]))
-    }, mc.cores = 4)
-  # 'Marginal' annotation file
-  mclapply(names(ndf_excluding_df), function(n) {
-    fl <- paste0("../output/ldsc/", n, ".Phase1.", sl, ".annot")
-    write_tsv(annot[, c("CHR", "BP", "SNP", "CM", n)], fl)
-    gzip(fl, overwrite = TRUE)
-  }, mc.cores = 4)
-}, mc.cores = 10)

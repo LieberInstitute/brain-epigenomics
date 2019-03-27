@@ -6,15 +6,16 @@
 ### -------------------------------------------------------------------------
 ###
 
-#$ -l mem_free=6G
-#$ -l h_vmem=6.1G
+#$ -l mem_free=2G
+#$ -l h_vmem=2.1G
 #$ -l h_fsize=500G
 #$ -l bluejay
+#$ -pe local 3
 #$ -o ./logs/
 #$ -e ./logs/ 
 #$ -cwd
 #$ -M amanda.joy.price@gmail.com
-#$ -t 1-36
+#$ -t 1-50
 
 
 ### =========================================================================
@@ -35,17 +36,13 @@ cn=$(awk "NR==$SGE_TASK_ID" $FILELIST)
 for gwas in ADHD Agreeableness Alzheimers_disease Anorexia_nervosa Anxiety_disorder Autism_spectrum_disorder Bipolar_disorder BMI Cardioembolic_stroke Childhood_cognitive_performance Cigarettes_per_day College_attainment Conscientiousness Coronary_artery_disease Crohns_disease Depressive_symptoms Epilepsy Ever_smoked Extraversion Focal_epilepsy Generalized_epilepsy Height Intracarebral_hemorrhage IQ Ischemic_stroke Large-vessel_disease Major_depressive_disorder Neuroticism Openness PTSD Schizophrenia Small-vessel_disease Subjective_well-being Years_of_education
 do
 
-if [ ! -e ${cn}.${gwas}.adjusting_for_CNS_LMRs_chromHMM.Phase1.results ]
+if [[ ! "${cn}" =~ ^(Prenatal_LMRs_all|Neuronal_LMRs_all|Glial_LMRs_all|Prenatal_LMRs|Neuronal_LMRs|Glial_LMRs|chromHMM_union|chromHMM_union_reduced|CNS|CNS_reduced)$ ]]
 then
-
-if [[ ! "${cn}" =~ ^(CNS|Prenatal_LMRs|Neuronal_LMRs|Glial_LMRs|chromHMM_union)$ ]]
-then
-
 
 python /users/aprice26/biotools/ldsc/ldsc.py \
 	--h2 /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/${gwas}.sumstats.gz \
         --w-ld-chr /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/weights_hm3_no_hla/weights. \
-	--ref-ld-chr /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/baseline/baseline.,/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/cell_type_groups/CNS.,/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/chromHMM_union.Phase1.,/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Prenatal_LMRs.Phase1.,/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Neuronal_LMRs.Phase1.,/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Glial_LMRs.Phase1.,/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/${cn}.Phase1. \
+	--ref-ld-chr /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/baseline/baseline.,/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/CNS_reduced.Phase1.,/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/chromHMM_union_reduced.Phase1.,/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Prenatal_LMRs.Phase1.,/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Neuronal_LMRs.Phase1.,/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Glial_LMRs.Phase1.,/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/${cn}.Phase1. \
         --overlap-annot \
         --frqfile-chr /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/1000G_frq/1000G.mac5eur. \
         --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/output/${cn}.${gwas}.adjusting_for_CNS_LMRs_chromHMM.Phase1 \
@@ -53,8 +50,6 @@ python /users/aprice26/biotools/ldsc/ldsc.py \
 
 else
 	echo Nothing to do for ${cn}
-
-fi
 
 fi
 

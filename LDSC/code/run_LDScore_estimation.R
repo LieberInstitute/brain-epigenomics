@@ -2,8 +2,6 @@
 # Code adapted from Peter Hickey (https://github.com/hansenlab/BrainEpigenomeNN/blob/master/SLDSR/scripts/run_LDScore_estimation.R)
 
 
-categories = readRDS("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/categories.rds")
-
 seqlevels = 1:22
 
 #------------------------------------------------------------------------------

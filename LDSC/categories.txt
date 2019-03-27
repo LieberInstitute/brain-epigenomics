@@ -1,3 +1,6 @@
+Celltype
+Age
+cdDMRs
 Celltype_HypoNeuron
 Celltype_HypoGlia
 Age_Decreasing
@@ -8,6 +11,12 @@ Gr3_cdDMRs
 Gr4_cdDMRs
 Gr5_cdDMRs
 Gr6_cdDMRs
+Celltype_nonDMRs_sameN
+Celltype_nonDMRs_sameWidth
+Age_nonDMRs_sameN
+Age_nonDMRs_sameWidth
+cdDMRs_nonDMRs_sameN
+cdDMRs_nonDMRs_sameWidth
 Celltype_HypoNeuron_nonDMRs_sameN
 Celltype_HypoNeuron_nonDMRs_sameWidth
 Celltype_HypoGlia_nonDMRs_sameN
@@ -29,8 +38,13 @@ Gr5_nonDMRs_sameWidth
 Gr6_nonDMRs_sameN
 Gr6_nonDMRs_sameWidth
 non_DMRs
+Prenatal_LMRs_all
+Neuronal_LMRs_all
+Glial_LMRs_all
 Prenatal_LMRs
 Neuronal_LMRs
 Glial_LMRs
 chromHMM_union
+chromHMM_union_reduced
 CNS
+CNS_reduced

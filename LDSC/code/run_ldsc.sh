@@ -6,15 +6,16 @@
 ### -------------------------------------------------------------------------
 ###
 
-#$ -l mem_free=6G
-#$ -l h_vmem=6.1G
+#$ -l mem_free=2G
+#$ -l h_vmem=2.1G
 #$ -l h_fsize=500G
 #$ -l bluejay
+#$ -pe local 3
 #$ -o ./logs/
 #$ -e ./logs/ 
 #$ -cwd
 #$ -M amanda.joy.price@gmail.com
-#$ -t 1-36
+#$ -t 1-50
 
 
 ### =========================================================================
@@ -36,7 +37,7 @@ cn=$(awk "NR==$SGE_TASK_ID" $FILELIST)
 for gwas in ADHD Agreeableness Alzheimers_disease Anorexia_nervosa Anxiety_disorder Autism_spectrum_disorder Bipolar_disorder BMI Cardioembolic_stroke Childhood_cognitive_performance Cigarettes_per_day College_attainment Conscientiousness Coronary_artery_disease Crohns_disease Depressive_symptoms Epilepsy Ever_smoked Extraversion Focal_epilepsy Generalized_epilepsy Height Intracarebral_hemorrhage IQ Ischemic_stroke Large-vessel_disease Major_depressive_disorder Neuroticism Openness PTSD Schizophrenia Small-vessel_disease Subjective_well-being Years_of_education
 do
 
-if [ ! -e ${cn}.${gwas}.Phase1.results ]
+if [ ! -e /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/output/${cn}.${gwas}.Phase1.results ]
 then
 
 if [ ${cn} == "CNS" ]
