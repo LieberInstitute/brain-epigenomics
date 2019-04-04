@@ -55,24 +55,37 @@ toplot = rbind(bp[1:4,], bp[which(bp$Description %in%
                                     c("gliogenesis","glial cell differentiation","regulation of I-kappaB kinase/NF-kappaB signaling","regulation of leukocyte mediated immunity")),])
 toplot$log10 = -log10(toplot$p.adjust)
 toplot = toplot[,colnames(toplot) !="geneID"]
-toplot$Description = factor(c("modulation of\nchemical synaptic transmission","regulation of\nsynaptic plasticity","regulation of\nmembrane potential",
-                       "regulation of\nneuron projection development","gliogenesis","glial cell differentiation","regulation of\nI-kappaB kinase/NF-kappaB signaling",
-                       "regulation of\nleukocyte mediated immunity"), levels = c("modulation of\nchemical synaptic transmission","regulation of\nsynaptic plasticity",
-                       "regulation of\nmembrane potential", "regulation of\nneuron projection development","gliogenesis","glial cell differentiation",
-                       "regulation of\nI-kappaB kinase/NF-kappaB signaling", "regulation of\nleukocyte mediated immunity"))
+toplot$Description = factor(c("Modulation of chemical synaptic transmission",
+                              "Regulation of synaptic plasticity",
+                              "Regulation of membrane potential",
+                              "Regulation of neuron projection development",
+                              "Gliogenesis","Glial cell differentiation",
+                              "Regulation of\nI-kappaB kinase/NF-kappaB signaling",
+                              "Regulation of leukocyte mediated immunity"), 
+                            levels = c("Modulation of chemical synaptic transmission",
+                                       "Regulation of synaptic plasticity",
+                                       "Regulation of membrane potential", 
+                                       "Regulation of neuron projection development",
+                                       "Gliogenesis","Glial cell differentiation",
+                                       "Regulation of\nI-kappaB kinase/NF-kappaB signaling", 
+                                       "Regulation of leukocyte mediated immunity"))
 toplot$Cluster = factor(toplot$Cluster, levels = c("Glial", "Neuronal"))
 
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/sorted_nuclear_RNA/figures/BP_byCellType_sortedNuclearRNA.pdf", width=12,height=8)
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/sorted_nuclear_RNA/figures/BP_byCellType_sortedNuclearRNA.pdf", width=9.5,height=5.25)
 ggplot(toplot, aes(x=Description, y =log10)) + scale_fill_brewer(8, palette="Dark2") + 
   geom_bar(stat = 'identity', aes(fill = Cluster), position = 'dodge', col = 'transparent') +
   geom_text(aes(label=GeneRatio), hjust=1.1, color="black", position = position_dodge(1), size=5) +
   coord_flip() +
   ylab("-log10(FDR)") + 
   xlab("") +
-  ggtitle("Biological Process Enrichment (Nuclear RNA)") + 
-  theme(title = element_text(size = 20)) +
-  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+  ggtitle("Biological Process Enrichment:\nBy Cell Type in Nuclear RNA") + 
+  theme(title = element_text(size = 20),
+        text = element_text(size = 20), 
+        legend.title=element_blank(),
+        legend.background = element_rect(fill = "transparent"),
+        legend.key = element_rect(fill = "transparent", color = "transparent"),
+        legend.position=c(0.8, 0.8))
 dev.off()
 
 

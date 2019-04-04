@@ -1,15 +1,17 @@
 library(GenomicRanges)
 library(bumphunter)
-library(RColorBrewer)
 library(jaffelab)
+library(scales)
+library(gplots)
+library(cowplot)
+library(RColorBrewer)
+
 
 
 # qrsh -l mem_free=150G,h_vmem=150G,h_fsize=200G
 
 load("/users/ajaffe/Lieber/Projects/RNAseq/n36/finalCode/gwasResults_lifted.rda")
 load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/BSobj_bsseqSmooth_Neuron_minCov_3.Rdata')
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/DMR_objects.rda")
-load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/bumphunting/rda/limma_Neuron_CpGs_minCov_3_ageInfo_dmrs.Rdata")
 
 pgc = read.delim("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/tableS3_Nature2014_pgc2_loci.txt",as.is=TRUE)
 pgc$chr = ss(pgc$Position..hg19.,":")
@@ -20,6 +22,7 @@ pgcGR = GRanges(pgc$chr, IRanges(pgc$start,pgc$end))
 pgcGR$Dx = "SCZ"
 
 gwas = c(as.list(split(gwasLift, gwasLift$Dx)), list(SCZ = pgcGR))
+names(gwas) = c("Alzheimer's Disease", "Parkinson's Disease", "Type II Diabetes", "Schizophrenia")
 
 
 # Identify all CpG clusters in the genome
@@ -31,82 +34,141 @@ gr.clusters = split(gr, cl)
 gr.clusters = unlist(range(gr.clusters))
 df.clusters = as.data.frame(gr.clusters)
 
+
 # Find overlaps with DMRS in all three models
 
-dmrs = split(dmrs, dmrs$k6cluster_label)
-names(dmrs) = c("Group 1 (G-N+)","Group 2 (G0N+)","Group 3 (G0N-)","Group 4 (G+N0)","Group 5 (G+N-)","Group 6 (G-N0)")
-oo = lapply(dmrs, function(x) findOverlaps(x, makeGRangesFromDataFrame(DMR$Interaction)))
-dmrs = lapply(oo, function(x) DMR$Interaction[subjectHits(x),])
-CT = split(DMR$CellType, DMR$CellType$Dir)
-names(CT) = c("Hypomethylated in Neurons", "Hypomethylated in Glia")
-DMRgr = lapply(c(CT, DMR[names(DMR)!="CellType"], dmrs), function(x) makeGRangesFromDataFrame(x[which(x$fwer<=0.05),], keep.extra.columns = T))
+brain_categories <- readRDS("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/categories.rds")
 
-oo = lapply(DMRgr, function(x) findOverlaps(gr.clusters, x))
+brain_categories_df <- data.frame(Category = names(brain_categories)[4:13],	
+                                  Extended = c("Cell Type (Glia > Neuron)", "Cell Type (Neuron > Glia)", 
+                                               "Age (Younger > Older)", "Age (Older > Younger)", 
+                                               "Group 1 (Decreasing Glial; Increasing Neuronal)", 
+                                               "Group 2 (Static Glial; Increasing Neuronal)", 
+                                               "Group 3 (Static Glial; Decreasing Neuronal)", 
+                                               "Group 4 (Increasing Glial; Static Neuronal)", 
+                                               "Group 5 (Increasing Glial; Decreasing Neuronal)", 
+                                               "Group 6 (Decreasing Glial; Static Neuronal)"))
+brain_categories = brain_categories[4:13]
+
+oo = lapply(brain_categories, function(x) findOverlaps(gr.clusters, x))
 lapply(oo, function(x) length(unique(queryHits(x))))
 
-Overlap = lapply(gwas, function(x) findOverlaps(x, gr.clusters))
+Overlap = lapply(gwas, function(x) findOverlaps(gr.clusters, x))
 
 df.clusters$regionID = paste0(df.clusters$seqnames,":",df.clusters$start,"-",df.clusters$end)
 df.clusters$rnum = 1:length(gr.clusters)
-df.clusters$"Hypomethylated in Neurons" = ifelse(df.clusters$rnum %in% queryHits(oo$"Hypomethylated in Neurons"), "yes","no")
-df.clusters$"Hypomethylated in Glia" = ifelse(df.clusters$rnum %in% queryHits(oo$"Hypomethylated in Glia"), "yes","no")
-df.clusters$Age = ifelse(df.clusters$rnum %in% queryHits(oo$Age), "yes","no")
-df.clusters$Interaction = ifelse(df.clusters$rnum %in% queryHits(oo$Interaction), "yes","no")
-df.clusters$`Group 1 (G-N+)` = ifelse(df.clusters$rnum %in% queryHits(oo$`Group 1 (G-N+)`), "yes","no")
-df.clusters$`Group 2 (G0N+)` = ifelse(df.clusters$rnum %in% queryHits(oo$`Group 2 (G0N+)`), "yes","no")
-df.clusters$`Group 3 (G0N-)` = ifelse(df.clusters$rnum %in% queryHits(oo$`Group 3 (G0N-)`), "yes","no")
-df.clusters$`Group 4 (G+N0)` = ifelse(df.clusters$rnum %in% queryHits(oo$`Group 4 (G+N0)`), "yes","no")
-df.clusters$`Group 5 (G+N-)` = ifelse(df.clusters$rnum %in% queryHits(oo$`Group 5 (G+N-)`), "yes","no")
-df.clusters$`Group 6 (G-N0)` = ifelse(df.clusters$rnum %in% queryHits(oo$`Group 6 (G-N0)`), "yes","no")
 
-df.clusters$Alz  = ifelse(df.clusters$rnum %in% subjectHits(Overlap$Alz), "yes","no")
-df.clusters$Park = ifelse(df.clusters$rnum %in% subjectHits(Overlap$Park), "yes","no")
-df.clusters$T2D  = ifelse(df.clusters$rnum %in% subjectHits(Overlap$T2D), "yes","no")
-df.clusters$SCZ  = ifelse(df.clusters$rnum %in% subjectHits(Overlap$SCZ), "yes","no")
+for (i in 1:length(brain_categories)) {
+  df.clusters[,names(brain_categories)[i]] = ifelse(df.clusters$rnum %in% queryHits(oo[[i]]), "yes","no")
+}
+
+for (i in 1:length(gwas)) {
+  df.clusters[,names(Overlap)[i]] = ifelse(df.clusters$rnum %in% queryHits(Overlap[[i]]), "yes","no")
+}
 
 
 ## make contingency tables
 
 tables = list(list(),list(),list(),list())
 for (j in 1:length(gwas)) {
-  for (i in 1:length(names(DMRgr))) {
-    tables[[j]][[i]] = data.frame(YesLocus = c(nrow(df.clusters[df.clusters[,colnames(df.clusters)==names(gwas)[j]]=="yes" & df.clusters[,colnames(df.clusters)==names(DMRgr)[i]]=="yes",]),
-                                      nrow(df.clusters[df.clusters[,colnames(df.clusters)==names(gwas)[j]]=="yes" & df.clusters[,colnames(df.clusters)==names(DMRgr)[i]]=="no",])),
-                           NoLocus = c(nrow(df.clusters[df.clusters[,colnames(df.clusters)==names(gwas)[j]]=="no" & df.clusters[,colnames(df.clusters)==names(DMRgr)[i]]=="yes",]),
-                                     nrow(df.clusters[df.clusters[,colnames(df.clusters)==names(gwas)[j]]=="no" & df.clusters[,colnames(df.clusters)==names(DMRgr)[i]]=="no",])), 
+  for (i in 1:length(names(brain_categories))) {
+    tables[[j]][[i]] = data.frame(YesLocus = c(nrow(df.clusters[df.clusters[,colnames(df.clusters)==names(gwas)[j]]=="yes" & 
+                                                                  df.clusters[,colnames(df.clusters)==names(brain_categories)[i]]=="yes",]),
+                                      nrow(df.clusters[df.clusters[,colnames(df.clusters)==names(gwas)[j]]=="yes" & 
+                                                         df.clusters[,colnames(df.clusters)==names(brain_categories)[i]]=="no",])),
+                           NoLocus = c(nrow(df.clusters[df.clusters[,colnames(df.clusters)==names(gwas)[j]]=="no" & 
+                                                          df.clusters[,colnames(df.clusters)==names(brain_categories)[i]]=="yes",]),
+                                     nrow(df.clusters[df.clusters[,colnames(df.clusters)==names(gwas)[j]]=="no" & 
+                                                        df.clusters[,colnames(df.clusters)==names(brain_categories)[i]]=="no",])), 
                            row.names = c("YesDMR","NoDMR"))
     }
-  names(tables[[j]]) = names(DMRgr)
+  names(tables[[j]]) = names(brain_categories)
   }
 names(tables) = names(gwas)
 
 fisher = lapply(tables, function(x) lapply(x, fisher.test))
-df = do.call(rbind, Map(cbind, GWAS = as.list(names(fisher)), Map(cbind, Model = lapply(fisher, names), lapply(fisher, function(x) do.call(rbind, lapply(x, function(y) data.frame(OR = y$estimate, pval = y$p.value)))))))
+df = do.call(rbind, Map(cbind, GWAS = as.list(names(fisher)), 
+                        Map(cbind, Model = lapply(fisher, names), 
+                            lapply(fisher, function(x) do.call(rbind, lapply(x, function(y) data.frame(OR = y$estimate, 
+                                                                                                       lower = y$conf.int[1],
+                                                                                                       upper = y$conf.int[2], 
+                                                                                                       pval = y$p.value)))))))
 df$fdr = p.adjust(df$pval, method= "fdr")
 rownames(df) = NULL
+df$Extended = brain_categories_df[match(df$Model, brain_categories_df$Category),"Extended"]
+
+ta = do.call(rbind, lapply(tables, function(x) do.call(rbind, lapply(x, function(y) data.frame(YesGWAS.YesDMR = y[1,1], 
+                                                                                               NoGWAS.YesDMR = y[1,2],
+                                                                                               YesGWAS.NoDMR = y[2,1], 
+                                                                                               NoGWAS.NoDMR = y[2,2])))))
+rownames(ta) = NULL
+df = cbind(df, ta)
 
 write.csv(df, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/GWAS_fisher_DMR_results.csv")
 
-df[df$fdr<=0.05,]
-#   GWAS                     Model        OR         pval          fdr
-#1   Alz Hypomethylated in Neurons  3.606411 6.724181e-04 2.988525e-03
-#11 Park Hypomethylated in Neurons  2.984641 1.034783e-03 3.595757e-03
-#12 Park    Hypomethylated in Glia  2.654812 8.673454e-04 3.469382e-03
-#13 Park                       Age 14.327692 9.131028e-03 2.282757e-02
-#14 Park               Interaction  5.468792 9.786045e-06 6.524030e-05
-#17 Park           Group 3 (G0,N-) 18.489768 1.364264e-06 1.091411e-05
-#20 Park           Group 6 (G-,N0)  8.619130 3.549918e-04 1.774959e-03
-#21  T2D Hypomethylated in Neurons  2.537779 7.750956e-03 2.066922e-02
-#22  T2D    Hypomethylated in Glia  4.438351 5.302595e-09 7.070127e-08
-#24  T2D               Interaction  4.045316 1.078727e-03 3.595757e-03
-#28  T2D           Group 4 (G+,N0) 32.255689 1.351645e-04 7.723688e-04
-#31  SCZ Hypomethylated in Neurons  2.908269 1.116321e-15 4.465282e-14
-#32  SCZ    Hypomethylated in Glia  1.407507 1.553310e-02 3.654848e-02
-#33  SCZ                       Age  4.222380 1.686004e-02 3.746675e-02
-#34  SCZ               Interaction  2.684525 2.125739e-07 2.125739e-06
-#37  SCZ           Group 3 (G0,N-)  7.867389 2.841518e-10 5.683037e-09
-#39  SCZ           Group 5 (G+,N-)  4.951127 1.736070e-03 5.341753e-03
-#40  SCZ           Group 6 (G-,N0)  2.770898 2.871673e-03 8.204779e-03
+df[df$fdr<=0.05,c("GWAS","Model","OR","fdr")]
+#   GWAS               Model        OR          fdr
+#1   Alz Celltype_HypoNeuron  3.606411 3.362091e-03
+#11 Park Celltype_HypoNeuron  2.984641 4.139130e-03
+#12 Park   Celltype_HypoGlia  2.654812 3.854868e-03
+#13 Park      Age_Decreasing 39.117463 4.936101e-03
+#17 Park          Gr3_cdDMRs 18.489768 1.364264e-05
+#20 Park          Gr6_cdDMRs  8.619130 2.366612e-03
+#21  T2D Celltype_HypoNeuron  2.537779 2.214559e-02
+#22  T2D   Celltype_HypoGlia  4.438351 7.070127e-08
+#28  T2D          Gr4_cdDMRs 32.255689 1.081316e-03
+#31  SCZ Celltype_HypoNeuron  2.908269 4.465282e-14
+#32  SCZ   Celltype_HypoGlia  1.407507 4.142161e-02
+#33  SCZ      Age_Decreasing 11.864517 2.877558e-03
+#37  SCZ          Gr3_cdDMRs  7.867389 5.683037e-09
+#39  SCZ          Gr5_cdDMRs  4.951127 5.786899e-03
+#40  SCZ          Gr6_cdDMRs  2.770898 8.835915e-03
+
+
+## Plot results
+
+df$sig = ifelse(df$fdr<=0.05, "Significant", "Not Significant")
+df$sig = factor(df$sig)
+df$Extended = factor(df$Extended, levels = c("Cell Type (Glia > Neuron)", "Cell Type (Neuron > Glia)",
+                                             "Age (Older > Younger)","Age (Younger > Older)",                          
+                                             "Group 1 (Decreasing Glial; Increasing Neuronal)",
+                                             "Group 2 (Static Glial; Increasing Neuronal)",    
+                                             "Group 3 (Static Glial; Decreasing Neuronal)",    
+                                             "Group 4 (Increasing Glial; Static Neuronal)",    
+                                             "Group 5 (Increasing Glial; Decreasing Neuronal)",
+                                             "Group 6 (Decreasing Glial; Static Neuronal)"))
+
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/figures/disease_GWAS_loci_enrichment_dotplot.pdf",
+    height = 2.5, width = 6)
+
+ggplot(data = df, aes(x = Extended, y = OR, col = Extended, shape = sig)) +
+  geom_point() + geom_pointrange(aes(ymin = lower, ymax = upper)) +
+  facet_grid(. ~ GWAS) +
+  theme_bw() + xlab("Feature") + ylab("Odds Ratio") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank()) +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_shape_manual(values = c(1, 16)) +
+  scale_size_manual(values = c(1, 2)) +
+  scale_colour_manual(values = c("#FC8D62","#66C2A5","#377EB8","#E41A1C",
+                                 "#1B9E77","#D95F02","#7570B3","#E7298A","#66A61E","#E6AB02")) +
+  guides(col = FALSE, shape = FALSE)
+ggplot(data = df, aes(x = Extended, y = log(OR), col = Extended, shape = sig)) +
+  geom_point() + geom_pointrange(aes(ymin = log(lower), ymax = log(upper))) +
+  facet_grid(. ~ GWAS) +
+  theme_bw() + xlab("Feature") + ylab("log(Odds Ratio)") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank()) +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_shape_manual(values = c(1, 16)) +
+  scale_size_manual(values = c(1, 2)) +
+  scale_colour_manual(values = c("#FC8D62","#66C2A5","#377EB8","#E41A1C",
+                                 "#1B9E77","#D95F02","#7570B3","#E7298A","#66A61E","#E6AB02")) +
+  guides(col = FALSE, shape = FALSE)
+dev.off()
+
+
 
 ## Test the genes within these loci
 

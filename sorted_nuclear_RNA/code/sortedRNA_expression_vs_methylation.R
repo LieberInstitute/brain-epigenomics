@@ -53,7 +53,7 @@ length(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR
 length(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR5") & cell$value!="NA" & cell$Coeff.CellTypeNeuron!="NA"), "Coeff.CellTypeNeuron"])
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/sorted_nuclear_RNA/figures/LFC_gene_expression_vs_meanBetadiff_byCellType.pdf", width = 9, height = 9)
-ggplot(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR5") & cell$value!="NA" & cell$Coeff.CellTypeNeuron!="NA"),], 
+ggplot(dtcell[which(dtcell$fwer<=0.05 & (dtcell$promoter=="Promoter" | dtcell$UTR5=="UTR5") & dtcell$value!="NA" & dtcell$Coeff.CellTypeNeuron!="NA"),,], 
        aes(x = value, y = Coeff.CellTypeNeuron)) + geom_point(alpha=1/10) +
   geom_smooth(method=lm) + theme_classic() +
   labs(fill="") +
@@ -137,6 +137,22 @@ ggplot(cell[which(cell$fwer<=0.05 & (cell$annotation=="CDS" | cell$annotation=="
   theme(title = element_text(size = 20)) +
   theme(text = element_text(size = 20))
 dev.off()
+
+pdf("./brain-epigenomics/sorted_nuclear_RNA/figures/LFC_expr_vs_meth_byCellType_forPoster.pdf", 
+    width = 5, height = 4.25)
+ggplot(dtcell[which(dtcell$fwer<=0.05 & (dtcell$promoter=="Promoter" | dtcell$UTR5=="UTR5") & 
+                      dtcell$value!="NA" & dtcell$Coeff.CellTypeNeuron!="NA"),,], 
+       aes(x = value, y = Coeff.CellTypeNeuron)) + geom_point(alpha=1/10) +
+  geom_smooth(method=lm) + theme_classic() +
+  labs(fill="") +
+  geom_hline(yintercept=0, linetype="dashed", color = "gray") +
+  geom_vline(xintercept=0, linetype="dashed", color = "gray") +
+  ylab("Log2(Fold Change)\nGene Expression") + 
+  xlab("Mean Difference in Methylation") +
+  theme(title = element_text(size = 20)) +
+  theme(text = element_text(size = 20))
+dev.off()
+
 
 # make contingency tables of quadrants of the above plots
 tables = list(Prom.5UTR = data.frame(c(nrow(cell[which(cell$fwer<=0.05 & (cell$promoter=="Promoter" | cell$UTR5=="UTR5") & cell$Coeff.CellTypeNeuron>0 & cell$value<0),]),

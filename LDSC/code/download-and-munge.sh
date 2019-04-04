@@ -8,6 +8,8 @@
 # Shell variables
 #
 
+source /users/aprice26/biotools/ENTER/bin/activate ldsc
+
 # NOTE: Need to manually specify path to ldsc directory
 LDSC="/users/aprice26/biotools/ldsc"
 
@@ -85,6 +87,12 @@ wget -O ${PHASE1}/1000G_Phase1_plinkfiles.tgz \
 # copied to ${GWASSS}
 # Filename: daner_AUT_meta14.hg19.Mar2016_info_0.60_maf_0.05_release_Jun2017.tar.gz
 # MD5 Checksum: 08d87fa42c7e926533f6a749be677705
+
+# Autism spectrum disorders - iPSYCH (2019)
+# Downloaded manually from http://www.med.unc.edu/pgc/results-and-downloads and
+# copied to ${GWASSS}
+# Filename: iPSYCH-PGC_ASD_Nov2017.gz
+# MD5 Checksum: 5ca46780db3b37038bd02bd20c38c85c
 
 # Bipolar disorder - PGC-BIP2
 # Downloaded manually from http://www.med.unc.edu/pgc/results-and-downloads
@@ -306,6 +314,10 @@ gzip -d ${GWASSS}/All_ancestries_SNP_gwas_mc_merge_nogc.tbl.uniq.gz
 gzip -d ${GWASSS}/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz
 tar xvfz ${GWASSS}/iibdgc-trans-ancestry-filtered-summary-stats.tgz -C ${GWASSS}
 unzip -d ${GWASSS} ${GWASSS}/cardiogram_gwas_results.zip
+gzip -d ${GWASSS}/iPSYCH-PGC_ASD_Nov2017.gz
+gzip -d ${GWASSS}/daner_PGC_BIP32b_mds7a_0416a.gz
+gzip -d ${GWASSS}/MDD2018_ex23andMe.gz
+
 
 # ------------------------------------------------------------------------------
 # Baseline BED files
@@ -370,6 +382,24 @@ python /users/aprice26/biotools/ldsc/munge_sumstats.py \
   --signed-sumstats or,1
 rm tmp.tsv
 
+# Autism spectrum disorders - iPSYCH (2019)
+# NOTE: --N-cas/--N-con based on https://www.nature.com/articles/s41588-019-0344-8
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/iPSYCH-PGC_ASD_Nov2017 \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Autism_spectrum_disorder_latest \
+  --N-cas 18381  \
+  --N-con 27969
+
+# Bipolar disorder 
+# NOTE: --N-cas/--N-con based on https://www.biorxiv.org/content/10.1101/173062v4 
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/daner_PGC_BIP32b_mds7a_0416a \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Bipolar_disorder_latest \
+  --N-cas 20352  \
+  --N-con 31358
+
 # Bipolar disorder (older version)
 # NOTE: --N 16731 based on Supplementary Table 3 of Finucane et al.
 python /users/aprice26/biotools/ldsc/munge_sumstats.py \
@@ -377,6 +407,15 @@ python /users/aprice26/biotools/ldsc/munge_sumstats.py \
   --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
   --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Bipolar_disorder \
   --N 16731
+
+# Major depressive disorder
+# NOTE: --N-cas/--N-con based on http://www.med.unc.edu/pgc/files/resultfiles/pgc-mdd-2018-readme-v.3
+python /users/aprice26/biotools/ldsc/munge_sumstats.py \
+  --sumstats /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_stats/MDD2018_ex23andMe \
+  --merge-alleles /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Phase1/w_hm3.snplist \
+  --out /dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/munge_sumstats/Major_depressive_disorder_latest \
+  --N-cas 135458 \
+  --N-con 344901
 
 # Major depressive disorder (older)
 # NOTE: --N-cas/--N-con based on abstract of doi: 10.1038/mp.2012.21

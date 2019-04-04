@@ -55,7 +55,7 @@ for (j in 1:length(gwas)) {
   }
   names(tables[[j]]) = c("Cell Type","Age","Interaction")
 }
-names(tables) = c("Alzheimers Disease","Parkinsons Disease","Type II Diabetes","Schizophrenia")
+names(tables) = c("Alzheimer's Disease","Parkinson's Disease","Type II Diabetes","Schizophrenia")
 
 CHneurons = data.frame(CHneuronsdt)
 for (j in 1:length(gwas)) {
@@ -68,11 +68,35 @@ for (j in 1:length(gwas)) {
                                                 
                                       
 fisher = lapply(tables, function(x) lapply(x, fisher.test))
-df = do.call(rbind, Map(cbind, GWAS = as.list(names(fisher)), Map(cbind, Model = lapply(fisher, names), lapply(fisher, function(x) do.call(rbind, lapply(x, function(y) data.frame(OR = y$estimate, pval = y$p.value)))))))
+df = do.call(rbind, Map(cbind, GWAS = as.list(names(fisher)), 
+                        Map(cbind, Model = lapply(fisher, names), lapply(fisher, function(x) 
+                          do.call(rbind, lapply(x, function(y) data.frame(OR = y$estimate,
+                                                                          lower = y$conf.int[1],
+                                                                          upper = y$conf.int[2],
+                                                                          pval = y$p.value)))))))
 df$fdr = p.adjust(df$pval, method= "fdr")
+
+ta = do.call(rbind, lapply(tables, function(x) do.call(rbind, lapply(x, function(y) data.frame(YesGWAS.YesDMR = y[1,1], 
+                                                                                               NoGWAS.YesDMR = y[1,2],
+                                                                                               YesGWAS.NoDMR = y[2,1], 
+                                                                                               NoGWAS.NoDMR = y[2,2])))))
+df = cbind(df, ta)
 rownames(df) = NULL
 
+
 write.csv(df, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/GWAS_fisher_CpH_results.csv")
+
+
+## Combine with DMR results into one table
+
+df2 = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/GWAS_fisher_DMR_results.csv")
+df2$Model = df2$Extended
+df2 = df2[,!colnames(df2) %in% c("X","Extended")]
+df = rbind(cbind("C Context" = "CpG-derived DMR", df2), cbind("C Context" = "CpH", df))
+df$fdr = p.adjust(df$pval, method= "fdr")
+
+write.csv(df, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/GWAS_fisher_results.csv")
+
 
 
 ## Test the genes within these loci

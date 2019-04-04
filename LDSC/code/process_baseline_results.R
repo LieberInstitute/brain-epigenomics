@@ -99,13 +99,8 @@ categories_df <- categories_df %>%
   arrange(Extended)
 
 
-traits_df <- openxlsx::read.xlsx("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/Rizzardi_Feinberg_Supp_tables.xlsx", 
-                                 sheet = 16, startRow = 2) %>%
-  mutate(TraitColour = case_when(
-    .$Type == "Additional_phenotype" ~ brewer_pal("qual")(5)[1],
-    .$Type == "Behavioural-cognitive" ~ brewer_pal("qual")(5)[2],
-    .$Type == "Neurological" ~ brewer_pal("qual")(5)[3],
-    .$Type == "Psychiatric" ~ brewer_pal("qual")(5)[4]))
+traits_df <- openxlsx::read.xlsx("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/ldsc/GWAS_summary_statistics_sources.xlsx", 
+                                 startRow = 3)
 traits_df$`Pretty Trait` = traits_df$Trait
 traits_df$Trait = c("ADHD", "Alzheimers_disease","Anorexia_nervosa", "Anxiety_disorder",
                        "Autism_spectrum_disorder", "Bipolar_disorder", "BMI", "Childhood_cognitive_performance",
@@ -116,7 +111,7 @@ traits_df$Trait = c("ADHD", "Alzheimers_disease","Anorexia_nervosa", "Anxiety_di
 traits_df = traits_df[,-which(colnames(traits_df) %in% c("Link.to.GWAS.data", "Filename", "MD5.checksum", "Publication"))]     
 
 
-### ----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 ### Load data and construct objects
 ###
 
@@ -153,7 +148,18 @@ x <- x %>%
 fls <- fls[-c(grep("Agreeableness", fls), grep("Cardioembolic_stroke", fls), 
               grep("Large-vessel_disease", fls), grep("Small-vessel_disease", fls))]
 
+# also use updated summary statistics for 3 psychiatric diseases since Feinberg paper
+x <- x %>%
+  filter(Trait != "Autism_spectrum_disorder",
+         Trait != "Bipolar_disorder",
+         Trait != "Major_depressive_disorder")
+fls <- fls[-c(grep("Autism_spectrum_disorder.", fls, fixed=T), grep("Bipolar_disorder.", fls, fixed=T), 
+              grep("Major_depressive_disorder.", fls, fixed=T))]
+
+
 # Join munged LDSC output with categories_df and traits_df
+
+x$Trait = gsub("_latest","", x$Trait)
 x <- x %>%
   inner_join(categories_df, c("Category" = "Category")) %>%
   inner_join(traits_df, c("Trait" = "Trait")) %>%
@@ -218,7 +224,7 @@ x_stratified <- inner_join(x, strata_df)
 x_stratified %>%
   dplyr::select(-Category, -lower, -upper, -n, -`Prop._SNPs`,
                 -file, -Source, -Differential,
-                -TraitColour, -Enrichment_p,
+                -Enrichment_p,
                 -Enrichment_holm, -Enrichment_holm_cutoff,
                 -`Mean.width..bp.`, -`Median.width..bp.`,
                 -`Proportion.of.CpGs`,
@@ -263,7 +269,7 @@ x_stratified$Extended = factor(x_stratified$Extended, levels = c("Cell Type (Gli
                                                                  "CNS (LDSC)","chromHMM (Union)","non-DMRs"))
 x_stratified$Differential = ifelse(x_stratified$Differential==TRUE, "DMR", "Other")
 x_stratified$sig_coef = ifelse(x_stratified$sig_coef==TRUE, "Significant","Not significant")
-
+  
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/LDSC/figures/Exploratory_boxplots_byFeature_baseline.pdf",
     height = 4.5, width = 11)
@@ -293,7 +299,6 @@ ggplot(x_stratified, aes(Coefficient_p, fill = Extended, colour=Extended)) +
         text = element_text(size = 20),
         legend.title = element_blank()) +
   guides(colour=FALSE)
-
 dev.off()
 
 
@@ -348,8 +353,8 @@ ggplot(x_stratified, aes(Coefficient_p, fill = Pretty.Trait, colour=Pretty.Trait
         text = element_text(size = 20),
         legend.title = element_blank()) +
   guides(colour=FALSE)
-
 dev.off()
+
 
 # ------------------------------------------------------------------------------
 # Coefficient Z-score
@@ -373,7 +378,6 @@ ggplot(x_stratified, aes(x = Extended, y = Coefficient_z.score,
   scale_colour_manual(values = c("#FC8D62","#66C2A5","#377EB8","#E41A1C",
                                  "#1B9E77","#D95F02","#7570B3","#E7298A","#66A61E","#E6AB02",
                                  "#A65628","#F781BF","#FFFF33","#8DA0CB","#666666","#E5C494"))
-
 dev.off()
 
 
@@ -394,7 +398,6 @@ ggplot(data = x_stratified, aes(x = Extended, y = `Coefficient_z.score`,
                                  "#1B9E77","#D95F02","#7570B3","#E7298A","#66A61E","#E6AB02",
                                  "#A65628","#F781BF","#FFFF33","#8DA0CB","#666666","#E5C494")) +
   guides(col = FALSE, shape = FALSE, size = FALSE)
-
 dev.off()
 
 
@@ -500,3 +503,146 @@ g = ggplot(data = x_stratified,
   scale_size_manual(values = c(2, 3))
 ggdraw(plot_grid(NULL, get_legend(g)))
 dev.off()
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/LDSC/figures/Feature.color.legend.longways.pdf", height = 6, width = 22)
+g = ggplot(data = x_stratified,
+           aes(x = Extended, y = -log10(Coefficient_p),
+               col = Extended, shape = sig_coef, size = sig_coef)) +
+  geom_point() +
+  facet_wrap( ~ Trait, ncol = 5) +
+  theme_bw() +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.title = element_blank(), legend.position = "bottom") +
+  scale_colour_manual(values = c("#FC8D62","#66C2A5","#377EB8","#E41A1C",
+                                 "#1B9E77","#D95F02","#7570B3","#E7298A","#66A61E","#E6AB02",
+                                 "#A65628","#F781BF","#FFFF33","#8DA0CB","#666666","#E5C494")) +
+  scale_shape_manual(values = c(1, 16)) +
+  scale_size_manual(values = c(2, 3)) +
+  guides(size=guide_legend(nrow=2),shape=guide_legend(nrow=2))
+ggdraw(plot_grid(NULL, get_legend(g)))
+dev.off()
+
+
+
+### ----------------------------------------------------------------------------
+### Additional plots
+###
+
+x_stratified$Type = gsub("Additional_phenotype", "Other", x_stratified$Type)
+x_stratified$Type = factor(x_stratified$Type, levels = c("Psychiatric","Behavioural-cognitive","Neurological","Other"))
+
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/LDSC/figures/Coefficient_Z-score.baseline_byType.pdf",
+    height = 2.5, width = 6.75)
+ggplot(data = x_stratified, aes(x = Extended, y = `Coefficient_z.score`,
+                                col = Extended, shape = sig_coef, size = sig_coef)) +
+  geom_jitter(width = 0.3) +
+  facet_grid(. ~ Type) +
+  theme_bw() + xlab("Feature") + ylab("Coefficient Z Score") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank()) +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_shape_manual(values = c(1, 16)) +
+  scale_size_manual(values = c(2, 3)) +
+  scale_colour_manual(values = c("#FC8D62","#66C2A5","#377EB8","#E41A1C",
+                                 "#1B9E77","#D95F02","#7570B3","#E7298A","#66A61E","#E6AB02",
+                                 "#A65628","#F781BF","#FFFF33","#8DA0CB","#666666","#E5C494")) +
+  guides(col = FALSE, shape = FALSE, size = FALSE)
+
+ggplot(data = x_stratified, aes(x = Extended, y = `Coefficient_z.score`,
+                                col = Extended)) +
+  geom_boxplot(outlier.shape=NA) + 
+  geom_jitter(data = x_stratified[which(x_stratified$sig_coef=="Significant"),],
+              width = 0.3, size=3,aes(x = Extended, y = `Coefficient_z.score`)) + 
+  facet_grid(. ~ Type) +
+  theme_bw() + xlab("Feature") + ylab("Coefficient Z Score") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank()) +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_colour_manual(values = c("#FC8D62","#66C2A5","#377EB8","#E41A1C",
+                                 "#1B9E77","#D95F02","#7570B3","#E7298A","#66A61E","#E6AB02",
+                                 "#A65628","#F781BF","#FFFF33","#8DA0CB","#666666","#E5C494")) +
+  guides(col = FALSE, shape = FALSE, size = FALSE)
+dev.off()
+
+x_stratified$three = ifelse(x_stratified$Type=="Psychiatric", "Psychiatric Trait","Other Brain Trait")
+x_stratified[x_stratified$Type=="Other","three"] = "Non-Brain Trait"
+x_stratified$three = factor(x_stratified$three, levels = c("Psychiatric Trait","Other Brain Trait","Non-Brain Trait"))
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/LDSC/figures/Coefficient_Z-score.baseline_3panel.pdf",
+    height = 2.5, width = 5)
+ggplot(data = x_stratified, aes(x = Extended, y = `Coefficient_z.score`,
+                                col = Extended, shape = sig_coef, size = sig_coef)) +
+  geom_jitter(width = 0.3) +
+  facet_grid(. ~ three) +
+  theme_bw() + xlab("Feature") + ylab("Coefficient Z Score") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank()) +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_shape_manual(values = c(1, 16)) +
+  scale_size_manual(values = c(1, 2)) +
+  scale_colour_manual(values = c("#FC8D62","#66C2A5","#377EB8","#E41A1C",
+                                 "#1B9E77","#D95F02","#7570B3","#E7298A","#66A61E","#E6AB02",
+                                 "#A65628","#F781BF","#FFFF33","#8DA0CB","#666666","#E5C494")) +
+  guides(col = FALSE, shape = FALSE, size = FALSE)
+
+ggplot(data = x_stratified[which(x_stratified$sig_coef=="Significant"),],
+       aes(x = Extended, y = log(Enrichment), col = Extended)) +
+  geom_jitter(width = 0.2, size=2, shape=16) +
+  facet_grid(. ~ three, labeller = labeller(sig = label_both)) +
+  theme_bw() + xlab("Feature") +
+  scale_x_discrete(drop=FALSE) +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.title = element_blank()) +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_colour_manual(values = c("#FC8D62","#7570B3","#E7298A","#A65628","#F781BF","#8DA0CB","#666666")) +
+  guides(col=FALSE, shape = FALSE, size = FALSE)
+
+ggplot(data = x_stratified[which(x_stratified$sig_coef=="Significant"),],
+       aes(x = Extended, y = Enrichment, col = Extended)) +
+  geom_jitter(width = 0.2, size=2, shape=16) +
+  geom_pointrange(aes(ymin = Enrichment - 2 * Enrichment_std_error,
+                      ymax = Enrichment + 2 * Enrichment_std_error)) +
+  facet_grid(. ~ three, labeller = labeller(sig = label_both)) +
+  theme_bw() + xlab("Feature") +
+  scale_x_discrete(drop=FALSE) +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.title = element_blank()) +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_colour_manual(values = c("#FC8D62","#7570B3","#E7298A","#A65628","#F781BF","#8DA0CB","#666666")) +
+  guides(col=FALSE, shape = FALSE, size = FALSE)
+dev.off()
+
+df = x_stratified[,c("Extended","Coefficient_z.score","sig_coef","Enrichment","three")]
+df$Enrichment = log(df$Enrichment)
+df = reshape2::melt(df)
+df$variable = gsub("Coefficient_z.score", "Coefficient Z Score", df$variable)
+df$variable = gsub("Enrichment", "log(Enrichment)", df$variable)
+df$variable = factor(df$variable)
+df$var2 = paste(df$sig_coef, df$variable, sep=":")
+df = df[which(df$var2!="Not significant:log(Enrichment)"),]
+head(df)
+
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/LDSC/figures/Coefficient_Z-score.baseline_3panel_faceted.pdf",
+    height = 3.5, width = 5.5)
+ggplot(data = df, aes(x = Extended, y = value,
+                                col = Extended, shape = sig_coef, size = sig_coef)) +
+  geom_jitter(width = 0.3) +
+  facet_grid(variable ~ three, scales = "free_y") +
+  theme_bw() + xlab("Feature") + ylab("") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank()) +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_shape_manual(values = c(1, 16)) +
+  scale_size_manual(values = c(1, 2)) +
+  scale_colour_manual(values = c("#FC8D62","#66C2A5","#377EB8","#E41A1C",
+                                 "#1B9E77","#D95F02","#7570B3","#E7298A","#66A61E","#E6AB02",
+                                 "#A65628","#F781BF","#FFFF33","#8DA0CB","#666666","#E5C494")) +
+  guides(col = FALSE, shape = FALSE, size = FALSE)
+dev.off()
+
+
