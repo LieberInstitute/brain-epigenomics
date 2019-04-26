@@ -1,6 +1,7 @@
 library(ggplot2)
 library(clusterProfiler)
 library(org.Hs.eg.db)
+library(cowplot)
 
 
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/sorted_nuclear_RNA/DE_limma_results_objects.rda")
@@ -19,14 +20,15 @@ markers$Sym = geneMap[match(markers$gencodeID,geneMap$gencodeID),"Symbol"]
 markers$marker = genes[match(markers$Sym, names(genes))]
 markers$Sym = factor(markers$Sym, levels = c("GFAP", "ALDH1L1", "OLIG2", "AQP4", "SLC17A7", "SNAP25", "TBR1", "GAD1", "RELN"))
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/sorted_nuclear_RNA/figures/cellType_markerGenes_tstats.pdf", width =12)
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/sorted_nuclear_RNA/figures/cellType_markerGenes_tstats.pdf", width =4, height=3.75)
 ggplot(markers, aes(x=Sym, y =Tstat.CellTypeNeuron)) + scale_fill_brewer(8, palette="Dark2") + 
   geom_bar(stat = 'identity', aes(fill = marker), position = 'dodge', col = 'transparent') +
-  ylab("T Statistic") + 
-  xlab("") +
+  ylab("T Statistic") + xlab("") +
   ggtitle("Cell Type Marker Genes") + 
-  theme(title = element_text(size = 20)) +
-  theme(text = element_text(size = 20), legend.title=element_blank())
+  theme(title = element_text(size = 20),
+        text = element_text(size = 20), 
+        legend.title=element_blank(),axis.text.x = element_text(angle = 30, hjust = 1),
+        legend.position = c(0.6, 0.2))
 dev.off()
 
 

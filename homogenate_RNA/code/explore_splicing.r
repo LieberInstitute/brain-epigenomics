@@ -1,5 +1,6 @@
 library(GenomicRanges)
 library(bumphunter)
+library(SGSeq)
 
 
 # load meQTLs
@@ -77,7 +78,8 @@ aej_sets = openxlsx::read.xlsx('/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/
 
 geneuniverse = na.omit(unique(geneMap$EntrezID))
 aej_sets_expressed = aej_sets[which(aej_sets$EntrezGene.ID %in% geneuniverse), ] # drop genes that are not present in the test set
-splitSets = split(aej_sets_expressed[aej_sets_expressed$Gene.Set!="SCZ PGC GWAS",], aej_sets_expressed$Gene.Set[aej_sets_expressed$Gene.Set!="SCZ PGC GWAS"])
+splitSets = split(aej_sets_expressed[!aej_sets_expressed$Gene.Set %in% c("SCZ PGC GWAS","BPAD GWAS","SCZ Meta-analysis"),], 
+                  aej_sets_expressed$Gene.Set[!aej_sets_expressed$Gene.Set %in% c("SCZ PGC GWAS","BPAD GWAS","SCZ Meta-analysis")])
 notspl = lapply(spl, function(y) lapply(y, function(z) lapply(z, function(x) geneuniverse[!(geneuniverse %in% x)])))
 
 DMRenrich = list()
@@ -91,8 +93,8 @@ for (h in 1:length(spl)) {
         NOT_DE_OVERLAP= c(sum(notspl[[h]][[i]][[j]] %in% x$EntrezGene.ID), sum(!(notspl[[h]][[i]][[j]] %in% x$EntrezGene.ID)))
         enrich_table = cbind(DE_OVERLAP, NOT_DE_OVERLAP)
         res = fisher.test(enrich_table)
-        dat=c(res$p.value, res$estimate)
-        names(dat) <- c("P.Value","Odds.Ratio")
+        dat=c(res$p.value, res$estimate, res$conf.int[1], res$conf.int[2])
+        names(dat) <- c("pval","OR", "lower","upper")
         return(dat)
       })
     }
@@ -102,14 +104,72 @@ for (h in 1:length(spl)) {
 }
 names(DMRenrich) = names(spl)
 
+enrich_table = list()
+for (h in 1:length(spl)) {
+  enrich_table[[h]] = list()
+  for (i in 1:length(spl[[h]])) {
+    enrich_table[[h]][[i]] = list()
+    for (j in 1:length(spl[[h]][[i]])) {
+      enrich_table[[h]][[i]][[j]] = lapply(splitSets, function(x) {
+        DE_OVERLAP = c( sum( spl[[h]][[i]][[j]] %in% x$EntrezGene.ID),sum(!(spl[[h]][[i]][[j]] %in% x$EntrezGene.ID)))
+        NOT_DE_OVERLAP= c(sum(notspl[[h]][[i]][[j]] %in% x$EntrezGene.ID), sum(!(notspl[[h]][[i]][[j]] %in% x$EntrezGene.ID)))
+        cbind(DE_OVERLAP, NOT_DE_OVERLAP)
+      })
+    }
+    names(enrich_table[[h]][[i]]) = names(spl[[h]][[i]])
+  }
+  names(enrich_table[[h]]) = names(spl[[h]])
+}
+names(enrich_table) = names(spl)
 
-DMRenrich = lapply(DMRenrich, function(x) lapply(x, function(z) 
-            lapply(z, function(h) do.call(rbind, Map(cbind,lapply(h, function(y) data.frame(OR = y[names(y)=="Odds.Ratio"], pval = y[names(y)=="P.Value"])), GeneSet = as.list(names(h)))))))
-DMRenrich = lapply(DMRenrich, function(x) lapply(x, function(z) do.call(rbind, Map(cbind, z, Direction = as.list(names(z))))))
-DMRenrich = lapply(DMRenrich, function(x) do.call(rbind, Map(cbind, x, Context = as.list(names(x)))))
 
-DMRenrich = do.call(rbind, Map(cbind, DMRenrich, Feature = as.list(names(DMRenrich))))
+df = lapply(DMRenrich, function(x) lapply(x, function(z) lapply(z, function(h) 
+                do.call(rbind, Map(cbind,lapply(h, function(y) data.frame(P.Value = y["pval"],
+                                                                          Odds.Ratio = y["OR"],
+                                                                          Lower = y["lower"],
+                                                                          Upper = y["upper"])), GeneSet = as.list(names(h)))))))
+df = lapply(df, function(x) lapply(x, function(z) do.call(rbind, Map(cbind, z, Direction = as.list(names(z))))))
+df = lapply(df, function(x) do.call(rbind, Map(cbind, x, Context = as.list(names(x)))))
+df = do.call(rbind, Map(cbind, df, Feature = as.list(names(df))))
 
+df$FDR = p.adjust(df$P.Value, method = "fdr")
+rownames(df) = NULL
+
+ta = lapply(enrich_table, function(x) lapply(x, function(z) lapply(z, function(h) 
+              do.call(rbind, Map(cbind,lapply(h, function(y) data.frame(YesGeneSet.YesExpr = y[1,1],
+                                                                        NoGeneSet.YesExpr = y[2,1],
+                                                                        YesGeneSet.NoExpr = y[1,2],
+                                                                        NoGeneSet.NoExpr = y[2,2])), GeneSet = as.list(names(h)))))))
+ta = lapply(ta, function(x) lapply(x, function(z) do.call(rbind, Map(cbind, z, Direction = as.list(names(z))))))
+ta = lapply(ta, function(x) do.call(rbind, Map(cbind, x, Context = as.list(names(x)))))
+ta = do.call(rbind, Map(cbind, ta, Feature = as.list(names(ta))))
+
+rownames(ta) = NULL
+df = cbind(df, ta[,1:4])
+
+write.csv(df,file="/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/Birnbaum_geneSet_enrichment_splicingResults_updated.csv",quote=F)
+
+df[which(df$FDR<=0.05),colnames(df) %in% c("GeneSet","Odds.Ratio", "FDR","Direction","Context","Feature")]
+#   Odds.Ratio      GeneSet Direction Context Feature          FDR
+#4    8.306668          NDD       Pos     CpH    Exon 1.553603e-02
+#16   3.764205 ASD DATABASE       Pos     CpG    Exon 5.311130e-03
+#37   3.752510 ASD DATABASE       Neg     CpH     PSI 3.163048e-04
+#42   2.928525      SCZ SNV       Neg     CpH     PSI 1.553603e-02
+#44   3.082437 ASD DATABASE       Pos     CpG     PSI 3.196115e-07
+#46   4.219748          NDD       Pos     CpG     PSI 2.087327e-02
+#49   2.525660      SCZ SNV       Pos     CpG     PSI 3.163048e-04
+#51   2.583172 ASD DATABASE       Neg     CpG     PSI 3.163048e-04
+#53   4.386468          NDD       Neg     CpG     PSI 2.520312e-02
+#56   2.116158      SCZ SNV       Neg     CpG     PSI 2.141714e-02
+#58   2.484406 ASD DATABASE       Pos     CpH    Gene 9.791413e-03
+#65   2.787712 ASD DATABASE       Neg     CpH    Gene 1.392849e-05
+#72   4.330241 ASD DATABASE       Pos     CpG    Gene 1.362547e-14
+#74   3.959069          NDD       Pos     CpG    Gene 2.514168e-02
+#77   2.273289      SCZ SNV       Pos     CpG    Gene 2.568041e-03
+#79   2.057475 ASD DATABASE       Neg     CpG    Gene 3.596949e-03
+
+df = read.csv("./Desktop/BAMS/Birnbaum_geneSet_enrichment_splicingResults_updated.csv")
+table(df[which(df$FDR<=0.05),colnames(df) %in% c("Direction","Context","Feature")])
 
 ## Enrichment in GWAS genes
 
@@ -386,13 +446,21 @@ chr1:24416434-24416434
 ## load compare cluster outputs
 
 load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/meth_vs_expr/rda/meqtl_venn_go_exon_using_near.Rdata")
+library(clusterProfiler)
 
 bpexon = go_cluster_comp[["BP"]]
 mfexon = go_cluster_comp[["MF"]]
 ccexon = go_cluster_comp[["CC"]]
 
+mfexon = simplify(mfexon)
+
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/meth_vs_expr/rda/mfexon_plot_full.pdf", height = 30, width = 21)
-plot(mfexon, colorBy= "p.adjust",  showCategory = 500, title= "Molecular Function GO: Exons")
+dotplot(mfexon, showCategory = 20, title= "Molecular Function GO: Exons")
+dev.off()
+
+pdf("./wgbs_development/Third submission/Figures/Figure S14 - molecular function gene ontology enrichment for spliced exons/mfexon_plot_top20.pdf", 
+    height = 11, width = 21)
+dotplot(mfexon, showCategory = 20, title= "Molecular Function GO: Exons")
 dev.off()
 
 

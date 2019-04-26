@@ -259,3 +259,24 @@ table$cdDMRs
 #         Yes.tmCG No.tmCG
 #Yes.hmCG        5       1
 #No.hmCG       879    1293
+
+
+### do a little more for paper
+
+library(data.table)
+df = read.csv("../../Desktop/BAMS/DMR_Kozlenkov_Dracheva_ScienceAdvances_2018_hydroxymeth_Overlap_Counts.csv")
+sub = data.table(df[df$DMRgroup=="cdDMRs",])
+sub[,sum(percentDMR),by=c("PaperType")]
+
+
+
+
+
+
+
+
+
+
+
+
+

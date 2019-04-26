@@ -62,7 +62,11 @@ for (i in 1:length(names(DMRgr))) {
 names(tables) = names(DMRgr)
 
 fisher = lapply(tables, fisher.test)
-df = do.call(rbind, Map(cbind, lapply(fisher, function(x) data.frame(OR = x$estimate, pval = x$p.value)), Model = as.list(names(fisher))))
+
+df = do.call(rbind, Map(cbind, lapply(fisher, function(x) data.frame(OR = x$estimate,
+                                                                     upper = x$conf.int[2],
+                                                                     lower = x$conf.int[1],
+                                                                     pval = x$p.value)), Model = as.list(names(fisher))))
 df$fdr = p.adjust(df$pval, method= "fdr")
 
 
@@ -147,7 +151,10 @@ names(tables) = names(DMRgr)
 
 fisher = lapply(tables, function(x) lapply(x, fisher.test))
 res = do.call(rbind, Map(cbind, lapply(fisher, function(y) 
-           do.call(rbind, Map(cbind, lapply(y, function(x) data.frame(OR = x$estimate, pval = x$p.value)), Feature = as.list(names(y))))),
+           do.call(rbind, Map(cbind, lapply(y, function(x) data.frame(OR = x$estimate,
+                                                                      upper = x$conf.int[2],
+                                                                      lower = x$conf.int[1],
+                                                                      pval = x$p.value)), Feature = as.list(names(y))))),
            Model = as.list(names(fisher))))
 res$fdr = p.adjust(res$pval, method= "fdr")
 res$Feature = gsub("enhancers","All Enhancers", res$Feature)
@@ -155,7 +162,13 @@ res$Feature = gsub("assignment","assigned", res$Feature)
 res$Feature = factor(res$Feature, levels=c("All Enhancers","No age assigned","Vertebrata","Gnathostomata","Tetrapoda",     
                                            "Amniota","Mammalia","Theria","Eutheria","Primate","Human"))     
 
-                                                    
+res = rbind(res, cbind(df[,1:4], Feature = "HAR", df[,5:6]))
+rownames(res) = NULL
+write.csv(res, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/HAR_conservedEnhancers_fisher.results.csv")
+
+
+## Plot results
+
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/figures/HARs_DMR_oddsRatios.pdf", height = 4)
 ggplot(df[which(df$Model %in% c("CellType", "Age", "Interaction")),], aes(Model, OR, fill = Model)) + 
   geom_col() + theme_classic() + 
@@ -193,9 +206,61 @@ ggplot(res[which(res$Model %in% c("Gr1", "Gr2", "Gr3","Gr4","Gr5","Gr6") & res$f
 dev.off()
 
 
-res = rbind(res, cbind(df[,1:2], Feature = "HAR", df[,3:4]))
-rownames(res) = NULL
-write.csv(res, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/DMR/HAR_conservedEnhancers_fisher.results.csv")
+df = read.csv("../Desktop/BAMS/HAR_conservedEnhancers_fisher.results.csv")
+df$sig = ifelse(df$fdr<=0.05, "Significant", "Not Significant")
+df$sig = factor(df$sig, levels = c("Significant", "Not Significant"))
+df = df[which(df$Model %in% c("Gr1", "Gr2", "Gr3","Gr4","Gr5","Gr6")),]
+df$Model = factor(df$Model, levels = c("Gr1", "Gr2", "Gr3","Gr4","Gr5","Gr6"))
+df$Feature = factor(df$Feature, levels=c("HAR","All Enhancers","No age assigned","Vertebrata","Gnathostomata",
+                                         "Tetrapoda", "Amniota","Mammalia","Theria","Eutheria","Primate","Human"))     
+
+pdf("./brain-epigenomics/DMR/figures/conservedEnhancers_DMR_oddsRatios_dotplot.pdf",
+    height = 5.5, width = 9.5)
+ggplot(data = df[-which(df$Feature %in% c("HAR", "Primate", "Human")),], 
+       aes(x = Model, y = log(OR), col = Model, shape = sig)) +
+  geom_point() + geom_pointrange(aes(ymin = log(lower), ymax = log(upper))) +
+  theme_bw() + facet_wrap(. ~ Feature) +
+  xlab("") + ylab("log(OR)") +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_shape_manual(values = c(16, 1)) +
+  scale_size_manual(values = c(2, 1)) +
+  scale_colour_brewer(8, palette="Dark2") +
+  ggtitle("Enrichment for Enhancers") +
+  theme(axis.ticks.x = element_blank(),  
+        title = element_text(size = 20),
+        text = element_text(size = 20),
+        legend.title = element_blank(),
+        legend.position = "bottom") +
+  guides(col = FALSE)
+dev.off()
+
+
+df$Model = gsub("Gr1", "Gr1\n(G-N+)", df$Model)
+df$Model = gsub("Gr2", "Gr2\n(G0N+)", df$Model)
+df$Model = gsub("Gr3", "Gr3\n(G0N-)", df$Model)
+df$Model = gsub("Gr4", "Gr4\n(G+N0)", df$Model)
+df$Model = gsub("Gr5", "Gr5\n(G+N-)", df$Model)
+df$Model = gsub("Gr6", "Gr6\n(G-N0)", df$Model)
+df$Model = factor(df$Model, levels = c("Gr1\n(G-N+)","Gr2\n(G0N+)","Gr3\n(G0N-)",
+                                       "Gr4\n(G+N0)","Gr5\n(G+N-)","Gr6\n(G-N0)"))
+
+pdf("./brain-epigenomics/DMR/figures/HARs_DMR_oddsRatios_dotplot.pdf",
+    height = 2.5, width = 6)
+ggplot(data = df[which(df$Feature=="HAR"),], 
+       aes(x = Model, y = log(OR), col = Model, shape = sig, size = sig)) +
+  geom_point() + geom_pointrange(aes(ymin = log(lower), ymax = log(upper))) +
+  theme_bw() + 
+  xlab("") + ylab("log(OR)") +
+  geom_hline(yintercept = 0, lty = 2) +
+  scale_shape_manual(values = c(16, 1)) +
+  scale_size_manual(values = c(1, 2)) +
+  scale_colour_brewer(8, palette="Dark2") +
+  ggtitle("Enrichment for HARs") +
+  theme(axis.ticks.x = element_blank(),  
+        title = element_text(size = 20),
+        text = element_text(size = 20)) +
+  guides(col = FALSE, shape = FALSE, size = FALSE)
+dev.off()
 
 
 
