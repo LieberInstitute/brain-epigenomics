@@ -646,3 +646,57 @@ ggplot(data = df, aes(x = Extended, y = value,
 dev.off()
 
 
+# Gr 4 neuronal precursor genes include RERE, PROX1, ID2, HHEX, PAX6, ARX
+# Gr 4 cell-cell adhesion via plasma-membrane adhesion molecules include "NLGN1"    "PCDHGA1"  "PCDHGA2"  "PCDHGA3"  "PCDHGB1"  "PCDHGA4"  "PCDHGB2"  "PCDHGA5"  "PCDHGB3"  "PCDHGA6"  "PCDHGA7"  "PCDHGB4" 
+# "PCDHGA8"  "PCDHGA9"  "PCDHGB6"  "PCDHGA10" "PCDHGB7"  "PCDHGA11" "PCDHGA12" "PCDHGC3"  "PCDHGC4"  "PCDHGC5"  "SDK1"
+
+# Gr 3 modulation of synaptic chemical transmission includes "PRKCZ"  "CLSTN1" "PREPL"  "NISCH"  "CAMK2A" "SYNPO"  "HRH2"   "BAI1"   "GRIN1"  "SYT7"   "IGSF9B" "CLSTN3" "STX1B"  "BAIAP2" "RAB3A" 
+# "SNAP25" "SYN1"
+
+library(data.table)
+
+sig = x_stratified[which(x_stratified$sig_coef=="TRUE"),]
+sig = sig[,colnames(sig) %in% c("Coefficient_z.score", "Enrichment", "Trait","Category", "Type")]
+sig = data.table(sig)
+sig$outside = ifelse(sig$Category %in% c("chromHMM_union", "CNS"), "Yes", "No")
+sig$typeout = ifelse(sig$Type=="Additional_phenotype", "Yes", "No")
+sig
+
+sig[,length(unique(Trait)), by = c("outside","typeout")]
+sig[grep("Neuron", sig$Category),length(unique(Trait)),by="typeout"]
+sig[grep("Neuron", sig$Category),mean(Enrichment),by=c("typeout", "Category")]
+sig[grep("Prenatal", sig$Category),,]
+sig[Trait %in% c("Major_depressive_disorder","Neuroticism", "IQ"),,]
+
+sig[Trait=="BMI",,]
+
+
+x_stratified = data.table(x_stratified)
+library(data.table)
+sig = data.table(x_stratified[x_stratified$sig_coef=="TRUE",c("Category","Prop._h2","Trait",
+                                                      "Enrichment","Type","Coefficient_z.score")])
+
+sig[Trait=="BMI",,]
+x_stratified[Trait=="BMI" & Category %in% c("Neuronal_LMRs_all","Prenatal_LMRs_all"),
+             c("Category","Prop._h2","Trait","Enrichment","Type",
+               "Coefficient_z.score", "Coefficient_holm"),]
+sig[grep("Prenatal", Category),,]
+
+unique(x_stratified[,c("Category","Total.width..bp.")])
+x_stratified$cattype = ifelse(x_stratified$Category %in% c("Glial_LMRs_all",
+                                                           "Neuronal_LMRs_all","Prenatal_LMRs_all"),
+                              "LMR", "DMR")
+x_stratified[Category=="non_DMRs", "cattype"] = "nonDMR"
+x_stratified[Category %in% c("CNS","chromHMM_union"), "cattype"] = "General"
+x_stratified[grep("Cell", Category), "cattype"] = "CellType"
+x_stratified[grep("Gr", Category), "cattype"] = "cdDMR"
+
+x_stratified[,mean(unique(Total.width..bp.)), by ="cattype"]$V1/499322.7
+x_stratified[,mean(unique(Proportion.of.SNPs)), by ="cattype"]$V1/1.692933e-04
+
+sig[grep("Gr", Category),,]
+x_stratified[Category=="Gr3_cdDMRs" & Trait=="Schizophrenia",,]
+
+x_stratified[Category=="Gr4_cdDMRs" & Trait=="PTSD",,]
+
+
