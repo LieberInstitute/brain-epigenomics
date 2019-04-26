@@ -307,8 +307,8 @@ dev.off()
 
 ## Explore results
 
-compareBP = lapply(compareBP, as.data.frame)
-compareBP = lapply(compareBP, function(x) x[order(x$p.adjust),])
+BP = lapply(compareBP, simplify)
+BP = lapply(BP, function(x) x[order(x$p.adjust),])
 geneBP = split(compareBP$Genes, compareBP$Genes$Cluster)
 lapply(geneBP,head)
 
@@ -332,6 +332,14 @@ plotExample@compareClusterResult$Description = c("Ras protein signal transductio
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/DMR/CT_Age_Interaction/figures/BP_selectedTerms_Interaction_kmeansClusters.pdf", height = 6, width=8.5)
 plot(plotExample, colorBy="p.adjust", showCategory = 450, title= "Biological Process Enrichment")
+dev.off()
+
+pdf("./brain-epigenomics/DMR/CT_Age_Interaction/figures/BP_kmeansClusters_genes_top10.pdf", height = 8.5, width=10.5)
+dotplot(BP$Genes, showCategory = 10, title= "Biological Process Enrichment")
+dev.off()
+
+pdf("./brain-epigenomics/DMR/CT_Age_Interaction/figures/BP_kmeansClusters_genes_top5.pdf", height = 5, width=10)
+dotplot(BP$Genes, showCategory = 5, title= "Biological Process Enrichment")
 dev.off()
 
 
