@@ -184,22 +184,28 @@ AgeG$Sig = ifelse(AgeG$fdr<=0.05,"FDR<0.05","FDR>0.05")
 expr = rbind(cbind(CT, Model = "Cell Type"), cbind(AgeN, Model = "Neurons"), cbind(AgeG, Model = "Glia"))
 write.csv(expr, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_gene_expression.csv")
 
+expr = read.csv("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_gene_expression.csv")
+expr$Model = factor(expr$Model, levels = c("Cell Type", "Glia", "Neurons"))
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_gene_expression.pdf", width = 20)
-ggplot(expr[which(expr$Model=="Cell Type" & expr$fdr<=0.05),], aes(x = Comp, y = tstat)) + geom_boxplot() +
-  theme_classic() + scale_fill_brewer(8, palette="Dark2") +
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_gene_expression.pdf", 
+    height=4.75, width = 6)
+ggplot(expr[which(expr$Model=="Cell Type" & expr$fdr<=0.05),], 
+       aes(x = Comp, y = tstat)) + geom_boxplot() +
+  scale_fill_brewer(8, palette="Dark2") +
   labs(fill="") + geom_hline(yintercept=0, linetype="dotted") +
   ylab("T Statistic") + xlab("") +
   ggtitle("DMV Gene Expression Enrichment") +
-  theme(title = element_text(size = 20)) +
-  theme(text = element_text(size = 20))
-ggplot(expr[which(expr$Model!="Cell Type" & expr$fdr<=0.05),], aes(x = Comp, y = tstat, fill = Model)) + geom_boxplot() +
-  theme_classic() + facet_grid(. ~ Model) + guides(fill=FALSE) +
+  theme(title = element_text(size = 20),
+        text = element_text(size = 20))
+
+ggplot(expr[which(expr$Model!="Cell Type" & expr$fdr<=0.05),], 
+       aes(x = Comp, y = tstat, fill = Model)) + geom_boxplot() +
+  facet_grid(Model ~ .) + guides(fill=FALSE) +
   labs(fill="") + geom_hline(yintercept=0, linetype="dotted") +
   ylab("T Statistic") + xlab("") + scale_fill_brewer(8, palette="Dark2") +
   ggtitle("DMV Gene Expression Enrichment") +
-  theme(title = element_text(size = 20)) +
-  theme(text = element_text(size = 20))
+  theme(title = element_text(size = 20), text = element_text(size = 20),
+        axis.text.x = element_text(angle = 25, hjust = 1))
 dev.off()
 
 table(expr[which(expr$Model=="Cell Type"),"fdr"]<=0.05)

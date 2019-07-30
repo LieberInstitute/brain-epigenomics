@@ -143,8 +143,10 @@ ggplot(w, aes(x = Age, y = percent, colour = celltype)) + geom_point() +
   labs(fill="") +  theme_classic() +
   ylab("Percent") + xlab("Age (Years)") +
   ggtitle("Percent of Genome that is DMV by Age") +
-  theme(title = element_text(size = 20)) +
-  theme(text = element_text(size = 20), legend.title=element_blank()) + theme(legend.position="bottom")
+  theme(title = element_text(size = 20),
+        text = element_text(size = 20), 
+        legend.title=element_blank(),
+        legend.position="bottom")
 ggplot(percGenome, aes(x = celltype, y = percent)) + geom_boxplot() +
   theme_classic() +
   labs(fill="") + ylim(0,2) +
