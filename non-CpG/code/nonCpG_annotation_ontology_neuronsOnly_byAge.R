@@ -169,6 +169,33 @@ ggplot(x, aes(x = annotation, y = V1)) + geom_bar(stat = "identity") +
   theme(text = element_text(size = 20))
 dev.off()
 
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/remake_CH_annotation_neuronsbyAge.pdf",
+    width = 4.75, height = 4.5)
+
+x = CHneuronsdt[sig=="FDR < 0.05",length(unique(regionID)), by = "annotation"]
+x$perc = round(x$V1/sum(x$V1)*100,2)
+x$annotation = gsub("Other", "Intergenic", x$annotation)
+x$annotation = gsub("UTR3", "3'UTR", x$annotation)
+x$annotation = gsub("UTR5", "5'UTR", x$annotation)
+x$annotation = factor(x$annotation, levels = c("Intergenic", "Intron", "Promoter", 
+                                               "CDS","3'UTR", "5'UTR"))
+x$Millions = x$V1/1000000
+x$perc1 = c("1.84%", "", "26.02%", "0.42%", "0.67%", "0.11%")
+x$perc2 = c("", "70.94%", "", "", "", "")
+
+ggplot(x, aes(x = annotation, y = Millions)) + geom_bar(stat = "identity") +
+  geom_text(aes(label = perc2), vjust=1.6, color="white", size=3.5) +
+  geom_text(aes(label = perc1), vjust = -.5, size=3.5) +
+  labs(fill="") + ylab("Count (Millions)") + xlab("") +
+  theme_bw() +
+  ggtitle("CpH annotation: FDR<0.05") +
+  theme(title = element_text(size = 20), 
+        text = element_text(size = 20),
+        axis.text.x=element_text(angle=25,hjust=0.75))
+
+dev.off()
+
+
 # Is there a relationship between being significantly DM and overlapping a gene?
 
 fisher.test(data.frame(c(nrow(CHneurons[which(CHneurons$sig=="FDR < 0.05" & CHneurons$distToGene==0),]),
