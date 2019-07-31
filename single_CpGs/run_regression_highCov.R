@@ -72,7 +72,7 @@ colSums(statsSig[,grep("qval", colnames(statsSig))] < 0.05)
 
 ############
 ## first plot signif in homogenate
-load("rdas/signif_stats_1e4_highCov.rda")
+load("/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/signif_stats_1e4_highCov.rda")
 
 statsSig_homSig = statsSig[statsSig$qval_age_hom < 0.05,]
 
@@ -88,6 +88,11 @@ dev.off()
 
 
 table(statsSig_homSig$dm_type_cell>0 ,  statsSig_homSig$dm_age_hom<0, dnn = c("Neuron>Glia", "AgeDecr"))
+#            AgeDecr
+#Neuron>Glia FALSE TRUE
+#FALSE       2233  311
+#TRUE        1543 1691
+
 fisher.test(table(statsSig_homSig$dm_type_cell>0 ,  statsSig_homSig$dm_age_hom<0))
 fisher.test(table(statsSig_homSig$dm_type_cell>0 ,  statsSig_homSig$dm_age_hom<0))$p.value
 # p-value < 2.2e-16
@@ -115,6 +120,11 @@ dev.off()
 
 
 table(statsSig_homSig$totalAge<0 ,  statsSig_homSig$dm_age_hom<0, dnn = c("TotalAgeDecr", "HomAgeDecr"))
+#              HomAgeDecr
+# TotalAgeDecr FALSE TRUE
+# FALSE        3530  576
+# TRUE         246   1426
+
 fisher.test(table(statsSig_homSig$totalAge < 0 ,  statsSig_homSig$dm_age_hom<0))
 fisher.test(table(statsSig_homSig$totalAge < 0 ,  statsSig_homSig$dm_age_hom<0))$p.value
 
@@ -150,6 +160,11 @@ abline(h=0,v=0,lty=3)
 
 
 table(statsSig_homSig$dm_age_cell<0 ,  statsSig_homSig$dm_age_hom<0, dnn = c("CellAgeDecr", "HomAgeDecr"))
+#             HomAgeDecr
+# CellAgeDecr FALSE TRUE
+# FALSE       3136  104
+# TRUE        640   1898
+
 fisher.test(table(statsSig_homSig$dm_age_cell < 0 ,  statsSig_homSig$dm_age_hom<0))
 fisher.test(table(statsSig_homSig$dm_age_cell < 0 ,  statsSig_homSig$dm_age_hom<0))$p.value
 
@@ -179,6 +194,12 @@ plot(dm_int_cell ~ dm_age_hom,data=statsSig,
 	xlab = "Age (Homogenate)",ylab="Specific Age (Cell)")
 abline(h=0,v=0,lty=3)
 dev.off()
+
+table(statsSig_homSig$dm_int_cell<0 ,  statsSig_homSig$dm_age_hom<0, dnn = c("CellSpAgeDecr", "HomAgeDecr"))
+#               HomAgeDecr
+# CellSpAgeDecr FALSE TRUE
+# FALSE         2293  1541
+# TRUE          1483  461
 
 fisher.test(data.frame(c(nrow(statsSig[which(statsSig$dm_int_cell>0 & statsSig$dm_age_hom<0 & statsSig$pval_age_hom < 1e-4),]),
                          nrow(statsSig[which(statsSig$dm_int_cell<0 & statsSig$dm_age_hom<0 & statsSig$pval_age_hom < 1e-4),])),

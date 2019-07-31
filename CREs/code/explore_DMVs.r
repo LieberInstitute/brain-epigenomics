@@ -128,7 +128,8 @@ percGenome$celltype = ifelse(percGenome$id %in% pd$Data.ID, pd[match(percGenome$
 
 write.csv(percGenome, quote=F, file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/rdas/CREs/DMV_genomeCoverage.csv")
 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_percentGenome.pdf")
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/CREs/figures/DMV_percentGenome.pdf",
+    height = 3.5, width = 4.5)
 
 w = percGenome[which(percGenome$celltype %in% c("Neuron", "Glia")),]
 w = cbind(w, Age = pd[match(w$id, pd$Data.ID), "Age"])
@@ -139,7 +140,8 @@ cor.test(x = w[which(w$celltype=="Glia"),"Age"], y = w[which(w$celltype=="Glia")
 #t = -1.321, df = 6, p-value = 0.2346, cor -0.4746662 
 
 ggplot(w, aes(x = Age, y = percent, colour = celltype)) + geom_point() +
-  geom_smooth(method=lm, se=T, fullrange=TRUE) + scale_colour_brewer(8, palette="Dark2") + 
+  geom_smooth(method=lm, se=T, fullrange=TRUE) + 
+  scale_colour_brewer(8, palette="Dark2") + 
   labs(fill="") +  theme_classic() +
   ylab("Percent") + xlab("Age (Years)") +
   ggtitle("Percent of Genome that is DMV by Age") +
@@ -148,7 +150,6 @@ ggplot(w, aes(x = Age, y = percent, colour = celltype)) + geom_point() +
         legend.title=element_blank(),
         legend.position="bottom")
 ggplot(percGenome, aes(x = celltype, y = percent)) + geom_boxplot() +
-  theme_classic() +
   labs(fill="") + ylim(0,2) +
   ylab("Percent") + xlab("") +
   ggtitle("Percent Genome: DMV") +

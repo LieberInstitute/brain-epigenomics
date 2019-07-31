@@ -109,7 +109,7 @@ save(compareKegg, compareBP, compareMF, compareCC, compareDO, keggList, goList_B
 
 ### Explore trinucleotide context
 
-## Subset by trinucleotids context
+## Subset by trinucleotide context
 
 CHdt = data.table(CH)
 CHneuronsdt = data.table(CHneurons)
@@ -176,6 +176,51 @@ for (i in 5:8) {
     theme(legend.position="bottom", legend.direction="horizontal", legend.title = element_blank())
   print(g)
 }
+dev.off()
+
+
+res = as.data.frame(CHneuronsdt[,length(unique(regionID)), by=c("trinucleotide_context", "sig")])
+colnames(res)[colnames(res)=="trinucleotide_context"] = "TC"
+res$TC = as.character(res$TC)
+
+for (j in seq(length(unique(res$TC)))) {
+  res[which(res$TC == unique(res$TC)[j]),"perc"] = 
+    round(res[which(res$TC == unique(res$TC)[j]),"V1"]/
+            sum(res[which(res$TC == unique(res$TC)[j]),"V1"])*100,1)
+  
+  res[which(res$TC == unique(res$TC)[j]),"pos"] = 
+    sum(res[which(res$TC == unique(res$TC)[j]),"V1"])
+}
+res
+res$TC = factor(res$TC, levels = c("CAG", "CAC", "CTG", "CAT", "CAA", "CTC", 
+                                   "CCA", "CTT", "CTA", "CCT", "CCC", "CCG"))
+
+res$perc = paste0(res$perc,"%")
+res[which(res$sig=="FDR > 0.05"),"perc"] = ""
+res$sig = factor(res$sig)
+res$perc1 = c("", "", "", "", "", "", "", "", "12%", "", "", "", "",
+              "", "", "", "", "", "", "", "", "", "", "")
+res$perc2 = c("", "", "", "11.6%", "30.6%", "", "", "1.9%", "", "", "", "", "",
+              "18.8%", "", "", "2%", "", "9%", "0.5%", "0.6%", "0.9%", "3.4%", "1.8%")
+
+
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/remake_CH_byContext.pdf", 
+    width = 5.75, height = 4.25)
+ggplot(res, aes(x = TC, y = V1/1000000)) + 
+  geom_bar(aes(fill=sig),stat = "identity") +
+  geom_text(aes(x = TC, y = pos/1000000, label = perc2), vjust = -0.75) +
+  geom_text(aes(x = TC, y = pos/1000000, label = perc1), vjust = 1.6, color = "white") +
+  scale_fill_grey() + theme_bw() +
+  labs(fill="") +
+  ylab("Count (Million)") + xlab("Context") +
+  ggtitle("CpH Context: By Age in Neurons") +
+  theme(axis.text.x = element_text(angle=25,hjust=0.75),
+        title = element_text(size = 20),
+        text = element_text(size = 20),
+        legend.position=c(0.8, 0.9), 
+        legend.title = element_blank(),
+        legend.background = element_blank())
+
 dev.off()
 
 
@@ -452,17 +497,21 @@ dev.off()
 
 ## now in only the genes that are either CAG or CAC but not both
 
-ent = list("Decreasing\nmCAG" = Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAG"[-which(Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAG" %in% Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAC")], 
-           "Decreasing\nmCAC" = Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAC"[-which(Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAG" %in% Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAC")],
-           "Increasing\nmCAG" = Ageentrez$"Increasing\n(Overlapping Genes)\nmCAG"[-which(Ageentrez$"Increasing\n(Overlapping Genes)\nmCAG" %in% Ageentrez$"Increasing\n(Overlapping Genes)\nmCAC")],
-           "Increasing\nmCAC" = Ageentrez$"Increasing\n(Overlapping Genes)\nmCAC"[-which(Ageentrez$"Increasing\n(Overlapping Genes)\nmCAG" %in% Ageentrez$"Increasing\n(Overlapping Genes)\nmCAC")])
+ent = list("Decreasing\nmCAG" = Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAG"[-which(Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAG" %in% 
+                                                                                           Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAC")], 
+           "Decreasing\nmCAC" = Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAC"[-which(Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAC" %in% 
+                                                                                           Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAG")],
+           "Increasing\nmCAG" = Ageentrez$"Increasing\n(Overlapping Genes)\nmCAG"[-which(Ageentrez$"Increasing\n(Overlapping Genes)\nmCAG" %in% 
+                                                                                           Ageentrez$"Increasing\n(Overlapping Genes)\nmCAC")],
+           "Increasing\nmCAC" = Ageentrez$"Increasing\n(Overlapping Genes)\nmCAC"[-which(Ageentrez$"Increasing\n(Overlapping Genes)\nmCAC" %in% 
+                                                                                           Ageentrez$"Increasing\n(Overlapping Genes)\nmCAG")])
 AgecompareBP = compareCluster(ent, fun="enrichGO", ont = "BP", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+AgecompareBP = simplify(AgecompareBP)
 
-plotExample = AgecompareBP
-plotExample@compareClusterResult = plotExample@compareClusterResult[plotExample@compareClusterResult$p.adjust<=0.01,]
- 
-pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/nonCG_BP_plots_byAgeinNeurons_CAG_or_CAC_only.pdf", height = 14, width = 12)
-dotplot(AgecompareBP, showCategory = 20, title= "non-CpG BP Enrichment by Age in Neurons")
+pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/nonCG_BP_plots_byAgeinNeurons_CAG_or_CAC_only.pdf", 
+    height = 12, width = 10)
+dotplot(AgecompareBP, showCategory = 20, 
+        title= "CpH Biological Process Enrichment:\nBy Age in Neurons")
 dev.off()
 
 elementNROWS(ent)

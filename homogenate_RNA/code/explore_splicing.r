@@ -451,8 +451,12 @@ library(clusterProfiler)
 bpexon = go_cluster_comp[["BP"]]
 mfexon = go_cluster_comp[["MF"]]
 ccexon = go_cluster_comp[["CC"]]
-
 mfexon = simplify(mfexon)
+mfexon = data.frame(mfexon)
+mfexon$Description = gsub(",", ";", mfexon$Description, fixed=TRUE)
+
+write.csv(mfexon, quote=FALSE, row.names=FALSE, 
+          file = "/dcl01/lieber/ajaffe/lab/brain-epigenomics/meth_vs_expr/rda/mfexon_table.csv")
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/meth_vs_expr/rda/mfexon_plot_full.pdf", height = 30, width = 21)
 dotplot(mfexon, showCategory = 20, title= "Molecular Function GO: Exons")
