@@ -497,19 +497,21 @@ dev.off()
 
 ## now in only the genes that are either CAG or CAC but not both
 
-ent = list("Decreasing\nmCAG" = Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAG"[-which(Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAG" %in% Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAC")], 
-           "Decreasing\nmCAC" = Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAC"[-which(Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAG" %in% Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAC")],
-           "Increasing\nmCAG" = Ageentrez$"Increasing\n(Overlapping Genes)\nmCAG"[-which(Ageentrez$"Increasing\n(Overlapping Genes)\nmCAG" %in% Ageentrez$"Increasing\n(Overlapping Genes)\nmCAC")],
-           "Increasing\nmCAC" = Ageentrez$"Increasing\n(Overlapping Genes)\nmCAC"[-which(Ageentrez$"Increasing\n(Overlapping Genes)\nmCAG" %in% Ageentrez$"Increasing\n(Overlapping Genes)\nmCAC")])
+ent = list("Decreasing\nmCAG" = Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAG"[-which(Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAG" %in% 
+                                                                                           Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAC")], 
+           "Decreasing\nmCAC" = Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAC"[-which(Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAC" %in% 
+                                                                                           Ageentrez$"Decreasing\n(Overlapping Genes)\nmCAG")],
+           "Increasing\nmCAG" = Ageentrez$"Increasing\n(Overlapping Genes)\nmCAG"[-which(Ageentrez$"Increasing\n(Overlapping Genes)\nmCAG" %in% 
+                                                                                           Ageentrez$"Increasing\n(Overlapping Genes)\nmCAC")],
+           "Increasing\nmCAC" = Ageentrez$"Increasing\n(Overlapping Genes)\nmCAC"[-which(Ageentrez$"Increasing\n(Overlapping Genes)\nmCAC" %in% 
+                                                                                           Ageentrez$"Increasing\n(Overlapping Genes)\nmCAG")])
 AgecompareBP = compareCluster(ent, fun="enrichGO", ont = "BP", OrgDb = org.Hs.eg.db, qvalueCutoff = 0.05, pvalueCutoff = 0.05)
+AgecompareBP = simplify(AgecompareBP)
 
-plotExample = AgecompareBP
-plotExample@compareClusterResult = plotExample@compareClusterResult[plotExample@compareClusterResult$p.adjust<=0.01,]
- 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/non-CpG/figures/nonCG_BP_plots_byAgeinNeurons_CAG_or_CAC_only.pdf", 
     height = 12, width = 10)
 dotplot(AgecompareBP, showCategory = 20, 
-        title= "CpH Biological Process Enrichment: By Age in Neurons")
+        title= "CpH Biological Process Enrichment:\nBy Age in Neurons")
 dev.off()
 
 elementNROWS(ent)
