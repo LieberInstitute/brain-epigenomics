@@ -505,7 +505,26 @@ ggdraw(plot_grid(NULL, get_legend(g)))
 dev.off()
 
 pdf("/dcl01/lieber/ajaffe/lab/brain-epigenomics/LDSC/figures/Feature.color.legend.longways.pdf", height = 6, width = 22)
-g = ggplot(data = x_stratified,
+x_releveled = x_stratified
+x_releveled$Extended = factor(x_releveled$Extended, 
+                              levels = c("Prenatal LMRs",                              
+                                         "Neuronal LMRs",                                  
+                                         "Glial LMRs",                                     
+                                         "CNS (LDSC)",                                     
+                                         "chromHMM (Union)",                               
+                                         "non-DMRs",
+                                         "Group 1 (Decreasing Glial; Increasing Neuronal)",
+                                         "Group 2 (Static Glial; Increasing Neuronal)",    
+                                         "Group 3 (Static Glial; Decreasing Neuronal)",   
+                                         "Group 4 (Increasing Glial; Static Neuronal)",    
+                                         "Group 5 (Increasing Glial; Decreasing Neuronal)",
+                                         "Group 6 (Decreasing Glial; Static Neuronal)",
+                                         "Cell Type (Glia > Neuron)",                      
+                                         "Cell Type (Neuron > Glia)",                      
+                                         "Age (Older > Younger)",                          
+                                         "Age (Younger > Older)"))
+
+g = ggplot(data = x_releveled,
            aes(x = Extended, y = -log10(Coefficient_p),
                col = Extended, shape = sig_coef, size = sig_coef)) +
   geom_point() +
@@ -514,12 +533,13 @@ g = ggplot(data = x_stratified,
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         legend.title = element_blank(), legend.position = "bottom") +
-  scale_colour_manual(values = c("#FC8D62","#66C2A5","#377EB8","#E41A1C",
+  scale_colour_manual(values = c("#A65628","#F781BF","#FFFF33","#8DA0CB","#666666","#E5C494",
                                  "#1B9E77","#D95F02","#7570B3","#E7298A","#66A61E","#E6AB02",
-                                 "#A65628","#F781BF","#FFFF33","#8DA0CB","#666666","#E5C494")) +
+                                 "#FC8D62","#66C2A5","#377EB8","#E41A1C")) +
   scale_shape_manual(values = c(1, 16)) +
   scale_size_manual(values = c(2, 3)) +
-  guides(size=guide_legend(nrow=2),shape=guide_legend(nrow=2))
+  guides(size=guide_legend(nrow=2),shape=guide_legend(nrow=2),
+         col=guide_legend(ncol=3))
 ggdraw(plot_grid(NULL, get_legend(g)))
 dev.off()
 
