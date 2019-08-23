@@ -1,4 +1,5 @@
 # brain-epigenomics
+[![DOI](https://zenodo.org/badge/68875556.svg)](https://zenodo.org/badge/latestdoi/68875556)
 
 Located in JHPCE at `/dcl01/lieber/ajaffe/lab/brain-epigenomics`
 
