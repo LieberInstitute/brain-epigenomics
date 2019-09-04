@@ -1,3 +1,4 @@
+# module load conda_R/3.5.x
 library('jaffelab')
 library('readr')
 library('sessioninfo')
@@ -9,64 +10,6 @@ library('RColorBrewer')
 
 ## For output files
 dir.create('rda', showWarnings = FALSE)
-
-##### Functions:
-## Code adapted from https://github.com/LieberInstitute/RNAseq-pipeline/blob/master/sh/create_count_objects-human.R#L209-L217
-splitAt <- function(x, pos) unname(split(x, cumsum(seq_along(x) %in% pos)))
-
-compute_fastqc_seqdist <- function(qcData) {
-    R <- lapply(qcData, function(x) scan(x, what = "character", sep= "\n", 
-    		quiet = TRUE, strip=TRUE) )
-    ## Split list into sublists of metric categories
-    zz <- lapply(R, function(x) splitAt(x, which(x==">>END_MODULE")+1))
-
-    ## Extract the sequence length distribution
-    seqlen <- lapply(zz, function(x) {
-        ## access the sequence distribution part of the report
-        y <- x[[8]]
-        ## Drop header and module separating lines
-        y[-c(1:2, length(y))]
-    })
-
-    seqdist <- lapply(seqlen, function(dat) {
-    
-        ## Process the read length section
-        len <- ss(dat, "\t", 1)
-    
-        ## Sometimes there's a range of read lengths
-        res <- do.call(rbind, mapply(function(x, hasdash) {
-            if(!hasdash) {
-                x <- as.numeric(x)
-                result <- data.frame(
-                    start = x,
-                    end = x,
-                    stringsAsFactors = FALSE
-                )
-            } else {
-                ## Get the start/end of the range
-                result <- data.frame(
-                    start = as.numeric(ss(x, '-', 1)),
-                    end = as.numeric(ss(x, '-', 2)),
-                    stringsAsFactors = FALSE
-                )
-            }
-            ## Compute the median read length based on the range info
-            result$median <- median(c(result$start, result$end))
-            return(result)
-        }, len, grepl('-', len), SIMPLIFY = FALSE))
-    
-        res$n <- as.numeric(ss(dat, "\t", 2))
-    
-        return(res)
-    })
-    return(seqdist)
-}
-compute_fastqc_auc <- function(qcData) {
-    auc <- sapply(compute_fastqc_seqdist(qcData), function(dat) {
-        sum(dat$median * dat$n)
-    })
-    return(auc)
-}
 
 ## bamcount reader
 read_bamcount <- function(f) {
@@ -85,68 +28,7 @@ hg19 <- readr::read_tsv(
 hg19.size <- sum(hg19$length[hg19$chr %in% paste0('chr', c(1:22, 'X', 'Y', 'M'))])
 
 ## Read in fastqc data
-get_fastqc_data <- function(id) {
-    message(paste(Sys.time(), 'processing sample', id))
-    
-    ## Build the paths to the FastQC output directories
-    id_dirs <- file.path(
-        '/dcl02/lieber/WGBS/LIBD_Data/FastQC',
-        c('Untrimmed', 'Trimmed'),
-    id)
-    
-    ## Find fastqc data files
-    fastqc_files <- dir(id_dirs, pattern = 'data.txt$', recursive = TRUE, full.names = TRUE)
-    stopifnot(length(fastqc_files) == 7)
-    
-    names(fastqc_files) <- gsub(paste0('^', id, '_|_fastqc'), '', ss(fastqc_files, '/', 9))
-
-    auc_dir <- compute_fastqc_auc(fastqc_files)
-    
-    res <- data.frame(
-        sample = id,
-        type = names(auc_dir),
-        auc = auc_dir,
-        stringsAsFactors = FALSE
-    )
-    rownames(res) <- NULL
-    return(res)
-}
-
-cov_fastqc <- do.call(rbind, lapply(ids, get_fastqc_data))
-# 2019-02-07 11:08:48 processing sample WGC052316L
-# 2019-02-07 11:09:09 processing sample WGC059613L
-# 2019-02-07 11:09:19 processing sample WGC059614L
-# 2019-02-07 11:09:30 processing sample WGC052317L
-# 2019-02-07 11:09:50 processing sample WGC055558L
-# 2019-02-07 11:10:04 processing sample WGC055559L
-# 2019-02-07 11:10:15 processing sample WGC059596L
-# 2019-02-07 11:10:28 processing sample WGC055561L
-# 2019-02-07 11:10:46 processing sample WGC052318L
-# 2019-02-07 11:11:03 processing sample WGC059588L
-# 2019-02-07 11:11:27 processing sample WGC059608L
-# 2019-02-07 11:11:45 processing sample WGC059594L
-# 2019-02-07 11:12:01 processing sample WGC052309L_reseq
-# 2019-02-07 11:12:01 processing sample WGC059592L
-# 2019-02-07 11:12:19 processing sample WGC052311L
-# 2019-02-07 11:12:39 processing sample WGC059612L
-# 2019-02-07 11:12:53 processing sample WGC055562L
-# 2019-02-07 11:13:07 processing sample WGC055573L
-# 2019-02-07 11:13:20 processing sample WGC052324L
-# 2019-02-07 11:13:30 processing sample WGC055575L
-# 2019-02-07 11:13:51 processing sample WGC059600L
-# 2019-02-07 11:14:17 processing sample WGC052328L
-# 2019-02-07 11:14:28 processing sample WGC052314L
-# 2019-02-07 11:14:42 processing sample WGC059598L
-# 2019-02-07 11:14:53 processing sample WGC059603L
-# 2019-02-07 11:15:14 processing sample WGC055577L
-# 2019-02-07 11:15:31 processing sample WGC059607L
-# 2019-02-07 11:15:55 processing sample WGC052312L
-# 2019-02-07 11:16:10 processing sample WGC055570L
-# 2019-02-07 11:16:22 processing sample WGC055568L
-# 2019-02-07 11:16:34 processing sample WGC059601L
-# 2019-02-07 11:16:51 processing sample WGC059604L
-
-save(cov_fastqc, file = 'rda/cov_fastqc.Rdata')
+load('rda/cov_fastqc.Rdata', verbose = TRUE)
 
 ## Read in bamcount output data
 get_bamcount_data <- function(id) {
@@ -155,7 +37,7 @@ get_bamcount_data <- function(id) {
     ## Find the files
     types <- c('duplicatesRemoved', 'Marked_duplicates')
     bamcount_files <- file.path(
-        '/dcl01/lieber/ajaffe/lab/brain-epigenomics/misc/cov/auc_files',
+        '/dcl01/lieber/ajaffe/lab/brain-epigenomics/misc/cov/auc_files_v0.4.0',
         paste0(id, '_', types, '.auc.tsv')
     )
     stopifnot(all(file.exists(bamcount_files)))
@@ -174,7 +56,7 @@ get_bamcount_data <- function(id) {
 }
 
 cov_bamcount <- do.call(rbind, lapply(ids, get_bamcount_data))
-save(cov_bamcount, file = 'rda/cov_bamcount.Rdata')
+save(cov_bamcount, file = 'rda/cov_bamcount_v0.4.0.Rdata')
 
 ## Merge both types
 cov_merged <- rbind(cov_fastqc, cov_bamcount)
@@ -207,7 +89,7 @@ rownames(cov_summarized) <- NULL
 cov_merged$coverage <- cov_merged$auc / hg19.size
 cov_summarized$coverage <- cov_summarized$auc / hg19.size
 
-save(cov_merged, file = 'rda/cov_merged.Rdata')
+save(cov_merged, file = 'rda/cov_merged_v0.4.0.Rdata')
 
 ## Load pheno data
 load('/dcl01/lieber/ajaffe/lab/brain-epigenomics/misc/rdas/rse_mean_meth.Rdata', verbose = FALSE)
@@ -229,7 +111,7 @@ combine_topd <- function(covdat) {
 pd_exp <- combine_topd(cov_summarized)
 
 
-save(pd_exp, file = 'rda/pd_exp.Rdata')
+save(pd_exp, file = 'rda/pd_exp_v0.4.0.Rdata')
 
 ## Long format
 combine_pd <- function(covdat) {
@@ -255,7 +137,7 @@ cov_summarized$age_group_cell <- factor(paste0(cov_summarized$age_group, '_',
     '_', c('Glia', 'Neuron')), 'Prenatal_H'))
 cov_summarized$col <- c(brewer.pal(8, "Paired"), 'grey50')[c(5:6, 7:8, 3:4, 1:2, 9)][cov_summarized$age_group_cell]
     
-save(cov_summarized, file = 'rda/cov_summarized.Rdata')
+save(cov_summarized, file = 'rda/cov_summarized_v0.4.0.Rdata')
 
 # summary(lm(coverage_initial ~ Age, data = pd_exp))
 model_fits <- list(
@@ -315,7 +197,7 @@ age_cell_colors <- with(cov_summarized, tapply(col, age_group_cell, unique))
 age_cell_colors['Prenatal'] <- 'grey50'
 
 dir.create('pdf', showWarnings = FALSE)
-pdf('pdf/coverage_across_processing_stages.pdf', width = 11, useDingbats = FALSE)
+pdf('pdf/coverage_across_processing_stages_v0.4.0.pdf', width = 11, useDingbats = FALSE)
 
 ## Basic
 ggplot(cov_summarized, aes(x = type, y = coverage))  + geom_boxplot() + theme_bw(base_size = 20) + xlab('Processing Stage') + ylab('Genome Coverage')
@@ -357,6 +239,20 @@ if(FALSE) {
     load('rda/pd_exp.Rdata', verbose = TRUE)
 }
 
+## Check vs prior results
+cov_summarized_v0.4.0 <- cov_summarized
+load('rda/cov_summarized.Rdata', verbose = TRUE)
+
+## It's identical =)
+stopifnot(identical(cov_summarized$auc, cov_summarized_v0.4.0$auc))
+stopifnot(identical(cov_summarized$coverage, cov_summarized_v0.4.0$coverage))
+
+## Could have simply checked this earlier :P
+cov_bamcount_v0.4.0 <- cov_bamcount
+load('rda/cov_bamcount.Rdata', verbose = TRUE)
+stopifnot(identical(cov_bamcount_v0.4.0, cov_bamcount))
+
+
 ## Reproducibility information
 print('Reproducibility information:')
 Sys.time()
@@ -366,88 +262,84 @@ session_info()
 
 # ─ Session info ───────────────────────────────────────────────────────────────────────────────────────────────────────
 #  setting  value
-#  version  R version 3.5.1 Patched (2018-10-29 r75535)
-#  os       Red Hat Enterprise Linux Server release 6.9 (Santiago)
+#  version  R version 3.5.3 Patched (2019-03-11 r76311)
+#  os       CentOS Linux 7 (Core)
 #  system   x86_64, linux-gnu
 #  ui       X11
 #  language (EN)
 #  collate  en_US.UTF-8
 #  ctype    en_US.UTF-8
 #  tz       US/Eastern
-#  date     2019-02-07
+#  date     2019-09-04
 #
 # ─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────
 #  package              * version   date       lib source
-#  assertthat             0.2.0     2017-04-11 [2] CRAN (R 3.5.0)
+#  assertthat             0.2.1     2019-03-21 [2] CRAN (R 3.5.1)
 #  backports              1.1.3     2018-12-14 [2] CRAN (R 3.5.1)
-#  bindr                  0.1.1     2018-03-13 [1] CRAN (R 3.5.0)
-#  bindrcpp               0.2.2     2018-03-29 [1] CRAN (R 3.5.0)
 #  Biobase              * 2.42.0    2018-10-30 [2] Bioconductor
 #  BiocGenerics         * 0.28.0    2018-10-30 [1] Bioconductor
-#  BiocParallel         * 1.16.5    2019-01-04 [1] Bioconductor
+#  BiocParallel         * 1.16.6    2019-02-10 [1] Bioconductor
 #  bitops                 1.0-6     2013-08-17 [2] CRAN (R 3.5.0)
-#  broom                * 0.5.1     2018-12-05 [1] CRAN (R 3.5.1)
-#  cli                    1.0.1     2018-09-25 [1] CRAN (R 3.5.1)
+#  broom                * 0.5.2     2019-04-07 [1] CRAN (R 3.5.3)
+#  cli                    1.1.0     2019-03-19 [1] CRAN (R 3.5.3)
 #  colorout             * 1.2-0     2018-05-02 [1] Github (jalvesaq/colorout@c42088d)
-#  colorspace             1.4-0     2019-01-13 [2] CRAN (R 3.5.1)
+#  colorspace             1.4-1     2019-03-18 [2] CRAN (R 3.5.1)
 #  crayon                 1.3.4     2017-09-16 [1] CRAN (R 3.5.0)
 #  DelayedArray         * 0.8.0     2018-10-30 [2] Bioconductor
-#  digest                 0.6.18    2018-10-10 [1] CRAN (R 3.5.1)
-#  dplyr                  0.7.8     2018-11-10 [1] CRAN (R 3.5.1)
-#  fansi                  0.4.0     2018-10-05 [1] CRAN (R 3.5.1)
+#  digest                 0.6.20    2019-07-04 [1] CRAN (R 3.5.3)
+#  dplyr                  0.8.3     2019-07-04 [1] CRAN (R 3.5.3)
 #  generics               0.0.2     2018-11-29 [1] CRAN (R 3.5.1)
-#  GenomeInfoDb         * 1.18.1    2018-11-12 [1] Bioconductor
+#  GenomeInfoDb         * 1.18.2    2019-02-12 [1] Bioconductor
 #  GenomeInfoDbData       1.2.0     2018-11-02 [2] Bioconductor
 #  GenomicRanges        * 1.34.0    2018-10-30 [1] Bioconductor
-#  ggplot2              * 3.1.0     2018-10-25 [1] CRAN (R 3.5.1)
-#  glue                   1.3.0     2018-07-17 [1] CRAN (R 3.5.1)
-#  gtable                 0.2.0     2016-02-26 [2] CRAN (R 3.5.0)
+#  ggplot2              * 3.2.1     2019-08-10 [1] CRAN (R 3.5.3)
+#  glue                   1.3.1     2019-03-12 [1] CRAN (R 3.5.1)
+#  gtable                 0.3.0     2019-03-25 [2] CRAN (R 3.5.1)
 #  hms                    0.4.2     2018-03-10 [2] CRAN (R 3.5.0)
 #  htmltools              0.3.6     2017-04-28 [2] CRAN (R 3.5.0)
 #  htmlwidgets            1.3       2018-09-30 [1] CRAN (R 3.5.1)
-#  httpuv                 1.4.5.1   2018-12-18 [2] CRAN (R 3.5.1)
+#  httpuv                 1.5.0     2019-03-15 [2] CRAN (R 3.5.1)
 #  IRanges              * 2.16.0    2018-10-30 [1] Bioconductor
 #  jaffelab             * 0.99.21   2018-05-03 [1] Github (LieberInstitute/jaffelab@7ed0ab7)
+#  jsonlite               1.6       2018-12-07 [2] CRAN (R 3.5.1)
 #  labeling               0.3       2014-08-23 [2] CRAN (R 3.5.0)
-#  later                  0.7.5     2018-09-18 [2] CRAN (R 3.5.1)
-#  lattice                0.20-38   2018-11-04 [3] CRAN (R 3.5.1)
-#  lazyeval               0.2.1     2017-10-29 [2] CRAN (R 3.5.0)
+#  later                  0.8.0     2019-02-11 [2] CRAN (R 3.5.1)
+#  lattice                0.20-38   2018-11-04 [3] CRAN (R 3.5.3)
+#  lazyeval               0.2.2     2019-03-15 [2] CRAN (R 3.5.1)
 #  limma                  3.38.3    2018-12-02 [1] Bioconductor
 #  magrittr               1.5       2014-11-22 [1] CRAN (R 3.5.0)
-#  Matrix                 1.2-15    2018-11-01 [3] CRAN (R 3.5.1)
+#  Matrix                 1.2-15    2018-11-01 [3] CRAN (R 3.5.3)
 #  matrixStats          * 0.54.0    2018-07-23 [1] CRAN (R 3.5.1)
-#  mime                   0.6       2018-10-05 [1] CRAN (R 3.5.1)
-#  munsell                0.5.0     2018-06-12 [2] CRAN (R 3.5.0)
-#  nlme                   3.1-137   2018-04-07 [3] CRAN (R 3.5.1)
-#  pillar                 1.3.1     2018-12-15 [1] CRAN (R 3.5.1)
+#  munsell                0.5.0     2018-06-12 [2] CRAN (R 3.5.1)
+#  nlme                   3.1-137   2018-04-07 [3] CRAN (R 3.5.3)
+#  pillar                 1.4.2     2019-06-29 [1] CRAN (R 3.5.3)
 #  pkgconfig              2.0.2     2018-08-16 [1] CRAN (R 3.5.1)
 #  plyr                   1.8.4     2016-06-08 [2] CRAN (R 3.5.0)
 #  png                    0.1-7     2013-12-03 [2] CRAN (R 3.5.0)
 #  promises               1.0.1     2018-04-13 [2] CRAN (R 3.5.0)
-#  purrr                  0.2.5     2018-05-29 [2] CRAN (R 3.5.0)
-#  R6                     2.3.0     2018-10-04 [2] CRAN (R 3.5.1)
+#  purrr                  0.3.2     2019-03-15 [2] CRAN (R 3.5.1)
+#  R6                     2.4.0     2019-02-14 [2] CRAN (R 3.5.1)
 #  rafalib              * 1.0.0     2015-08-09 [1] CRAN (R 3.5.0)
 #  RColorBrewer         * 1.1-2     2014-12-07 [2] CRAN (R 3.5.0)
-#  Rcpp                   1.0.0     2018-11-07 [1] CRAN (R 3.5.1)
-#  RCurl                  1.95-4.11 2018-07-15 [2] CRAN (R 3.5.1)
+#  Rcpp                   1.0.2     2019-07-25 [1] CRAN (R 3.5.3)
+#  RCurl                  1.95-4.12 2019-03-04 [2] CRAN (R 3.5.1)
 #  readr                * 1.3.1     2018-12-21 [1] CRAN (R 3.5.1)
 #  reshape2               1.4.3     2017-12-11 [2] CRAN (R 3.5.0)
-#  rlang                  0.3.1     2019-01-08 [1] CRAN (R 3.5.1)
+#  rlang                  0.4.0     2019-06-25 [1] CRAN (R 3.5.3)
 #  rmote                * 0.3.4     2018-05-02 [1] deltarho (R 3.5.0)
 #  S4Vectors            * 0.20.1    2018-11-09 [1] Bioconductor
 #  scales                 1.0.0     2018-08-09 [2] CRAN (R 3.5.1)
 #  segmented              0.5-3.0   2017-11-30 [2] CRAN (R 3.5.0)
-#  servr                  0.11      2018-10-23 [1] CRAN (R 3.5.1)
+#  servr                  0.15      2019-08-07 [1] CRAN (R 3.5.3)
 #  sessioninfo          * 1.1.1     2018-11-05 [1] CRAN (R 3.5.1)
-#  stringi                1.2.4     2018-07-20 [2] CRAN (R 3.5.1)
-#  stringr                1.3.1     2018-05-10 [1] CRAN (R 3.5.0)
+#  stringi                1.4.3     2019-03-12 [2] CRAN (R 3.5.1)
+#  stringr                1.4.0     2019-02-10 [1] CRAN (R 3.5.1)
 #  SummarizedExperiment * 1.12.0    2018-10-30 [1] Bioconductor
-#  tibble                 2.0.1     2019-01-12 [1] CRAN (R 3.5.1)
-#  tidyr                * 0.8.2     2018-10-28 [2] CRAN (R 3.5.1)
+#  tibble                 2.1.3     2019-06-06 [1] CRAN (R 3.5.3)
+#  tidyr                * 0.8.3     2019-03-01 [2] CRAN (R 3.5.1)
 #  tidyselect             0.2.5     2018-10-11 [2] CRAN (R 3.5.1)
-#  utf8                   1.1.4     2018-05-24 [1] CRAN (R 3.5.0)
 #  withr                  2.1.2     2018-03-15 [2] CRAN (R 3.5.0)
-#  xfun                   0.4       2018-10-23 [1] CRAN (R 3.5.1)
+#  xfun                   0.9       2019-08-21 [1] CRAN (R 3.5.3)
 #  XVector                0.22.0    2018-10-30 [1] Bioconductor
 #  zlibbioc               1.28.0    2018-10-30 [2] Bioconductor
 #

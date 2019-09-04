@@ -1,10 +1,10 @@
 #!/bin/bash
 
 ## Usage:
-# sh compute_aucs.sh
+# sh compute_aucs_v0.4.0.sh
 
 mkdir -p logs
-mkdir -p auc_files
+mkdir -p auc_files_v0.4.0
 
 CORES=4
 FILELIST=/dcl01/lieber/ajaffe/lab/brain-epigenomics/misc/cov/WGC_IDs_subset.txt
@@ -13,7 +13,7 @@ NUM=$(cat $FILELIST | awk '{print $NF}' | uniq | wc -l)
 for bamtype in duplicatesRemoved Marked_duplicates
 do
     
-    SHORT="compute_aucs_${bamtype}"
+    SHORT="compute_aucs_${bamtype}_v0.4.0"
 
     # Construct shell file
     echo "Creating script for BAM files ${bamtype}"
@@ -41,14 +41,14 @@ echo "Task id: \${TASK_ID}"
 ID=\$(awk "NR==\${SGE_TASK_ID}" $FILELIST )
 
 ## Load dependencies
-module load bamcount/0.2.6
+module load bamcount/0.4.0
 
 ## List current modules
 module list
 
 ## compute aucs
 ls -lh /dcl02/lieber/WGBS/LIBD_Data/BAM/\${ID}*${bamtype}.bam
-bamcount /dcl02/lieber/WGBS/LIBD_Data/BAM/\${ID}*${bamtype}.bam --threads ${CORES} --no_head --auc auc_files/\${ID}_${bamtype}
+bamcount /dcl02/lieber/WGBS/LIBD_Data/BAM/\${ID}*${bamtype}.bam --threads ${CORES} --no_head --auc auc_files_v0.4.0/\${ID}_${bamtype}
 
 echo "**** Job ends ****"
 date
