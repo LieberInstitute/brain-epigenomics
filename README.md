@@ -5,7 +5,7 @@ Located in JHPCE at `/dcl01/lieber/ajaffe/lab/brain-epigenomics`
 
 This repository contains the code used in the analyses in the following citation:
 
-Price AJ__*__, Collado-Torres L__*__, Ivanov NA, Xia W, Burke EE, Shin JH, Tao R, Ma L, Jia Y,  Hyde TM, Kleinman JE, Weinberger DR, Jaffe AE &dagger;. Divergent neuronal DNA methylation patterns across human cortical development reveal critical periods and a unique role of CpH methylation. Genome Biology. 2019. DOI: [10.1186/s13059-019-1805-1](https://doi.org/10.1186/s13059-019-1805-1). Pre-print: bioRxiv, 2018. DOI: [10.1101/428391](https://doi.org/10.1101/428391).
+Price AJ &ast;, Collado-Torres L &ast;, Ivanov NA, Xia W, Burke EE, Shin JH, Tao R, Ma L, Jia Y,  Hyde TM, Kleinman JE, Weinberger DR, Jaffe AE &dagger;. Divergent neuronal DNA methylation patterns across human cortical development reveal critical periods and a unique role of CpH methylation. Genome Biology. 2019. DOI: [10.1186/s13059-019-1805-1](https://doi.org/10.1186/s13059-019-1805-1). Pre-print: bioRxiv, 2018. DOI: [10.1101/428391](https://doi.org/10.1101/428391).
 
 If you use anything from this repository please cite the above. Here's a bibtex entry:
 
