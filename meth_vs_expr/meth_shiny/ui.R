@@ -15,11 +15,11 @@ shinyUI(navbarPage(
         tags$head(
             includeScript("google-analytics.js")
         ),
-        p('Welcome to the ', strong('LIBD WGBS Expression explorer!'), 'Here you can explore the methylation and expression associations described by Price et al, 2018. For more details check the documentation tab or simply jump to the next tab.'),
+        p('Welcome to the ', strong('LIBD WGBS Expression explorer!'), 'Here you can explore the methylation and expression associations described by Price et al, 2019. For more details check the documentation tab or simply jump to the next tab.'),
         tags$hr(),
         h3('Main publication'),
         tags$ul(
-            tags$li(HTML('<b>Price AJ</b>, Collado-Torres L, Ivanov NA, Xia W, Burke EE, Shin JH, Tao R, Ma L, Jia Y,  Hyde TM, Kleinman JE, Weinberger DR, Jaffe AE. <a href="http://www.sciencemag.org/" onclick="ga(\'send\', \'event\', \'click\', \'link\', \'paper\', 1)">Paper title TBD</a>. <i>paper journal</i>, 2018. doi: todo.'))
+            tags$li(HTML('<b>Price AJ</b>, <b>Collado-Torres L</b>, Ivanov NA, Xia W, Burke EE, Shin JH, Tao R, Ma L, Jia Y,  Hyde TM, Kleinman JE, Weinberger DR, Jaffe AE. <a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1805-1" onclick="ga(\'send\', \'event\', \'click\', \'link\', \'paper\', 1)">Divergent neuronal DNA methylation patterns across human cortical development reveal critical periods and a unique role of CpH methylation</a>. <i>Genome Biology</i>, 2019. DOI: <a href="https://doi.org/10.1186/s13059-019-1805-1">10.1186/s13059-019-1805-1</a>. Pre-print: <i>bioRxiv</i>, 2018. DOI: <a href="https://doi.org/10.1101/428391">10.1101/428391</a>.'))
         )
     ),
     tabPanel('methylation data',
