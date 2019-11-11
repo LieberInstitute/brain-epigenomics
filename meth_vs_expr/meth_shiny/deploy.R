@@ -27,6 +27,7 @@ library('rsconnect')
 load('.deploy_info.Rdata')
 rsconnect::setAccountInfo(name=deploy_info$name, token=deploy_info$token,
     secret=deploy_info$secret)
+options(repos = BiocManager::repositories())
 rsconnect::deployApp(appFiles = c('ui.R', 'server.R', 'meth_df_withSymbol.Rdata',
     'meth_data.Rdata', 'global.R',
     'tf_data.Rdata', 'google-analytics.js', 'www/LICENSE.txt'),
