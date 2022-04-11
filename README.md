@@ -27,6 +27,8 @@ If you use anything from this repository please cite the above. Here's a bibtex 
 }
 ```
 
+The raw data is publicly available through the PsychENCODE Consortium Knowledge Portal at [DOI: 10.7303/syn5842535](https://doi.org/10.7303/syn5842535).
+
 License Attribution-NonCommercial: CC BY-NC
 This license lets others remix, tweak, and build upon our work non-commercially as long as they acknowledge our work.
 
